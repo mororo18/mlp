@@ -5,17 +5,49 @@ from random import randint
 
 n, m = get_instance_info()
 
-def construct(alpha):
-    return
+def construction(alpha):
+    s = [0]
+    c_list = []
+    for i in range(1, n):
+        c_list.append(i)
+
+    r = 0
+
+    while len(c_list) > 0:
+        c_list = sorted(c_list, key = lambda i : m[i][r], reverse=False)
+        print(c_list)
+
+        '''
+        for i in range(len(c_list)):
+            print(m[c_list[i]][r])
+        '''
+
+        i = int(len(c_list)*alpha)
+        if i == 0:
+            Rc_list = [c_list[i]]
+        else:
+            Rc_list = c_list[:i]
+
+        print(Rc_list)
+
+        c = Rc_list[randint(0, len(Rc_list)-1)]
+        s.append(c)
+        r = c
+        c_list.remove(r)
+
+    print(s)
+
+    return s
 
 def RVND(s):
-    return
+    return None
 
 def perturb(s):
-    return
+    return None
 
 def cost_calc(s):
     cost = 0
+    # calc errado
     for i in range(len(s) - 1):
         cost += m[s[i]][s[i+1]]
         
@@ -26,9 +58,10 @@ def GILS_RVND(Imax, Iils, R):
     cost_best = float('inf')
 
     for i in range(Imax):
-        alpha = R[randint(0, len(R))]
+        alpha = R[randint(0, len(R)-1)]
 
         s = construction(alpha)
+        exit(1)
         sl = s
 
         iterILS = 0
@@ -53,4 +86,4 @@ def main():
     GILS_RVND(Imax, Iils, R)
 
 
-
+main()
