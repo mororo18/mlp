@@ -5,6 +5,8 @@ from random import randint
 #from rcdtype import *
 import types
 
+EPSILON = 0.000000001
+
 n, m = get_instance_info()
 
 #subseq_info = types.SimpleNamespace('T C W')
@@ -81,6 +83,10 @@ def subseq_info_load(s, seq):
             seq[i][j].C = seq[i][j].T + seq[i][a].C
             seq[i][j].W = j + k
 
+            seq[j][i].T = seq[i][j].T
+            seq[j][i].C = seq[i][j].C
+            seq[j][i].W = seq[i][j].W
+
             j += 1
 
         #exit(1)
@@ -96,7 +102,7 @@ def perturb(s):
 def GILS_RVND(Imax, Iils, R):
 
     cost_best = float('inf')
-
+    s_best = []
 
     subseq = subseq_info_fill(n)
 
@@ -111,17 +117,29 @@ def GILS_RVND(Imax, Iils, R):
         print(subseq[0][n].C)
         exit(1)
         sl = s
+        rvnd_cost_best = subseq[0][n].C - EPSILON
 
         iterILS = 0
         while iterILS < Iils:
-            s = RVND(s)
-
-            if cost_calc(s) < cost_calc(sl):
+            s = RVND(s, subseq)
+            rvnd_cost_crnt  = subseq[0][n].C - EPSILON
+            if rvnd_cost_crnt < rvnd_cost_best:
+                rvnd_cost_best = rvnd_cost_crnt
                 sl = s
                 iterILS = 0
 
             s = perturb(sl)
+            subseq_info_load(s, subseq)
             iterILS += 1
+
+        subseq_info_load(sl, subseq)
+        sl_cost = subseq[0][n].C - EPSILON
+
+        if sl_cost < cost_best:
+            s_best = sl
+            cost_best = sl_cost
+
+
 
 
 def main():
