@@ -1,9 +1,31 @@
 #! /usr/bin/python3
 
-from test import *
+from read import *
 from random import randint
+#from rcdtype import *
+import types
 
 n, m = get_instance_info()
+
+#subseq_info = types.SimpleNamespace('T C W')
+
+def subseq_info_fill(n):
+    matrix = []
+
+    for i in range(n+1):
+        matrix.append([])
+        for j in range(n+1):
+            matrix[i].append(types.SimpleNamespace())
+            matrix[i][j].T = 0
+            matrix[i][j].C = 0
+            matrix[i][j].W = 0
+            #matrix[i].append(subseq_info(0, 0, 0))
+
+        print(matrix[i])
+
+
+
+    return matrix
 
 def construction(alpha):
     s = [0]
@@ -35,9 +57,35 @@ def construction(alpha):
         r = c
         c_list.remove(r)
 
+    s.append(0)
+
     print(s)
 
     return s
+
+def subseq_info_load(s, seq):
+    i = 0
+    d = n + 1
+    while i < d:
+        k = 1 - i - int(not i)
+
+        seq[i][i].T = 0
+        seq[i][i].C = 0
+        seq[i][i].W = int(not (i == 0))
+
+        j = i + 1
+        while j < d:
+            a = j - 1
+
+            seq[i][j].T = m[s[a]][s[j]] + seq[i][a].T
+            seq[i][j].C = seq[i][j].T + seq[i][a].C
+            seq[i][j].W = j + k
+
+            j += 1
+
+        #exit(1)
+
+        i += 1
 
 def RVND(s):
     return None
@@ -45,22 +93,22 @@ def RVND(s):
 def perturb(s):
     return None
 
-def cost_calc(s):
-    cost = 0
-    # calc errado
-    for i in range(len(s) - 1):
-        cost += m[s[i]][s[i+1]]
-        
-    return cost
-
 def GILS_RVND(Imax, Iils, R):
 
     cost_best = float('inf')
+
+
+    subseq = subseq_info_fill(n)
 
     for i in range(Imax):
         alpha = R[randint(0, len(R)-1)]
 
         s = construction(alpha)
+        #s = [0, 7, 8, 10, 12, 6, 11, 5, 4, 3, 2, 13, 1, 9, 0]
+        # s_cost igual a 20315 p burma14
+        print('aqui')
+        subseq_info_load(s, subseq)
+        print(subseq[0][n].C)
         exit(1)
         sl = s
 
