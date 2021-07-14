@@ -7,6 +7,12 @@ import types
 
 EPSILON = 0.000000001
 
+SWAP        = 0
+TWO_OPT     = 1
+REINSERTION = 2
+OR_OPT_2    = 3
+OR_OPT_3    = 4
+
 n, m = get_instance_info()
 
 #subseq_info = types.SimpleNamespace('T C W')
@@ -93,7 +99,66 @@ def subseq_info_load(s, seq):
 
         i += 1
 
-def RVND(s):
+def swap(s, i, j):
+    s[i], s[j] = s[j], s[i]
+
+    print(s)
+
+def reverse(s, i, j):
+    s[i:j+1] = s[i:j+1][::-1]
+    print(s)
+
+def reinsertion(s, i, j, pos):
+    if i < pos:
+        s[pos:pos] = s[i:j+1]
+        s = s[:i] + s[j+1:]
+    else:
+        sub = s[i:j+1]
+        s = s[:i] + s[j+1:]
+        s[pos:pos] = sub
+
+    print(s)
+
+def search_swap(s, subseq):
+    print(s)
+    swap(s, 7, 4)
+    return None
+
+def search_two_opt(s, subseq):
+    print(s)
+    reverse(s, 2, 5)
+    return None
+
+def search_reinsertion(s, subseq, opt):
+    print(s)
+    reinsertion(s, 4, 5, 2)
+    return None
+
+def RVND(s, subseq):
+
+    #neighbd_list = [SWAP]
+    #neighbd_list = [TWO_OPT]
+    neighbd_list = [REINSERTION]
+    #neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
+
+    while len(neighbd_list) > 0:
+        i = randint(0, len(neighbd_list)-1)
+        neighbd = neighbd_list[i]
+
+        if neighbd == SWAP:
+            search_swap(s, subseq)
+        elif neighbd == TWO_OPT:
+            search_two_opt(s, subseq)
+        elif neighbd == REINSERTION:
+            search_reinsertion(s, subseq, REINSERTION)
+        elif neighbd == OR_OPT_2:
+            search_reinsertion(s, subseq, OR_OPT_2)
+        elif neighbd == OR_OPT_3:
+            search_reinsertion(s, subseq, OR_OPT_3)
+
+        exit(1)
+        
+
     return None
 
 def perturb(s):
@@ -115,7 +180,7 @@ def GILS_RVND(Imax, Iils, R):
         print('aqui')
         subseq_info_load(s, subseq)
         print(subseq[0][n].C)
-        exit(1)
+        #exit(1)
         sl = s
         rvnd_cost_best = subseq[0][n].C - EPSILON
 
