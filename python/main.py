@@ -1,11 +1,12 @@
 #! /usr/bin/python3
 
+import time
 from read import *
 from random import randint
 #from rcdtype import *
-import types
+import math
 
-EPSILON = 0.000000001
+EPSILON = 0.00000000000001
 
 SWAP        = 0
 TWO_OPT     = 1
@@ -62,7 +63,7 @@ def construction(alpha):
 
     while len(c_list) > 0:
         c_list = sorted(c_list, key = lambda i : m[i][r], reverse=False)
-        print(c_list)
+        #print(c_list)
 
         '''
         for i in range(len(c_list)):
@@ -75,7 +76,7 @@ def construction(alpha):
         else:
             Rc_list = c_list[:i]
 
-        print(Rc_list)
+        #print(Rc_list)
 
         c = Rc_list[randint(0, len(Rc_list)-1)]
         s.append(c)
@@ -84,7 +85,7 @@ def construction(alpha):
 
     s.append(0)
 
-    print(s)
+    #print(s)
 
     return s
 
@@ -131,10 +132,10 @@ def reverse(s, i, j):
 def reinsert(s, i, j, pos):
     if i < pos:
         s[pos:pos] = s[i:j+1]
-        s[:-1] = s[:i] + s[j+1:]
+        s[:] = s[:i] + s[j+1:]
     else:
         sub = s[i:j+1]
-        s[:-1] = s[:i] + s[j+1:]
+        s[:] = s[:i] + s[j+1:]
         s[pos:pos] = sub
 
 
@@ -168,11 +169,11 @@ def search_swap(s, seq):
             #print( m[s[i_prev]][s[j]], s[i_prev], s[j], i_prev, j,  "\n")
             total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j]]
             #TODO problema aqui
-            print(total_1, m[s[j]][s[i_next]], s[j], s[i_next], j, i_next)
+            #print(total_1, m[s[j]][s[i_next]], s[j], s[i_next], j, i_next)
             total_2 = total_1 + m[s[j]][s[i_next]]
             total_3 = total_2 + seq[T][i_next][j_prev] + m[s[j_prev]][s[i]]
             #TODO problema aqui
-            print(total_3, m[s[i]][s[j_next]], s[i], s[j_next], i, j_next)
+            #print(total_3, m[s[i]][s[j_next]], s[i], s[j_next], i, j_next)
             total_4 = total_3 + m[s[i]][s[j_next]]
 
             cost = seq[C][0][i_prev] + total_1 + seq[W][i_next][j_prev] * total_2 + seq[C][i_next][j_prev] + total_3 + seq[W][j_next][n] * total_4 + seq[C][j_next][n]
@@ -184,8 +185,8 @@ def search_swap(s, seq):
 
     if cost_best < seq[C][0][n] - EPSILON:
         swap(s, I, J)
-        print("swap", I, J)
-        print(s)
+        #print("swap", I, J)
+        #print(s, "\n")
         subseq_info_load(s, seq)
         improv_flag = True
 
@@ -213,8 +214,8 @@ def search_two_opt(s, seq):
 
     if cost_best < seq[C][0][n] - EPSILON:
         reverse(s, I, J)
-        print("reverse", I, J)
-        print(s)
+        #print("reverse", I, J)
+        #print(s, "\n")
         subseq_info_load(s, seq)
         improv_flag = True
 
@@ -236,7 +237,7 @@ def search_reinsertion(s, seq, OPT):
 
             total_1 = seq[T][0][k] + m[s[k]][s[i]]
             total_2 = total_1 + seq[T][i][j] + m[s[j]][s[k_next]]
-            
+
             cost = seq[C][0][k] + seq[W][i][j] * total_1 + seq[C][i][j]
             cost += seq[W][k_next][i_prev] * total_2 + seq[C][k_next][i_prev]
             cost += seq[W][j_next][n] * (total_2 + seq[T][k_next][i_prev] + m[s[i_prev]][s[j_next]]) + seq[C][j_next][n]
@@ -249,11 +250,11 @@ def search_reinsertion(s, seq, OPT):
 
         for k in range(i+opt, n - opt - 1):
             k_next = k+1
-            
+
             total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j_next]]
             #TODO problema aqui
             total_2 = total_1 + seq[T][j_next][k] + m[s[k]][s[i]]
-            
+
             cost = seq[C][0][i_prev] + seq[W][j_next][k] * total_1 + seq[C][j_next][k]
             cost += seq[W][i][j] * total_2 + seq[C][i][j]
             #TODO problema aqui
@@ -271,8 +272,8 @@ def search_reinsertion(s, seq, OPT):
         reinsert(s, I, J, POS+1)
         subseq_info_load(s, seq)
         improv_flag = True
-        print("reinsertion", I,"a", J, "em" , POS)
-        print(s)
+        #print("reinsertion", I,"a", J, "em" , POS)
+        #print(s, "\n")
     #return None
 
 def RVND(s, subseq):
@@ -304,20 +305,57 @@ def RVND(s, subseq):
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
         else:
             neighbd_list.pop(i)
-        
 
-    print(subseq[C][0][n])
+
+    #print(subseq[C][0][n])
     #exit(1)
 
     return s
 
+def min_and_max(a, b):
+    if a < b:
+        return a, b
+    else:
+        return b, a
+
 def perturb(s):
-    return None
+    #s = sl
+    A_start, A_end = 1, 1
+    B_start, B_end = 1, 1
+
+    size_max = math.floor(len(s)/10) if math.floor(len(s)/10) >= 2 else 2
+    #print(size_max)
+    size_min = 2
+    #i_first, i_last = min_and_max(a, b)
+
+    while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
+        A_start = randint(1, len(s) - 1 - size_max)
+        A_end = A_start + randint(size_min, size_max)
+
+        B_start = randint(1, len(s) - 1 - size_max)
+        B_end = B_start + randint(size_min, size_max)
+
+    #print(A_start, A_end)
+    #print(B_start, B_end)
+    #s[A_start:A_end] = s[A_start:A_end][::-1]
+    #s[B_start:B_end] = s[B_start:B_end][::-1]
+
+    if A_start < B_start:
+        reinsert(s, B_start, B_end-1, A_end)
+        reinsert(s, A_start, A_end-1, B_end )
+    else:
+        reinsert(s, A_start, A_end-1, B_end)
+        reinsert(s, B_start, B_end-1, A_end )
+
+    #print(s)
+
+    #return s
 
 def GILS_RVND(Imax, Iils, R):
 
     cost_best = float('inf')
     s_best = []
+    sl = None
 
     subseq = subseq_info_fill(n)
 
@@ -327,12 +365,14 @@ def GILS_RVND(Imax, Iils, R):
         s = construction(alpha)
         #s = [0, 7, 8, 10, 12, 6, 11, 5, 4, 3, 2, 13, 1, 9, 0]
         # s_cost igual a 20315 p burma14
-        print('aqui')
+        #print('aqui')
         subseq_info_load(s, subseq)
-        print(subseq[C][0][n])
+        #print(subseq[C][0][n])
         #exit(1)
         sl = s
         rvnd_cost_best = subseq[C][0][n] - EPSILON
+
+        print("SL ", sl)
 
         iterILS = 0
         while iterILS < Iils:
@@ -340,15 +380,21 @@ def GILS_RVND(Imax, Iils, R):
             rvnd_cost_crnt  = subseq[C][0][n] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
+                print("cost best ", rvnd_cost_best)
                 sl = s
                 iterILS = 0
 
-            #s = perturb(sl)
+            s = sl
+            perturb(s)
             subseq_info_load(s, subseq)
             iterILS += 1
 
+
+        print("SL ", sl)
         subseq_info_load(sl, subseq)
         sl_cost = subseq[C][0][n] - EPSILON
+        print("Sl cost", sl_cost)
+        exit(1)
 
         if sl_cost < cost_best:
             s_best = sl
@@ -360,13 +406,15 @@ def GILS_RVND(Imax, Iils, R):
 
 
 def main():
-    
+
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
-    
+
     Imax = 10
-    Iils = min(n, 100)
+    #Iils = min(n, 100)
+    Iils = int(n/2) if n >= 150 else n
 
     GILS_RVND(Imax, Iils, R)
 
-
+start = time.time()
 main()
+print("--- TEMPO %s seconds ---" % (time.time() - start))
