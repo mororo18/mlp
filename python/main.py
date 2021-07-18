@@ -3,7 +3,6 @@
 import time
 from read import *
 from random import randint
-#from rcdtype import *
 import math
 
 EPSILON = 0.00000000000001
@@ -20,9 +19,7 @@ W = "W"
 T = "T"
 C = "C"
 
-improv_flag = False
-
-#subseq_info = types.SimpleNamespace('T C W')
+improv_flag = None
 
 def subseq_info_fill(n):
     matrix = {
@@ -36,20 +33,9 @@ def subseq_info_fill(n):
         matrix[T].append([])
         matrix[C].append([])
         for j in range(n+1):
-            #matrix[i].append(types.SimpleNamespace())
             matrix[W][i].append(0.0)
             matrix[T][i].append(0.0)
             matrix[C][i].append(0.0)
-            #matrix[i].append(subseq_info(0, 0, 0))
-
-
-
-    '''
-    print(matrix[W])
-    print(matrix[T])
-    print(matrix[C])
-    exit(1)
-    '''
 
     return matrix
 
@@ -60,36 +46,22 @@ def construction(alpha):
         c_list.append(i)
 
     r = 0
-
     while len(c_list) > 0:
-        c_list = sorted(c_list, key = lambda i : m[i][r], reverse=False)
-        #print(c_list)
 
-        '''
-        for i in range(len(c_list)):
-            print(m[c_list[i]][r])
-        '''
+        i = int(len(c_list)*alpha) + 1
 
-        i = int(len(c_list)*alpha)
-        if i == 0:
-            Rc_list = [c_list[i]]
-        else:
-            Rc_list = c_list[:i]
+        c_list = sorted(c_list, key = lambda n : m[n][r], reverse=False)
 
-        #print(Rc_list)
-
-        c = Rc_list[randint(0, len(Rc_list)-1)]
+        c = c_list[randint(0, i-1)]
         s.append(c)
         r = c
-        c_list.remove(r)
+        c_list.remove(c)
 
     s.append(0)
 
-    #print(s)
-
     return s
 
-def subseq_info_load(s, seq):
+def subseq_info_load(sol, seq):
     i = 0
     d = n + 1
     while i < d:
@@ -103,12 +75,7 @@ def subseq_info_load(s, seq):
         while j < d:
             a = j - 1
 
-            '''
-            print(s[a], s[j], a, j)
-            print(type(m[s[a]][s[j]]), type(seq[T][i][a]))
-            print(m[s[a]][s[j]],  seq[T][i][a])
-            '''
-            seq[T][i][j] = m[s[a]][s[j]] + seq[T][i][a]
+            seq[T][i][j] = m[sol[a]][sol[j]] + seq[T][i][a]
             seq[C][i][j] = seq[T][i][j] + seq[C][i][a]
             seq[W][i][j] = j + k
 
@@ -118,10 +85,7 @@ def subseq_info_load(s, seq):
 
             j += 1
 
-        #print(seq[C][i])
-
         i += 1
-    #exit(1)
 
 def swap(s, i, j):
     s[i], s[j] = s[j], s[i]
@@ -165,15 +129,9 @@ def search_swap(s, seq):
             j_next = j + 1
             j_prev = j - 1
 
-            #print(seq[T][0][i_prev])
-            #print( m[s[i_prev]][s[j]], s[i_prev], s[j], i_prev, j,  "\n")
             total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j]]
-            #TODO problema aqui
-            #print(total_1, m[s[j]][s[i_next]], s[j], s[i_next], j, i_next)
             total_2 = total_1 + m[s[j]][s[i_next]]
             total_3 = total_2 + seq[T][i_next][j_prev] + m[s[j_prev]][s[i]]
-            #TODO problema aqui
-            #print(total_3, m[s[i]][s[j_next]], s[i], s[j_next], i, j_next)
             total_4 = total_3 + m[s[i]][s[j_next]]
 
             cost = seq[C][0][i_prev] + total_1 + seq[W][i_next][j_prev] * total_2 + seq[C][i_next][j_prev] + total_3 + seq[W][j_next][n] * total_4 + seq[C][j_next][n]
@@ -185,13 +143,9 @@ def search_swap(s, seq):
 
     if cost_best < seq[C][0][n] - EPSILON:
         swap(s, I, J)
-        #print("swap", I, J)
-        #print(s, "\n")
         subseq_info_load(s, seq)
+        global improv_flag
         improv_flag = True
-
-    #swap(s, 7, 4)
-    #return None
 
 def search_two_opt(s, seq):
     cost_best = float('inf')
@@ -204,7 +158,6 @@ def search_two_opt(s, seq):
             total = seq[T][0][i_prev] + m[s[j]][s[i_prev]]
 
             cost = seq[C][0][i_prev] + seq[W][i][j] * total + sum([seq[T][x][j] for x in range(i, j)])
-            #TODO problema aqui
             cost += seq[W][j_next][n] * (total + seq[T][i][j] + m[s[j_next]][s[i]]) + seq[C][j_next][n]
 
             if cost < cost_best:
@@ -214,10 +167,10 @@ def search_two_opt(s, seq):
 
     if cost_best < seq[C][0][n] - EPSILON:
         reverse(s, I, J)
-        #print("reverse", I, J)
-        #print(s, "\n")
         subseq_info_load(s, seq)
+        global improv_flag
         improv_flag = True
+
 
 def search_reinsertion(s, seq, OPT):
     cost_best = float('inf')
@@ -252,12 +205,10 @@ def search_reinsertion(s, seq, OPT):
             k_next = k+1
 
             total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j_next]]
-            #TODO problema aqui
             total_2 = total_1 + seq[T][j_next][k] + m[s[k]][s[i]]
 
             cost = seq[C][0][i_prev] + seq[W][j_next][k] * total_1 + seq[C][j_next][k]
             cost += seq[W][i][j] * total_2 + seq[C][i][j]
-            #TODO problema aqui
             cost += seq[W][k_next][n] * (total_2 + seq[T][i][j] + m[s[j]][s[k_next]]) + seq[C][k_next][n]
 
             if cost < cost_best:
@@ -271,22 +222,18 @@ def search_reinsertion(s, seq, OPT):
     if cost_best < seq[C][0][n] - EPSILON:
         reinsert(s, I, J, POS+1)
         subseq_info_load(s, seq)
+        global improv_flag
         improv_flag = True
-        #print("reinsertion", I,"a", J, "em" , POS)
-        #print(s, "\n")
-    #return None
 
 def RVND(s, subseq):
 
-    #neighbd_list = [SWAP, TWO_OPT]
-    #neighbd_list = [TWO_OPT]
-    #neighbd_list = [REINSERTION]
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
     while len(neighbd_list) > 0:
         i = randint(0, len(neighbd_list)-1)
         neighbd = neighbd_list[i]
 
+        global improv_flag
         improv_flag = False
 
         if neighbd == SWAP:
@@ -302,31 +249,20 @@ def RVND(s, subseq):
 
 
         if improv_flag == True:
+            neighbd_list.clear()
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
         else:
             neighbd_list.pop(i)
 
-
-    #print(subseq[C][0][n])
-    #exit(1)
-
     return s
 
-def min_and_max(a, b):
-    if a < b:
-        return a, b
-    else:
-        return b, a
-
-def perturb(s):
-    #s = sl
+def perturb(sl):
+    s = sl.copy()
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
     size_max = math.floor(len(s)/10) if math.floor(len(s)/10) >= 2 else 2
-    #print(size_max)
     size_min = 2
-    #i_first, i_last = min_and_max(a, b)
 
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
         A_start = randint(1, len(s) - 1 - size_max)
@@ -335,11 +271,6 @@ def perturb(s):
         B_start = randint(1, len(s) - 1 - size_max)
         B_end = B_start + randint(size_min, size_max)
 
-    #print(A_start, A_end)
-    #print(B_start, B_end)
-    #s[A_start:A_end] = s[A_start:A_end][::-1]
-    #s[B_start:B_end] = s[B_start:B_end][::-1]
-
     if A_start < B_start:
         reinsert(s, B_start, B_end-1, A_end)
         reinsert(s, A_start, A_end-1, B_end )
@@ -347,60 +278,59 @@ def perturb(s):
         reinsert(s, A_start, A_end-1, B_end)
         reinsert(s, B_start, B_end-1, A_end )
 
-    #print(s)
 
-    #return s
+    return s
 
 def GILS_RVND(Imax, Iils, R):
 
     cost_best = float('inf')
     s_best = []
-    sl = None
 
     subseq = subseq_info_fill(n)
 
     for i in range(Imax):
         alpha = R[randint(0, len(R)-1)]
 
+        print("[+] Local Search {}".format(i+1))
+        print("\t[+] Constructing Inital Solution..")
         s = construction(alpha)
-        #s = [0, 7, 8, 10, 12, 6, 11, 5, 4, 3, 2, 13, 1, 9, 0]
-        # s_cost igual a 20315 p burma14
-        #print('aqui')
         subseq_info_load(s, subseq)
         #print(subseq[C][0][n])
         #exit(1)
-        sl = s
+        sl = s.copy()
         rvnd_cost_best = subseq[C][0][n] - EPSILON
 
-        print("SL ", sl)
-
+        print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
-            s = RVND(s, subseq)
+            RVND(s, subseq)
             rvnd_cost_crnt  = subseq[C][0][n] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
-                print("cost best ", rvnd_cost_best)
-                sl = s
+                #print("cost best ", rvnd_cost_best)
+                sl = s.copy()
+                #print("   SL ", sl)
                 iterILS = 0
 
-            s = sl
-            perturb(s)
+            s = perturb(sl)
+            #print("   Perturb", s)
             subseq_info_load(s, subseq)
+            #print("   ", subseq[C][0][n])
             iterILS += 1
 
 
-        print("SL ", sl)
+        #print(i, " Iteracoes")
         subseq_info_load(sl, subseq)
         sl_cost = subseq[C][0][n] - EPSILON
-        print("Sl cost", sl_cost)
-        exit(1)
+        #print("Sl cost", sl_cost)
 
         if sl_cost < cost_best:
             s_best = sl
             cost_best = sl_cost
 
-    print(cost_best)
+        print("\tCurrent best solution cost: ", cost_best)
+
+    print("COST: ", cost_best)
 
 
 
@@ -410,11 +340,11 @@ def main():
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
 
     Imax = 10
-    #Iils = min(n, 100)
-    Iils = int(n/2) if n >= 150 else n
+    Iils = min(n, 100)
+    #Iils = int(n/2) if n >= 150 else n
 
     GILS_RVND(Imax, Iils, R)
 
 start = time.time()
 main()
-print("--- TEMPO %s seconds ---" % (time.time() - start))
+print("TEMPO %s " % (time.time() - start))
