@@ -19,6 +19,14 @@ W = "W"
 T = "T"
 C = "C"
 
+t_reinsertion = 0
+t_or_opt2 = 0
+t_or_opt3 = 0
+t_swap = 0
+t_two_opt = 0
+t_construction = 0
+t_perturb = 0
+
 improv_flag = None
 
 def subseq_info_fill(n):
@@ -140,7 +148,6 @@ def search_swap(s, seq):
                 I = i
                 J = j
 
-
     if cost_best < seq[C][0][n] - EPSILON:
         swap(s, I, J)
         subseq_info_load(s, seq)
@@ -152,12 +159,17 @@ def search_two_opt(s, seq):
 
     for i in range(1, n-1):
         i_prev = i - 1
+        reverse_cost = seq[T][i][i+1]
         for j in range(i+2, n):
             j_next = j + 1
 
+            reverse_cost += m[s[j-1]][s[j]] * (seq[W][i][j]-1)
+
             total = seq[T][0][i_prev] + m[s[j]][s[i_prev]]
 
-            cost = seq[C][0][i_prev] + seq[W][i][j] * total + sum([seq[T][x][j] for x in range(i, j)])
+            cost = seq[C][0][i_prev] + seq[W][i][j] * total + reverse_cost
+            #print(rev, sum([seq[T][x][j] for x in range(i, j)]))
+            #cost = seq[C][0][i_prev] + seq[W][i][j] * total + sum([seq[T][x][j] for x in range(i, j)])
             cost += seq[W][j_next][n] * (total + seq[T][i][j] + m[s[j_next]][s[i]]) + seq[C][j_next][n]
 
             if cost < cost_best:
@@ -178,8 +190,9 @@ def search_reinsertion(s, seq, OPT):
     J = None
     POS = None
     opt = OPT - 1 
+    MAX = n - opt 
 
-    for i in range(1, n - opt + 1):
+    for i in range(1, MAX + 1):
         j = opt + i - 1
 
         j_next = j+1
@@ -201,7 +214,7 @@ def search_reinsertion(s, seq, OPT):
                 J = j
                 POS = k
 
-        for k in range(i+opt, n - opt - 1):
+        for k in range(i+opt, MAX - 1):
             k_next = k+1
 
             total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j_next]]
@@ -217,8 +230,6 @@ def search_reinsertion(s, seq, OPT):
                 J = j
                 POS = k
 
-
-
     if cost_best < seq[C][0][n] - EPSILON:
         reinsert(s, I, J, POS+1)
         subseq_info_load(s, seq)
@@ -227,29 +238,45 @@ def search_reinsertion(s, seq, OPT):
 
 def RVND(s, subseq):
 
+
+    global t_reinsertion
+    global t_or_opt2 
+    global t_or_opt3 
+    global t_swap 
+    global t_two_opt 
+
+    global improv_flag
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
     while len(neighbd_list) > 0:
         i = randint(0, len(neighbd_list)-1)
         neighbd = neighbd_list[i]
 
-        global improv_flag
         improv_flag = False
 
         if neighbd == SWAP:
+            t_swap -= time.time()
             search_swap(s, subseq)
+            t_swap += time.time()
         elif neighbd == TWO_OPT:
+            t_two_opt -= time.time()
             search_two_opt(s, subseq)
+            t_two_opt += time.time()
         elif neighbd == REINSERTION:
+            t_reinsertion -= time.time()
             search_reinsertion(s, subseq, REINSERTION)
+            t_reinsertion += time.time()
         elif neighbd == OR_OPT_2:
+            t_or_opt2 -= time.time()
             search_reinsertion(s, subseq, OR_OPT_2)
+            t_or_opt2 += time.time()
         elif neighbd == OR_OPT_3:
+            t_or_opt3 -= time.time()
             search_reinsertion(s, subseq, OR_OPT_3)
+            t_or_opt3 += time.time()
 
 
         if improv_flag == True:
-            neighbd_list.clear()
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
         else:
             neighbd_list.pop(i)
@@ -286,6 +313,9 @@ def GILS_RVND(Imax, Iils, R):
     cost_best = float('inf')
     s_best = []
 
+    global t_construction
+    global t_perturb
+
     subseq = subseq_info_fill(n)
 
     for i in range(Imax):
@@ -293,10 +323,10 @@ def GILS_RVND(Imax, Iils, R):
 
         print("[+] Local Search {}".format(i+1))
         print("\t[+] Constructing Inital Solution..")
+        t_construction -= time.time()
         s = construction(alpha)
+        t_construction += time.time()
         subseq_info_load(s, subseq)
-        #print(subseq[C][0][n])
-        #exit(1)
         sl = s.copy()
         rvnd_cost_best = subseq[C][0][n] - EPSILON
 
@@ -307,22 +337,17 @@ def GILS_RVND(Imax, Iils, R):
             rvnd_cost_crnt  = subseq[C][0][n] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
-                #print("cost best ", rvnd_cost_best)
                 sl = s.copy()
-                #print("   SL ", sl)
                 iterILS = 0
 
+            t_perturb -= time.time()
             s = perturb(sl)
-            #print("   Perturb", s)
+            t_perturb += time.time()
             subseq_info_load(s, subseq)
-            #print("   ", subseq[C][0][n])
             iterILS += 1
 
-
-        #print(i, " Iteracoes")
         subseq_info_load(sl, subseq)
         sl_cost = subseq[C][0][n] - EPSILON
-        #print("Sl cost", sl_cost)
 
         if sl_cost < cost_best:
             s_best = sl
@@ -331,6 +356,7 @@ def GILS_RVND(Imax, Iils, R):
         print("\tCurrent best solution cost: ", cost_best)
 
     print("COST: ", cost_best)
+    print("SOLUTION: ", s_best)
 
 
 
@@ -341,10 +367,14 @@ def main():
 
     Imax = 10
     Iils = min(n, 100)
-    #Iils = int(n/2) if n >= 150 else n
 
     GILS_RVND(Imax, Iils, R)
 
 start = time.time()
 main()
-print("TEMPO %s " % (time.time() - start))
+print("TIME %s " % (time.time() - start))
+print("SWAP %s" % t_swap)
+print("Reinsert %s" % t_reinsertion)
+print("or_opt2 %s" % t_or_opt2)
+print("or_opt3 %s" % t_or_opt3)
+print("two_opt %s" % t_two_opt)
