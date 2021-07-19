@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+# Python 3.8.10
 
 import time
 from read import *
