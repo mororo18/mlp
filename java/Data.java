@@ -5,9 +5,13 @@ import java.util.Scanner;
 class Data{
     private int dimension;
     private double [][] matrix;
+
     Data(){
         dimension = 0;
     }
+
+    public int      getDimension()              {return dimension;}
+    public double   getDistance(int i, int j)   {return matrix[i][j];}
     
     //programacao orientada a spaghetti
     public void loadData(){
@@ -34,7 +38,9 @@ class Data{
                     line = line.substring(line.indexOf(' ')+1, line.length());
 
                     double cost_value = Double.parseDouble(cost);
-                    matrix[i][j++] = cost_value;
+                    matrix[i][j] = cost_value;
+                    matrix[j][i] = matrix[i][j];
+                    j++;
                     System.out.print(cost + " ");
                 }
                 System.out.println(); 

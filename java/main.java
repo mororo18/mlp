@@ -1,11 +1,11 @@
-class GILS_RVND {
+class Main {
     public static void main(String args[]){
         read();
     }
 
     private static void read(){
         System.out.println("Hello World!\n");
-        Data data = new Data();
-        data.loadData();
+        GILS_RVND tsp = new GILS_RVND();
+        tsp.solve();
     }
 }

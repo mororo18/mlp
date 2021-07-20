@@ -1,3 +1,3 @@
 #! /usr/bin/bash
-javac main.java && java GILS_RVND
+javac main.java && java Main
 rm *.class
