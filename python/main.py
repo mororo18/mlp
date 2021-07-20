@@ -1,5 +1,4 @@
-#! /usr/bin/python3
-# Python 3.8.10
+#! /usr/bin/pypy
 
 import time
 from read import *
@@ -193,6 +192,15 @@ def search_reinsertion(s, seq, OPT):
     opt = OPT - 1 
     MAX = n - opt 
 
+    '''
+    #branchless approach
+    BEST = 1
+    J_arr = [None, None]
+    I_arr = [None, None]
+    POS_arr = [None, None]
+    COST_arr=[None, cost_best]
+    '''
+
     for i in range(1, MAX + 1):
         j = opt + i - 1
 
@@ -214,6 +222,15 @@ def search_reinsertion(s, seq, OPT):
                 I = i
                 J = j
                 POS = k
+            '''
+            #branchless approach
+            if_state = int(cost < COST_arr[BEST])
+            COST_arr[if_state] = cost - EPSILON
+            I_arr[if_state] = i
+            J_arr[if_state] = j
+            POS_arr[if_state] = k
+            '''
+
 
         for k in range(i+opt, MAX - 1):
             k_next = k+1
@@ -230,8 +247,18 @@ def search_reinsertion(s, seq, OPT):
                 I = i
                 J = j
                 POS = k
+            '''
+            #branchless approach
+            if_state = int(cost < COST_arr[BEST])
+            COST_arr[if_state] = cost - EPSILON
+            I_arr[if_state] = i
+            J_arr[if_state] = j
+            POS_arr[if_state] = k
+            '''
 
+    #if COST_arr[BEST] < seq[C][0][n] - EPSILON:
     if cost_best < seq[C][0][n] - EPSILON:
+        #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
         reinsert(s, I, J, POS+1)
         subseq_info_load(s, seq)
         global improv_flag
@@ -285,7 +312,8 @@ def RVND(s, subseq):
     return s
 
 def perturb(sl):
-    s = sl.copy()
+    s = sl[:]
+    #s = sl.copy()
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
@@ -328,7 +356,8 @@ def GILS_RVND(Imax, Iils, R):
         s = construction(alpha)
         t_construction += time.time()
         subseq_info_load(s, subseq)
-        sl = s.copy()
+        sl = s[:]
+        #sl = s.copy()
         rvnd_cost_best = subseq[C][0][n] - EPSILON
 
         print("\t[+] Looking for the best Neighbor..")
@@ -338,7 +367,8 @@ def GILS_RVND(Imax, Iils, R):
             rvnd_cost_crnt  = subseq[C][0][n] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
-                sl = s.copy()
+                sl = s[:]
+                #sl = s.copy()
                 iterILS = 0
 
             t_perturb -= time.time()
@@ -354,10 +384,10 @@ def GILS_RVND(Imax, Iils, R):
             s_best = sl
             cost_best = sl_cost
 
-        print("\tCurrent best solution cost: ", cost_best)
+        print("\tCurrent best solution cost: {}".format(cost_best))
 
-    print("COST: ", cost_best)
-    print("SOLUTION: ", s_best)
+    print("COST: {}".format (cost_best))
+    print("SOLUTION: {}".format( s_best))
 
 
 
