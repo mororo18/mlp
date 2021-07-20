@@ -18,7 +18,10 @@ int main(int argc, char ** argv){
         for(int j = i+1; j <= dimension; j++){
             file << cost[i][j] << " ";
         }
-        file << endl;
+        if(i != dimension)
+            file << endl;
+        else
+            file << "EOF" << endl;;
     }
 
 
