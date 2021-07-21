@@ -23,7 +23,8 @@ class GILS_RVND {
     // parameters
     private int Iils;
     private final int Imax = 10;
-    private static final double [] R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
+    private static final double [] R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
+                                        0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
     private final int R_size = 26;
 
     Random rand;
@@ -104,6 +105,30 @@ class GILS_RVND {
         System.exit(1);
         return s;
     }
+
+    private void swap(ArrayList<Integer> s, int i, int j){
+
+    }
+
+    private void reverse(ArrayList<Integer> s, int i, int j){
+
+    }
+
+    private void reinsert(ArrayList<Integer> s, int i, int j, int pos){
+
+    }
+
+    private void search_swap(ArrayList<Integer> s, double [][][] seq){
+
+    } 
+
+    private void search_two_opt(ArrayList<Integer> s, double [][][] seq){
+
+    } 
+
+    private void search_reinsertion(ArrayList<Integer> s, double [][][] seq, int opt){
+
+    } 
 
     private void RVND(ArrayList<Integer> s, double [][][] subseq){
         ArrayList<Integer> neighbd_list = new ArrayList<>() {{
