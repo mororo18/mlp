@@ -14,7 +14,7 @@ class GILS_RVND {
     // Neighborhoods ids
     private static final int SWAP       = 0;
     private static final int REINSERTION= 1;
-    private static final int OR_OPT2    = 2
+    private static final int OR_OPT2    = 2;
     private static final int OR_OPT3    = 3;
     private static final int TWO_OPT    = 4;
 
@@ -116,7 +116,7 @@ class GILS_RVND {
 
         while(!neighbd_list.isEmpty()){
             
-            int i_rand = rand.nexInt(neighbd_list.size());
+            int i_rand = rand.nextInt(neighbd_list.size());
             int neighbd = neighbd_list.get(i_rand);
 
             improv_flag = false;
