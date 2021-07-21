@@ -1,14 +1,32 @@
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Random;
 
 class GILS_RVND {
+    private final double EPSILON = 1e-8;
     private int     dimension;
     private double  [][] c;
+    private double  [][][] subseq;
 
-    private final int C = 0;
-    private final int T = 1;
-    private final int W = 2;
+    private static final int C = 0;
+    private static final int T = 1;
+    private static final int W = 2;
 
-    private double [][][] subseq;
+    // Neighborhoods ids
+    private static final int SWAP       = 0;
+    private static final int REINSERTION= 1;
+    private static final int OR_OPT2    = 2
+    private static final int OR_OPT3    = 3;
+    private static final int TWO_OPT    = 4;
+
+    private boolean improv_flag;
+
+    // parameters
+    private int Iils;
+    private final int Imax = 10;
+    private static final double [] R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
+    private final int R_size = 26;
+
+    Random rand;
 
     GILS_RVND(){
         Data data = new Data();
@@ -26,10 +44,12 @@ class GILS_RVND {
         }
 
         subseq = new double [dimension+1][dimension+1][3];
+        Iils = (dimension < 100 ? dimension : 100);
+
+        rand = new Random();
     }
 
-    private void subseq_load(Vector<Integer> s, double [][][] seq){
-        double [] arr_branch = {0.0, 1.0};
+    private void subseq_load(ArrayList<Integer> s, double [][][] seq){
         for(int i = 0; i < dimension+1; i++){
             int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -55,17 +75,120 @@ class GILS_RVND {
         }
     }
 
-    public void solve(){
-        Vector<Integer> s = new Vector<>(dimension);
+    private ArrayList<Integer> construction(double alpha){
+        ArrayList<Integer> s = new ArrayList<>();
+        s.add(0);
 
-        for(int i = 0; i < dimension; i++){
-            s.add(i); 
-            System.out.print(s.get(i));
-            System.out.print(" ");
+        ArrayList<Integer> cList = new ArrayList<>();
+        for(int i = 1; i < dimension; i++){
+            cList.add(i);
         }
-        s.add(0); 
-        System.out.println();
 
-        subseq_load(s, subseq);
+        int r = 0;
+        while(!cList.isEmpty()){
+            cList.sort((Integer i, Integer j) -> Double.compare (c[i][s.get(s.size()-1)], c[j][s.get(s.size()-1)]));
+            //erro ao usar variavel 'r' na lambda expression. 'r' n eh final(const)
+            //cList.sort((Integer i, Integer j) -> Double.compare (c[i][r], c[j][r]));
+
+            int range = (int)(((double)cList.size()) * alpha)+1;
+            System.out.println(range);
+            int c = cList.get(rand.nextInt(range));
+            s.add(c);
+            cList.remove(Integer.valueOf(c));
+            r = c;
+            System.out.println(cList);
+        }
+
+        s.add(0);
+        System.out.println(s);
+        System.exit(1);
+        return s;
+    }
+
+    private void RVND(ArrayList<Integer> s, double [][][] subseq){
+        ArrayList<Integer> neighbd_list = new ArrayList<>() {{
+            add(REINSERTION);
+            add(OR_OPT2);
+            add(OR_OPT3);
+            add(SWAP);
+            add(TWO_OPT);
+        }};
+
+        while(!neighbd_list.isEmpty()){
+            
+            int i_rand = rand.nexInt(neighbd_list.size());
+            int neighbd = neighbd_list.get(i_rand);
+
+            improv_flag = false;
+
+            switch(neighbd){
+                case REINSERTION:
+                    break;
+                case OR_OPT2:
+                    break;
+                case OR_OPT3:
+                    break;
+                case SWAP:
+                    break;
+                case TWO_OPT:
+                    break;
+            }
+
+            if(improv_flag){
+                neighbd_list.clear();
+                neighbd_list = new ArrayList<>() {{
+                    add(REINSERTION);
+                    add(OR_OPT2);
+                    add(OR_OPT3);
+                    add(SWAP);
+                    add(TWO_OPT);
+                }};
+            }else
+                neighbd_list.remove(i_rand);
+        }
+    }
+
+    private void perturb(ArrayList<Integer> s, ArrayList<Integer> sl){
+        
+    }
+
+    public void solve(){
+        double cost_best = Double.MAX_VALUE;
+        ArrayList<Integer> s_best;
+        for(int i = 0; i < Imax; i++){
+            double alpha = R[rand.nextInt(R_size)];
+            System.out.println(alpha);
+
+            ArrayList<Integer> s = construction(alpha);
+            ArrayList<Integer> sl = new ArrayList<>(s); 
+            subseq_load(s, subseq); 
+            double rvnd_cost_best = subseq[0][dimension][C] - EPSILON;
+            double rvnd_cost_crnt;
+
+            int iterILS = 0;
+            while(iterILS < Iils){
+                RVND(s, subseq);
+                rvnd_cost_crnt = subseq[0][dimension][C] - EPSILON; 
+                if(rvnd_cost_crnt < rvnd_cost_best){
+                    rvnd_cost_best = rvnd_cost_crnt;
+                    sl.clear();
+                    sl = new ArrayList<>(s);
+                    iterILS = 0;
+                }
+                perturb(s, sl);
+                subseq_load(s, subseq);
+                iterILS++;
+            }
+            subseq_load(s, subseq);
+            double sl_cost = subseq[0][dimension][C] - EPSILON;
+
+            if(sl_cost < cost_best){
+                cost_best = sl_cost;
+                s_best = sl;
+            }
+        }
+
+        //ArrayList<Integer> s = new ArrayList<>(dimension);
+        //subseq_load(s, subseq);
     }
 }
