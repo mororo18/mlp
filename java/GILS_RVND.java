@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Collections;
 
 class GILS_RVND {
     private final double EPSILON = 1e-8;
@@ -102,20 +103,31 @@ class GILS_RVND {
 
         s.add(0);
         System.out.println(s);
-        System.exit(1);
+        //System.exit(1);
         return s;
     }
 
     private void swap(ArrayList<Integer> s, int i, int j){
-
+        Collections.swap(s, i, j);
+        //System.out.println(s);
     }
 
     private void reverse(ArrayList<Integer> s, int i, int j){
-
+        Collections.reverse(s.subList(i,j+1));
+        System.out.println(s);
     }
 
     private void reinsert(ArrayList<Integer> s, int i, int j, int pos){
+        if(i > pos){
+            int sz = j-i+1;
+            s.addAll(pos, s.subList(i, j+1));
+            s.subList(i+sz, j+1+sz).clear();
+        }else{
+            s.addAll(pos, s.subList(i, j+1));
+            s.subList(i, j+1).clear();
+        }
 
+        System.out.println(s);
     }
 
     private void search_swap(ArrayList<Integer> s, double [][][] seq){
@@ -141,6 +153,12 @@ class GILS_RVND {
 
         while(!neighbd_list.isEmpty()){
             
+            System.out.println(s);
+            //reverse(s, 2, 5);
+            //reinsert(s, 2, 7, 9);
+            //reinsert(s, 7, 9, 3);
+            //swap(s, 2, 5);
+            System.exit(1);
             int i_rand = rand.nextInt(neighbd_list.size());
             int neighbd = neighbd_list.get(i_rand);
 
