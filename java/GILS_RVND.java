@@ -114,7 +114,7 @@ class GILS_RVND {
 
     private void reverse(ArrayList<Integer> s, int i, int j){
         Collections.reverse(s.subList(i,j+1));
-        System.out.println(s);
+        //System.out.println(s);
     }
 
     private void reinsert(ArrayList<Integer> s, int i, int j, int pos){
@@ -127,11 +127,76 @@ class GILS_RVND {
             s.subList(i, j+1).clear();
         }
 
-        System.out.println(s);
+        //System.out.println(s);
     }
 
     private void search_swap(ArrayList<Integer> s, double [][][] seq){
+        double cost_best = Double.MAX_VALUE;
+        double cost_new;
+        double cost_concat_1;
+        double cost_concat_2;
+        double cost_concat_3;
+        double cost_concat_4;
+        int I = -1;
+        int J = -1;
+        
+        for(int i = 1; i < dimension-1; i++){
+            int i_prev = i - 1;
+            int i_next = i + 1;
+            int s_i_prev = s.get(i_prev);
+            int s_i_next = s.get(i_next);
+            int s_i = s.get(i);
 
+            // immediate nodes case
+
+            // concatenation costs
+            cost_concat_1 = seq[0][i_prev][T] + c[s_i_prev][s_i];
+            cost_concat_2 = cost_concat_1 + seq[i][i_next][T] + c[s_i][s.get(i_next+1)];
+            // first concatenation
+            cost_new = seq[0][i_prev][C] + seq[i][i_next][W] * (cost_concat_1) + c[s_i_next][s_i];
+
+            // second concatenation
+            cost_new += seq[i_next+1][dimension][W] * (cost_concat_2) + seq[i_next+1][dimension][C];
+
+            if(cost_new < cost_best){
+                cost_best = cost_new - EPSILON;
+                I = i;
+                J = i_next;
+            }
+
+            for(int j = i_next+1; j < dimension; j++){
+                int j_next = j+1;
+                int j_prev = j-1;
+                int s_j = s.get(j);
+                int s_j_prev = s.get(j_prev);
+                int s_j_next = s.get(j_next);
+
+                cost_concat_1 = seq[0][i_prev][T] + c[s_i_prev][s_j];
+                cost_concat_2 = cost_concat_1 + c[s_j][s_i_next];
+                cost_concat_3 = cost_concat_2 + seq[i_next][j_prev][T] + c[s_j_prev][s_i];
+                cost_concat_4 = cost_concat_3 + c[s_i][s_j_next];
+
+                cost_new = seq[0][i_prev][C]                                                        // first subseq
+                        + cost_concat_1                                                             // concatenate second subseq (single node)
+                        + seq[i_next][j_prev][W] * cost_concat_2 + seq[i_next][j_prev][C]           // concatenate third subseq
+                        + cost_concat_3                                                             // concatenate fourth subseq (single node)
+                        + seq[j_next][dimension][W] * cost_concat_4 + seq[j_next][dimension][C];    // concatenate fifth subseq
+
+                if(cost_new < cost_best){
+                    cost_best = cost_new - EPSILON;
+                    I = i;
+                    J = j;
+                }
+
+            }
+
+        }
+
+        if(cost_best < seq[0][dimension][C] - EPSILON){
+            swap(s, I, J);
+            subseq_load(s, seq);
+            improv_flag = true;
+        }
     } 
 
     private void search_two_opt(ArrayList<Integer> s, double [][][] seq){
@@ -166,14 +231,19 @@ class GILS_RVND {
 
             switch(neighbd){
                 case REINSERTION:
+                    search_reinsertion(s, subseq, REINSERTION);
                     break;
                 case OR_OPT2:
+                    search_reinsertion(s, subseq, OR_OPT2);
                     break;
                 case OR_OPT3:
+                    search_reinsertion(s, subseq, OR_OPT3);
                     break;
                 case SWAP:
+                    search_swap(s, subseq);
                     break;
                 case TWO_OPT:
+                    search_two_opt(s, subseq);
                     break;
             }
 
