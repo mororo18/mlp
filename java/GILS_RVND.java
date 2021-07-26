@@ -226,9 +226,9 @@ class GILS_RVND {
                 cost_concat_1 = seq[0][i_prev][T] + c[s_j][s_i_prev];
                 cost_concat_2 = cost_concat_1 + seq[i][j][T] + c[s_j_next][s_i];
 
-                cost_new = seq[0][i_prev][C]                                                        //        1st subseq */
-                        + seq[i][j][W] * cost_concat_1 + rev_seq_cost                               // concat 2nd subseq (reversed seq) */
-                        + seq[j_next][dimension][W] * cost_concat_2 + seq[j_next][dimension][C];    // concat 3rd subseq */
+                cost_new = seq[0][i_prev][C]                                                        /*        1st subseq */
+                        + seq[i][j][W] * cost_concat_1 + rev_seq_cost                               /* concat 2nd subseq (reversed seq) */
+                        + seq[j_next][dimension][W] * cost_concat_2 + seq[j_next][dimension][C];    /* concat 3rd subseq */
 
                 if(cost_new < cost_best){
                     cost_best = cost_new - EPSILON;
@@ -453,7 +453,5 @@ class GILS_RVND {
         }
 
         System.out.println(cost_best);
-        //ArrayList<Integer> s = new ArrayList<>(dimension);
-        //subseq_load(s, subseq);
     }
 }
