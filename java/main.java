@@ -6,6 +6,11 @@ class Main {
     private static void read(){
         System.out.println("Hello World!\n");
         GILS_RVND tsp = new GILS_RVND();
+        long time = - System.nanoTime();
         tsp.solve();
+        time += System.nanoTime();
+
+        System.out.print("TIME: ");
+        System.out.println(time/10e8);
     }
 }

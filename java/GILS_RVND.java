@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.lang.Math;
 
 class GILS_RVND {
-    private final double EPSILON = 1e-8;
+    private final double EPSILON = 1e-16;
     private int     dimension;
     private double  [][] c;
     private double  [][][] subseq;
@@ -277,7 +277,7 @@ class GILS_RVND {
                 cost_new = seq[0][k][C]                                                             /*        1st subseq */
                         + seq[i][j][W]             * cost_concat_1 + seq[i][j][C]                   /* concat 2nd subseq (reinserted seq) */
                         + seq[k_next][i_prev][W]    * cost_concat_2 + seq[k_next][i_prev][C]        /* concat 3rd subseq */
-                        + seq[j_next][dimension][W] * cost_concat_3 + seq[k_next][dimension][C];    /* concat 4th subseq */
+                        + seq[j_next][dimension][W] * cost_concat_3 + seq[j_next][dimension][C];    /* concat 4th subseq */
                 if(cost_new < cost_best){
                     cost_best = cost_best - EPSILON;
                     I = i;
@@ -402,56 +402,58 @@ class GILS_RVND {
             reinsert(sl_cpy, B_start, B_end-1, A_end);
         }
 
-        return sl_copy;
+        return sl_cpy;
     }
 
     public void solve(){
         double cost_best = Double.MAX_VALUE;
-        ArrayList<Integer> s_best;
+        ArrayList<Integer> s_best = new ArrayList();
         for(int i = 0; i < Imax; i++){
             double alpha = R[rand.nextInt(R_size)];
             //System.out.println(alpha);
 
-            System.out.println("Constructing");
+            System.out.print("[+] Local Search ");
+            System.out.println(i+1);
+            System.out.println("\t[+] Constructing Inital Solution..");
             ArrayList<Integer> s = construction(alpha);
             ArrayList<Integer> sl = new ArrayList<>(s); 
             subseq_load(s, subseq); 
             double rvnd_cost_best = subseq[0][dimension][C] - EPSILON;
-            System.out.print("Cost Rvnd Best  ");
-            System.out.println(rvnd_cost_best);
+            //System.out.print("Cost Rvnd Best  ");
+            //System.out.println(rvnd_cost_best);
             double rvnd_cost_crnt;
 
             int iterILS = 0;
-            System.out.println("Searching");
+            System.out.println("\t[+] Looking for the best Neighbor..");
             while(iterILS < Iils){
                 RVND(s, subseq);
                 //System.exit(1);
                 rvnd_cost_crnt = subseq[0][dimension][C] - EPSILON; 
                 if(rvnd_cost_crnt < rvnd_cost_best){
-                    System.out.println("sim");
                     rvnd_cost_best = rvnd_cost_crnt;
                     sl.clear();
                     sl = new ArrayList<>(s);
                     iterILS = 0;
                 }
-                System.out.println(s);
                 s = perturb(sl);
-                System.out.println(s);
                 subseq_load(s, subseq);
-                System.out.print("Search");
-                System.out.println(iterILS);
                 iterILS++;
             }
-            subseq_load(s, subseq);
+            subseq_load(sl, subseq);
             double sl_cost = subseq[0][dimension][C] - EPSILON;
-
+            
             if(sl_cost < cost_best){
                 cost_best = sl_cost;
-                s_best = sl;
+                s_best = new ArrayList(sl);
             }
+
+            System.out.print("\tCurrent best solution cost: ");
             System.out.println(cost_best);
         }
 
+        System.out.print("COST: ");
         System.out.println(cost_best);
+        System.out.print("SOLUTION: ");
+        System.out.println(s_best);
     }
 }
