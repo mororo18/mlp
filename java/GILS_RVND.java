@@ -200,7 +200,44 @@ class GILS_RVND {
     } 
 
     private void search_two_opt(ArrayList<Integer> s, double [][][] seq){
+        double cost_best = Double.MAX_VALUE;
+        double cost_concat_1;
+        double cost_concat_2;
 
+        for(int i = 1; i < dimension-1; i++){
+            int i_prev = i -1;
+            int s_i = s.get(i);
+            int s_i_prev = s.get(i_prev);
+            double rev_seq_cost = seq[i][i+1][T];
+
+            for(int j = i+2; j < dimenison; j++){
+                int j_next = j+1;
+                int s_j_next = s.get(j_next);
+                int s_j_prev = s.get(j-1);
+                int s_j = s.get(j);
+
+                rev_seq_cost += c[s_j_prev][s_j] * (seq[i][j][W]-1);
+
+                cost_concat_1 = seq[0][i_prev][T] + c[s_j][s_i_prev];
+                cost_concat_2 = cost_concat_1 + seq[i][j][T] + c[s_j_next][s_i]
+
+                cost_new = seq[0][i_prev][C]                                                    //             1st subseq
+                        + seq[i][j][W] * cost_concat + rev_seq_cost                             // concatenate 2nd subseq (reverse seq)
+                        + seq[j_next][dimension][W] * cost_concat_2 + seq[j_next][dimension];   // concatenate 3rd subseq
+
+                if(cost_new < cost_best){
+                    cost_best = cost_new - EPSILON;
+                    I = i;
+                    J = j;
+                }
+            }
+        }
+
+        if(cost_best < seq[0][dimension][C] - EPSILON){
+            reverse(s, I, J);
+            subseq_load(s, seq);
+            improv_flag = true;
+        }
     } 
 
     private void search_reinsertion(ArrayList<Integer> s, double [][][] seq, int opt){
