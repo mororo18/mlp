@@ -19,6 +19,8 @@ W = "W"
 T = "T"
 C = "C"
 
+IT = 0
+
 t_reinsertion = 0
 t_or_opt2 = 0
 t_or_opt3 = 0
@@ -277,6 +279,8 @@ def RVND(s, subseq):
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
     while len(neighbd_list) > 0:
+        global IT
+        IT += 1
         i = randint(0, len(neighbd_list)-1)
         neighbd = neighbd_list[i]
 
@@ -388,6 +392,7 @@ def GILS_RVND(Imax, Iils, R):
 
     print("COST: {}".format (cost_best))
     print("SOLUTION: {}".format( s_best))
+    print("Total Iterations RVND {}".format(IT))
 
 
 

@@ -23,11 +23,11 @@ class GILS_RVND {
     private boolean improv_flag;
 
     // parameters
-    private int Iils;
-    private final int Imax = 10;
-    private static final double [] R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
+    private int                     Iils;
+    private final int               Imax = 10;
+    private static final double []  R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                                         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
-    private final int R_size = 26;
+    private final int               R_size = 26;
 
     Random rand;
 
@@ -41,9 +41,9 @@ class GILS_RVND {
             for(int j = i; j < dimension; j++){
                 c[i][j] = data.getDistance(i, j);
                 c[j][i] = data.getDistance(i, j);
-                System.out.print(Double.toString(c[i][j])+ " ");
+                //System.out.print(Double.toString(c[i][j])+ " ");
             }
-            System.out.println(i);
+            //System.out.println(i);
         }
 
         subseq = new double [dimension+1][dimension+1][3];
@@ -61,10 +61,10 @@ class GILS_RVND {
             seq[i][i][W] = (i != 0 ? 1.0 : 0.0);
 
             for(int j = i+1; j < dimension+1; j++){
-                int a = j-1;
+                int j_prev = j-1;
 
-                seq[i][j][T] = c[s.get(a)][s.get(j)] + seq[i][a][T];
-                seq[i][j][C] = seq[i][j][T] + seq[i][a][C];
+                seq[i][j][T] = c[s.get(j_prev)][s.get(j)] + seq[i][j_prev][T];
+                seq[i][j][C] = seq[i][j][T] + seq[i][j_prev][C];
                 seq[i][j][W] = j + k;
 
                 seq[j][i][T] = seq[i][j][T];
@@ -154,10 +154,9 @@ class GILS_RVND {
             cost_concat_1 = seq[0][i_prev][T] + c[s_i_prev][s_i_next];
             cost_concat_2 = cost_concat_1 + seq[i][i_next][T] + c[s_i][s.get(i_next+1)];
             // first concatenation
-            cost_new = seq[0][i_prev][C] + seq[i][i_next][W] * (cost_concat_1) + c[s_i_next][s_i];
-
-            // second concatenation
-            cost_new += seq[i_next+1][dimension][W] * (cost_concat_2) + seq[i_next+1][dimension][C];
+            cost_new = seq[0][i_prev][C] 
+                    + seq[i][i_next][W] *           (cost_concat_1) + c[s_i_next][s_i]
+                    + seq[i_next+1][dimension][W] * (cost_concat_2) + seq[i_next+1][dimension][C];
 
             if(cost_new < cost_best){
                 cost_best = cost_new - EPSILON;
@@ -195,8 +194,10 @@ class GILS_RVND {
 
         if(cost_best < seq[0][dimension][C] - EPSILON){
             swap(s, I, J);
-            subseq_load(s, seq);
             //System.out.println("Swap");
+            //System.out.println(cost_best);
+            subseq_load(s, seq);
+            //System.out.println(seq[0][dimension][C]);
             improv_flag = true;
         }
     } 
@@ -241,7 +242,9 @@ class GILS_RVND {
         if(cost_best < seq[0][dimension][C] - EPSILON){
             reverse(s, I, J);
             //System.out.println("Two opt");
+            //System.out.println(cost_best);
             subseq_load(s, seq);
+            //System.out.println(seq[0][dimension][C]);
             improv_flag = true;
         }
     } 
@@ -256,12 +259,13 @@ class GILS_RVND {
         int J = -1;
         int POS = -1;
 
-        for(int i = 1, j = opt + i - 1; i < dimension - opt + 1; i++, j++){
+        for(int i = 1; i < dimension - opt + 1; i++){
+            int j = opt + i - 1;
             int i_prev = i-1;
             int j_next = j+1;
             int s_i = s.get(i);
-            int s_i_prev = s.get(i_prev);
             int s_j = s.get(j);
+            int s_i_prev = s.get(i_prev);
             int s_j_next = s.get(j_next);
 
             // k -> reinsertion places
@@ -271,15 +275,16 @@ class GILS_RVND {
                 int s_k_next = s.get(k_next);
                 
                 cost_concat_1 = seq[0][k][T] + c[s_k][s_i];
-                cost_concat_2 = cost_concat_1 + seq[i][j][T] + c[s_i][s_k_next];
+                cost_concat_2 = cost_concat_1 + seq[i][j][T] + c[s_j][s_k_next];
                 cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][T] + c[s_i_prev][s_j_next];
 
                 cost_new = seq[0][k][C]                                                             /*        1st subseq */
-                        + seq[i][j][W]             * cost_concat_1 + seq[i][j][C]                   /* concat 2nd subseq (reinserted seq) */
+                        + seq[i][j][W]              * cost_concat_1 + seq[i][j][C]                  /* concat 2nd subseq (reinserted seq) */
                         + seq[k_next][i_prev][W]    * cost_concat_2 + seq[k_next][i_prev][C]        /* concat 3rd subseq */
                         + seq[j_next][dimension][W] * cost_concat_3 + seq[j_next][dimension][C];    /* concat 4th subseq */
+
                 if(cost_new < cost_best){
-                    cost_best = cost_best - EPSILON;
+                    cost_best = cost_new - EPSILON;
                     I = i;
                     J = j;
                     POS = k;
@@ -311,13 +316,12 @@ class GILS_RVND {
 
         if(cost_best < seq[0][dimension][C] - EPSILON){
             reinsert(s, I, J, POS+1);
-            //System.out.print("reinsertion ");
-            //System.out.println(opt);
             subseq_load(s, seq);
             improv_flag = true;
         }
-
     } 
+
+    //private int IT = 0;
 
     private void RVND(ArrayList<Integer> s, double [][][] subseq){
         ArrayList<Integer> neighbd_list = new ArrayList<>() {{
@@ -330,6 +334,7 @@ class GILS_RVND {
 
         while(!neighbd_list.isEmpty()){
             
+            //IT++;
             //System.out.println(s);
             //reverse(s, 2, 5);
             //reinsert(s, 2, 7, 9);
@@ -362,6 +367,7 @@ class GILS_RVND {
             //System.out.println(neighbd_list);
             //System.out.println(subseq[0][dimension][C]);
             if(improv_flag){
+                //System.out.println(neighbd);
                 neighbd_list.clear();
                 neighbd_list = new ArrayList<>() {{
                     add(REINSERTION);
@@ -370,13 +376,14 @@ class GILS_RVND {
                     add(SWAP);
                     add(TWO_OPT);
                 }};
+                //System.out.println(subseq[0][dimension][C]);
             }else
                 neighbd_list.remove(i_rand);
         }
     }
 
     private ArrayList<Integer> perturb(ArrayList<Integer> sl){
-        ArrayList<Integer> sl_cpy = new ArrayList(sl); 
+        ArrayList<Integer> sl_cpy = new ArrayList<>(sl); 
 
         int A_start = 1, A_end = 1;
         int B_start = 1, B_end = 1;
@@ -407,7 +414,7 @@ class GILS_RVND {
 
     public void solve(){
         double cost_best = Double.MAX_VALUE;
-        ArrayList<Integer> s_best = new ArrayList();
+        ArrayList<Integer> s_best = new ArrayList<>();
         for(int i = 0; i < Imax; i++){
             double alpha = R[rand.nextInt(R_size)];
             //System.out.println(alpha);
@@ -444,7 +451,7 @@ class GILS_RVND {
             
             if(sl_cost < cost_best){
                 cost_best = sl_cost;
-                s_best = new ArrayList(sl);
+                s_best = new ArrayList<>(sl);
             }
 
             System.out.print("\tCurrent best solution cost: ");
@@ -455,5 +462,9 @@ class GILS_RVND {
         System.out.println(cost_best);
         System.out.print("SOLUTION: ");
         System.out.println(s_best);
+        /*
+        System.out.print("Iterations RVND: ");
+        System.out.println(IT);
+        */
     }
 }

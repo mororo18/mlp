@@ -28,7 +28,7 @@ class Data{
                     dimension = Integer.parseInt(line);
                     matrix = new double [dimension][dimension];
                     for(int k = 0; k < dimension; k++) matrix[k][k] = 0.0;
-                    System.out.println(dimension); 
+                    //System.out.println(dimension); 
                     continue;
                 }
 
@@ -41,9 +41,9 @@ class Data{
                     matrix[i][j] = cost_value;
                     matrix[j][i] = matrix[i][j];
                     j++;
-                    System.out.print(cost + " ");
+                    //System.out.print(cost + " ");
                 }
-                System.out.println(); 
+                //System.out.println(); 
                 i++;
             }
             f_reader.close();
