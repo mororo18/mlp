@@ -2,7 +2,7 @@ using System;
 using static System.IO.File;
 
 namespace MLP {
-    public class Data {
+    class Data {
         private int dimension;
         private double [,] matrix;
         public Data(){

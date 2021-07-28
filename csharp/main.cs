@@ -4,8 +4,8 @@ namespace MLP {
     class main {
         static void Main(){
             Console.WriteLine("Hello World!");
-            Data opa = new Data();
-            opa.loadData();
+            GILS_RVND tsp = new GILS_RVND();
+            tsp.solve();
         }
     }
 }
