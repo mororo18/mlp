@@ -14,9 +14,17 @@ namespace MLP {
         private const int C = 1;
         private const int T = 2;
 
+        private const int SWAP          = 0;
+        private const int REINSERTION   = 1;
+        private const int OR_OPT2       = 2;
+        private const int OR_OPT3       = 3;
+        private const int TWO_OPT       = 4;
+
+        private bool improv_flag;
+
         private  int                    Iils;
         private const int               Imax = 10;
-        private static const double []  R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
+        private double []  R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                                             0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
         private const int               R_size = 26;
 
@@ -88,12 +96,64 @@ namespace MLP {
             return s;
         }
 
-        private void RVND(List<int> s, double [,,] subseq){
+        private void swap(List<int> s, int i, int j){
+        }
 
+        private void reverse(List<int> s, int i, int j){
+        }
+
+        private void reinsert(List<int> s, int i, int j, int pos){
+        }
+
+        private void search_swap(List<int> s, double [,,] seq){
+        }
+
+        private void search_two_opt(List<int> s, double [,,] seq){
+        }
+
+        private void search_reinsertion(List<int> s, double [,,] seq, int opt){
+        }
+
+        private void RVND(List<int> s, double [,,] subseq){
+            List<int> neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
+
+            while(neighbd_list.Count != 0){
+                int i_rand = rand.Next(neighbd_list.Count);
+                int neighbd = neighbd_list[i_rand];
+
+                improv_flag = false;
+
+                switch(neighbd){
+                    case REINSERTION:
+                        search_reinsertion(s, subseq, REINSERTION);
+                        break;
+                    case OR_OPT2:
+                        search_reinsertion(s, subseq, OR_OPT2);
+                        break;
+                    case OR_OPT3:
+                        search_reinsertion(s, subseq, OR_OPT3);
+                        break;
+                    case SWAP:
+                        search_swap(s, subseq);
+                        break;
+                    case TWO_OPT:
+                        search_two_opt(s, subseq);
+                        break;
+                }
+
+                if(improv_flag){
+                    neighbd_list.Clear();
+                    neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
+                }else
+                    neighbd_list.Remove(i_rand);
+            }
         }
 
         private List<int> perturb(List<int> sl){
+            var s = new List<int>(sl);
+            return s;
         }
+
 
         public void solve(){
             /*
@@ -109,26 +169,27 @@ namespace MLP {
             Console.WriteLine(string.Format("Inicial: ({0}).", string.Join(", ", opa)));
             */
 
-            double cost_best = Double.MAX_VALUE;
+            double cost_best = Double.MaxValue;
             var s_best = new List<int>();
 
             for(int i = 0; i < Imax; i++){
                 double alpha = R[rand.Next(R_size)];
                 var s = construction(alpha);
-                var sl = List<int>(s);
+                var sl = new List<int>(s);
 
                 subseq_load(s, subseq);
 
                 double rvnd_cost_best = subseq[0, dimension, C] - EPSILON;
                 double rvnd_cost_crnt;
 
+                Environment.Exit(0);
                 int iterILS = 0;
                 while(iterILS < Iils){
                     RVND(s, subseq);
                     rvnd_cost_crnt = subseq[0, dimension, C] - EPSILON;
                     if(rvnd_cost_crnt < rvnd_cost_best){
                         rvnd_cost_best = rvnd_cost_crnt;
-                        sl.Clear;
+                        sl.Clear();
                         sl = new List<int>(s);
                         iterILS = 0;
                     }
