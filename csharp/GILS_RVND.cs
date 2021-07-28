@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MLP {
     class GILS_RVND {
         Random rand;
+        private const double EPSILON = 1e-15;
         private double [,] c;
         private double [,,] subseq;
 
@@ -12,6 +13,12 @@ namespace MLP {
         private const int W = 0;
         private const int C = 1;
         private const int T = 2;
+
+        private  int                    Iils;
+        private const int               Imax = 10;
+        private static const double []  R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
+                                            0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
+        private const int               R_size = 26;
 
         public GILS_RVND(){
             Data data = new Data();
@@ -26,6 +33,8 @@ namespace MLP {
                     c[j, i] = data.getDistance(i, j);
                 }
             }
+
+            Iils = (dimension < 100 ? dimension : 100);
 
             subseq = new double [dimension+1, dimension+1, 3];
             rand = new Random();
@@ -67,7 +76,7 @@ namespace MLP {
 
             int r = 0;
             while(cList.Count > 0){
-                cList.Sort((a, b)=> (c[r, a] > c[r, b] ? 1 : -1));
+                cList.Sort((i, j) => (c[r, i] > c[r, j] ? 1 : -1));
                 int range = (int)(((double)cList.Count) * alpha) +1;
                 int cN = cList[rand.Next(range)];
                 s.Add(cN);
@@ -79,7 +88,15 @@ namespace MLP {
             return s;
         }
 
+        private void RVND(List<int> s, double [,,] subseq){
+
+        }
+
+        private List<int> perturb(List<int> sl){
+        }
+
         public void solve(){
+            /*
             Console.WriteLine(T);
             var s = new List<int>();
             for(int i = 0; i < dimension; i++){
@@ -90,6 +107,44 @@ namespace MLP {
             subseq_load(s, subseq);
             var opa = construction(0.05);
             Console.WriteLine(string.Format("Inicial: ({0}).", string.Join(", ", opa)));
+            */
+
+            double cost_best = Double.MAX_VALUE;
+            var s_best = new List<int>();
+
+            for(int i = 0; i < Imax; i++){
+                double alpha = R[rand.Next(R_size)];
+                var s = construction(alpha);
+                var sl = List<int>(s);
+
+                subseq_load(s, subseq);
+
+                double rvnd_cost_best = subseq[0, dimension, C] - EPSILON;
+                double rvnd_cost_crnt;
+
+                int iterILS = 0;
+                while(iterILS < Iils){
+                    RVND(s, subseq);
+                    rvnd_cost_crnt = subseq[0, dimension, C] - EPSILON;
+                    if(rvnd_cost_crnt < rvnd_cost_best){
+                        rvnd_cost_best = rvnd_cost_crnt;
+                        sl.Clear;
+                        sl = new List<int>(s);
+                        iterILS = 0;
+                    }
+
+                    s = perturb(sl);
+                    subseq_load(s, subseq);
+                    iterILS++;
+                }
+                subseq_load(sl, subseq);
+                double sl_cost = subseq[0, dimension, C] - EPSILON;
+
+                if(sl_cost < cost_best){
+                    cost_best = sl_cost;
+                    s_best = new List<int>(sl);
+                }
+            }
         }
     }
 }
