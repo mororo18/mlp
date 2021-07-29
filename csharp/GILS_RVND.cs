@@ -97,21 +97,90 @@ namespace MLP {
         }
 
         private void swap(List<int> s, int i, int j){
+            int tmp = s[i];
+            s[i] = s[j];
+            s[j] = tmp;
+            Console.WriteLine(string.Format("Swap: ({0}).", string.Join(", ", s)));
         }
 
         private void reverse(List<int> s, int i, int j){
+            s.Reverse(i, j-i+1);
+            Console.WriteLine(string.Format("Reverse: ({0}).", string.Join(", ", s)));
         }
 
         private void reinsert(List<int> s, int i, int j, int pos){
+            int sz = j-i+1;
+            if(i < pos){
+                s.InsertRange(pos, s.GetRange(i, sz));
+                s.RemoveRange(i, sz);
+            }else{
+                s.InsertRange(pos, s.GetRange(i, sz));
+                s.RemoveRange(i+sz, sz);
+            }
+            Console.WriteLine(string.Format("Reinsert: ({0}).", string.Join(", ", s)));
         }
 
         private void search_swap(List<int> s, double [,,] seq){
+            double cost_best = Double.MaxValue;
+            double cost_new;
+            double cost_concat_1, cost_concat_2,
+                   cost_concat_3, cost_concat_4;
+            int I = -1;
+            int J = -1;
+
+            for(int i = 1; i < dimension-1; i++){
+                int i_prev = i - 1;
+                int i_next = i + 1;
+
+                cost_concat_1 = seq[0, i_prev, T] + c[s[i_prev], s[i_next]];
+                cost_concat_2 = cost_concat_2 + seq[i, i_next, T] + c[s[i], s[i_next+1]];
+
+                cost_new = seq[0, i_prev, C]
+                        + seq[i, i_next, W]             * (cost_concat_1) + c[s[i_next], s[i]]
+                        + seq[i_next+1, dimension, W]   * (cost_concat_2) + seq[i_next+1, dimension, C];
+
+                if(cost_new < cost_best){
+                    cost_best = cost_new - EPSILON;
+                    I = i;
+                    J = i_next;
+                }
+
+                for(int j = i_next+1; j < dimension; j++){
+                    int j_next = j+1;
+                    int j_prev = j-1;
+
+                    cost_concat_1 = seq[0, i_prev, T] + c[s[i_prev], s[j]];
+                    cost_concat_2 = cost_concat_1 + c[s[j], s[i_next]];
+                    cost_concat_3 = cost_concat_2 + seq[i_next, j_prev, T] + c[s[j_prev], s[i]];
+                    cost_concat_4 = cost_concat_3 + c[s[i], s[j_next]];
+
+                    cost_new = seq[0, i_prev, T]
+                            + cost_concat_1
+                            + seq[i_next, j_prev, W] * cost_concat_2 + seq[i_next, j_prev, C]
+                            + cost_concat_3
+                            + seq[j_next, dimension, W] * cost_concat_4 + seq[j_next, dimension, C];
+                    
+                    if(cost_new < cost_best){
+                        cost_best = cost_new - EPSILON;
+                        I = i;
+                        J = j;
+                    }
+                }
+            }
+
+            if(cost_best < seq[0, dimension, C] - EPSILON){
+                swap(s, I, J);
+                subseq_load(s, seq);
+                improv_flag = true;
+            }
         }
 
         private void search_two_opt(List<int> s, double [,,] seq){
+            reverse(s, 1,4);
         }
 
         private void search_reinsertion(List<int> s, double [,,] seq, int opt){
+            reinsert(s,  4, 8, 1);
         }
 
         private void RVND(List<int> s, double [,,] subseq){
@@ -122,6 +191,7 @@ namespace MLP {
                 int neighbd = neighbd_list[i_rand];
 
                 improv_flag = false;
+                //Console.WriteLine(string.Format("Original: ({0}).", string.Join(", ", s)));
 
                 switch(neighbd){
                     case REINSERTION:
@@ -140,6 +210,8 @@ namespace MLP {
                         search_two_opt(s, subseq);
                         break;
                 }
+
+                //Environment.Exit(0);
 
                 if(improv_flag){
                     neighbd_list.Clear();
@@ -182,7 +254,7 @@ namespace MLP {
                 double rvnd_cost_best = subseq[0, dimension, C] - EPSILON;
                 double rvnd_cost_crnt;
 
-                Environment.Exit(0);
+                //Environment.Exit(0);
                 int iterILS = 0;
                 while(iterILS < Iils){
                     RVND(s, subseq);
