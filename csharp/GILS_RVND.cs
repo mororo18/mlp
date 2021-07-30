@@ -38,7 +38,7 @@ namespace MLP {
             for(int i = 0; i < dimension; i++){
                 for(int j = i; j < dimension; j++){
                     c[i, j] = data.getDistance(i, j);
-                    c[j, i] = data.getDistance(i, j);
+                    c[j, i] = data.getDistance(j, i);
                 }
             }
 
@@ -154,7 +154,7 @@ namespace MLP {
                     cost_concat_3 = cost_concat_2 + seq[i_next, j_prev, T] + c[s[j_prev], s[i]];
                     cost_concat_4 = cost_concat_3 + c[s[i], s[j_next]];
 
-                    cost_new = seq[0, i_prev, T]
+                    cost_new = seq[0, i_prev, C]
                             + cost_concat_1
                             + seq[i_next, j_prev, W] * cost_concat_2 + seq[i_next, j_prev, C]
                             + cost_concat_3
@@ -170,7 +170,10 @@ namespace MLP {
 
             if(cost_best < seq[0, dimension, C] - EPSILON){
                 swap(s, I, J);
+                //Console.WriteLine("Swap");
+                //Console.WriteLine(cost_best);
                 subseq_load(s, seq);
+                //Console.WriteLine(seq[0, dimension, C]);
                 improv_flag = true;
             }
         }
@@ -211,7 +214,10 @@ namespace MLP {
 
             if(cost_best < seq[0, dimension, C] - EPSILON){
                 reverse(s, I, J);
+                Console.WriteLine("Reverse");
+                Console.WriteLine(cost_best);
                 subseq_load(s, seq);
+                Console.WriteLine(seq[0, dimension, C]);
                 improv_flag = true;
             }
         }
@@ -272,8 +278,11 @@ namespace MLP {
             }
 
             if(cost_best < seq[0, dimension, C] - EPSILON){
+                //Console.WriteLine("Reinsertion");
+                //Console.WriteLine(cost_best);
                 reinsert(s, I, J, POS+1);
                 subseq_load(s, seq);
+                //Console.WriteLine(seq[0, dimension, C]);
                 improv_flag = true;
             }
         }
@@ -311,13 +320,38 @@ namespace MLP {
                 if(improv_flag){
                     neighbd_list.Clear();
                     neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
-                }else
+                }else{
+                    Console.WriteLine("Removed");
                     neighbd_list.Remove(i_rand);
+                }
             }
         }
 
         private List<int> perturb(List<int> sl){
             var s = new List<int>(sl);
+
+            int A_start = 1, A_end = 1;
+            int B_start = 1, B_end = 1;
+
+            int size_max = (int)Math.Floor((double)sl.Count/10);
+            size_max = (size_max >= 2 ? size_max : 2);
+            int size_min = 2;
+
+            while((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)){
+                int max = sl.Count - 1 - size_max;
+                A_start = rand.Next(max) + 1;
+                A_end = A_start + rand.Next(size_max - size_min + 1) + size_min;
+                B_start = rand.Next(max) + 1;
+                B_end = B_start + rand.Next(size_max - size_min + 1) + size_min;
+            }
+            if(A_start < B_start){
+                reinsert(s, B_start, B_end-1, A_end);
+                reinsert(s, A_start, A_end-1, B_end);
+            }else{
+                reinsert(s, A_start, A_end-1, B_end);
+                reinsert(s, B_start, B_end-1, A_end);
+            }
+
             return s;
         }
 
