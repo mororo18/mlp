@@ -6,7 +6,6 @@ namespace MLP {
         private int dimension;
         private double [,] matrix;
         public Data(){
-            Console.WriteLine("Opa meu abencoado!");
             dimension = 0;
         }
 
@@ -16,25 +15,28 @@ namespace MLP {
             matrix = new double [dimension, dimension];
 
             for(int i = 1; i < dimension; i++){
-                Console.WriteLine(file[i]);
+                //Console.WriteLine(file[i]);
                 int j = i;
                 while(file[i].IndexOf(" ") != -1){
                     int index = file[i].IndexOf(" ");
                     matrix[i-1, j] = Convert.ToDouble(file[i].Substring(0, index));
                     matrix[j, i-1] = matrix[i-1, j];
+                    matrix[i-1, i-1] = 0.0;
                     file[i] = file[i].Substring(index+1);
                     //Console.WriteLine(matrix[i-1, j]);
                     j++;
                 }
             }
-
+            matrix[dimension-1, dimension-1] = 0.0;
             
+            /*
             for(int i = 0; i < dimension; i++){
                 for(int j = i+1; j < dimension; j++){
                     Console.Write(matrix[i, j] + " ");
                 }
                 Console.WriteLine();
             }
+            */
         }
 
         public double getDistance(int i, int j){

@@ -170,8 +170,6 @@ def search_two_opt(s, seq):
             total = seq[T][0][i_prev] + m[s[j]][s[i_prev]]
 
             cost = seq[C][0][i_prev] + seq[W][i][j] * total + reverse_cost
-            #print(rev, sum([seq[T][x][j] for x in range(i, j)]))
-            #cost = seq[C][0][i_prev] + seq[W][i][j] * total + sum([seq[T][x][j] for x in range(i, j)])
             cost += seq[W][j_next][n] * (total + seq[T][i][j] + m[s[j_next]][s[i]]) + seq[C][j_next][n]
 
             if cost < cost_best:

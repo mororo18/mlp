@@ -193,33 +193,41 @@ namespace MLP {
 
                 for(int j = i+2; j < dimension; j++){
                     int j_next = j+1;
-                    int j_prev = j-1;
+                    //int j_prev = j-1;
 
-                    rev_seq_cost += c[s[j_prev], s[j]] * (seq[i, j, W]-1);
+                    rev_seq_cost += c[s[j-1], s[j]] * (seq[i, j, W]-1.0);
 
-                    cost_concat_1 = seq[0, i_prev, T] * c[s[j], s[i_prev]];
+                    cost_concat_1 = seq[0, i_prev, T] + c[s[j], s[i_prev]];
                     cost_concat_2 = cost_concat_1 + seq[i, j, T] + c[s[j_next], s[i]];
 
                     cost_new = seq[0, i_prev, C]
                             + seq[i, j, W]              * cost_concat_1 + rev_seq_cost
                             + seq[j_next, dimension, W] * cost_concat_2 + seq[j_next, dimension, C];
 
+                    /*
+                    Console.WriteLine("REV_cost " + rev_seq_cost);
+                    Console.WriteLine("concat 1 " + cost_concat_1);
+                    Console.WriteLine("concat 2 "  + cost_concat_2);
+                    Console.WriteLine(cost_new);
+                    */
                     if(cost_new < cost_best){
                         cost_best = cost_new - EPSILON;
                         I = i;
                         J = j;
                     }
+                    //Environment.Exit(0);
                 }
             }
 
             if(cost_best < seq[0, dimension, C] - EPSILON){
                 reverse(s, I, J);
-                Console.WriteLine("Reverse");
-                Console.WriteLine(cost_best);
+                //Console.WriteLine("Reverse " + I + " " + J);
+                //Console.WriteLine(cost_best);
                 subseq_load(s, seq);
-                Console.WriteLine(seq[0, dimension, C]);
+                //Console.WriteLine(seq[0, dimension, C]);
                 improv_flag = true;
             }
+            //Environment.Exit(0);
         }
 
         private void search_reinsertion(List<int> s, double [,,] seq, int opt){
@@ -285,17 +293,25 @@ namespace MLP {
                 //Console.WriteLine(seq[0, dimension, C]);
                 improv_flag = true;
             }
+
         }
 
         private void RVND(List<int> s, double [,,] subseq){
+            //List<int> neighbd_list = new List<int> {TWO_OPT};
             List<int> neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
+            var t = new List<int>();
+            for(int i = 0; i < dimension; i++)
+                t.Add(i);
+            t.Add(0);
+
+            //subseq_load(t, subseq);
 
             while(neighbd_list.Count != 0){
                 int i_rand = rand.Next(neighbd_list.Count);
                 int neighbd = neighbd_list[i_rand];
 
                 improv_flag = false;
-                Console.WriteLine(string.Format("NL: ({0}).", string.Join(", ", neighbd_list)));
+                //Console.WriteLine(string.Format("T: ({0}).", string.Join(", ", neighbd_list)));
 
                 switch(neighbd){
                     case REINSERTION:
@@ -320,9 +336,10 @@ namespace MLP {
                 if(improv_flag){
                     neighbd_list.Clear();
                     neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
+                    //Console.WriteLine("not Removed " + i_rand);
                 }else{
-                    Console.WriteLine("Removed");
-                    neighbd_list.Remove(i_rand);
+                    //Console.WriteLine("Removed " + i_rand);
+                    neighbd_list.RemoveAt(i_rand);
                 }
             }
         }
@@ -375,6 +392,8 @@ namespace MLP {
 
             for(int i = 0; i < Imax; i++){
                 double alpha = R[rand.Next(R_size)];
+                Console.WriteLine("[+] Local Search " + (i+1));
+                Console.WriteLine("\t[+] Constructing Inital Solution..");
                 var s = construction(alpha);
                 var sl = new List<int>(s);
 
@@ -384,6 +403,7 @@ namespace MLP {
                 double rvnd_cost_crnt;
 
                 //Environment.Exit(0);
+                Console.WriteLine("\t[+] Looking for the best Neighbor..");
                 int iterILS = 0;
                 while(iterILS < Iils){
                     RVND(s, subseq);
@@ -406,7 +426,10 @@ namespace MLP {
                     cost_best = sl_cost;
                     s_best = new List<int>(sl);
                 }
+                Console.WriteLine("\tCurrent best solution cost: "+cost_best);
             }
+            Console.WriteLine(string.Format("SOLUTION: ({0}).", string.Join(", ", s_best)));
+            Console.WriteLine("COST: " + cost_best);
         }
     }
 }
