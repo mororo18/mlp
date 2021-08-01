@@ -7,8 +7,10 @@ namespace MLP {
     class GILS_RVND {
         Random rand;
         private const double EPSILON = 1e-15;
-        private double [,] c;
-        private double [,,] subseq;
+        private double [][] c;
+        //private double [,] c;
+        private double [][][] subseq;
+        //private double [,,] subseq;
 
         private int dimension;
 
@@ -44,37 +46,49 @@ namespace MLP {
             data.loadData();
 
             dimension = data.getDimension();
-            c = new double [dimension, dimension];
+            c = new double [dimension][];
+            for(int i = 0; i < dimension; i++){
+                c[i] = new double [dimension];
+            }
 
             for(int i = 0; i < dimension; i++){
                 for(int j = i; j < dimension; j++){
-                    c[i, j] = data.getDistance(i, j);
-                    c[j, i] = data.getDistance(j, i);
+                    c[i][j] = data.getDistance(i, j);
+                    c[j][i] = data.getDistance(j, i);
                 }
             }
 
             Iils = (dimension < 100 ? dimension : 100);
 
-            subseq = new double [dimension+1, dimension+1, 3];
+            //subseq = new double [dimension+1, dimension+1, 3];
+            subseq = new double [dimension+1][][];
+            for(int i = 0; i < dimension+1; i++){
+                subseq[i] = new double [dimension+1][];
+
+                for(int j = 0; j < dimension+1; j++){
+                    subseq[i][j] = new double [3];
+                }
+            }
+
             rand = new Random();
 
         }
 
-        private void subseq_load(List<int> s, double [,,] seq){
+        private void subseq_load(List<int> s, double [][][] seq){
             t_subseq -= Stopwatch.GetTimestamp();
             for(int i = 0; i < dimension+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
 
-                seq[i, i, T] = 0.0;
-                seq[i, i, C] = 0.0;
-                seq[i, i, W] = (i != 0 ? 1.0 : 0.0);
+                seq[i][ i][ T] = 0.0;
+                seq[i][ i][ C] = 0.0;
+                seq[i][ i][ W] = (i != 0 ? 1.0 : 0.0);
 
                 for(int j = i+1; j < dimension+1; j++){
                     int j_prev = j-1;
 
-                    seq[i, j, T] = c[s[j_prev], s[j]] + seq[i, j_prev, T];
-                    seq[i, j, C] = seq[i, j, T] + seq[i, j_prev, C];
-                    seq[i, j, W] = j + k;
+                    seq[i][ j][ T] = c[s[j_prev]][ s[j]] + seq[i][ j_prev][ T];
+                    seq[i][ j][ C] = seq[i][ j][ T] + seq[i][ j_prev][ C];
+                    seq[i][ j][ W] = j + k;
 
                     // a bit faster without it
                     //seq[j, i, T] = seq[i, j, T];
@@ -100,7 +114,7 @@ namespace MLP {
             while(cList.Count > 0){
                 // bug ae (geralmente apos muitas comparacoes)
                 //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
-                cList = cList.OrderBy(i => c[r, i]).ToList();
+                cList = cList.OrderBy(i => c[r][ i]).ToList();
                 //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
                 int range = (int)(((double)cList.Count) * alpha) +1;
                 int cN = cList[rand.Next(range)];
@@ -137,7 +151,7 @@ namespace MLP {
             //Console.WriteLine(string.Format("Reinsert: ({0}).", string.Join(", ", s)));
         }
 
-        private void search_swap(List<int> s, double [,,] seq){
+        private void search_swap(List<int> s, double [][][] seq){
             double cost_best = Double.MaxValue;
             double cost_new;
             double cost_concat_1, cost_concat_2,
@@ -149,12 +163,12 @@ namespace MLP {
                 int i_prev = i - 1;
                 int i_next = i + 1;
 
-                cost_concat_1 = seq[0, i_prev, T] + c[s[i_prev], s[i_next]];
-                cost_concat_2 = cost_concat_1 + seq[i, i_next, T] + c[s[i], s[i_next+1]];
+                cost_concat_1 = seq[0][ i_prev][ T] + c[s[i_prev]][ s[i_next]];
+                cost_concat_2 = cost_concat_1 + seq[i][ i_next][ T] + c[s[i]][ s[i_next+1]];
 
-                cost_new = seq[0, i_prev, C]
-                        + seq[i, i_next, W]             * (cost_concat_1) + c[s[i_next], s[i]]
-                        + seq[i_next+1, dimension, W]   * (cost_concat_2) + seq[i_next+1, dimension, C];
+                cost_new = seq[0][ i_prev][ C]
+                        + seq[i][ i_next][ W]             * (cost_concat_1) + c[s[i_next]][ s[i]]
+                        + seq[i_next+1][ dimension][ W]   * (cost_concat_2) + seq[i_next+1][ dimension][ C];
 
                 if(cost_new < cost_best){
                     cost_best = cost_new - EPSILON;
@@ -166,16 +180,16 @@ namespace MLP {
                     int j_next = j+1;
                     int j_prev = j-1;
 
-                    cost_concat_1 = seq[0, i_prev, T] + c[s[i_prev], s[j]];
-                    cost_concat_2 = cost_concat_1 + c[s[j], s[i_next]];
-                    cost_concat_3 = cost_concat_2 + seq[i_next, j_prev, T] + c[s[j_prev], s[i]];
-                    cost_concat_4 = cost_concat_3 + c[s[i], s[j_next]];
+                    cost_concat_1 = seq[0][ i_prev][ T] + c[s[i_prev]][ s[j]];
+                    cost_concat_2 = cost_concat_1 + c[s[j]][ s[i_next]];
+                    cost_concat_3 = cost_concat_2 + seq[i_next][ j_prev][ T] + c[s[j_prev]][ s[i]];
+                    cost_concat_4 = cost_concat_3 + c[s[i]][ s[j_next]];
 
-                    cost_new = seq[0, i_prev, C]
+                    cost_new = seq[0][ i_prev][ C]
                             + cost_concat_1
-                            + seq[i_next, j_prev, W] * cost_concat_2 + seq[i_next, j_prev, C]
+                            + seq[i_next][ j_prev][ W] * cost_concat_2 + seq[i_next][ j_prev][ C]
                             + cost_concat_3
-                            + seq[j_next, dimension, W] * cost_concat_4 + seq[j_next, dimension, C];
+                            + seq[j_next][ dimension][ W] * cost_concat_4 + seq[j_next][ dimension][ C];
                     
                     if(cost_new < cost_best){
                         cost_best = cost_new - EPSILON;
@@ -185,7 +199,7 @@ namespace MLP {
                 }
             }
 
-            if(cost_best < seq[0, dimension, C] - EPSILON){
+            if(cost_best < seq[0][ dimension][ C] - EPSILON){
                 swap(s, I, J);
                 //Console.WriteLine("Swap");
                 //Console.WriteLine(cost_best);
@@ -195,7 +209,7 @@ namespace MLP {
             }
         }
 
-        private void search_two_opt(List<int> s, double [,,] seq){
+        private void search_two_opt(List<int> s, double [][][] seq){
             double cost_best = Double.MaxValue;
             double cost_new;
             double cost_concat_1,
@@ -206,20 +220,20 @@ namespace MLP {
             for(int i = 1; i < dimension-1; i++){
                 int i_prev = i-1;
 
-                double rev_seq_cost = seq[i, i+1, T];
+                double rev_seq_cost = seq[i][ i+1][ T];
 
                 for(int j = i+2; j < dimension; j++){
                     int j_next = j+1;
                     //int j_prev = j-1;
 
-                    rev_seq_cost += c[s[j-1], s[j]] * (seq[i, j, W]-1.0);
+                    rev_seq_cost += c[s[j-1]][ s[j]] * (seq[i][ j][ W]-1.0);
 
-                    cost_concat_1 = seq[0, i_prev, T] + c[s[j], s[i_prev]];
-                    cost_concat_2 = cost_concat_1 + seq[i, j, T] + c[s[j_next], s[i]];
+                    cost_concat_1 = seq[0][ i_prev][ T] + c[s[j]][ s[i_prev]];
+                    cost_concat_2 = cost_concat_1 + seq[i][ j][ T] + c[s[j_next]][ s[i]];
 
-                    cost_new = seq[0, i_prev, C]
-                            + seq[i, j, W]              * cost_concat_1 + rev_seq_cost
-                            + seq[j_next, dimension, W] * cost_concat_2 + seq[j_next, dimension, C];
+                    cost_new = seq[0][ i_prev][ C]
+                            + seq[i][ j][ W]              * cost_concat_1 + rev_seq_cost
+                            + seq[j_next][ dimension][ W] * cost_concat_2 + seq[j_next][ dimension][ C];
 
                     /*
                     Console.WriteLine("REV_cost " + rev_seq_cost);
@@ -236,7 +250,7 @@ namespace MLP {
                 }
             }
 
-            if(cost_best < seq[0, dimension, C] - EPSILON){
+            if(cost_best < seq[0][ dimension][ C] - EPSILON){
                 reverse(s, I, J);
                 //Console.WriteLine("Reverse " + I + " " + J);
                 //Console.WriteLine(cost_best);
@@ -247,7 +261,7 @@ namespace MLP {
             //Environment.Exit(0);
         }
 
-        private void search_reinsertion(List<int> s, double [,,] seq, int opt){
+        private void search_reinsertion(List<int> s, double [][][] seq, int opt){
             double cost_best = Double.MaxValue;
             double cost_new;
             double cost_concat_1, cost_concat_2,
@@ -264,14 +278,14 @@ namespace MLP {
                 for(int k = 0; k < i_prev; k++){
                     int k_next = k+1;
 
-                    cost_concat_1 = seq[0, k, T] + c[s[k], s[i]];
-                    cost_concat_2 = cost_concat_1 + seq[i, j, T] + c[s[j], s[k_next]];
-                    cost_concat_3 = cost_concat_2 + seq[k_next, i_prev, T] + c[s[i_prev], s[j_next]];
+                    cost_concat_1 = seq[0][ k][ T] + c[s[k]][ s[i]];
+                    cost_concat_2 = cost_concat_1 + seq[i][ j][ T] + c[s[j]][ s[k_next]];
+                    cost_concat_3 = cost_concat_2 + seq[k_next][ i_prev][ T] + c[s[i_prev]][ s[j_next]];
 
-                    cost_new = seq[0, k, C]
-                            + seq[i, j, W]              * cost_concat_1 + seq[i, j, C]
-                            + seq[k_next, i_prev, W]    * cost_concat_2 + seq[k_next, i_prev, C]
-                            + seq[j_next, dimension, W] * cost_concat_3 + seq[j_next, dimension, C];
+                    cost_new = seq[0][ k][ C]
+                            + seq[i][ j][ W]              * cost_concat_1 + seq[i][ j][ C]
+                            + seq[k_next][ i_prev][ W]    * cost_concat_2 + seq[k_next][ i_prev][ C]
+                            + seq[j_next][ dimension][ W] * cost_concat_3 + seq[j_next][ dimension][ C];
 
                     if(cost_new < cost_best){
                         cost_best = cost_new - EPSILON;
@@ -284,14 +298,14 @@ namespace MLP {
                 for(int k = i+opt; k < dimension - opt - 1; k++){
                     int k_next = k+1;
 
-                    cost_concat_1 = seq[0, i_prev, T] + c[s[i_prev], s[j_next]];;
-                    cost_concat_2 = cost_concat_1 + seq[j_next, k, T] + c[s[k], s[i]];
-                    cost_concat_3 = cost_concat_2 + seq[i, j, T] + c[s[j], s[k_next]];
+                    cost_concat_1 = seq[0][ i_prev][ T] + c[s[i_prev]][ s[j_next]];;
+                    cost_concat_2 = cost_concat_1 + seq[j_next][ k][ T] + c[s[k]][ s[i]];
+                    cost_concat_3 = cost_concat_2 + seq[i][ j][ T] + c[s[j]][ s[k_next]];
 
-                    cost_new = seq[0, i_prev, C]
-                            + seq[j_next, k, W]         * cost_concat_1 + seq[j_next, k, C]
-                            + seq[i, j, W]              * cost_concat_2 + seq[i, j, C]
-                            + seq[k_next, dimension, W] * cost_concat_3 + seq[k_next, dimension, C];
+                    cost_new = seq[0][ i_prev][ C]
+                            + seq[j_next][ k][ W]         * cost_concat_1 + seq[j_next][ k][ C]
+                            + seq[i][ j][ W]              * cost_concat_2 + seq[i][ j][ C]
+                            + seq[k_next][ dimension][ W] * cost_concat_3 + seq[k_next][ dimension][ C];
 
                     if(cost_new < cost_best){
                         cost_best = cost_new - EPSILON;
@@ -302,7 +316,7 @@ namespace MLP {
                 }
             }
 
-            if(cost_best < seq[0, dimension, C] - EPSILON){
+            if(cost_best < seq[0][ dimension][ C] - EPSILON){
                 //Console.WriteLine("Reinsertion");
                 //Console.WriteLine(cost_best);
                 reinsert(s, I, J, POS+1);
@@ -313,7 +327,7 @@ namespace MLP {
 
         }
 
-        private void RVND(List<int> s, double [,,] subseq){
+        private void RVND(List<int> s, double [][][] subseq){
             //List<int> neighbd_list = new List<int> {TWO_OPT};
             List<int> neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
             var t = new List<int>();
@@ -428,7 +442,7 @@ namespace MLP {
 
                 subseq_load(s, subseq);
 
-                double rvnd_cost_best = subseq[0, dimension, C] - EPSILON;
+                double rvnd_cost_best = subseq[0][ dimension][ C] - EPSILON;
                 double rvnd_cost_crnt;
 
                 //Environment.Exit(0);
@@ -436,7 +450,7 @@ namespace MLP {
                 int iterILS = 0;
                 while(iterILS < Iils){
                     RVND(s, subseq);
-                    rvnd_cost_crnt = subseq[0, dimension, C] - EPSILON;
+                    rvnd_cost_crnt = subseq[0][ dimension][ C] - EPSILON;
                     if(rvnd_cost_crnt < rvnd_cost_best){
                         rvnd_cost_best = rvnd_cost_crnt;
                         //sl.Clear();
@@ -449,7 +463,7 @@ namespace MLP {
                     iterILS++;
                 }
                 subseq_load(sl, subseq);
-                double sl_cost = subseq[0, dimension, C] - EPSILON;
+                double sl_cost = subseq[0][ dimension][ C] - EPSILON;
 
                 if(sl_cost < cost_best){
                     cost_best = sl_cost;
