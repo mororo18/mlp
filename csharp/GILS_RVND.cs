@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MLP {
     class GILS_RVND {
@@ -84,7 +85,10 @@ namespace MLP {
 
             int r = 0;
             while(cList.Count > 0){
-                cList.Sort((i, j) => (c[r, i] > c[r, j] ? 1 : -1));
+                // bug ae (geralmente apos muitas comparacoes)
+                //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
+                cList = cList.OrderBy(i => c[r, i]).ToList();
+                //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
                 int range = (int)(((double)cList.Count) * alpha) +1;
                 int cN = cList[rand.Next(range)];
                 s.Add(cN);
