@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MLP {
     class GILS_RVND {
@@ -11,9 +12,9 @@ namespace MLP {
 
         private int dimension;
 
-        private const int W = 0;
+        private const int W = 2;
         private const int C = 1;
-        private const int T = 2;
+        private const int T = 0;
 
         private const int SWAP          = 0;
         private const int REINSERTION   = 1;
@@ -28,6 +29,15 @@ namespace MLP {
         private double []  R = {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                                             0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
         private const int               R_size = 26;
+
+        // exec time vars
+        private long t_construction = 0;
+        private long t_swap = 0;
+        private long t_two_opt = 0;
+        private long t_or_opt2 = 0;
+        private long t_or_opt3 = 0;
+        private long t_reinsertion = 0;
+        private long t_subseq = 0;
 
         public GILS_RVND(){
             Data data = new Data();
@@ -51,6 +61,7 @@ namespace MLP {
         }
 
         private void subseq_load(List<int> s, double [,,] seq){
+            t_subseq -= Stopwatch.GetTimestamp();
             for(int i = 0; i < dimension+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -65,14 +76,15 @@ namespace MLP {
                     seq[i, j, C] = seq[i, j, T] + seq[i, j_prev, C];
                     seq[i, j, W] = j + k;
 
-                    seq[j, i, T] = seq[i, j, T];
-                    seq[j, i, C] = seq[i, j, C];
-                    seq[j, i, W] = seq[i, j, W];
+                    //seq[j, i, T] = seq[i, j, T];
+                    //seq[j, i, C] = seq[i, j, C];
+                    //seq[j, i, W] = seq[i, j, W];
 
                     //Console.Write(seq[i, j, C] + " ");
                 }
                 //Console.WriteLine();
             }
+            t_subseq += Stopwatch.GetTimestamp();
         }
 
         private List<int> construction(double alpha){
@@ -319,26 +331,36 @@ namespace MLP {
 
                 switch(neighbd){
                     case REINSERTION:
+                        t_reinsertion -= Stopwatch.GetTimestamp();
                         search_reinsertion(s, subseq, REINSERTION);
+                        t_reinsertion += Stopwatch.GetTimestamp();
                         break;
                     case OR_OPT2:
+                        t_or_opt2 -= Stopwatch.GetTimestamp();
                         search_reinsertion(s, subseq, OR_OPT2);
+                        t_or_opt2 += Stopwatch.GetTimestamp();
                         break;
                     case OR_OPT3:
+                        t_or_opt3 -= Stopwatch.GetTimestamp();
                         search_reinsertion(s, subseq, OR_OPT3);
+                        t_or_opt3 += Stopwatch.GetTimestamp();
                         break;
                     case SWAP:
+                        t_swap -= Stopwatch.GetTimestamp();
                         search_swap(s, subseq);
+                        t_swap += Stopwatch.GetTimestamp();
                         break;
                     case TWO_OPT:
+                        t_two_opt -= Stopwatch.GetTimestamp();
                         search_two_opt(s, subseq);
+                        t_two_opt += Stopwatch.GetTimestamp();
                         break;
                 }
 
                 //Environment.Exit(0);
 
                 if(improv_flag){
-                    neighbd_list.Clear();
+                    //neighbd_list.Clear();
                     neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
                     //Console.WriteLine("not Removed " + i_rand);
                 }else{
@@ -398,7 +420,9 @@ namespace MLP {
                 double alpha = R[rand.Next(R_size)];
                 Console.WriteLine("[+] Local Search " + (i+1));
                 Console.WriteLine("\t[+] Constructing Inital Solution..");
+                t_construction -= Stopwatch.GetTimestamp();
                 var s = construction(alpha);
+                t_construction += Stopwatch.GetTimestamp();
                 var sl = new List<int>(s);
 
                 subseq_load(s, subseq);
@@ -414,7 +438,7 @@ namespace MLP {
                     rvnd_cost_crnt = subseq[0, dimension, C] - EPSILON;
                     if(rvnd_cost_crnt < rvnd_cost_best){
                         rvnd_cost_best = rvnd_cost_crnt;
-                        sl.Clear();
+                        //sl.Clear();
                         sl = new List<int>(s);
                         iterILS = 0;
                     }
@@ -434,6 +458,13 @@ namespace MLP {
             }
             Console.WriteLine(string.Format("SOLUTION: ({0}).", string.Join(", ", s_best)));
             Console.WriteLine("COST: " + cost_best);
+            Console.WriteLine("Construction: " + t_construction/10e6);
+            Console.WriteLine("Swap: " + t_swap/10e6);
+            Console.WriteLine("2_opt: " + t_two_opt/10e6);
+            Console.WriteLine("or_opt2: " + t_or_opt2/10e6);
+            Console.WriteLine("or_opt3: " + t_or_opt3/10e6);
+            Console.WriteLine("reinseriton: " + t_reinsertion/10e6);
+            Console.WriteLine("subseq_load: " + t_subseq/10e6);
         }
     }
 }
