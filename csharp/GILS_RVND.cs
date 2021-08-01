@@ -76,6 +76,7 @@ namespace MLP {
                     seq[i, j, C] = seq[i, j, T] + seq[i, j_prev, C];
                     seq[i, j, W] = j + k;
 
+                    // a bit faster without it
                     //seq[j, i, T] = seq[i, j, T];
                     //seq[j, i, C] = seq[i, j, C];
                     //seq[j, i, W] = seq[i, j, W];

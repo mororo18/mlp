@@ -29,6 +29,14 @@ class GILS_RVND {
                                         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
     private final int               R_size = 26;
 
+    private static long t_construction = 0;
+    private static long t_swap = 0;
+    private static long t_two_opt = 0;
+    private static long t_or_opt2 = 0;
+    private static long t_or_opt3 = 0;
+    private static long t_reinsertion = 0;
+    private static long t_subseq = 0;
+
     Random rand;
 
     GILS_RVND(){
@@ -53,6 +61,7 @@ class GILS_RVND {
     }
 
     private void subseq_load(ArrayList<Integer> s, double [][][] seq){
+        t_subseq -= System.nanoTime();
         for(int i = 0; i < dimension+1; i++){
             int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -67,15 +76,16 @@ class GILS_RVND {
                 seq[i][j][C] = seq[i][j][T] + seq[i][j_prev][C];
                 seq[i][j][W] = j + k;
 
-                seq[j][i][T] = seq[i][j][T];
-                seq[j][i][C] = seq[i][j][C];
-                seq[j][i][W] = seq[i][j][W];
+                //seq[j][i][T] = seq[i][j][T];
+                //seq[j][i][C] = seq[i][j][C];
+                //seq[j][i][W] = seq[i][j][W];
 
                 //System.out.print(seq[i][j][C]);
                 //System.out.print(" ");
             }
             //System.out.println();
         }
+        t_subseq += System.nanoTime();
     }
 
     private ArrayList<Integer> construction(double alpha){
@@ -332,19 +342,29 @@ class GILS_RVND {
 
             switch(neighbd){
                 case REINSERTION:
+                    t_reinsertion -= System.nanoTime();
                     search_reinsertion(s, subseq, REINSERTION);
+                    t_reinsertion += System.nanoTime();
                     break;
                 case OR_OPT2:
+                    t_or_opt2 -= System.nanoTime();
                     search_reinsertion(s, subseq, OR_OPT2);
+                    t_or_opt2 += System.nanoTime();
                     break;
                 case OR_OPT3:
+                    t_or_opt3 -= System.nanoTime();
                     search_reinsertion(s, subseq, OR_OPT3);
+                    t_or_opt3 += System.nanoTime();
                     break;
                 case SWAP:
+                    t_swap -= System.nanoTime();
                     search_swap(s, subseq);
+                    t_swap += System.nanoTime();
                     break;
                 case TWO_OPT:
+                    t_two_opt -= System.nanoTime();
                     search_two_opt(s, subseq);
+                    t_two_opt += System.nanoTime();
                     break;
             }
 
@@ -401,7 +421,9 @@ class GILS_RVND {
             System.out.print("[+] Local Search ");
             System.out.println(i+1);
             System.out.println("\t[+] Constructing Inital Solution..");
+            t_construction -= System.nanoTime();
             ArrayList<Integer> s = construction(alpha);
+            t_construction += System.nanoTime();
             ArrayList<Integer> sl = new ArrayList<>(s); 
             subseq_load(s, subseq); 
             double rvnd_cost_best = subseq[0][dimension][C] - EPSILON;
@@ -439,5 +461,19 @@ class GILS_RVND {
         System.out.println(cost_best);
         System.out.print("SOLUTION: ");
         System.out.println(s_best);
+        System.out.print("Construction: ");
+        System.out.println(t_construction/10e8);
+        System.out.print("swap: ");
+        System.out.println(t_swap/10e8);
+        System.out.print("2_opt: ");
+        System.out.println(t_two_opt/10e8);
+        System.out.print("or_opt2: ");
+        System.out.println(t_or_opt2/10e8);
+        System.out.print("or_opt3: ");
+        System.out.println(t_or_opt3/10e8);
+        System.out.print("reinsertion: ");
+        System.out.println(t_reinsertion/10e8);
+        System.out.print("subseq_load: ");
+        System.out.println(t_subseq/10e8);
     }
 }
