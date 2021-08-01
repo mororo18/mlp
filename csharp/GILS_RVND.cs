@@ -7,9 +7,9 @@ namespace MLP {
     class GILS_RVND {
         Random rand;
         private const double EPSILON = 1e-15;
-        private double [][] c;
+        private static double [][] c;
         //private double [,] c;
-        private double [][][] subseq;
+        private static double [][][] subseq;
         //private double [,,] subseq;
 
         private int dimension;
