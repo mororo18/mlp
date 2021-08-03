@@ -14,9 +14,9 @@ namespace MLP {
 
         private int dimension;
 
-        private const int W = 2;
-        private const int C = 1;
         private const int T = 0;
+        private const int C = 1;
+        private const int W = 2;
 
         private const int SWAP          = 0;
         private const int REINSERTION   = 1;
