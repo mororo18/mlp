@@ -47,14 +47,16 @@ function get_instance_info()
         i += 1
     end
 
+    """
     println("opa")
     for i in 1:dimension
         for j in 1:dimension
-            #print(matrix[i,j])
-            #print(" ")
+            print(matrix[i,j])
+            print(" ")
         end
-        #println()
+        println()
     end
+    """
 
     close(f)
 
