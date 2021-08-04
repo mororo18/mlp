@@ -28,6 +28,7 @@ t_swap = 0
 t_two_opt = 0
 t_construction = 0
 t_perturb = 0
+t_seq = 0
 
 improv_flag = None
 
@@ -72,6 +73,8 @@ def construction(alpha):
     return s
 
 def subseq_info_load(sol, seq):
+    global t_seq
+    t_seq -= time.time()
     i = 0
     d = n + 1
     while i < d:
@@ -89,13 +92,17 @@ def subseq_info_load(sol, seq):
             seq[C][i][j] = seq[T][i][j] + seq[C][i][a]
             seq[W][i][j] = j + k
 
+            """
             seq[T][j][i] = seq[T][i][j]
             seq[C][j][i] = seq[C][i][j]
             seq[W][j][i] = seq[W][i][j]
+            """
 
             j += 1
 
         i += 1
+
+    t_seq += time.time()
 
 def swap(s, i, j):
     s[i], s[j] = s[j], s[i]
@@ -412,3 +419,4 @@ print("Reinsert %s" % t_reinsertion)
 print("or_opt2 %s" % t_or_opt2)
 print("or_opt3 %s" % t_or_opt3)
 print("two_opt %s" % t_two_opt)
+print("subseq_load %s" % t_seq)

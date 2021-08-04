@@ -5,6 +5,14 @@ const T = 1
 const C = 2
 const W = 3
 
+const EPSILON = 1e-15
+
+const REINSERTION = 1
+const OR_OPT2     = 2
+const OR_OPT3     = 3
+const SWAP        = 4
+const TWO_OPT     = 5
+
 dimension, c = get_instance_info()
 
 function subseq_load(s::Array{Int64, 1}, seq::Array{Float64, 3})
@@ -28,12 +36,39 @@ function subseq_load(s::Array{Int64, 1}, seq::Array{Float64, 3})
 end
 
 function construction(alpha::Float64)
+    s = [1]
+    cList = [2:dimension;]
+
+    r = 1
+    while length(cList) > 0
+        sort!(cList, by= i -> c[i,r])
+
+        i = convert(Int64, floor(length(cList)*alpha + 1))
+        cN = cList[rand(1:i)]
+        push!(s, cN)
+        r = cN
+        deleteat!(cList, findfirst(x->x==cN, cList))
+
+        println(cList)
+    end
+
+    return s
+end
+
+function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
+
+end
+
+function perturb(sl::Array{Int64, 1})
+    s = copy(sl)
+    return s
 end
 
 function GILS_RVND(Imax::Int64, Iils::Int64, R)
     cost_best = Inf
     s_best = []
 
+    """
     s = Array{Int64, 1}()
     for i in 1:dimension
         push!(s, i)
@@ -43,12 +78,42 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
 
     subseq = zeros(dimension+1, dimension+1, 3)
     subseq_load(s, subseq)
-    #subseq[1,1,3] = 10
 
     println(subseq)
     println(subseq[1, dimension+1, C])
+    """
     for i in 1:Imax
         alpha = R[rand(1:26)]
+        s = construction(alpha)
+        sl = copy(s)
+        subseq_load(s, subseq)
+
+        rvnd_cost_best = subseq[0,dimension,C] - EPSILON
+
+        iterILS = 0
+        while iterILS < Iils
+            RVND(s, subseq)
+            rvnd_cost_crnt = subseq[0,dimension,C] - EPSILON
+            if rvnd_cost_crnt < rvnd_cost_best
+                rvnd_cost_best = rvnd_cost_crnt
+                sl = copy(s)
+                iterILS = 0
+            end
+
+            s = perturb(sl)
+            subseq_load(s, subseq)
+
+            iterILS += 1
+        end
+
+        subseq_load(sl, subseq)
+        sl_cost = subseq[0,dimension,C] - EPSILON
+
+        if sl_cost < cost_best
+            s_best = sl
+            cost_best = sl_cost
+        end
+        exit(0)
     end
 end
 
