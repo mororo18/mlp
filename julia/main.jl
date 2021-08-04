@@ -56,6 +56,7 @@ function construction(alpha::Float64)
 end
 
 function swap(s, i, j)
+    s[i], s[j] = s[j], s[i]
 end
 
 function reverse(s, i, j)
@@ -74,7 +75,10 @@ function search_reinsertion(s, seq, opt)
 end
 
 function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
-    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
+    neighbd_list = [SWAP]
+    #neighbd_list = [TWO_OPT]
+    #neighbd_list = [OR_OPT2]
+    #neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
 
     while length(neighbd_list) > 0
         i = rand(1:length(neighbd_list))
@@ -92,7 +96,6 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
             search_two_opt(s, seq)
         end
     end
-
 end
 
 function perturb(sl::Array{Int64, 1})
@@ -129,6 +132,7 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
         iterILS = 0
         while iterILS < Iils
             RVND(s, subseq)
+            exit(0)
             rvnd_cost_crnt = subseq[0,dimension,C] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best
                 rvnd_cost_best = rvnd_cost_crnt
@@ -149,7 +153,6 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
             s_best = sl
             cost_best = sl_cost
         end
-        exit(0)
     end
 end
 
