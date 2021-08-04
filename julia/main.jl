@@ -55,7 +55,43 @@ function construction(alpha::Float64)
     return s
 end
 
+function swap(s, i, j)
+end
+
+function reverse(s, i, j)
+end
+
+function reinsert(s, i, j, pos)
+end
+
+function search_swap(s, seq)
+end
+
+function search_two_opt(s, seq)
+end
+
+function search_reinsertion(s, seq, opt)
+end
+
 function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
+    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
+
+    while length(neighbd_list) > 0
+        i = rand(1:length(neighbd_list))
+        neighbd = neighbd_list[i]
+
+        if neighbd == REINSERTION
+            search_reinsertion(s, seq, REINSERTION)
+        elseif neighbd == OR_OPT2
+            search_reinsertion(s, seq, OR_OPT2)
+        elseif neighbd == OR_OPT3
+            search_reinsertion(s, seq, OR_OPT3)
+        elseif neighbd == SWAP
+            search_swap(s, seq)
+        elseif neighbd == TWO_OPT
+            search_two_opt(s, seq)
+        end
+    end
 
 end
 
