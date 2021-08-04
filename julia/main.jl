@@ -61,24 +61,20 @@ function swap(s, i, j)
 end
 
 
-# funcs removed from https://github.com/JuliaLang/julia/blob/master/base/array.jl
-_growat!(a::Vector, i::Integer, delta::Integer) =
-    ccall(:jl_array_grow_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
+# func removed from https://github.com/JuliaLang/julia/blob/master/base/array.jl
 _deleteat!(a::Vector, i::Integer, delta::Integer) =
     ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
 
-# custom version of 'insert!()' func
-function insert!(a::Array{T,1}, i::Integer, item::Array{T,1}) where T
-    _growat!(a, i, length(item))
-    bd = i + length(item) - 1
-    @inbounds for _i in i:bd a[_i] = item[_i-i+1] end
-    return a
-end
-
 function reinsert(s, i, j, pos)
+    sz = j - i + 1
     if i < pos
-        insert!(s, pos, s[i:j])
+        #insert!(s, pos, s[i:j])
+        splice!(s, pos:pos-1, s[i:j]) 
+        _deleteat!(s, i, sz)
     else
+        #insert!(s, pos, s[i:j])
+        splice!(s, pos:pos-1, s[i:j]) 
+        _deleteat!(s, i+sz, sz)
     end
 end
 
@@ -92,7 +88,7 @@ function search_two_opt(s, seq)
 end
 
 function search_reinsertion(s, seq, opt)
-    reinsert(s, 1,3,9)
+    reinsert(s, 2,4,9)
     println(s)
 end
 
