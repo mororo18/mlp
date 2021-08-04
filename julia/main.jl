@@ -60,13 +60,12 @@ function swap(s, i, j)
     s[i], s[j] = s[j], s[i]
 end
 
-
 # func removed from https://github.com/JuliaLang/julia/blob/master/base/array.jl
-_deleteat!(a::Vector, i::Integer, delta::Integer) =
-    ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
 
 function reinsert(s, i, j, pos)
     sz = j - i + 1
+    _deleteat!(a::Vector, i::Integer, delta::Integer) =
+        ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
     if i < pos
         #insert!(s, pos, s[i:j])
         splice!(s, pos:pos-1, s[i:j]) 
