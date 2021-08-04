@@ -52,6 +52,7 @@ function construction(alpha::Float64)
         println(cList)
     end
 
+    push!(s, 1)
     return s
 end
 
@@ -59,26 +60,48 @@ function swap(s, i, j)
     s[i], s[j] = s[j], s[i]
 end
 
-function reverse(s, i, j)
+
+# funcs removed from https://github.com/JuliaLang/julia/blob/master/base/array.jl
+_growat!(a::Vector, i::Integer, delta::Integer) =
+    ccall(:jl_array_grow_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
+_deleteat!(a::Vector, i::Integer, delta::Integer) =
+    ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
+
+# custom version of 'insert!()' func
+function insert!(a::Array{T,1}, i::Integer, item::Array{T,1}) where T
+    _growat!(a, i, length(item))
+    bd = i + length(item) - 1
+    @inbounds for _i in i:bd a[_i] = item[_i-i+1] end
+    return a
 end
 
 function reinsert(s, i, j, pos)
+    if i < pos
+        insert!(s, pos, s[i:j])
+    else
+    end
 end
 
 function search_swap(s, seq)
 end
 
 function search_two_opt(s, seq)
+
+    reverse!(s, 2, 6)
+    println(s)
 end
 
 function search_reinsertion(s, seq, opt)
+    reinsert(s, 1,3,9)
+    println(s)
 end
 
 function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
-    neighbd_list = [SWAP]
+    #neighbd_list = [SWAP]
     #neighbd_list = [TWO_OPT]
-    #neighbd_list = [OR_OPT2]
+    neighbd_list = [OR_OPT2]
     #neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
+    println(s)
 
     while length(neighbd_list) > 0
         i = rand(1:length(neighbd_list))
@@ -95,6 +118,7 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         elseif neighbd == TWO_OPT
             search_two_opt(s, seq)
         end
+        exit(0)
     end
 end
 
@@ -107,6 +131,8 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
     cost_best = Inf
     s_best = []
 
+    subseq = zeros(dimension+1, dimension+1, 3)
+
     """
     s = Array{Int64, 1}()
     for i in 1:dimension
@@ -115,7 +141,6 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
     push!(s, 1)
     println(s)
 
-    subseq = zeros(dimension+1, dimension+1, 3)
     subseq_load(s, subseq)
 
     println(subseq)
@@ -127,13 +152,12 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
         sl = copy(s)
         subseq_load(s, subseq)
 
-        rvnd_cost_best = subseq[0,dimension,C] - EPSILON
+        rvnd_cost_best = subseq[1,dimension+1,C] - EPSILON
 
         iterILS = 0
         while iterILS < Iils
             RVND(s, subseq)
-            exit(0)
-            rvnd_cost_crnt = subseq[0,dimension,C] - EPSILON
+            rvnd_cost_crnt = subseq[1,dimension+1,C] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best
                 rvnd_cost_best = rvnd_cost_crnt
                 sl = copy(s)
@@ -147,7 +171,7 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
         end
 
         subseq_load(sl, subseq)
-        sl_cost = subseq[0,dimension,C] - EPSILON
+        sl_cost = subseq[1,dimension+1,C] - EPSILON
 
         if sl_cost < cost_best
             s_best = sl
