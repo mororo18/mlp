@@ -68,29 +68,26 @@ function construction(alpha::Float64)
         r = cN
         deleteat!(cList, findfirst(x->x==cN, cList))
 
-        #println(cList)
     end
 
     push!(s, 1)
     return s
 end
 
-function swap(s, i, j)
-    global s[i], s[j] = s[j], s[i]
+function swap(s::Array{Int64,1}, i::Int64, j::Int64)
+    s[i], s[j] = s[j], s[i]
 end
 
-function reinsert(s, i, j, pos)
+function reinsert(s::Array{Int64,1}, i::Int64, j::Int64, pos::Int64)
     # func from https://github.com/JuliaLang/julia/blob/master/base/array.jl
     _deleteat!(a::Vector, i::Integer, delta::Integer) =
         ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
 
     sz = j - i + 1
     if i < pos
-        #insert!(s, pos, s[i:j])
         splice!(s, pos:pos-1, s[i:j]) 
         _deleteat!(s, i, sz)
     else
-        #insert!(s, pos, s[i:j])
         splice!(s, pos:pos-1, s[i:j]) 
         _deleteat!(s, i+sz, sz)
     end
@@ -101,23 +98,16 @@ function search_swap(s::Array{Int64,1}, seq::Array{Float64,3})
     I = -1
     J = -1
 
-    """
-    s = [1:dimension;]
-    push!(s, 1)
-    subseq_load(s, seq)
-    println("Swap")
-    """
-
     for i in 2:dimension-1
         i_prev = i - 1
         i_next = i + 1
 
-        cost_concat_1 = seq[1, i_prev, T] + c[s[i_prev], s[i_next]]
+        cost_concat_1 =                 seq[1, i_prev, T] + c[s[i_prev], s[i_next]]
         cost_concat_2 = cost_concat_1 + seq[i, i_next, T] + c[s[i], s[i_next+1]]
 
-        cost_new = seq[1, i_prev, C] +
-                seq[i, i_next, W]             * (cost_concat_1) + c[s[i_next], s[i]] +
-                seq[i_next+1, dimension+1, W]   * (cost_concat_2) + seq[i_next+1, dimension+1, C]
+        cost_new = seq[1, i_prev, C]                                                    +           #       1st subseq
+                seq[i, i_next, W]               * (cost_concat_1) + c[s[i_next], s[i]]  +           # concat 2nd subseq
+                seq[i_next+1, dimension+1, W]   * (cost_concat_2) + seq[i_next+1, dimension+1, C]   # concat 3rd subseq
 
         if cost_new < cost_best
             cost_best = cost_new - EPSILON
@@ -130,17 +120,17 @@ function search_swap(s::Array{Int64,1}, seq::Array{Float64,3})
             j_next = j+1
 
 
-            cost_concat_1 = seq[1, i_prev, T] + c[s[i_prev], s[j]]
-            cost_concat_2 = cost_concat_1 + c[s[j], s[i_next]]
-            cost_concat_3 = cost_concat_2 + seq[i_next, j_prev, T] + c[s[j_prev], s[i]]
-            cost_concat_4 = cost_concat_3 + c[s[i], s[j_next]]
+            cost_concat_1 =                 seq[1, i_prev, T]       + c[s[i_prev], s[j]]
+            cost_concat_2 = cost_concat_1                           + c[s[j], s[i_next]]
+            cost_concat_3 = cost_concat_2 + seq[i_next, j_prev, T]  + c[s[j_prev], s[i]]
+            cost_concat_4 = cost_concat_3                           + c[s[i], s[j_next]]
 
 
-            cost_new = seq[1, i_prev, C] +
-                        cost_concat_1 +
-                        seq[i_next, j_prev, W] * cost_concat_2 + seq[i_next, j_prev, C] +
-                        cost_concat_3 +
-                        seq[j_next, dimension+1, W] * cost_concat_4 + seq[j_next, dimension+1, C] 
+            cost_new = seq[1, i_prev, C]                                                 +      # 1st subseq
+                    cost_concat_1 +                                                             # concat 2nd subseq (single node)
+                    seq[i_next, j_prev, W]      * cost_concat_2 + seq[i_next, j_prev, C] +      # concat 3rd subseq
+                    cost_concat_3 +                                                             # concat 4th subseq (single node)
+                    seq[j_next, dimension+1, W] * cost_concat_4 + seq[j_next, dimension+1, C]   # concat 5th subseq
 
             if(cost_new < cost_best)
                 """
@@ -157,27 +147,14 @@ function search_swap(s::Array{Int64,1}, seq::Array{Float64,3})
         end
     end
 
-    """
-    println(cost_best)
-    swap(s, I, J)
-    subseq_load(s, seq)
-    println(seq[1,dimension+1,C])
-    exit(0)
-    """
     if cost_best < seq[1,dimension+1,C] - EPSILON
-        #println("Swap")
-        #@printf "Swap %d %d\n" I J
-        #println(cost_best)
-        #println(s)
         swap(s, I, J)
-        #println(s)
         subseq_load(s, seq)
-        #println(seq[1,dimension+1,C])
         global improv_flag = true
     end
 end
 
-function search_two_opt(s, seq)
+function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3})
     cost_best = Inf
     I = -1
     J = -1
@@ -190,12 +167,12 @@ function search_two_opt(s, seq)
 
             rev_seq_cost += c[s[j-1], s[j]] * (seq[i, j, W]-1.0)
 
-            cost_concat_1 = seq[1, i_prev, T] + c[s[j], s[i_prev]]
-            cost_concat_2 = cost_concat_1 + seq[i, j, T] + c[s[j_next], s[i]]
+            cost_concat_1 =                 seq[1, i_prev, T]   + c[s[j], s[i_prev]]
+            cost_concat_2 = cost_concat_1 + seq[i, j, T]        + c[s[j_next], s[i]]
 
-            cost_new = seq[1, i_prev, C] +
-                        seq[i, j, W]              * cost_concat_1 + rev_seq_cost +
-                        seq[j_next, dimension+1, W] * cost_concat_2 + seq[j_next, dimension+1, C]
+            cost_new = seq[1, i_prev, C]                                                        +   #   1st subseq
+            seq[i, j, W]                        * cost_concat_1 + rev_seq_cost                  +   # concat 2nd subseq (reversed seq)
+                    seq[j_next, dimension+1, W] * cost_concat_2 + seq[j_next, dimension+1, C]       # concat 3rd subseq
 
             if cost_new < cost_best
                 """
@@ -214,11 +191,8 @@ function search_two_opt(s, seq)
     end
 
     if cost_best < seq[1, dimension+1, C] - EPSILON
-        #println("TWO_opt")
-        #println(cost_best)
         reverse!(s, I, J)
         subseq_load(s, seq)
-        #println(seq[1, dimension+1, C])
         global improv_flag = true
     end
 end
@@ -237,14 +211,14 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
         for k in 1:i_prev-1
             k_next = k+1
 
-            cost_concat_1 = seq[1, k, T] + c[s[k], s[i]]
-            cost_concat_2 = cost_concat_1 + seq[i, j, T] + c[s[j], s[k_next]]
-            cost_concat_3 = cost_concat_2 + seq[k_next, i_prev, T] + c[s[i_prev], s[j_next]]
+            cost_concat_1 =                 seq[1, k, T]            + c[s[k], s[i]]
+            cost_concat_2 = cost_concat_1 + seq[i, j, T]            + c[s[j], s[k_next]]
+            cost_concat_3 = cost_concat_2 + seq[k_next, i_prev, T]  + c[s[i_prev], s[j_next]]
 
-            cost_new = seq[1, k, C] +
-                        seq[i, j, W]              * cost_concat_1 + seq[i, j, C] +
-                        seq[k_next, i_prev, W]    * cost_concat_2 + seq[k_next, i_prev, C] +
-                        seq[j_next, dimension+1, W] * cost_concat_3 + seq[j_next, dimension+1, C]
+            cost_new = seq[1, k, C]                                                             +   #       1st subseq
+                    seq[i, j, W]                * cost_concat_1 + seq[i, j, C]                  +   # concat 2nd subseq (reinserted seq)
+                    seq[k_next, i_prev, W]      * cost_concat_2 + seq[k_next, i_prev, C]        +   # concat 3rd subseq
+                    seq[j_next, dimension+1, W] * cost_concat_3 + seq[j_next, dimension+1, C]       # concat 4th subseq
 
             if cost_new < cost_best
                 cost_best = cost_new - EPSILON
@@ -261,10 +235,10 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
             cost_concat_2 = cost_concat_1 + seq[j_next, k, T] + c[s[k], s[i]]
             cost_concat_3 = cost_concat_2 + seq[i, j, T] + c[s[j], s[k_next]]
 
-            cost_new = seq[1, i_prev, C] +
-                    seq[j_next, k, W]         * cost_concat_1 + seq[j_next, k, C] +
-                    seq[i, j, W]              * cost_concat_2 + seq[i, j, C] +
-                    seq[k_next, dimension+1, W] * cost_concat_3 + seq[k_next, dimension+1, C]
+            cost_new = seq[1, i_prev, C]                                                        +   #       1st subseq
+                    seq[j_next, k, W]           * cost_concat_1 + seq[j_next, k, C]             +   # concat 2nd subseq
+                    seq[i, j, W]                * cost_concat_2 + seq[i, j, C]                  +   # concat 3rd subseq (reinserted seq)
+                    seq[k_next, dimension+1, W] * cost_concat_3 + seq[k_next, dimension+1, C]       # concat 4th subseq
 
             if cost_new < cost_best
                 cost_best = cost_new - EPSILON
@@ -277,12 +251,8 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
     end
 
     if cost_best < seq[1, dimension+1, C]
-        #@printf "Reinsertion  %d %d em %d\n" I J POS 
-        #println(s)
-        #println(cost_best)
         reinsert(s, I, J, POS+1)
         subseq_load(s, seq)
-        #println(seq[1,dimension+1,C])
         global improv_flag = true
     end
 end
@@ -290,7 +260,6 @@ end
 
 function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
-    #println(s)
 
     while length(neighbd_list) > 0
         global it += 1
@@ -300,15 +269,15 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         global improv_flag = false
 
         if neighbd == REINSERTION
-            global t_reinsertion += @elapsed search_reinsertion(s, seq, REINSERTION)
+            global t_reinsertion    += @elapsed search_reinsertion(s, seq, REINSERTION)
         elseif neighbd == OR_OPT2
-            global t_or_opt2 += @elapsed search_reinsertion(s, seq, OR_OPT2)
+            global t_or_opt2        += @elapsed search_reinsertion(s, seq, OR_OPT2)
         elseif neighbd == OR_OPT3
-            global t_or_opt3 += @elapsed search_reinsertion(s, seq, OR_OPT3)
+            global t_or_opt3        += @elapsed search_reinsertion(s, seq, OR_OPT3)
         elseif neighbd == SWAP
-            global t_swap += @elapsed search_swap(s, seq)
+            global t_swap           += @elapsed search_swap(s, seq)
         elseif neighbd == TWO_OPT
-            global t_two_opt += @elapsed search_two_opt(s, seq)
+            global t_two_opt        += @elapsed search_two_opt(s, seq)
         end
 
         if improv_flag
@@ -392,7 +361,6 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
 
         @printf "\tCurrent best solution cost: %.2lf\n" cost_best
     end
-    #println(cost_best)
     @printf "COST: %.2lf\n" cost_best
     print("SOLUTION: ")
     println(s_best)
@@ -405,9 +373,6 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
 end
 
 function main()
-    #println(dimension)
-    #println(c)
-
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
          0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
     
@@ -417,7 +382,7 @@ function main()
     time = @elapsed GILS_RVND(Imax, Iils, R)
 
     @printf "TIME %.6lf\n" time
-    @printf "RVND iteracoaes %d\n" it
+    @printf "RVND iteracoes %d\n" it
 
 end
 
