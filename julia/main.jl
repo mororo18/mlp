@@ -301,10 +301,10 @@ function perturb(sl::Array{Int64, 1})
 
     while (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)
         A_start = rand(2:length(s)-1-size_max)
-        A_end = A_start + rand(size_min:size_max-1)
+        A_end = A_start + rand(size_min:size_max)
 
         B_start = rand(2:length(s)-1-size_max)
-        B_end = B_start + rand(size_min:size_max-1)
+        B_end = B_start + rand(size_min:size_max)
     end
 
     if A_start < B_start
