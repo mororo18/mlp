@@ -25,7 +25,7 @@ function get_instance_info()
 
     i = 1
     for line in eachline(f)
-        println(line)
+        #println(line)
         if line == "EOF"
             break
         end
