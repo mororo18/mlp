@@ -5,7 +5,7 @@ from read import *
 from random import randint
 import math
 
-EPSILON = 0.00000000000001
+EPSILON = 1e-13
 
 SWAP        = 0
 TWO_OPT     = 1
@@ -52,9 +52,7 @@ def subseq_info_fill(n):
 
 def construction(alpha):
     s = [0]
-    c_list = []
-    for i in range(1, n):
-        c_list.append(i)
+    c_list = list(range(1, n))
 
     r = 0
     while len(c_list) > 0:
@@ -129,29 +127,41 @@ def search_swap(s, seq):
         i_prev = i - 1
         i_next = i + 1
 
-        total = seq[T][0][i_prev] + m[s[i_prev]][s[i_next]]
+        cost_concat_1 = seq[T][0][i_prev] + m[s[i_prev]][s[i_next]]
+        cost_concat_2 = cost_concat_1 + seq[T][i][i_next] + m[s[i]][s[i_next+1]]
 
-        cost = seq[C][0][i_prev] + seq[W][i][i_next] * (total) + m[s[i_next]][s[i]]
-        cost += seq[W][i_next+1][n] * (total + seq[T][i][i_next] + m[s[i]][s[i_next+1]]) + seq[C][i_next+1][n]
+        cost = seq[C][0][i_prev]                                            + \
+                seq[W][i][i_next]   * (cost_concat_1) + m[s[i_next]][s[i]]  + \
+                seq[W][i_next+1][n] * (cost_concat_2) + seq[C][i_next+1][n]
 
         if cost < cost_best:
             cost_best = cost - EPSILON
             I = i
             J = i_next
 
-        #if i == n-2:
-        #    continue
-
         for j in range(i_next+1, (n)):
             j_next = j + 1
             j_prev = j - 1
 
-            total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j]]
-            total_2 = total_1 + m[s[j]][s[i_next]]
-            total_3 = total_2 + seq[T][i_next][j_prev] + m[s[j_prev]][s[i]]
-            total_4 = total_3 + m[s[i]][s[j_next]]
+            cost_concat_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j]]
+            cost_concat_2 = cost_concat_1 + m[s[j]][s[i_next]]
+            cost_concat_3 = cost_concat_2 + seq[T][i_next][j_prev] + m[s[j_prev]][s[i]]
+            cost_concat_4 = cost_concat_3 + m[s[i]][s[j_next]]
 
-            cost = seq[C][0][i_prev] + total_1 + seq[W][i_next][j_prev] * total_2 + seq[C][i_next][j_prev] + total_3 + seq[W][j_next][n] * total_4 + seq[C][j_next][n]
+            """
+            cost = 1st subseq                       +
+                    concat 2nd subseq (sigle node)  + 
+                    concat 3rd subseq               +
+                    concat 4th subseq (single node) +
+                    concat 5th subseq
+            """
+
+            cost = seq[C][0][i_prev]                                                + \
+                    cost_concat_1                                                   + \
+                    seq[W][i_next][j_prev] * cost_concat_2 + seq[C][i_next][j_prev] + \
+                    cost_concat_3                                                   + \
+                    seq[W][j_next][n] * cost_concat_4 + seq[C][j_next][n]
+
             if cost < cost_best:
                 cost_best = cost - EPSILON
                 I = i
@@ -174,10 +184,18 @@ def search_two_opt(s, seq):
 
             reverse_cost += m[s[j-1]][s[j]] * (seq[W][i][j]-1)
 
-            total = seq[T][0][i_prev] + m[s[j]][s[i_prev]]
+            cost_concat_1 = seq[T][0][i_prev] + m[s[j]][s[i_prev]]
+            cost_concat_2 = cost_concat_1 + seq[T][i][j] + m[s[j_next]][s[i]]
 
-            cost = seq[C][0][i_prev] + seq[W][i][j] * total + reverse_cost
-            cost += seq[W][j_next][n] * (total + seq[T][i][j] + m[s[j_next]][s[i]]) + seq[C][j_next][n]
+            """
+            cost = 1st subseq                           +
+                    concat 2nd subseq (reversed seq)    + 
+                    concat 3rd subseq               
+            """
+
+            cost = seq[C][0][i_prev]                                        + \
+                    seq[W][i][j] * cost_concat_1 + reverse_cost             + \
+                    seq[W][j_next][n] * (cost_concat_2) + seq[C][j_next][n]
 
             if cost < cost_best:
                 cost_best = cost - EPSILON
@@ -217,12 +235,21 @@ def search_reinsertion(s, seq, OPT):
         for k in range(0, i_prev):
             k_next = k+1
 
-            total_1 = seq[T][0][k] + m[s[k]][s[i]]
-            total_2 = total_1 + seq[T][i][j] + m[s[j]][s[k_next]]
+            cost_concat_1 = seq[T][0][k] + m[s[k]][s[i]]
+            cost_concat_2 = cost_concat_1 + seq[T][i][j] + m[s[j]][s[k_next]]
+            cost_concat_3 = cost_concat_2 + seq[T][k_next][i_prev] + m[s[i_prev]][s[j_next]]
 
-            cost = seq[C][0][k] + seq[W][i][j] * total_1 + seq[C][i][j]
-            cost += seq[W][k_next][i_prev] * total_2 + seq[C][k_next][i_prev]
-            cost += seq[W][j_next][n] * (total_2 + seq[T][k_next][i_prev] + m[s[i_prev]][s[j_next]]) + seq[C][j_next][n]
+            """
+            cost = 1st subseq                           +
+                    concat 2nd subseq (reinserted seq)  + 
+                    concat 3rd subseq                   +
+                    concat 4th subseq  
+            """
+
+            cost = seq[C][0][k]                                                         + \
+                    seq[W][i][j]            * cost_concat_1 + seq[C][i][j]              + \
+                    seq[W][k_next][i_prev]  * cost_concat_2 + seq[C][k_next][i_prev]    + \
+                    seq[W][j_next][n]       * cost_concat_3 + seq[C][j_next][n]
 
             if cost < cost_best:
                 cost_best = cost - EPSILON
@@ -242,12 +269,21 @@ def search_reinsertion(s, seq, OPT):
         for k in range(i+opt, MAX - 1):
             k_next = k+1
 
-            total_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j_next]]
-            total_2 = total_1 + seq[T][j_next][k] + m[s[k]][s[i]]
+            cost_concat_1 = seq[T][0][i_prev] + m[s[i_prev]][s[j_next]]
+            cost_concat_2 = cost_concat_1 + seq[T][j_next][k] + m[s[k]][s[i]]
+            cost_concat_3 = cost_concat_2 + seq[T][i][j] + m[s[j]][s[k_next]]
 
-            cost = seq[C][0][i_prev] + seq[W][j_next][k] * total_1 + seq[C][j_next][k]
-            cost += seq[W][i][j] * total_2 + seq[C][i][j]
-            cost += seq[W][k_next][n] * (total_2 + seq[T][i][j] + m[s[j]][s[k_next]]) + seq[C][k_next][n]
+            """
+            cost = 1st subseq                           +
+                    concat 2nd subseq                   + 
+                    concat 3rd subseq  (reinserted seq) +
+                    concat 4th subseq  
+            """
+
+            cost = seq[C][0][i_prev]                                        + \
+                    seq[W][j_next][k]   * cost_concat_1 + seq[C][j_next][k] + \
+                    seq[W][i][j]        * cost_concat_2 + seq[C][i][j]      + \
+                    seq[W][k_next][n]   * cost_concat_3 + seq[C][k_next][n]
 
             if cost < cost_best:
                 cost_best = cost - EPSILON
