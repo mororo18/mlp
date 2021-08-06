@@ -260,6 +260,11 @@ end
 
 function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
+    t_reinsertion_local = 0
+    t_or_opt2_local = 0
+    t_or_opt3_local = 0
+    t_two_opt_local = 0
+    t_swap_local = 0
 
     while length(neighbd_list) > 0
         global it += 1
@@ -269,15 +274,15 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         global improv_flag = false
 
         if neighbd == REINSERTION
-            global t_reinsertion    += @elapsed search_reinsertion(s, seq, REINSERTION)
+            t_reinsertion_local    += @elapsed search_reinsertion(s, seq, REINSERTION)
         elseif neighbd == OR_OPT2
-            global t_or_opt2        += @elapsed search_reinsertion(s, seq, OR_OPT2)
+            t_or_opt2_local        += @elapsed search_reinsertion(s, seq, OR_OPT2)
         elseif neighbd == OR_OPT3
-            global t_or_opt3        += @elapsed search_reinsertion(s, seq, OR_OPT3)
+            t_or_opt3_local        += @elapsed search_reinsertion(s, seq, OR_OPT3)
         elseif neighbd == SWAP
-            global t_swap           += @elapsed search_swap(s, seq)
+            t_swap_local           += @elapsed search_swap(s, seq)
         elseif neighbd == TWO_OPT
-            global t_two_opt        += @elapsed search_two_opt(s, seq)
+            t_two_opt_local        += @elapsed search_two_opt(s, seq)
         end
 
         if improv_flag
@@ -287,6 +292,14 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         end
 
     end
+
+    global t_swap +=t_swap_local 
+    global t_reinsertion +=t_reinsertion_local
+    global t_or_opt2 += t_or_opt2_local
+    global t_or_opt3 += t_or_opt3_local
+    global t_two_opt += t_two_opt_local
+
+
 end
 
 function perturb(sl::Array{Int64, 1})
@@ -318,7 +331,7 @@ function perturb(sl::Array{Int64, 1})
     return s
 end
 
-function solve(Imax::Int64, Iils::Int64, R)
+function GILS_RVND(Imax::Int64, Iils::Int64, R)
     cost_best = Inf
     s_best = []
 
@@ -372,7 +385,7 @@ function solve(Imax::Int64, Iils::Int64, R)
     @printf "subseq time: %.6lf\n" t_seq/1e9
 end
 
-function Solvee()
+function main()
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
          0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
     
@@ -386,4 +399,4 @@ function Solvee()
 
 end
 
-#main()
+main()

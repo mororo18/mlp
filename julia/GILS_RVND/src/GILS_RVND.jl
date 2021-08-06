@@ -1,7 +1,6 @@
 module GILS_RVND
 
-using Printf
-include("Data.jl")
+#using Printf
 
 const T = 1
 const C = 2
@@ -14,6 +13,47 @@ const OR_OPT2     = 2
 const OR_OPT3     = 3
 const SWAP        = 4
 const TWO_OPT     = 5
+
+dimension = nothing
+matrix = nothing
+
+function get_instance_info()
+
+    f = open("../distance_matrix")
+
+    line = readline(f)
+    dimension = parse(Int32, line)
+    #matrix = Matrix{Float64}(undef, dimension,dimension)
+    matrix = zeros(dimension, dimension)
+
+    i = 1
+    for line in eachline(f)
+        #println(line)
+        if line == "EOF"
+            break
+        end
+
+
+        j = i+1
+        while length(line) > 0
+            index = findfirst(isequal(' '), line)
+            d = parse(Float64, line[begin:index])
+            #setindex!(matrix, d, i, j)
+            matrix[i,j] = d
+            matrix[j,i] = d
+
+            line = line[index+1:end]
+
+            j += 1
+        end
+
+        i += 1
+    end
+
+    close(f)
+
+    return dimension, matrix
+end
 
 dimension, c = get_instance_info()
 
@@ -261,6 +301,11 @@ end
 
 function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
+    t_reinsertion_local = 0
+    t_or_opt2_local = 0
+    t_or_opt3_local = 0
+    t_two_opt_local = 0
+    t_swap_local = 0
 
     while length(neighbd_list) > 0
         global it += 1
@@ -270,15 +315,15 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         global improv_flag = false
 
         if neighbd == REINSERTION
-            global t_reinsertion    += @elapsed search_reinsertion(s, seq, REINSERTION)
+            t_reinsertion_local    += @elapsed search_reinsertion(s, seq, REINSERTION)
         elseif neighbd == OR_OPT2
-            global t_or_opt2        += @elapsed search_reinsertion(s, seq, OR_OPT2)
+            t_or_opt2_local        += @elapsed search_reinsertion(s, seq, OR_OPT2)
         elseif neighbd == OR_OPT3
-            global t_or_opt3        += @elapsed search_reinsertion(s, seq, OR_OPT3)
+            t_or_opt3_local        += @elapsed search_reinsertion(s, seq, OR_OPT3)
         elseif neighbd == SWAP
-            global t_swap           += @elapsed search_swap(s, seq)
+            t_swap_local           += @elapsed search_swap(s, seq)
         elseif neighbd == TWO_OPT
-            global t_two_opt        += @elapsed search_two_opt(s, seq)
+            t_two_opt_local        += @elapsed search_two_opt(s, seq)
         end
 
         if improv_flag
@@ -288,6 +333,12 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         end
 
     end
+
+    global t_swap +=t_swap_local 
+    global t_reinsertion +=t_reinsertion_local
+    global t_or_opt2 += t_or_opt2_local
+    global t_or_opt3 += t_or_opt3_local
+    global t_two_opt += t_two_opt_local
 end
 
 function perturb(sl::Array{Int64, 1})
@@ -327,15 +378,15 @@ function main(Imax::Int64, Iils::Int64, R)
 
     for i in 1:Imax
         alpha = R[rand(1:26)]
-        @printf "[+] Local Search %d\n" i
-        @printf "\t[+] Constructing Inital Solution..\n"
+        #@printf "[+] Local Search %d\n" i
+        #@printf "\t[+] Constructing Inital Solution..\n"
         s = construction(alpha)
         sl = copy(s)
         subseq_load(s, subseq)
 
         rvnd_cost_best = subseq[1,dimension+1,C] - EPSILON
 
-        @printf "\t[+] Looking for the best Neighbor..\n"
+        #@printf "\t[+] Looking for the best Neighbor..\n"
         iterILS = 0
         while iterILS < Iils
             RVND(s, subseq)
@@ -360,17 +411,18 @@ function main(Imax::Int64, Iils::Int64, R)
             cost_best = sl_cost
         end
 
-        @printf "\tCurrent best solution cost: %.2lf\n" cost_best
+        #@printf "\tCurrent best solution cost: %.2lf\n" cost_best
     end
-    @printf "COST: %.2lf\n" cost_best
+    #@printf "COST: %.2lf\n" cost_best
     print("SOLUTION: ")
     println(s_best)
-    @printf "Swap time: %.6lf\n" t_swap
-    @printf "Reinsertion time: %.6lf\n" t_reinsertion
-    @printf "Or_opt2 time: %.6lf\n" t_or_opt2
-    @printf "Or_opt3 time: %.6lf\n" t_or_opt3
-    @printf "Two_opt time: %.6lf\n" t_two_opt
-    @printf "subseq time: %.6lf\n" t_seq/1e9
+    println(cost_best)
+    #@printf "Swap time: %.6lf\n" t_swap
+    #@printf "Reinsertion time: %.6lf\n" t_reinsertion
+    #@printf "Or_opt2 time: %.6lf\n" t_or_opt2
+    #@printf "Or_opt3 time: %.6lf\n" t_or_opt3
+    #@printf "Two_opt time: %.6lf\n" t_two_opt
+    #@printf "subseq time: %.6lf\n" t_seq/1e9
 end
 
 function solve()
@@ -382,8 +434,8 @@ function solve()
 
     time = @elapsed main(Imax, Iils, R)
 
-    @printf "TIME %.6lf\n" time
-    @printf "RVND iteracoes %d\n" it
+    #@printf "TIME %.6lf\n" time
+    #@printf "RVND iteracoes %d\n" it
 
 end
 
