@@ -93,7 +93,7 @@ function reinsert(s::Array{Int64,1}, i::Int64, j::Int64, pos::Int64)
     end
 end
 
-function search_swap(s::Array{Int64,1}, seq::Array{Float64,3})
+function search_swap(s::Array{Int64,1}, seq::Array{Float64,3}, c)
     cost_best = Inf
     I = -1
     J = -1
@@ -154,7 +154,7 @@ function search_swap(s::Array{Int64,1}, seq::Array{Float64,3})
     end
 end
 
-function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3})
+function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3}, c)
     cost_best = Inf
     I = -1
     J = -1
@@ -197,7 +197,7 @@ function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3})
     end
 end
 
-function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64)
+function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64, c)
     cost_best = Inf
     I = -1
     J = -1
@@ -274,15 +274,15 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
         global improv_flag = false
 
         if neighbd == REINSERTION
-            t_reinsertion_local    += @elapsed search_reinsertion(s, seq, REINSERTION)
+            t_reinsertion_local    += @elapsed search_reinsertion(s, seq, REINSERTION, c)
         elseif neighbd == OR_OPT2
-            t_or_opt2_local        += @elapsed search_reinsertion(s, seq, OR_OPT2)
+            t_or_opt2_local        += @elapsed search_reinsertion(s, seq, OR_OPT2, c)
         elseif neighbd == OR_OPT3
-            t_or_opt3_local        += @elapsed search_reinsertion(s, seq, OR_OPT3)
+            t_or_opt3_local        += @elapsed search_reinsertion(s, seq, OR_OPT3, c)
         elseif neighbd == SWAP
-            t_swap_local           += @elapsed search_swap(s, seq)
+            t_swap_local           += @elapsed search_swap(s, seq, c)
         elseif neighbd == TWO_OPT
-            t_two_opt_local        += @elapsed search_two_opt(s, seq)
+            t_two_opt_local        += @elapsed search_two_opt(s, seq, c)
         end
 
         if improv_flag
