@@ -3,9 +3,9 @@ Public ct() As Double
 Public subseq() As Double
 Public dimension As Integer
 
-Public Const T As Integer = 1
-Public Const C As Integer = 2
-Public Const W As Integer = 3
+Public Const T As Integer = 0
+Public Const C As Integer = 1
+Public Const W As Integer = 2
 
 
 Public Const SIZE_EMPTY As Long = 0
@@ -60,7 +60,7 @@ Sub readData()
     
     ReDim ct(dimension, dimension) As Double
     
-    i = 1
+    i = 0
     Do Until EOF(1)
         Line Input #1, textline
         If StrComp(textline, "EOF", vbBinaryCompare) = 0 Then
@@ -84,8 +84,8 @@ Sub readData()
     
     Close
     
-    For i = 1 To dimension
-        For j = 1 To dimension
+    For i = 0 To dimension - 1
+        For j = 0 To dimension - 1
             Debug.Print CStr(ct(i, j)) + " ";
         Next j
         Debug.Print ""
@@ -95,7 +95,7 @@ End Sub
 Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
     Dim k As Integer
     
-    For i = 1 To (dimension + 1)
+    For i = 0 To (dimension)
         k = 1 - i - IIf(i <> 0, 0, 1)
         
         seq(i, i, T) = 0
@@ -103,7 +103,7 @@ Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
         seq(i, i, C) = IIf(i <> 0, 1, 0)
         
         Dim j_prev As Integer
-        For j = 1 To (dimension + 1)
+        For j = (i + 1) To (dimension)
             j_prev = j - 1
             
             seq(i, j, T) = ct(s(j_prev), s(j)) + seq(i, j_prev, T)
@@ -128,12 +128,12 @@ Sub solve()
     Iils = IIf(dimension < 100, dimension, 100)
     
     
-    For i = 1 To dimension
+    For i = 0 To dimension - 1
         s(i) = i
         Debug.Print s(i)
     Next
-    s(dimension + 1) = 1
+    s(dimension) = 0
     
     subseq_load s, subseq
-    Debug.Print subseq(1, dimension + 1, C)
+    Debug.Print subseq(0, dimension, C)
 End Sub
