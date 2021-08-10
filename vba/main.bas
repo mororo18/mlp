@@ -4,7 +4,7 @@ Public subseq() As Double
 Public dimension As Integer
 
 Public Const T As Integer = 0
-Public Const C As Integer = 1
+Public Const c As Integer = 1
 Public Const W As Integer = 2
 
 
@@ -17,7 +17,7 @@ Public Function size( _
     ByRef r_values() As Integer _
   , Optional ByVal dimensionOneBased As Long = 1 _
 ) As Long
-  Dim result As Long: result = SIZE_EMPTY 'Default to Empty
+  Dim Result As Long: Result = SIZE_EMPTY 'Default to Empty
 
   Dim lowerBound As Long
   Dim upperBound As Long
@@ -27,15 +27,15 @@ Public Function size( _
   lowerBound = LBound(r_values, dimensionOneBased) 'Possibly generates error
   upperBound = UBound(r_values, dimensionOneBased) 'Possibly generates error
   If (lowerBound < upperBound) Then
-    result = upperBound - lowerBound + 1 'Size greater than 1
+    Result = upperBound - lowerBound + 1 'Size greater than 1
   Else
     If (lowerBound = upperBound) Then
-      result = 1 'Size equal to 1
+      Result = 1 'Size equal to 1
     End If
   End If
   
 NormalExit:
-  size = result
+  size = Result
 End Function
 
 Public Function isEmpty( _
@@ -53,7 +53,7 @@ Sub readData()
     
     Dim i As Integer
     Dim j As Integer
-    Dim index As Integer
+    Dim Index As Integer
     
     Line Input #1, textline
     dimension = CInt(textline)
@@ -70,12 +70,12 @@ Sub readData()
         j = i + 1
         Do While Len(textline) > 0
             'Debug.Print textline
-            index = InStr(textline, " ")
-            cost = CDbl(Left(textline, index - 1))
+            Index = InStr(textline, " ")
+            cost = CDbl(Left(textline, Index - 1))
             ct(i, j) = cost
             ct(j, i) = cost
             
-            textline = Right(textline, Len(textline) - index)
+            textline = Right(textline, Len(textline) - Index)
             j = j + 1
         Loop
         
@@ -100,14 +100,14 @@ Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
         
         seq(i, i, T) = 0
         seq(i, i, W) = 0
-        seq(i, i, C) = IIf(i <> 0, 1, 0)
+        seq(i, i, c) = IIf(i <> 0, 1, 0)
         
         Dim j_prev As Integer
         For j = (i + 1) To (dimension)
             j_prev = j - 1
             
             seq(i, j, T) = ct(s(j_prev), s(j)) + seq(i, j_prev, T)
-            seq(i, j, C) = seq(i, j, T) + seq(i, j_prev, C)
+            seq(i, j, c) = seq(i, j, T) + seq(i, j_prev, c)
             seq(i, j, W) = j + k
             
         Next
@@ -115,6 +115,63 @@ Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
     
 End Sub
 
+Sub sort_until_by(ByRef Arr() As Integer, Index As Integer, r As Integer)
+    Dim tmp As Integer
+    
+    For i = 0 To Index
+        For j = size(Arr) - 1 To i + 1 Step -1
+            If ct(r, Arr(j)) < ct(r, Arr(j - 1)) Then
+                tmp = Arr(j)
+                Arr(j) = Arr(j - 1)
+                Arr(j - 1) = tmp
+            End If
+        Next
+    Next
+    
+End Sub
+
+Function construction(alpha As Double) As Integer()
+    'initial solution
+    Dim s() As Integer
+    ReDim s(1) As Integer
+    s(0) = 0
+    
+    Dim cList() As Integer
+    ReDim cList(dimension - 1) As Integer
+    For j = 1 To dimension - 1
+        cList(j - 1) = j
+    Next
+    
+    Dim count As Integer
+    count = 0
+    
+    Dim r As Integer
+    Dim item As Integer
+    Dim cN As Integer
+    r = 0
+    Do While IsArrayEmpty(cList) <> True
+        item = CInt(size(cList) * alpha) + 1
+        sort_until_by cList, item, r
+        cN = cList(CInt((item * Rnd) + 0))
+        InsertElementIntoArray s, UBound(s) + 1, c
+        r = cN
+        DeleteArrayElement cList, cN, True
+        
+        If count = 20 Then
+            Exit Function
+        End If
+        
+        count = count + 1
+    Loop
+    
+    
+    For j = 0 To size(s) - 1
+        Debug.Print s(j)
+    Next
+    
+    construction = s
+    
+End Function
 
 
 Sub solve()
@@ -135,5 +192,6 @@ Sub solve()
     s(dimension) = 0
     
     subseq_load s, subseq
-    Debug.Print subseq(0, dimension, C)
+    s = construction(0.12)
+    Debug.Print subseq(0, dimension, c)
 End Sub
