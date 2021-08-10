@@ -53,7 +53,7 @@ Sub readData()
     
     Dim i As Integer
     Dim j As Integer
-    Dim Index As Integer
+    Dim index As Integer
     
     Line Input #1, textline
     dimension = CInt(textline)
@@ -70,12 +70,12 @@ Sub readData()
         j = i + 1
         Do While Len(textline) > 0
             'Debug.Print textline
-            Index = InStr(textline, " ")
-            cost = CDbl(Left(textline, Index - 1))
+            index = InStr(textline, " ")
+            cost = CDbl(Left(textline, index - 1))
             ct(i, j) = cost
             ct(j, i) = cost
             
-            textline = Right(textline, Len(textline) - Index)
+            textline = Right(textline, Len(textline) - index)
             j = j + 1
         Loop
         
@@ -115,10 +115,10 @@ Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
     
 End Sub
 
-Sub sort_until_by(ByRef Arr() As Integer, Index As Integer, r As Integer)
+Sub sort_until_by(ByRef Arr() As Integer, index As Integer, r As Integer)
     Dim tmp As Integer
     
-    For i = 0 To Index
+    For i = 0 To index
         For j = size(Arr) - 1 To i + 1 Step -1
             If ct(r, Arr(j)) < ct(r, Arr(j - 1)) Then
                 tmp = Arr(j)
@@ -137,25 +137,41 @@ Function construction(alpha As Double) As Integer()
     s(0) = 0
     
     Dim cList() As Integer
-    ReDim cList(dimension - 1) As Integer
+    ReDim cList(dimension - 2) As Integer
     For j = 1 To dimension - 1
         cList(j - 1) = j
     Next
-    
+    Debug.Print ""
+    For j = 0 To size(cList) - 1
+        Debug.Print cList(j)
+    Next
+    Debug.Print ""
     Dim count As Integer
     count = 0
     
     Dim r As Integer
     Dim item As Integer
-    Dim cN As Integer
+    Dim index As Long
+    Dim cN As Long
     r = 0
     Do While IsArrayEmpty(cList) <> True
         item = CInt(size(cList) * alpha) + 1
         sort_until_by cList, item, r
-        cN = cList(CInt((item * Rnd) + 0))
-        InsertElementIntoArray s, UBound(s) + 1, c
+        
+        If size(cList) = 1 Then
+            item = 0
+        End If
+        
+        index = CInt((item * Rnd) + 0)
+        'Debug.Print "index ", index
+        cN = cList(index)
+        Debug.Print "cN ", cN
+        InsertElementIntoArray s, UBound(s), cN
         r = cN
-        DeleteArrayElement cList, cN, True
+        DeleteArrayElement cList, index, True
+        
+        'Debug.Print cN
+        'Debug.Print "tamanho ", size(cList)
         
         If count = 20 Then
             Exit Function
@@ -165,9 +181,6 @@ Function construction(alpha As Double) As Integer()
     Loop
     
     
-    For j = 0 To size(s) - 1
-        Debug.Print s(j)
-    Next
     
     construction = s
     
@@ -177,7 +190,7 @@ End Function
 Sub solve()
     readData
     Dim s() As Integer
-    ReDim s(dimension + 1) As Integer
+    'ReDim s(dimension + 1) As Integer
     ReDim subseq(dimension + 1, dimension + 1, 3) As Double
     
     Dim Imax As Integer
@@ -186,12 +199,18 @@ Sub solve()
     
     
     For i = 0 To dimension - 1
-        s(i) = i
+        's(i) = i
+        'Debug.Print s(i)
+    Next
+    's(dimension) = 0
+    
+    
+    s = construction(0.12)
+    subseq_load s, subseq
+    Debug.Print "Sinit:"
+    For i = 0 To size(s) - 1
         Debug.Print s(i)
     Next
-    s(dimension) = 0
     
-    subseq_load s, subseq
-    s = construction(0.12)
     Debug.Print subseq(0, dimension, c)
 End Sub
