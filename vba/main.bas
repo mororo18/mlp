@@ -3,10 +3,13 @@ Public ct() As Double
 Public subseq() As Double
 Public Dimension As Integer
 
-Public Const T As Integer = 0
-Public Const c As Integer = 1
-Public Const W As Integer = 2
+Public Const SWAP As Integer = 0
+Public Const REINSERTION As Integer = 1
+Public Const OR_OPT2 As Integer = 2
+Public Const OR_OPT3 As Integer = 3
+Public Const TWO_OPT As Integer = 4
 
+Public Const improv_flag As Boolean = False
 
 Public Const SIZE_EMPTY As Long = 0
 
@@ -158,7 +161,7 @@ Function construction(alpha As Double) As Integer()
     Dim Index As Long
     Dim cN As Long
     r = 0
-    Do While IsArrayEmpty(cList) <> True
+    Do While IsArrayEmpty(cList) = False
         item = CInt(size(cList) * alpha) + 1
         sort_until_by cList, item, r
         
@@ -166,6 +169,7 @@ Function construction(alpha As Double) As Integer()
             item = 0
         End If
         
+        ' random between item and 0
         Index = CInt((item * Rnd) + 0)
         'Debug.Print "index ", index
         cN = cList(Index)
@@ -191,14 +195,54 @@ Function construction(alpha As Double) As Integer()
     
 End Function
 
+Sub RVND(s() As Integer, subseq() As Double)
+    Dim neighbd_list() As Integer
+    neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
+    
+    Dim i As Integer
+    Do While IsArrayEmpty(neighbd_list) = False
+        i = CInt((size(neighbd_list) - 1) * Rnd)
+        
+        improv_flag = False
+        
+        Select Case neighbd_list(i)
+            Case SWAP
+                search_swap s, subseq
+            Case REINSERTION
+                search_reinsert s, subseq, REINSERTION
+            Case OR_OPT2
+                search_reinsert s, subseq, OR_OPT2
+            Case OR_OPT3
+                search_reinsert s, subseq, OR_OPT3
+            Case TWO_OPT
+                search_two_opt s, subseq
+        End Select
+        
+        If improv_flag Then
+            neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
+        Else
+            DeleteArrayElement neighbd_list, i, True
+        End If
+            
+    Loop
+    
+End Sub
 
 Sub solve()
     readData
     Dim s() As Integer
+    Dim sl() As Integer
     'ReDim s(dimension + 1) As Integer
     ReDim subseq(Dimension + 1, Dimension + 1, 3) As Double
+    Dim rvnd_cost_best As Double
+    Dim rnvd_cost_crnt As Double
     
+    
+    Dim R_size As Integer
+    Dim R_table() As Double
+    R_table = Array(0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25)
     Dim Imax As Integer
+    Imax = 10
     Dim Iils As Integer
     Iils = IIf(Dimension < 100, Dimension, 100)
     
@@ -211,4 +255,22 @@ Sub solve()
     Next
     
     Debug.Print subseq(0, Dimension, c)
+    
+    For i = 0 To Imax
+        Dim alpha As Double
+    
+        alpha = R_table(CInt((R_size * Rnd) + 0))
+        s = construction(alpha)
+        sl = s
+        
+        subseq_load s, subseq
+        rvnd_cost_best = subseq(0, Dimension, c)
+        Dim Iiter As Integer
+        Iiter = 0
+        Do While Iiter < Iils
+            RVND s, subseq
+            
+            Iiter = Iiter + 1
+        Loop
+    Next
 End Sub
