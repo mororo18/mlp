@@ -9,7 +9,7 @@ Public Const OR_OPT2 As Integer = 2
 Public Const OR_OPT3 As Integer = 3
 Public Const TWO_OPT As Integer = 4
 
-Public Const improv_flag As Boolean = False
+Public improv_flag As Boolean
 
 Public Const SIZE_EMPTY As Long = 0
 
@@ -17,7 +17,7 @@ Public Const SIZE_EMPTY As Long = 0
 '   -1 - Not an Array
 '    0 - Empty
 Public Function size( _
-    ByRef r_values() As Integer _
+    ByRef r_values As Variant _
   , Optional ByVal dimensionOneBased As Long = 1 _
 ) As Long
   Dim Result As Long: Result = SIZE_EMPTY 'Default to Empty
@@ -47,6 +47,15 @@ Public Function isEmpty( _
 ) As Boolean
   isEmpty = size(r_values, dimensionOneBased) = 0
 End Function
+
+Sub printArray(ByRef Arr() As Integer, name As String)
+    Dim output As String
+    output = name & ": "
+    For i = 0 To size(Arr) - 1
+        output = output & Arr(i) & " "
+    Next
+    Debug.Print output
+End Sub
 
 Sub readData()
     Dim myFile As String, text As String, textline As String, cost As Double
@@ -141,17 +150,13 @@ Function construction(alpha As Double) As Integer()
     
     Dim cList() As Integer
     ReDim cList(Dimension - 2) As Integer
-    For j = 0 To size(s) - 1
-        Debug.Print s(j)
-    Next
+    
     Debug.Print ""
     For j = 1 To Dimension - 1
         cList(j - 1) = j
     Next
     Debug.Print ""
-    For j = 0 To size(cList) - 1
-        Debug.Print cList(j)
-    Next
+    printArray cList, "cList"
     Debug.Print ""
     Dim count As Integer
     count = 0
@@ -195,28 +200,78 @@ Function construction(alpha As Double) As Integer()
     
 End Function
 
+Sub swap_f(s() As Integer, i As Integer, j As Integer)
+    Dim tmp As Integer
+    tmp = s(i)
+    s(i) = s(j)
+    s(j) = tmp
+End Sub
+
+Sub reverse(s() As Integer, i As Integer, j As Integer)
+    Dim a As Integer
+    Dim b As Integer
+    b = j
+    For a = i To CInt((j + i) \ 2)
+        swap_f s, a, b
+        b = b - 1
+    Next a
+End Sub
+
+Sub reinsert(s() As Integer, i As Integer, j As Integer, pos As Integer)
+    If i < pos Then
+        For k = i To j
+            tmp = s(i)
+            InsertElementIntoArray s, CLng(pos), tmp
+            'printArray s, "insert"
+            DeleteArrayElement s, CLng(i), True
+            'printArray s, "delete"
+        Next
+    Else
+        For k = i To j
+            tmp = s(j)
+            DeleteArrayElement s, CLng(j), True
+            InsertElementIntoArray s, CLng(pos), tmp
+        Next
+    End If
+End Sub
+
+Sub search_swap(s() As Integer, seq() As Double)
+
+End Sub
+
+Sub search_two_opt(s() As Integer, seq() As Double)
+    reinsert s, 6, 10, 2
+End Sub
+
+Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
+
+End Sub
+
 Sub RVND(s() As Integer, subseq() As Double)
-    Dim neighbd_list() As Integer
-    neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
+    Dim neighbd_list() As Variant
+    'neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
+    neighbd_list = Array(TWO_OPT)
     
-    Dim i As Integer
+    Dim i As Long
     Do While IsArrayEmpty(neighbd_list) = False
         i = CInt((size(neighbd_list) - 1) * Rnd)
         
         improv_flag = False
-        
+        printArray s, "S antes"
         Select Case neighbd_list(i)
             Case SWAP
                 search_swap s, subseq
             Case REINSERTION
-                search_reinsert s, subseq, REINSERTION
+                search_reinsertion s, subseq, REINSERTION
             Case OR_OPT2
-                search_reinsert s, subseq, OR_OPT2
+                search_reinsertion s, subseq, OR_OPT2
             Case OR_OPT3
-                search_reinsert s, subseq, OR_OPT3
+                search_reinsertion s, subseq, OR_OPT3
             Case TWO_OPT
                 search_two_opt s, subseq
         End Select
+        printArray s, "S depos"
+        Exit Sub
         
         If improv_flag Then
             neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
@@ -239,8 +294,8 @@ Sub solve()
     
     
     Dim R_size As Integer
-    Dim R_table() As Double
-    R_table = Array(0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25)
+    Dim R_table()
+    R_table = Array(0#, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25)
     Dim Imax As Integer
     Imax = 10
     Dim Iils As Integer
@@ -249,10 +304,7 @@ Sub solve()
     
     s = construction(0.12)
     subseq_load s, subseq
-    Debug.Print "Sinit:"
-    For i = 0 To size(s) - 1
-        Debug.Print s(i)
-    Next
+    printArray s, "Sinit"
     
     Debug.Print subseq(0, Dimension, c)
     
@@ -269,6 +321,7 @@ Sub solve()
         Iiter = 0
         Do While Iiter < Iils
             RVND s, subseq
+            Exit Sub
             
             Iiter = Iiter + 1
         Loop
