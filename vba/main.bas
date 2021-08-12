@@ -9,9 +9,9 @@ Public Const OR_OPT2 As Integer = 2
 Public Const OR_OPT3 As Integer = 3
 Public Const TWO_OPT As Integer = 4
 
-Public Const T As Integer = 1
-Public Const C As Integer = 2
-Public Const W As Integer = 3
+Public Const T As Integer = 0
+Public Const C As Integer = 1
+Public Const W As Integer = 2
 
 Public improv_flag As Boolean
 
@@ -55,7 +55,7 @@ Public Function isEmpty( _
   isEmpty = size(r_values, dimensionOneBased) = 0
 End Function
 
-Sub printArray(ByRef Arr() As Integer, name As String)
+Sub printArray(ByRef Arr As Variant, name As String)
     Dim output As String
     output = name & ": "
     For i = 0 To size(Arr) - 1
@@ -298,7 +298,7 @@ Sub search_swap(s() As Integer, seq() As Double)
             If cost_new < cost_best Then
                 cost_best = cost_new - EPSILON
                 I_best = i
-                J_best -j
+                J_best = j
             End If
                     
         Next
@@ -306,8 +306,11 @@ Sub search_swap(s() As Integer, seq() As Double)
     Next
     
     If cost_best < seq(0, Dimension, C) Then
+        Debug.Print "Swap"
+        Debug.Print cost_best
         swap_f s, I_best, J_best
         subseq_load s, seq
+        Debug.Print seq(0, Dimension, C)
         improv_flag = True
     End If
         
@@ -356,16 +359,24 @@ Sub search_two_opt(s() As Integer, seq() As Double)
     Next
     
     If cost_best < seq(0, Dimension, C) Then
+        Debug.Print "two opt"
+        Debug.Print cost_best
+        printArray s, "antes"
         reverse s, I_best, J_best
+        printArray s, "depois"
         subseq_load s, seq
+        Debug.Print seq(0, Dimension, C)
         improv_flag = True
     End If
+    
+    
     
 End Sub
 
 Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
     Dim cost_best As Double
     Dim cost_new As Double
+    cost_best = inf
     
     ' concat costs vars
     Dim cost_concat_1 As Double
@@ -401,7 +412,7 @@ Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
             If cost_new < cost_best Then
                 cost_best = cost_new - EPSILON
                 I_best = i
-                J_best j
+                J_best = j
                 POS_best = k
             End If
             
@@ -428,54 +439,73 @@ Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
             
         Next
         
-        If cost_best < seq(0, Dimension, C) Then
-            reinsert s, I_best, J_best, POS_best + 1
-            subseq_load s, seq
-            improv_flag = True
-        End If
-        
     Next
+    
+    If cost_best < seq(0, Dimension, C) Then
+        Debug.Print "reinsertion"
+        Debug.Print cost_best, I_best, J_best, POS_best
+        reinsert s, I_best, J_best, POS_best + 1
+        subseq_load s, seq
+        Debug.Print seq(0, Dimension, C)
+        improv_flag = True
+    End If
     
 End Sub
 
-Sub RVND(s() As Integer, subseq() As Double)
+Sub RVND(sl() As Integer, subseq() As Double)
     Dim neighbd_list() As Variant
     'neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
     neighbd_list = Array(TWO_OPT)
+    
+    Dim s() As Integer
+    ReDim s(0) As Integer
+    s(0) = 0
+    For j = 1 To Dimension - 1
+        InsertElementIntoArray s, UBound(s) + 1, j
+    Next
+    InsertElementIntoArray s, UBound(s) + 1, 0
+    
+    printArray s, "s"
     
     Dim i As Long
     Do While IsArrayEmpty(neighbd_list) = False
         i = CInt((size(neighbd_list) - 1) * Rnd)
         
         improv_flag = False
-        printArray s, "S antes"
+        printArray neighbd_list, "NL "
+        Debug.Print "i", i, size(neighbd_list)
         Select Case neighbd_list(i)
             Case SWAP
+                Debug.Print "swap"
                 search_swap s, subseq
             Case REINSERTION
+                Debug.Print "reinsert"
                 search_reinsertion s, subseq, REINSERTION
             Case OR_OPT2
+            Debug.Print "or_opt2"
                 search_reinsertion s, subseq, OR_OPT2
             Case OR_OPT3
+            Debug.Print "or_opt3"
                 search_reinsertion s, subseq, OR_OPT3
             Case TWO_OPT
+            Debug.Print "two_opt"
                 search_two_opt s, subseq
         End Select
-        printArray s, "S depos"
         'Exit Sub
         
-        If improv_flag Then
+        If improv_flag = True Then
             neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
         Else
             DeleteArrayElement neighbd_list, i, True
         End If
             
+        'Exit Sub
     Loop
     
 End Sub
 
 Function perturb(sl As Variant)
-    Dim s
+    Dim s() As Integer
     Dim A_start As Integer, A_end As Integer
     Dim B_start As Integer, B_end As Integer
     Dim size_max As Integer, size_min As Integer, max As Integer
@@ -525,10 +555,18 @@ Sub solve()
     Dim R_size As Integer
     Dim R_table()
     R_table = Array(0#, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25)
+    R_size = 26
     Dim Imax As Integer
     Imax = 10
     Dim Iils As Integer
     Iils = IIf(Dimension < 100, Dimension, 100)
+    
+    For i = 0 To 10
+        Debug.Print Rnd
+    Next
+    
+    Exit Sub
+    
     
     
     s = construction(0.12)
@@ -536,7 +574,6 @@ Sub solve()
     printArray s, "Sinit"
     
     Debug.Print subseq(0, Dimension, C)
-    Exit Sub
     
     Dim s_best() As Integer
     Dim cost_best As Double
