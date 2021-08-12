@@ -462,7 +462,7 @@ Sub RVND(s() As Integer, subseq() As Double)
                 search_two_opt s, subseq
         End Select
         printArray s, "S depos"
-        Exit Sub
+        'Exit Sub
         
         If improv_flag Then
             neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
@@ -473,6 +473,44 @@ Sub RVND(s() As Integer, subseq() As Double)
     Loop
     
 End Sub
+
+Function perturb(sl As Variant)
+    Dim s
+    Dim A_start As Integer, A_end As Integer
+    Dim B_start As Integer, B_end As Integer
+    Dim size_max As Integer, size_min As Integer, max As Integer
+    
+    A_start = 1
+    A_end = 1
+    B_start = 1
+    B_end = 1
+    
+    size_max = size(sl) / 10
+    size_max = IIf(size_max >= 2, size_max, 2)
+    size_min = 2
+    
+    Do While (A_start <= B_start And B_start <= A_end) Or (B_start <= A_start And A_start <= B_end)
+        max = size(sl) - 2 - size_max
+        A_start = CInt((max * Rnd) + 1)
+        A_end = A_start + CInt(((size_max - size_min) * Rnd) + size_min)
+        
+        B_start = CInt((max * Rnd) + 1)
+        B_end = B_start + CInt(((size_max - size_min) * Rnd) + size_min)
+    Loop
+    
+    s = sl
+    
+    If A_start < B_start Then
+        reinsert s, B_start, B_end - 1, A_end
+        reinsert s, A_start, A_end - 1, B_end
+    Else
+        reinsert s, A_start, A_end - 1, B_end
+        reinsert s, B_start, B_end - 1, A_end
+    End If
+    
+    perturb = s
+    
+End Function
 
 Sub solve()
     readData
@@ -500,22 +538,42 @@ Sub solve()
     Debug.Print subseq(0, Dimension, C)
     Exit Sub
     
+    Dim s_best() As Integer
+    Dim cost_best As Double
+    cost_best = inf
+    
     For i = 0 To Imax
         Dim alpha As Double
     
-        alpha = R_table(CInt((R_size * Rnd) + 0))
+        alpha = R_table(CInt(((R_size - 1) * Rnd) + 0))
         s = construction(alpha)
         sl = s
         
         subseq_load s, subseq
-        rvnd_cost_best = subseq(0, Dimension, C)
-        Dim Iiter As Integer
-        Iiter = 0
-        Do While Iiter < Iils
+        rvnd_cost_best = subseq(0, Dimension, C) - EPSILON
+        Dim iterILS As Integer
+        iterILS = 0
+        Do While iterILS < Iils
             RVND s, subseq
-            Exit Sub
+            rvnd_cost_crnt = subseq(0, Dimension, C) - EPSILON
+            If rvnd_cost_crnt < rvnd_cost_best Then
+                rvnd_cost_best = rvnd_cost_crnt
+                sl = s
+                iterILS = 0
+            End If
             
+            s = perturb(sl)
+            subseq_load s, subseq
             Iiter = Iiter + 1
         Loop
+        
+        subseq_load sl, subseq
+        sl_cost = subseq(0, Dimension, C) - EPSILON
+        
+        If sl_cost < cost_best Then
+            cost_best = sl_cost
+            s_best = sl
+        End If
+        
     Next
 End Sub
