@@ -1,4 +1,4 @@
-Attribute VB_Name = "Módulo1"
+Attribute VB_Name = "main"
 Public ct() As Double
 Public subseq() As Double
 Public Dimension As Integer
