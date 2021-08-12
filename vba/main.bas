@@ -9,7 +9,14 @@ Public Const OR_OPT2 As Integer = 2
 Public Const OR_OPT3 As Integer = 3
 Public Const TWO_OPT As Integer = 4
 
+Public Const T As Integer = 1
+Public Const C As Integer = 2
+Public Const W As Integer = 3
+
 Public improv_flag As Boolean
+
+Public Const inf As Double = 10 ^ 16
+Public Const EPSILON As Double = 10 ^ (-16)
 
 Public Const SIZE_EMPTY As Long = 0
 
@@ -112,14 +119,14 @@ Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
         
         seq(i, i, T) = 0
         seq(i, i, W) = 0
-        seq(i, i, c) = IIf(i <> 0, 1, 0)
+        seq(i, i, C) = IIf(i <> 0, 1, 0)
         
         Dim j_prev As Integer
         For j = (i + 1) To (Dimension)
             j_prev = j - 1
             
             seq(i, j, T) = ct(s(j_prev), s(j)) + seq(i, j_prev, T)
-            seq(i, j, c) = seq(i, j, T) + seq(i, j_prev, c)
+            seq(i, j, C) = seq(i, j, T) + seq(i, j_prev, C)
             seq(i, j, W) = j + k
             
         Next
@@ -236,15 +243,199 @@ Sub reinsert(s() As Integer, i As Integer, j As Integer, pos As Integer)
 End Sub
 
 Sub search_swap(s() As Integer, seq() As Double)
-
+    Dim cost_best As Double
+    Dim cost_new As Double
+    
+    ' concat costs vars
+    Dim cost_concat_1 As Double
+    Dim cost_concat_2 As Double
+    Dim cost_concat_3 As Double
+    Dim cost_concat_4 As Double
+    
+    ' pos vars
+    Dim i_prev As Integer
+    Dim i_next As Integer
+    Dim j_next As Integer
+    Dim j_prev As Integer
+    
+    Dim I_best As Integer
+    Dim J_best As Integer
+    
+    cost_best = inf
+    
+    For i = 1 To Dimension - 2
+        i_next = i + 1
+        i_prev = i - 1
+        
+        cost_concat_1 = seq(0, i_prev, T) + ct(s(i_prev), s(i_next))
+        cost_concat_2 = cost_concat_1 + seq(i, i_next, T) + ct(s(i), s(i_next + 1))
+        
+        cost_new = seq(0, i_prev, C) _
+                + seq(i, i_next, W) * cost_concat_1 + ct(s(i_next), s(i)) _
+                + seq(i_next + 1, Dimension, W) * cost_concat_2 + seq(i_next + 1, Dimension, C)
+                
+        If cost_new < cost_best Then
+            cost_best = cost_new - EPSILON
+            I_best = i
+            J_best = i_next
+        End If
+        
+        For j = i + 1 To Dimension - 1
+            j_next = j + 1
+            j_prev = j - 1
+            
+            cost_concat_1 = seq(0, i_prev, T) + ct(s(i_prev), s(j))
+            cost_concat_2 = cost_concat_1 + ct(s(j), s(i_next))
+            cost_concat_3 = cost_concat_2 + seq(i_next, j_prev, T) + ct(s(j_prev), s(i))
+            cost_concat_4 = cost_concat_3 + ct(s(i), s(j_next))
+            
+            cost_new = seq(0, i_prev, C) _
+                    + cost_concat_1 _
+                    + seq(i_next, j_prev, W) * cost_concat_2 + seq(i_next, j_prev, C) _
+                    + cost_concat_3 _
+                    + seq(j_next, Dimension, W) * cost_concat_4 + seq(j_next, Dimension, C)
+                    
+            If cost_new < cost_best Then
+                cost_best = cost_new - EPSILON
+                I_best = i
+                J_best -j
+            End If
+                    
+        Next
+        
+    Next
+    
+    If cost_best < seq(0, Dimension, C) Then
+        swap_f s, I_best, J_best
+        subseq_load s, seq
+        improv_flag = True
+    End If
+        
 End Sub
 
 Sub search_two_opt(s() As Integer, seq() As Double)
-    reinsert s, 6, 10, 2
+    Dim cost_best As Double
+    Dim cost_new As Double
+    
+    ' concat costs vars
+    Dim cost_concat_1 As Double
+    Dim cost_concat_2 As Double
+    Dim rev_seq_cost As Double
+    
+    Dim i_prev As Integer
+    Dim j_next As Integer
+    
+    Dim I_best As Integer
+    Dim J_best As Integer
+    
+    cost_best = inf
+    
+    For i = 1 To Dimension - 2
+        i_prev = i - 1
+        rev_seq_cost = seq(i, i + 1, T)
+        
+        For j = i + 1 To Dimension - 1
+            j_next = j + 1
+            
+            rev_seq_cost = rev_seq_cost + ct(s(j - 1), s(j)) * (seq(i, j, W) - 1)
+            
+            cost_concat_1 = seq(0, i_prev, T) + ct(s(j), s(i_prev))
+            cost_concat_2 = cost_concat_1 + seq(i, j, T) + ct(s(j_next), s(i))
+            
+            cos_new = seq(0, i_prev, C) _
+                    + seq(i, j, W) * cost_concat_1 + rev_seq_cost _
+                    + seq(j_next, Dimension, W) * cost_concat_2 + seq(j_next, Dimension, C)
+                    
+            If cost_new < cost_best Then
+                cost_best = cost_new - EPSILON
+                I_best = i
+                J_best = j
+            End If
+            
+        Next
+    Next
+    
+    If cost_best < seq(0, Dimension, C) Then
+        reverse s, I_best, J_best
+        subseq_load s, seq
+        improv_flag = True
+    End If
+    
 End Sub
 
 Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
-
+    Dim cost_best As Double
+    Dim cost_new As Double
+    
+    ' concat costs vars
+    Dim cost_concat_1 As Double
+    Dim cost_concat_2 As Double
+    Dim cost_concat_3 As Double
+    
+    Dim j As Integer
+    Dim i_prev As Integer
+    Dim j_next As Integer
+    Dim k_next As Integer
+    
+    Dim I_best As Integer
+    Dim J_best As Integer
+    Dim POS_best As Integer
+    
+    For i = 1 To Dimension - opt
+        j = opt + i - 1
+        i_prev = i - 1
+        j_next = j + 1
+        
+        For k = 0 To i_prev - 1
+            k_next = k + 1
+            
+            cost_concat_1 = seq(0, k, T) + ct(s(k), s(i))
+            cost_concat_2 = cost_concat_1 + seq(i, j, T) + ct(s(j), s(k_next))
+            cost_concat_3 = cost_concat_2 + seq(k_next, i_prev, T) + ct(s(i_prev), s(j_next))
+            
+            cost_new = seq(0, k, C) _
+                    + seq(i, j, W) * cost_concat_1 + seq(i, j, C) _
+                    + seq(k_next, i_prev, W) * cost_concat_2 + seq(k_next, i_prev, C) _
+                    + seq(j_next, Dimension, W) * cost_concat_3 + seq(j_next, Dimension, C)
+                    
+            If cost_new < cost_best Then
+                cost_best = cost_new - EPSILON
+                I_best = i
+                J_best j
+                POS_best = k
+            End If
+            
+        Next
+        
+        For k = i + opt To Dimension - opt - 2
+            k_next = k + 1
+            
+            cost_concat_1 = seq(0, i_prev, T) + ct(s(i_prev), s(j_next))
+            cost_concat_2 = cost_concat_1 + seq(j_next, k, T) + ct(s(k), s(i))
+            cost_concat_3 = cost_concat_2 + seq(i, j, T) + ct(s(j), s(k_next))
+            
+            cost_new = seq(0, i_prev, C) _
+                    + seq(j_next, k, W) * cost_concat_1 + seq(j_next, k, C) _
+                    + seq(i, j, W) * cost_concat_2 + seq(i, j, C) _
+                    + seq(k_next, Dimension, W) * cost_concat_3 + seq(k_next, Dimension, C)
+                    
+            If cost_new < cost_best Then
+                cost_best = cost_new - EPSILON
+                I_best = i
+                J_best = j
+                POS_best = k
+            End If
+            
+        Next
+        
+        If cost_best < seq(0, Dimension, C) Then
+            reinsert s, I_best, J_best, POS_best + 1
+            subseq_load s, seq
+            improv_flag = True
+        End If
+        
+    Next
+    
 End Sub
 
 Sub RVND(s() As Integer, subseq() As Double)
@@ -306,7 +497,8 @@ Sub solve()
     subseq_load s, subseq
     printArray s, "Sinit"
     
-    Debug.Print subseq(0, Dimension, c)
+    Debug.Print subseq(0, Dimension, C)
+    Exit Sub
     
     For i = 0 To Imax
         Dim alpha As Double
@@ -316,7 +508,7 @@ Sub solve()
         sl = s
         
         subseq_load s, subseq
-        rvnd_cost_best = subseq(0, Dimension, c)
+        rvnd_cost_best = subseq(0, Dimension, C)
         Dim Iiter As Integer
         Iiter = 0
         Do While Iiter < Iils
