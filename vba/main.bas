@@ -569,7 +569,9 @@ Sub solve()
     'printArray s, "Sinit"
     
     'Debug.Print subseq(0, Dimension, C)
-    
+
+    TotalTime = 0
+    TotalTime = TotalTime - CDbl(MicroTimer)
     Dim s_best() As Integer
     Dim cost_best As Double
     cost_best = inf
@@ -581,10 +583,10 @@ Sub solve()
         s = construction(alpha)
         sl = s
         
-        'Debug.Print "Local Search", i
+        Debug.Print "Local Search", i
         'printArray s, "constructed"
         subseq_load s, subseq
-        Debug.Print "load", i
+        'Debug.Print "load", i
         rvnd_cost_best = subseq(0, Dimension, C) - EPSILON
         Dim iterILS As Integer
         iterILS = 0
@@ -614,4 +616,6 @@ Sub solve()
     Next
     
     Debug.Print cost_best
+    TotalTime = TotalTime + MicroTimer
+    Debug.Print TotalTime
 End Sub
