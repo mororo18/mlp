@@ -306,11 +306,11 @@ Sub search_swap(s() As Integer, seq() As Double)
     Next
     
     If cost_best < seq(0, Dimension, C) Then
-        Debug.Print "Swap"
-        Debug.Print cost_best, I_best, J_best
+        'Debug.Print "Swap"
+        'Debug.Print cost_best, I_best, J_best
         swap_f s, I_best, J_best
         subseq_load s, seq
-        Debug.Print seq(0, Dimension, C)
+        'Debug.Print seq(0, Dimension, C)
         improv_flag = True
     End If
         
@@ -364,14 +364,14 @@ Sub search_two_opt(s() As Integer, seq() As Double)
     Next
     
     If cost_best < seq(0, Dimension, C) Then
-        Debug.Print "two opt"
-        Debug.Print cost_best
-        Debug.Print I_best, J_best
-        printArray s, "antes"
+        'Debug.Print "two opt"
+        'Debug.Print cost_best
+        'Debug.Print I_best, J_best
+        'printArray s, "antes"
         reverse s, I_best, J_best
-        printArray s, "depois"
+        'printArray s, "depois"
         subseq_load s, seq
-        Debug.Print seq(0, Dimension, C)
+        'Debug.Print seq(0, Dimension, C)
         improv_flag = True
     End If
     
@@ -448,11 +448,11 @@ Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
     Next
     
     If cost_best < seq(0, Dimension, C) Then
-        Debug.Print "reinsertion"
-        Debug.Print cost_best, I_best, J_best, POS_best
+        'Debug.Print "reinsertion"
+        'Debug.Print cost_best, I_best, J_best, POS_best
         reinsert s, I_best, J_best, POS_best + 1
         subseq_load s, seq
-        Debug.Print seq(0, Dimension, C)
+        'Debug.Print seq(0, Dimension, C)
         improv_flag = True
     End If
     
@@ -485,19 +485,19 @@ Sub RVND(s() As Integer, subseq() As Double)
         'Debug.Print "i", i, size(neighbd_list)
         Select Case neighbd_list(i)
             Case SWAP
-                Debug.Print "swap"
+                'Debug.Print "swap"
                 search_swap s, subseq
             Case REINSERTION
-                Debug.Print "reinsert"
+                'Debug.Print "reinsert"
                 search_reinsertion s, subseq, REINSERTION
             Case OR_OPT2
-            Debug.Print "or_opt2"
+                'Debug.Print "or_opt2"
                 search_reinsertion s, subseq, OR_OPT2
             Case OR_OPT3
-            Debug.Print "or_opt3"
+                'Debug.Print "or_opt3"
                 search_reinsertion s, subseq, OR_OPT3
             Case TWO_OPT
-            Debug.Print "two_opt"
+                'Debug.Print "two_opt"
                 search_two_opt s, subseq
         End Select
         'End
@@ -582,12 +582,14 @@ Sub solve()
     Dim cost_best As Double
     cost_best = inf
     
-    For i = 0 To Imax
+    For i = 1 To Imax
         Dim alpha As Double
     
         alpha = R_table(CInt(((R_size - 1) * Rnd) + 0))
         s = construction(alpha)
         sl = s
+        
+        Debug.Print "Local Search", i
         
         subseq_load s, subseq
         rvnd_cost_best = subseq(0, Dimension, C) - EPSILON
@@ -597,14 +599,15 @@ Sub solve()
             RVND s, subseq
             rvnd_cost_crnt = subseq(0, Dimension, C) - EPSILON
             If rvnd_cost_crnt < rvnd_cost_best Then
+                'Debug.Print rvnd_cost_crnt
                 rvnd_cost_best = rvnd_cost_crnt
                 sl = s
                 iterILS = 0
             End If
-            
+            'Debug.Print iterILS
             s = perturb(sl)
             subseq_load s, subseq
-            Iiter = Iiter + 1
+            iterILS = iterILS + 1
         Loop
         
         subseq_load sl, subseq
