@@ -163,7 +163,7 @@ Function construction(alpha As Double) As Integer()
         cList(j - 1) = j
     Next
     'Debug.Print ""
-   ' printArray cList, "cList"
+    'printArray cList, "cList"
     'Debug.Print ""
     Dim count As Integer
     count = 0
@@ -192,10 +192,6 @@ Function construction(alpha As Double) As Integer()
         
         'Debug.Print cN
         'Debug.Print "tamanho ", size(cList)
-        
-        If count = 20 Then
-            Exit Function
-        End If
         
         count = count + 1
     Loop
@@ -570,10 +566,6 @@ Sub solve()
     Dim Iils As Integer
     Iils = IIf(Dimension < 100, Dimension, 100)
     
-    
-    
-    s = construction(0.12)
-    subseq_load s, subseq
     'printArray s, "Sinit"
     
     'Debug.Print subseq(0, Dimension, C)
@@ -589,9 +581,10 @@ Sub solve()
         s = construction(alpha)
         sl = s
         
-        Debug.Print "Local Search", i
-        
+        'Debug.Print "Local Search", i
+        'printArray s, "constructed"
         subseq_load s, subseq
+        Debug.Print "load", i
         rvnd_cost_best = subseq(0, Dimension, C) - EPSILON
         Dim iterILS As Integer
         iterILS = 0
