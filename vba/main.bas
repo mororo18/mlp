@@ -280,7 +280,7 @@ Sub search_swap(s() As Integer, seq() As Double)
             J_best = i_next
         End If
         
-        For j = i + 1 To Dimension - 1
+        For j = i + 2 To Dimension - 1
             j_next = j + 1
             j_prev = j - 1
             
@@ -307,7 +307,7 @@ Sub search_swap(s() As Integer, seq() As Double)
     
     If cost_best < seq(0, Dimension, C) Then
         Debug.Print "Swap"
-        Debug.Print cost_best
+        Debug.Print cost_best, I_best, J_best
         swap_f s, I_best, J_best
         subseq_load s, seq
         Debug.Print seq(0, Dimension, C)
@@ -352,7 +352,7 @@ Sub search_two_opt(s() As Integer, seq() As Double)
                     + seq(i, j, W) * cost_concat_1 + rev_seq_cost _
                     + seq(j_next, Dimension, W) * cost_concat_2 + seq(j_next, Dimension, C)
             'Debug.Print cost_new, i, j
-            Debug.Print (seq(0, i_prev, C)), seq(i, j, W) * cost_concat_1, rev_seq_cost, seq(j_next, Dimension, W) * cost_concat_2, seq(j_next, Dimension, C)
+            'Debug.Print (seq(0, i_prev, C)), seq(i, j, W) * cost_concat_1, rev_seq_cost, seq(j_next, Dimension, W) * cost_concat_2, seq(j_next, Dimension, C)
             If cost_new < cost_best Then
                 cost_best = cost_new - EPSILON
                 I_best = i
@@ -458,21 +458,22 @@ Sub search_reinsertion(s() As Integer, seq() As Double, opt As Integer)
     
 End Sub
 
-Sub RVND(sl() As Integer, subseq() As Double)
+Sub RVND(s() As Integer, subseq() As Double)
     Dim neighbd_list() As Variant
-    'neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
-    neighbd_list = Array(SWAP)
+    neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
+    'neighbd_list = Array(SWAP)
     
-    Dim s() As Integer
-    ReDim s(0) As Integer
-    s(0) = 0
-    For j = 1 To Dimension - 1
-        InsertElementIntoArray s, UBound(s) + 1, j
-    Next
-    InsertElementIntoArray s, UBound(s) + 1, 0
-    subseq_load s, subseq
-    printArray s, "s"
-    Debug.Print "s_cost"; subseq(0, Dimension, C)
+    'Dim s() As Integer
+    'ReDim s(0) As Integer
+    's(0) = 0
+    'For j = (Dimension - 1) To 1 Step -1
+    '    InsertElementIntoArray s, UBound(s) + 1, j
+    'Next
+    
+    'InsertElementIntoArray s, UBound(s) + 1, 0
+    'subseq_load s, subseq
+    'printArray s, "s"
+    'Debug.Print "s_cost"; subseq(0, Dimension, C)
     
     
     Dim i As Long
@@ -499,7 +500,7 @@ Sub RVND(sl() As Integer, subseq() As Double)
             Debug.Print "two_opt"
                 search_two_opt s, subseq
         End Select
-        End
+        'End
         
         If improv_flag = True Then
             neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)

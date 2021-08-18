@@ -168,8 +168,10 @@ def search_swap(s, seq):
                 J = j
 
     if cost_best < seq[C][0][n] - EPSILON:
+        print(cost_best, I, J)
         swap(s, I, J)
         subseq_info_load(s, seq)
+        print(seq[C][0][n])
         global improv_flag
         improv_flag = True
 
@@ -322,14 +324,20 @@ def RVND(sl, subseq):
     global t_two_opt 
 
     global improv_flag
-    neighbd_list = [TWO_OPT]
+    neighbd_list = [SWAP]
     #neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
-    s = list(range(0, n))
+    s = []
+    
     s.append(0)
+    i = n-1
+    while i > 0:
+        s.append(i)
+        i -= 1
+    s.append(0)
+    print(s)
     subseq_info_load(s, subseq)
 
-    print(s)
     print(subseq[C][0][n])
 
     while len(neighbd_list) > 0:
