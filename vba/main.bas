@@ -117,9 +117,9 @@ Sub subseq_load(ByRef s() As Integer, ByRef seq() As Double)
     For i = 0 To (Dimension)
         k = 1 - i - IIf(i <> 0, 0, 1)
         
-        seq(i, i, T) = 0
-        seq(i, i, W) = 0
-        seq(i, i, C) = IIf(i <> 0, 1, 0)
+        seq(i, i, T) = 0#
+        seq(i, i, C) = 0#
+        seq(i, i, W) = IIf(i <> 0, 1, 0)
         
         Dim j_prev As Integer
         For j = (i + 1) To (Dimension)
@@ -158,13 +158,13 @@ Function construction(alpha As Double) As Integer()
     Dim cList() As Integer
     ReDim cList(Dimension - 2) As Integer
     
-    Debug.Print ""
+    'Debug.Print ""
     For j = 1 To Dimension - 1
         cList(j - 1) = j
     Next
-    Debug.Print ""
-    printArray cList, "cList"
-    Debug.Print ""
+    'Debug.Print ""
+   ' printArray cList, "cList"
+    'Debug.Print ""
     Dim count As Integer
     count = 0
     
@@ -337,23 +337,28 @@ Sub search_two_opt(s() As Integer, seq() As Double)
         i_prev = i - 1
         rev_seq_cost = seq(i, i + 1, T)
         
-        For j = i + 1 To Dimension - 1
+        
+        For j = i + 2 To Dimension - 1
             j_next = j + 1
             
             rev_seq_cost = rev_seq_cost + ct(s(j - 1), s(j)) * (seq(i, j, W) - 1)
             
             cost_concat_1 = seq(0, i_prev, T) + ct(s(j), s(i_prev))
+            
             cost_concat_2 = cost_concat_1 + seq(i, j, T) + ct(s(j_next), s(i))
             
-            cos_new = seq(0, i_prev, C) _
+            
+            cost_new = seq(0, i_prev, C) _
                     + seq(i, j, W) * cost_concat_1 + rev_seq_cost _
                     + seq(j_next, Dimension, W) * cost_concat_2 + seq(j_next, Dimension, C)
-                    
+            'Debug.Print cost_new, i, j
+            Debug.Print (seq(0, i_prev, C)), seq(i, j, W) * cost_concat_1, rev_seq_cost, seq(j_next, Dimension, W) * cost_concat_2, seq(j_next, Dimension, C)
             If cost_new < cost_best Then
                 cost_best = cost_new - EPSILON
                 I_best = i
                 J_best = j
             End If
+            'End
             
         Next
     Next
@@ -361,6 +366,7 @@ Sub search_two_opt(s() As Integer, seq() As Double)
     If cost_best < seq(0, Dimension, C) Then
         Debug.Print "two opt"
         Debug.Print cost_best
+        Debug.Print I_best, J_best
         printArray s, "antes"
         reverse s, I_best, J_best
         printArray s, "depois"
@@ -455,7 +461,7 @@ End Sub
 Sub RVND(sl() As Integer, subseq() As Double)
     Dim neighbd_list() As Variant
     'neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
-    neighbd_list = Array(TWO_OPT)
+    neighbd_list = Array(SWAP)
     
     Dim s() As Integer
     ReDim s(0) As Integer
@@ -464,16 +470,18 @@ Sub RVND(sl() As Integer, subseq() As Double)
         InsertElementIntoArray s, UBound(s) + 1, j
     Next
     InsertElementIntoArray s, UBound(s) + 1, 0
-    
+    subseq_load s, subseq
     printArray s, "s"
+    Debug.Print "s_cost"; subseq(0, Dimension, C)
+    
     
     Dim i As Long
     Do While IsArrayEmpty(neighbd_list) = False
         i = CInt((size(neighbd_list) - 1) * Rnd)
         
         improv_flag = False
-        printArray neighbd_list, "NL "
-        Debug.Print "i", i, size(neighbd_list)
+        'printArray neighbd_list, "NL "
+        'Debug.Print "i", i, size(neighbd_list)
         Select Case neighbd_list(i)
             Case SWAP
                 Debug.Print "swap"
@@ -491,7 +499,7 @@ Sub RVND(sl() As Integer, subseq() As Double)
             Debug.Print "two_opt"
                 search_two_opt s, subseq
         End Select
-        'Exit Sub
+        End
         
         If improv_flag = True Then
             neighbd_list = Array(SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT)
@@ -561,19 +569,13 @@ Sub solve()
     Dim Iils As Integer
     Iils = IIf(Dimension < 100, Dimension, 100)
     
-    For i = 0 To 10
-        Debug.Print Rnd
-    Next
-    
-    Exit Sub
-    
     
     
     s = construction(0.12)
     subseq_load s, subseq
-    printArray s, "Sinit"
+    'printArray s, "Sinit"
     
-    Debug.Print subseq(0, Dimension, C)
+    'Debug.Print subseq(0, Dimension, C)
     
     Dim s_best() As Integer
     Dim cost_best As Double
@@ -613,4 +615,6 @@ Sub solve()
         End If
         
     Next
+    
+    Debug.Print cost_best
 End Sub

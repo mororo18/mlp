@@ -178,6 +178,7 @@ def search_two_opt(s, seq):
 
     for i in range(1, n-1):
         i_prev = i - 1
+        
         reverse_cost = seq[T][i][i+1]
         for j in range(i+2, n):
             j_next = j + 1
@@ -197,12 +198,16 @@ def search_two_opt(s, seq):
                     seq[W][i][j] * cost_concat_1 + reverse_cost             + \
                     seq[W][j_next][n] * (cost_concat_2) + seq[C][j_next][n]
 
+            #print(cost, i, "        ", j)
+            print(seq[C][0][i_prev], seq[W][i][j] * cost_concat_1,seq[W][j_next][n] * (cost_concat_2), seq[C][j_next][n] )
             if cost < cost_best:
                 cost_best = cost - EPSILON
                 I = i
                 J = j
 
     if cost_best < seq[C][0][n] - EPSILON:
+        print(cost_best)
+        print(I, J)
         reverse(s, I, J)
         subseq_info_load(s, seq)
         global improv_flag
@@ -307,7 +312,7 @@ def search_reinsertion(s, seq, OPT):
         global improv_flag
         improv_flag = True
 
-def RVND(s, subseq):
+def RVND(sl, subseq):
 
 
     global t_reinsertion
@@ -317,7 +322,15 @@ def RVND(s, subseq):
     global t_two_opt 
 
     global improv_flag
-    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
+    neighbd_list = [TWO_OPT]
+    #neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
+
+    s = list(range(0, n))
+    s.append(0)
+    subseq_info_load(s, subseq)
+
+    print(s)
+    print(subseq[C][0][n])
 
     while len(neighbd_list) > 0:
         global IT
@@ -348,6 +361,7 @@ def RVND(s, subseq):
             search_reinsertion(s, subseq, OR_OPT_3)
             t_or_opt3 += time.time()
 
+        exit(0)
 
         if improv_flag == True:
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
