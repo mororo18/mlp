@@ -576,17 +576,20 @@ Sub solve()
     Dim cost_best As Double
     cost_best = inf
     
+    tabspace = "        "
+    
     For i = 1 To Imax
+        Debug.Print "[+] Local Search " & i
+        Debug.Print tabspace & "[+] Constructing Inital Solution.."
         Dim alpha As Double
     
         alpha = R_table(CInt(((R_size - 1) * Rnd) + 0))
         s = construction(alpha)
         sl = s
         
-        Debug.Print "Local Search", i
-        'printArray s, "constructed"
+        Debug.Print tabspace & "[+] Looking for the best Neighbor.."
         subseq_load s, subseq
-        'Debug.Print "load", i
+        
         rvnd_cost_best = subseq(0, Dimension, C) - EPSILON
         Dim iterILS As Integer
         iterILS = 0
@@ -613,9 +616,11 @@ Sub solve()
             s_best = sl
         End If
         
+        Debug.Print tabspace & "Current best solution cost: " & cost_best
+        
     Next
     
-    Debug.Print cost_best
+    Debug.Print "COST: " & cost_best
     TotalTime = TotalTime + MicroTimer
-    Debug.Print TotalTime
+    Debug.Print "TIME: " & TotalTime
 End Sub
