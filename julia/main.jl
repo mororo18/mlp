@@ -39,7 +39,7 @@ t_seq = 0
         seq[i,i,C] = 0.0
         seq[i,i,W] = i!=0#convert(Float64, i != 0)
 
-        for j in i+1:dimension+1
+        @simd for j in i+1:dimension+1
             j_prev = j-1
 
             seq[i,j,T] = c[s[j_prev], s[j]] + seq[i,j_prev,T]
@@ -108,6 +108,12 @@ function search_swap(s::Array{Int64,1}, seq::Array{Float64,3}, c::Array{Float64,
     cost_best = Inf
     I = -1
     J = -1
+
+    cost_concat_1 = 0.0
+    cost_concat_2 = 0.0
+    cost_concat_3 = 0.0
+    cost_concat_4 = 0.0
+    cost_new = 0.0
 
     @fastmath @inbounds @simd for i in 2:dimension-1
             i_prev = i - 1
@@ -178,10 +184,14 @@ function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3}, c::Array{Float
     I = -1
     J = -1
 
+    cost_concat_1 = 0.0
+    cost_concat_2 = 0.0
+    cost_new = 0.0
+
     @fastmath @inbounds @simd for i in 2:dimension-1
         i_prev = i - 1
         rev_seq_cost = seq[i, i+1, T]
-        for j in i+2:dimension
+        @simd for j in i+2:dimension
             j_next = j+1
 
             rev_seq_cost += c[s[j-1], s[j]] * (seq[i, j, W]-1.0)
@@ -240,7 +250,7 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
         i_prev = i-1
         j_next = j+1
 
-        for k in 1:i_prev-1
+        @simd for k in 1:i_prev-1
                 k_next = k+1
 
                 cost_concat_1 =                 seq[1, k, T]            + c[s[k], s[i]]
@@ -261,7 +271,7 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
 
         end
 
-        for k in i+opt:dimension-opt-1
+        @simd for k in i+opt:dimension-opt-1
                 k_next = k+1
 
                 cost_concat_1 =                 seq[1, i_prev, T]   + c[s[i_prev], s[j_next]]
