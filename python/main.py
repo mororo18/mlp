@@ -4,6 +4,8 @@ import time
 from read import *
 from random import randint
 import math
+import sys
+#globals()['__debug__'] = False
 
 EPSILON = 1e-13
 
@@ -15,9 +17,9 @@ OR_OPT_3    = 4
 
 n, m = get_instance_info()
 
-W = "W"
-T = "T"
-C = "C"
+W = 0
+T = 1
+C = 2
 
 IT = 0
 
@@ -33,11 +35,7 @@ t_seq = 0
 improv_flag = None
 
 def subseq_info_fill(n):
-    matrix = {
-            W:[],
-            T:[],
-            C:[]
-            }
+    matrix = [[], [], []]
 
     for i in range(n+1):
         matrix[W].append([])
@@ -75,6 +73,9 @@ def subseq_info_load(sol, seq):
     t_seq -= time.time()
     i = 0
     d = n + 1
+    W = 0
+    T = 1
+    C = 2
     while i < d:
         k = 1 - i - int(not i)
 
@@ -233,6 +234,9 @@ def search_reinsertion(s, seq, OPT):
     COST_arr=[None, cost_best]
     '''
 
+    W = 0
+    T = 1
+    C = 2
     for i in range(1, MAX + 1):
         j = opt + i - 1
 
