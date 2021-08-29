@@ -1,4 +1,7 @@
 mod Data;
+extern crate rand;
+use rand::Rng;
+use std::cmp::Ordering;
 
 static T : usize = 0;
 static C : usize = 1;
@@ -28,12 +31,40 @@ fn subseq_load(s : Vec<usize>, seq : &mut Vec<Vec<Vec<f64>>>, info : &mut Instan
     }
 }
 
+fn construction(alpha : f64, info : Instance_info) -> Vec<usize> {
+    let mut s = vec![0; 1];
+
+    //let mut cList = vec![0; info.dimension -1];
+    let mut cList = vec![];
+    for i in 1..info.dimension {
+        cList.push(i);
+    }
+
+    let mut rng = rand::thread_rng();
+    let mut r : usize = 0;
+    while cList.is_empty() == false {
+        cList.sort_by(|i, j| 
+                    if info.c[*i as usize][r] < info.c[*j as usize][r] 
+                        {Ordering::Less} 
+                    else 
+                        {Ordering::Greater});
+
+        let range = (cList.len() as f64 * alpha + 1.0) as usize;
+        let index = rng.gen::<usize>() % i;
+        let c = cList[index];
+        cList.remove(index);
+        s.push(c);
+    }
+    println!("{:?}", s);
+
+    return s;
+}
+
 fn main() {
     let mut dimension : usize = 0;
     let mut c : Vec<Vec<f64>> = vec![vec![];0];
 
     Data::load(&mut dimension, &mut c);
-    //println!("{} \n", dimension);
 
     let mut info = Instance_info {
         dimension : dimension,
@@ -57,6 +88,7 @@ fn main() {
     subseq_load(s, &mut subseq, &mut info);
     println!("{} \n", subseq[0][info.dimension][C]);
 
+    construction(0.2, info);
     /*
     for i in 0..dimension {
         for j in 0..dimension {
