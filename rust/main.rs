@@ -1,5 +1,4 @@
 mod Data;
-extern crate opa;
 extern crate rand;
 use rand::Rng;
 use std::cmp::Ordering;
