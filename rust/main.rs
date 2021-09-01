@@ -14,6 +14,7 @@ static REINSERTION  : usize = 2;
 static OR_OPT_2     : usize = 3;
 static OR_OPT_3     : usize = 4;
 
+// 3d matrix
 type SeqStruct = Vec<Vec<Vec<f64>>>;
 
 #[derive(Debug)]
@@ -87,8 +88,7 @@ fn reinsert(s : &mut Vec<usize>, i : usize, j : usize, pos : usize){
         }
     } else {
         for k in i..=j {
-            let tmp = s[j];
-            s.remove(j);
+            let tmp = s.remove(j);
             s.insert(pos, tmp);
         }
     }
@@ -100,7 +100,7 @@ fn search_swap(s : &mut Vec<usize>, seq : &mut SeqStruct, info : & InstanceInfo)
     let mut cost_concat_3 : f64;
     let mut cost_concat_4 : f64;
 
-    let mut cost_best : f64 = std::f64::MAX;
+    let mut cost_best : f64 = f64::MAX;
     let mut cost_new : f64;// = std::f64::MAX;
     let mut I : usize = 0;
     let mut J : usize = 0;
@@ -154,9 +154,49 @@ fn search_swap(s : &mut Vec<usize>, seq : &mut SeqStruct, info : & InstanceInfo)
     }
 }
 
-fn search_two_opt(s : &mut Vec<usize>, seq : & SeqStruct, info : & InstanceInfo) -> bool {
-    return false;
+fn search_two_opt(s : &mut Vec<usize>, seq : &mut SeqStruct, info : & InstanceInfo) -> bool {
+    let mut cost_new : f64;
+    let mut cost_best : f64 = f64::MAX;
+
+    let mut cost_concat_1 : f64;
+    let mut cost_concat_2 : f64;
+
+    let mut I : usize = 0;
+    let mut J : usize = 0;
+
+    for i in 1..info.dimension-1 {
+        let mut i_prev : usize = i - 1;
+        let mut rev_seq_cost : f64 = seq[i][i+1][T];
+
+        for j in i+2..info.dimension {
+            let mut j_next = j + 1;
+
+            rev_seq_cost += info.c[s[j-1]][s[j]] * (seq[i][j][W]-1.0);
+
+            cost_concat_1 =  seq[0][i_prev][T] + info.c[s[j]][s[i_prev]];
+            cost_concat_2 = cost_concat_1 + seq[i][j][T] + info.c[s[j_next]][s[i]];
+
+            cost_new = seq[0][i_prev][C]
+                    + seq[i][j][W]      * cost_concat_1 + rev_seq_cost
+                    + seq[j_next][info.dimension][W] * cost_concat_2 + seq[j_next][info.dimension][C];
+
+            if cost_new < cost_best {
+                cost_best = cost_new - f64::EPSILON;
+                I = i;
+                J = j;
+            }
+        }
+    }
+
+    if cost_best < seq[0][info.dimension][C] - f64::EPSILON {
+        reverse(s, I, J);
+        subseq_load(s, seq, info);
+        return true;
+    } else {
+        return false;
+    }
 }
+
 
 fn search_reinsertion(s : &mut Vec<usize>, seq : & SeqStruct, opt : usize, info : & InstanceInfo) -> bool {
     reinsert(s, 2, 4, 9);
@@ -164,13 +204,6 @@ fn search_reinsertion(s : &mut Vec<usize>, seq : & SeqStruct, opt : usize, info 
 }
 
 fn RVND(s : &mut Vec<usize>, seq : &mut SeqStruct, info : & InstanceInfo) {
-    /*
-    let SWAP : usize = 0;
-    let TWO_OPT : usize = 1;
-    let REINSERTION : usize = 2;
-    let OR_OPT_2 : usize = 3;
-    let OR_OPT_3 : usize = 4;
-    */
 
     let mut neighbd_list = vec![SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
     let mut improv_flag = false;
