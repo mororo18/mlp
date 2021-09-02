@@ -19,9 +19,10 @@ static TWO_OPT      : usize = 4;
 type SeqStruct = Vec<Vec<Vec<f64>>>;
 
 #[derive(Debug)]
+#[repr(align(64))]
 struct InstanceInfo {
-    dimension : usize,
     c : Vec<Vec<f64>>,
+    dimension : usize,
 }
 
 fn subseq_load(s : & Vec<usize>, seq : &mut SeqStruct, info : & InstanceInfo) {
@@ -437,7 +438,7 @@ fn main() {
     GILS_RVND(Imax, Iils, R, &info);
 
     let new_now = Instant::now();
-    println!("{:?}", new_now.duration_since(now));
+    println!("{}", new_now.duration_since(now).as_secs_f64());
 
     /*
     for i in 0..dimension {
