@@ -11,7 +11,7 @@ function matrix_fill(matrix, n) {
 module.exports = {
     info_load: function(c) {
         for (var i = -1; i+1 < file.length; i++) {
-            console.log(file[i+1]);
+            //console.log(file[i+1]);
             let l = i+1;
             if (i == -1) {
                 var dimension = parseInt(file[l]);
