@@ -2,42 +2,45 @@
 using Printf
 include("Data.jl")
 
-const t_S = 1
-const c_S = 2
-const w_S = 3
+# const t_S = 1
+# const c_S = 2
+# const w_S = 3
 
-const EPSILON = 1e-15
+# const EPSILON = 1e-15
 
-const REINSERTION = 1
-const OR_OPT2     = 2
-const OR_OPT3     = 3
-const SWAP        = 4
-const TWO_OPT     = 5
+# const REINSERTION = 1
+# const OR_OPT2     = 2
+# const OR_OPT3     = 3
+# const SWAP        = 4
+# const TWO_OPT     = 5
 
-dimension, c = get_instance_info()
+# dimension, c = get_instance_info()
 
-improv_flag = true
-it = 0
+# improv_flag = true
+# it = 0
 
-t_swap = 0
-t_reinsertion = 0
-t_or_opt2 = 0
-t_or_opt3 = 0
-t_two_opt = 0
-t_seq = 0
+# t_swap = 0
+# t_reinsertion = 0
+# t_or_opt2 = 0
+# t_or_opt3 = 0
+# t_two_opt = 0
+# t_seq = 0
 
-@inline function subseq_load(s::Array{Int64, 1}, seq::Array{Float64, 3})
-    T = t_S
-    C = c_S
-    W = w_S
+@inline function subseq_load(s::Array{Int, 1}, seq::Array{Float64, 3}, dimension::Int, c::Matrix{Float64})
+    # T = t_S
+    # C = c_S
+    # W = w_S
+    T = 1
+    C = 2
+    W = 3
 
-    global t_seq -= time_ns()
+    # global t_seq -= time_ns()
     @fastmath @inbounds @simd for i in 1:dimension+1
-        k = 1 - i -(i==0)#convert(Int64, i==0)
+        k = 1 - i - (i==1)#convert(Int, i==0)
 
         seq[i,i,T] = 0.0
         seq[i,i,C] = 0.0
-        seq[i,i,W] = i!=0#convert(Float64, i != 0)
+        seq[i,i,W] = i!=1#convert(Float64, i != 0)
 
         @simd for j in i+1:dimension+1
             j_prev = j-1
@@ -53,13 +56,13 @@ t_seq = 0
             """
         end
     end
-    t_seq += time_ns()
+    # t_seq += time_ns()
 
     return
 
 end
 
-function construction(alpha::Float64)::Array{Int64, 1}
+function construction(alpha::Float64, dimension::Int, c::Matrix{Float64})::Array{Int, 1}
     s = [1]
     cList = [2:dimension;]
 
@@ -67,7 +70,7 @@ function construction(alpha::Float64)::Array{Int64, 1}
     while length(cList) > 0
         sort!(cList, by= i -> c[i,r])
 
-        i = convert(Int64, floor(length(cList)*alpha + 1))
+        i = convert(Int, floor(length(cList)*alpha + 1))
         cN = cList[rand(1:i)]
         push!(s, cN)
         r = cN
@@ -79,15 +82,15 @@ function construction(alpha::Float64)::Array{Int64, 1}
     return s
 end
 
-function swap(s::Array{Int64,1}, i::Int64, j::Int64)
+function swap(s::Array{Int,1}, i::Int, j::Int)
     s[i], s[j] = s[j], s[i]
 end
 
-function reinsert(s::Array{Int64,1}, i::Int64, j::Int64, pos::Int64)
-    # func from https://github.com/JuliaLang/julia/blob/master/base/array.jl
-    _deleteat!(a::Vector, i::Integer, delta::Integer) =
-        ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
+# func from https://github.com/JuliaLang/julia/blob/master/base/array.jl
+_deleteat!(a::Vector, i::Integer, delta::Integer) =
+    ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
 
+function reinsert(s::Array{Int,1}, i::Int, j::Int, pos::Int)
     sz = j - i + 1
     if i < pos
         splice!(s, pos:pos-1, s[i:j]) 
@@ -98,10 +101,10 @@ function reinsert(s::Array{Int64,1}, i::Int64, j::Int64, pos::Int64)
     end
 end
 
-function search_swap(s::Array{Int64,1}, seq::Array{Float64,3}, c::Array{Float64, 2})
-    T = t_S
-    C = c_S
-    W = w_S
+function search_swap(s::Array{Int,1}, seq::Array{Float64,3}, dimension::Int, c::Matrix{Float64})
+    T = 1
+    C = 2
+    W = 3
 
     EPSILON = 1e-15
 
@@ -167,17 +170,17 @@ function search_swap(s::Array{Int64,1}, seq::Array{Float64,3}, c::Array{Float64,
 
     if cost_best < seq[1,dimension+1,C] - EPSILON
         swap(s, I, J)
-        subseq_load(s, seq)
-        global improv_flag = true
+        subseq_load(s, seq, dimension, c)
+        return true
     end
 
-    return
+    return false
 end
 
-function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3}, c::Array{Float64, 2})
-    T = t_S
-    C = c_S
-    W = w_S
+function search_two_opt(s::Array{Int,1}, seq::Array{Float64,3}, dimension::Int, c::Array{Float64, 2})
+    T = 1
+    C = 2
+    W = 3
 
     EPSILON = 1e-15
     cost_best = Inf
@@ -220,17 +223,17 @@ function search_two_opt(s::Array{Int64,1}, seq::Array{Float64,3}, c::Array{Float
 
     if cost_best < seq[1, dimension+1, C] - EPSILON
         reverse!(s, I, J)
-        subseq_load(s, seq)
-        global improv_flag = true
+        subseq_load(s, seq, dimension, c)
+        return true
     end
 
-    return
+    return false
 end
 
-function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64, c::Array{Float64,2})
-    T = t_S
-    C = c_S
-    W = w_S
+function search_reinsertion(s::Array{Int,1}, seq::Array{Float64,3}, opt::Int, dimension::Int, c::Array{Float64,2})
+    T = 1
+    C = 2
+    W = 3
 
     EPSILON = 1e-15
 
@@ -245,7 +248,7 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
     cost_new = 0.0
 
 
-   @fastmath @inbounds @simd for i in 2:dimension-opt+1
+    @fastmath @inbounds @simd for i in 2:dimension-opt+1
         j = opt+i-1
         i_prev = i-1
         j_next = j+1
@@ -295,15 +298,21 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
 
     if cost_best < seq[1, dimension+1, C]
         reinsert(s, I, J, POS+1)
-        subseq_load(s, seq)
-        global improv_flag = true
+        subseq_load(s, seq, dimension, c)
+        return true
     end
 
-    return
+    return false
 end
 
 
-function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
+function RVND(s::Array{Int, 1}, seq::Array{Float64, 3}, dimension::Int, c::Matrix{Float64})
+    REINSERTION = 1
+    OR_OPT2     = 2
+    OR_OPT3     = 3
+    SWAP        = 4
+    TWO_OPT     = 5
+
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
     t_reinsertion_local = 0
     t_or_opt2_local = 0
@@ -312,25 +321,31 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
     t_swap_local = 0
 
     while length(neighbd_list) > 0
-        global it += 1
+        # global it += 1
         i = rand(1:length(neighbd_list))
         neighbd = neighbd_list[i]
 
-        global improv_flag = false
+        improve = false
 
+        time_before_search = time_ns()
         if neighbd == REINSERTION
-            t_reinsertion_local    += @elapsed search_reinsertion(s, seq, REINSERTION, c)
+            improve = search_reinsertion(s, seq, REINSERTION, dimension, c)
+            t_reinsertion_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == OR_OPT2
-            t_or_opt2_local        += @elapsed search_reinsertion(s, seq, OR_OPT2, c)
+            improve = search_reinsertion(s, seq, OR_OPT2, dimension, c)
+            t_or_opt2_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == OR_OPT3
-            t_or_opt3_local        += @elapsed search_reinsertion(s, seq, OR_OPT3, c)
+            improve = search_reinsertion(s, seq, OR_OPT3, dimension, c)
+            t_or_opt3_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == SWAP
-            t_swap_local           += @elapsed search_swap(s, seq, c)
+            improve = search_swap(s, seq, dimension, c)
+            t_two_opt_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == TWO_OPT
-            t_two_opt_local        += @elapsed search_two_opt(s, seq, c)
+            improve = search_two_opt(s, seq, dimension, c)
+            t_swap_local += (time_ns() - time_before_search) * 1e9
         end
 
-        if improv_flag
+        if improve
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
         else
             deleteat!(neighbd_list, i)
@@ -338,22 +353,22 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3})
 
     end
 
-    global t_swap +=t_swap_local 
-    global t_reinsertion +=t_reinsertion_local
-    global t_or_opt2 += t_or_opt2_local
-    global t_or_opt3 += t_or_opt3_local
-    global t_two_opt += t_two_opt_local
+    # global t_swap +=t_swap_local 
+    # global t_reinsertion +=t_reinsertion_local
+    # global t_or_opt2 += t_or_opt2_local
+    # global t_or_opt3 += t_or_opt3_local
+    # global t_two_opt += t_two_opt_local
 
-
+    return
 end
 
-function perturb(sl::Array{Int64, 1})
+function perturb(sl::Array{Int, 1})
     s = copy(sl)
 
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
-    size_max = convert(Int64, floor(length(s)/10))
+    size_max = Int(floor(length(s)/10))
     size_max = (size_max >= 2 ? size_max : 2)
     size_min = 2
 
@@ -376,8 +391,9 @@ function perturb(sl::Array{Int64, 1})
     return s
 end
 
-function GILS_RVND(Imax::Int64, Iils::Int64, R)
-    C = c_S
+function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, dimension::Int, c::Matrix{Float64})
+    C = 2
+    EPSILON = 1e-15
     cost_best = Inf
     s_best = []
 
@@ -387,16 +403,16 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
         alpha = R[rand(1:26)]
         @printf "[+] Local Search %d\n" i
         @printf "\t[+] Constructing Inital Solution..\n"
-        s = construction(alpha)
+        s = construction(alpha, dimension, c)
         sl = copy(s)
-        subseq_load(s, subseq)
+        subseq_load(s, subseq, dimension, c)
 
         rvnd_cost_best = subseq[1,dimension+1,C] - EPSILON
 
         @printf "\t[+] Looking for the best Neighbor..\n"
         iterILS = 0
         while iterILS < Iils
-            RVND(s, subseq)
+            RVND(s, subseq, dimension, c)
             rvnd_cost_crnt = subseq[1,dimension+1,C] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best
                 rvnd_cost_best = rvnd_cost_crnt
@@ -405,12 +421,12 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
             end
 
             s = perturb(sl)
-            subseq_load(s, subseq)
+            subseq_load(s, subseq, dimension, c)
 
             iterILS += 1
         end
 
-        subseq_load(sl, subseq)
+        subseq_load(sl, subseq, dimension, c)
         sl_cost = subseq[1,dimension+1,C] - EPSILON
 
         if sl_cost < cost_best
@@ -423,26 +439,37 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R)
     @printf "COST: %.2lf\n" cost_best
     print("SOLUTION: ")
     println(s_best)
-    @printf "Swap time: %.6lf\n" t_swap
-    @printf "Reinsertion time: %.6lf\n" t_reinsertion
-    @printf "Or_opt2 time: %.6lf\n" t_or_opt2
-    @printf "Or_opt3 time: %.6lf\n" t_or_opt3
-    @printf "Two_opt time: %.6lf\n" t_two_opt
-    @printf "subseq time: %.6lf\n" t_seq/1e9
+    # @printf "Swap time: %.6lf\n" t_swap
+    # @printf "Reinsertion time: %.6lf\n" t_reinsertion
+    # @printf "Or_opt2 time: %.6lf\n" t_or_opt2
+    # @printf "Or_opt3 time: %.6lf\n" t_or_opt3
+    # @printf "Two_opt time: %.6lf\n" t_two_opt
+    # @printf "subseq time: %.6lf\n" t_seq/1e9
 end
 
 function main()
+
+    dimension, c = get_instance_info()
+
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
          0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
-    
+
     Imax = 10
     Iils = min(dimension, 100)
 
-    time = @elapsed GILS_RVND(Imax, Iils, R)
+    time = @elapsed GILS_RVND(Imax, Iils, R, dimension, c)
 
     @printf "TIME %.6lf\n" time
-    @printf "RVND iteracoes %d\n" it
+    # @printf "RVND iteracoes %d\n" it
 
 end
 
 main()
+# main()
+
+# using ProfileView, Profile, PProf
+# Profile.init(n = 10^8, delay = 0.00005)
+# # @profview main()
+# @profile main()
+# pprof(;webport=58599)
+# readline()
