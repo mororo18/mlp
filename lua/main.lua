@@ -83,28 +83,15 @@ function construction(alpha, info)
     while #cList > 0 do
     --while table.getn(cList) > 0 do
         table.sort(cList, function(i, j) return info.c[r][i] < info.c[r][j] end)
-        --io.write("Soted ")
-        --[[
-        for i=1,#cList do
-            io.write(cList[i], " ")
-        end
-        --print()
-        ]]--
 
         local range = math.floor(#cList * alpha) + 1
         local i = math.random(1, range)
 
-        --print(#cList)
         local c = table.remove(cList, i)
         table.insert(s, c)
         r = c
     end
     table.insert(s, 1)
-
-    for i=1,#s do
-        --io.write(s[i], " ")
-    end
-    --print()
 
     return table.clone(s)
 end
@@ -237,11 +224,8 @@ function search_two_opt(solut, info)
     end
 
     if cost_best < solut.seq[1][info.dimension+1][info.C] - info.EPSILON then
-        --print("two_opt")
-        --print(cost_best)
         reverse(solut.s, I, J)
         subseq_load(solut, info)
-        --print(solut.seq[1][info.dimension+1][info.C])
         return true
     end
 
@@ -259,12 +243,6 @@ function search_reinsertion(solut, info, opt)
     local cost_concat_3 = 0.0
     local cost_new = 0.0
 
-    --solut.s = {1,3 , 14 ,11, 13, 7,  12 ,6  ,5 , 4,  8 , 9 , 2,  10, 1}
-    subseq_load(solut, info)
-
-    --local test = {}
-
-
     for i = 2, info.dimension-opt+1 do
         local j = opt+i-1
         local i_prev = i-1
@@ -281,13 +259,6 @@ function search_reinsertion(solut, info, opt)
             solut.seq[i][j][info.W]                * cost_concat_1 + solut.seq[i][j][info.C]                  +   -- concat 2nd subseq (reinserted seq)
             solut.seq[k_next][i_prev][info.W]      * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   -- concat 3rd subseq
             solut.seq[j_next][info.dimension+1][info.W] * cost_concat_3 + solut.seq[j_next][info.dimension+1][info.C];       -- concat 4th subseq
-                
-            --[[
-            local test_a = {solut.seq[1][k][info.C]                                                             ,   --       1st subseq
-            solut.seq[i][j][info.W]                , cost_concat_1 , solut.seq[i][j][info.C]                  ,   -- concat 2nd subseq (reinserted seq)
-            solut.seq[k_next][i_prev][info.W]      , cost_concat_2 , solut.seq[k_next][i_prev][info.C]        ,   -- concat 3rd subseq
-            solut.seq[j_next][info.dimension+1][info.W] , cost_concat_3 , solut.seq[j_next][info.dimension+1][info.C]}       -- concat 4th subseq
-            ]]--
 
             if cost_new < cost_best then
                 cost_best = cost_new - info.EPSILON
@@ -309,13 +280,6 @@ function search_reinsertion(solut, info, opt)
                     solut.seq[j_next][k][info.W]           * cost_concat_1 + solut.seq[j_next][k][info.C]             +   -- concat 2nd subseq
                     solut.seq[i][j][info.W]                * cost_concat_2 + solut.seq[i][j][info.C]                  +   -- concat 3rd subseq (reinserted seq)
                     solut.seq[k_next][info.dimension+1][info.W] * cost_concat_3 + solut.seq[k_next][info.dimension+1][info.C];       -- concat 4th subseq
-
-            --[[
-            local test_b = {solut.seq[1][i_prev][info.C]                                                        ,   --       1st subseq
-                    solut.seq[j_next][k][info.W]           , cost_concat_1 , solut.seq[j_next][k][info.C]             ,   -- concat 2nd subseq
-                    solut.seq[i][j][info.W]                , cost_concat_2 , solut.seq[i][j][info.C]                  ,   -- concat 3rd subseq (reinserted seq)
-                    solut.seq[k_next][info.dimension+1][info.W] , cost_concat_3 , solut.seq[k_next][info.dimension+1][info.C]}       -- concat 4th subseq
-                    ]]--
 
             if cost_new < cost_best then
                 cost_best = cost_new - info.EPSILON
@@ -427,14 +391,11 @@ function GILS_RVND(Imax, Iils, R, info)
         s = {},
         seq = {}, 
     }
+
     subseq_fill(solut_partial.seq, info)
     solut_partial.cost = 0
 
-    --seq_print(solut_partial)
-
-    --print("opa")
     local solut_crnt = solut_clone(solut_partial)
-    --print("opa 2")
     local solut_best = solut_clone(solut_crnt)
 
     solut_best.cost = math.huge
@@ -497,41 +458,13 @@ function main()
     local info = {
         c = {}, 
         T = 1,
-        C = 2, W = 3, EPSILON = 1e-15
+        C = 2, W = 3, 
+        EPSILON = 1e-15
     }
 
 
     info.dimension = readData(info.c)
     math.randomseed(os.time()) 
-
-    --[[
-    print(info.dimension)
-    for i=1,info.dimension do
-        for j=1,info.dimension do
-            io.write(info.c[i][j], " ")
-        end
-        print()
-    end
-
-
-    for i=1,info.dimension+1 do
-        for j=1,info.dimension+1 do
-            for s=1,3 do
-                io.write(solut.seq[i][j][s] , " ") --= {0, 0, 0}
-            end
-            io.write("| ")
-        end
-        print()
-    end
-
-    for i=1,info.dimension do
-        solut.sl[#solut.sl + 1] = i
-        io.write(solut.sl[i], " ")
-    end
-    solut.sl[#solut.sl + 1] = 1
-    io.write(solut.sl[info.dimension+1], " ")
-    print()
-    ]]--
 
     local Imax = 10
     local Iils = math.min(100, info.dimension)
@@ -540,10 +473,20 @@ function main()
 
 
     info = protect(info)
+    local start = os.clock()
     GILS_RVND(Imax, Iils, R, info)
 
-
+    print("TIME: ", os.clock()-start)
 end
 
-collectgarbage("stop")
 main()
+
+--[[
+collectgarbage("stop")
+ProFi = require 'ProFi'
+ProFi:start()
+main()
+--coroutine.resume( main )
+ProFi:stop()
+ProFi:writeReport( 'MyProfilingReport.txt' )
+]]--
