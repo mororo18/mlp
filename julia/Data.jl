@@ -6,7 +6,7 @@ function get_instance_info()
     f = open("../distance_matrix")
 
     line = readline(f)
-    dimension = parse(Int32, line)
+    dimension = parse(Int, line)
     #matrix = Matrix{Float64}(undef, dimension,dimension)
     matrix = zeros(dimension, dimension)
 
