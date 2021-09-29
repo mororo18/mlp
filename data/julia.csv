@@ -1,0 +1,3 @@
+COST,TIME,instance,mem_avg,mem_lookups,mem_max,source
+209320.0,0.199136,instances/att48.tsp,133.46286161794026,76490,150.76953125,julia
+209320.0,0.198968,instances/att48.tsp,125.02609954400002,87267,150.78515625,julia

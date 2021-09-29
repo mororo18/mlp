@@ -21,3 +21,10 @@
 /home/victor/repos/mlp/csharp/build_output/csharp.dll
 /home/victor/repos/mlp/csharp/build_output/ref/csharp.dll
 /home/victor/repos/mlp/csharp/build_output/csharp.pdb
+/home/victor/repos/mlp/csharp/dotnet_output/csharp
+/home/victor/repos/mlp/csharp/dotnet_output/csharp.deps.json
+/home/victor/repos/mlp/csharp/dotnet_output/csharp.runtimeconfig.json
+/home/victor/repos/mlp/csharp/dotnet_output/csharp.runtimeconfig.dev.json
+/home/victor/repos/mlp/csharp/dotnet_output/csharp.dll
+/home/victor/repos/mlp/csharp/dotnet_output/ref/csharp.dll
+/home/victor/repos/mlp/csharp/dotnet_output/csharp.pdb

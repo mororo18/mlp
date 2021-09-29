@@ -472,7 +472,7 @@ def main():
 
 start = time.time()
 main()
-print("TIME %s " % (time.time() - start))
+print("TIME: %s " % (time.time() - start))
 print("SWAP %s" % t_swap)
 print("Reinsert %s" % t_reinsertion)
 print("or_opt2 %s" % t_or_opt2)

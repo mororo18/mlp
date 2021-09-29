@@ -459,7 +459,7 @@ function main()
 
     time = @elapsed GILS_RVND(Imax, Iils, R, dimension, c)
 
-    @printf "TIME %.6lf\n" time
+    @printf "TIME: %.6lf\n" time
     # @printf "RVND iteracoes %d\n" it
 
 end
