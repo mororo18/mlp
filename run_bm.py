@@ -1,4 +1,5 @@
 import subprocess
+import argparse
 import tempfile
 import os
 import pandas as pd
@@ -50,14 +51,6 @@ def get_mem_avg(pid):
                 #print(p.status())
 
             mem = p.memory_info()
-
-            """
-            print(" Shared"  , float(mem.shared) / 1024**2)
-            print(" Resident"  , float(mem.rss)/ 1024**2)
-            print(" Virtual"  , float(mem.vms)/ 1024**2)
-            print("pid", pid)
-"""
-
             mem_total = (float(mem.rss)- float(mem.shared))/ MB
             if mem_total < gap:
                 print("break by gap")
@@ -76,7 +69,7 @@ def get_COST(_str):
     lines = _str.split("\n")
 
     for l in lines :
-        print(l)
+        #print(l)
         if l.find("COST") != -1:
             i = l.find(":")
             col = l[:i]
@@ -87,7 +80,7 @@ def get_TIME(_str):
     lines = _str.split("\n")
 
     for l in lines :
-        print(l)
+        #print(l)
         if l.find("TIME") != -1:
             i = l.find(":")
             col = l[:i]
@@ -97,7 +90,8 @@ def get_TIME(_str):
 
 def get_info(lang):
     f = open('run_' + lang + '.sh', 'r')
-    print(f.readline())
+    #print(f.readline())
+    f.readline()
     cmd_line = f.readline().replace('\n', '').split(' ')
     print(cmd_line)
 
@@ -122,13 +116,24 @@ def get_info(lang):
 
 def main():
 
-    # receber argumentos do usuario
+    parser = argparse.ArgumentParser(description='Run Benchmark')
+    parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required=True)
+    parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
+    parser.add_argument('--lang' , nargs='+', help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
+    args = parser.parse_args()
+    print(args.lang)
+    
+    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia"]
 
-    instance = "instances/att48.tsp"
-    n = 2
+    for i in args.lang:
+        if i not in sources:
+            print("{} is not suported".format(i))
+            exit(0)
 
-    sources = ["julia"]#, "dotnet", "mcs", "python3", "pypy", "julia"]
-    #sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia"]
+    sources = args.lang[:]
+    instance = args.instance
+    n = args.n
+
     lang_dir = {
             "dotnet": "csharp",
             "mcs": "csharp",
