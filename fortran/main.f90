@@ -7,6 +7,12 @@ module data_types
         integer :: T = 1
         integer :: C = 2
         integer :: W = 3
+        
+        integer :: REINSERTION  = 1
+        integer :: OR_OPT_2     = 2
+        integer :: OR_OPT_3     = 3 
+        integer :: SWAP         = 4
+        integer :: TWO_OPT      = 5
     end type
 
     type tSolution
@@ -179,12 +185,75 @@ function construction(alpha, info) result(ret)
 
 end function
 
+subroutine search_swap(solut, info, ret) 
+    use data_types
+    implicit none
+    type(tSolution) :: solut
+    type(tInfo) :: info
+    logical, intent(out) :: ret
+end subroutine
+
+subroutine search_two_opt(solut, info, ret) 
+    use data_types
+    implicit none
+    type(tSolution) :: solut
+    type(tInfo) :: info
+    logical, intent(out) :: ret
+end subroutine
+
+subroutine search_reinsertion(solut, info, opt, ret) 
+    use data_types
+    implicit none
+    type(tSolution) :: solut
+    type(tInfo) :: info
+    integer :: opt
+    logical, intent(out) :: ret
+end subroutine
+
 subroutine RVND(sol, info)
     use data_types
     implicit none
 
     type(tSolution) :: sol
     type(tInfo) :: info
+
+    real :: rnd
+
+    integer, dimension(5) :: neighbd_list
+    integer :: nl_size
+    integer :: neighbd
+
+    integer :: index_
+    logical :: improve_flag
+
+    do while (nl_size > 0)
+        call random_number(rnd)
+        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
+        index_ = ceiling(rnd*nl_size)
+        neighbd = neighbd_list(index_)
+
+        improve_flag = .false.
+
+        if (neighbd == info%REINSERTION) then
+            call search_reinsertion(sol, info, info%REINSERTION, improve_flag)
+        else if (neighbd == info%OR_OPT_2) then
+            call search_reinsertion(sol, info, info%OR_OPT_2, improve_flag)
+        else if (neighbd == info%OR_OPT_3) then
+            call search_reinsertion(sol, info, info%OR_OPT_3, improve_flag)
+        else if (neighbd == info%SWAP) then
+            call search_swap(sol, info, improve_flag)
+        else if (neighbd == info%TWO_OPT) then
+            call search_two_opt(sol, info, improve_flag)
+        endif
+
+        if (improve_flag) then
+            neighbd_list(:) = (/ info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3, info%SWAP, info%TWO_OPT /)
+        else
+            call arr_shift(neighbd_list, index_+1, index_, nl_size-index_)
+            nl_size = nl_size-1
+        endif
+        
+    end do
 end subroutine
 
 function GILS_RVND(Imax, Iils, R, info) result(ret)
@@ -278,8 +347,6 @@ program main
             integer, dimension(info%dimen+1) :: ret 
         end function
     end interface
-
-
 
     call load_matrix(info%cost)
 
