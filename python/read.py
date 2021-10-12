@@ -13,8 +13,8 @@ def matrix_fill(n):
 
     return matrix
 
-def get_instance_info():
-    source_f = open('../distance_matrix', 'r')
+def get_instance_info(f_name='../distance_matrix'):
+    source_f = open(f_name, 'r')
     cost = []
 
     i = -1  

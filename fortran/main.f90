@@ -12,6 +12,7 @@ module data_types
     type tSolution
         integer, allocatable :: s (:)
         real, allocatable :: seq (:,:,:)
+        real :: cost
     end type
 
 end module
@@ -159,6 +160,7 @@ function construction(alpha, info) result(ret)
 
         rng = ceiling(cL_size * alpha)
         call random_number(RND)
+        RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
         index_ = ceiling(rng * RND)
 
         cN = cL(index_)
@@ -174,6 +176,82 @@ function construction(alpha, info) result(ret)
     s(info%dimen+1) = 1
 
     ret = s(:)
+
+end function
+
+subroutine RVND(sol, info)
+    use data_types
+    implicit none
+
+    type(tSolution) :: sol
+    type(tInfo) :: info
+end subroutine
+
+function GILS_RVND(Imax, Iils, R, info) result(ret)
+    use data_types
+
+    implicit none
+
+    !! parameters
+    integer :: Imax
+    integer :: Iils
+    real, dimension(26) :: R
+    type(tInfo) :: info
+    type(tSolution) :: ret
+
+    !! solutions
+    type(tSolution) :: sol_best
+    type(tSolution) :: sol_partial
+    type(tSolution) :: sol_crnt
+
+    !! aux variables
+    integer :: i
+    integer :: index_
+    integer :: R_size = 26
+    real :: alpha
+    real :: rnd
+    integer :: iterILS
+
+    interface
+        function construction(alpha, info) result (ret)
+            use data_types
+            implicit none
+            real :: alpha
+            type(tInfo) :: info
+            integer, dimension(info%dimen+1) :: ret 
+        end function
+    end interface
+
+    do i=1, Imax
+        call random_number(rnd)
+        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
+        index_ = ceiling(rnd*R_size)
+        alpha = R(index_)
+        sol_crnt%s = construction(alpha, info)
+        sol_partial = sol_crnt
+
+        iterILS = 0
+        do while (iterILS < Iils)
+            call RVND(sol_crnt, info)
+
+            if (sol_crnt%cost < sol_partial%cost - EPSILON(1.0)) then
+                sol_partial = sol_crnt
+                sol_partial%cost = sol_partial%cost - EPSILON(1.0)
+                iterILS = 0
+            endif
+
+            call subseq_load(sol_crnt, info)
+
+            iterILS = iterILS + 1
+        end do
+        
+        call subseq_load(sol_partial, info)
+
+        if (sol_partial%cost < sol_best%cost) then
+            sol_best = sol_partial
+        endif
+    
+    end do
 
 end function
 
@@ -224,8 +302,8 @@ program main
 
     print *, sol%seq(1, info%dimen+1, info%C)
 
-    s = construction(0.2, info)
+    sol%s = construction(0.2, info)
 
-    print *, s
+    print *, sol%s
 
 end program
