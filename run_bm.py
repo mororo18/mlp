@@ -2,6 +2,7 @@ import subprocess
 import argparse
 import tempfile
 import os
+import sys
 import pandas as pd
 import concurrent.futures
 import psutil as pU
@@ -117,12 +118,12 @@ def get_info(lang):
 def main():
 
     parser = argparse.ArgumentParser(description='Run Benchmark')
-    parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required=True)
+    parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required= not ('--instances-list' in sys.argv or '-I' in sys.argv ))
+    parser.add_argument('-I' ,'--instances-list', help='Path to the file with a list of the paths of the instances.', required=not ('-i' in sys.argv or '--instance' in sys.argv))
     parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
-    parser.add_argument('--lang' , nargs='+', help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
+    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
     args = parser.parse_args()
-    print(args.lang)
-    
+
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia"]
 
     for i in args.lang:
@@ -132,6 +133,12 @@ def main():
 
     sources = args.lang[:]
     instance = args.instance
+    instances = []
+    if args.instance != None:
+        instances.append(args.instance)
+    else:
+        instances = open(args.instances_list, 'r')
+
     n = args.n
 
     lang_dir = {
@@ -150,30 +157,33 @@ def main():
             }
     """
     
-    os.system("./load " + instance)
+    print("opa")
+    for inst in instances:
+        print("opa")
+        os.system("./load " + inst)
 
-    for lang in sources:
-        ds = ds_open(lang_dir[lang])
-        
-        os.chdir(lang_dir[lang])
-        print(os.getcwd())
+        for lang in sources:
+            ds = ds_open(lang_dir[lang])
+            
+            os.chdir(lang_dir[lang])
+            print(os.getcwd())
 
-        # IDEIA: criar arquivo cm lista de sources no dir de cada lang p gerar o nome do respectivo shell script "build_<source_name>.sh"
-        if os.path.isfile("./build.sh"):
-            # compila oq eh necessario
-            os.system("./build.sh")
+            # IDEIA: criar arquivo cm lista de sources no dir de cada lang p gerar o nome do respectivo shell script "build_<source_name>.sh"
+            if os.path.isfile("./build.sh"):
+                # compila oq eh necessario
+                os.system("./build.sh")
 
-        for i in range(n):
+            for i in range(n):
 
-            info = get_info(lang)
-            info.update({"source" : lang, "instance" : instance})
+                info = get_info(lang)
+                info.update({"source" : lang, "instance" : inst})
 
-            ds = ds.append(pd.DataFrame(info), ignore_index=True)
+                ds = ds.append(pd.DataFrame(info), ignore_index=True)
 
-            print(ds)
+                print(ds)
 
-        ds.to_csv('../data/' +  lang_dir[lang] + '.csv', index=False)
+            ds.to_csv('../data/' +  lang_dir[lang] + '.csv', index=False)
 
-        os.chdir("..")
+            os.chdir("..")
 
 main()

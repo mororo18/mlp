@@ -13,6 +13,8 @@ module data_types
         integer :: OR_OPT_3     = 3 
         integer :: SWAP         = 4
         integer :: TWO_OPT      = 5
+
+        real :: fmax = 3.4028235E+38
     end type
 
     type tSolution
@@ -154,7 +156,7 @@ function construction(alpha, info) result(ret)
 
     ! init cL
     cL = (/ (I, I=2, info%dimen) /)
-    print *, cl
+    !print *, cl
    !do i=2, info%dimen
    !    cL(i-1) = i
    !end do
@@ -185,12 +187,147 @@ function construction(alpha, info) result(ret)
 
 end function
 
+subroutine swap(s, i, j)
+    implicit none
+
+    integer, dimension(*), intent(out) :: s 
+    integer :: i
+    integer :: j
+
+    integer :: tmp
+
+    tmp = s(i)
+    s(i) = s(j)
+    s(j) = tmp
+
+end subroutine
+
+subroutine reverse(s, i, j)
+    implicit none
+
+    integer, dimension(*), intent(out) :: s 
+    integer :: i
+    integer :: j
+
+    integer :: index_
+
+    do index_=i, int((i+j)/2)
+        call swap(s, i, j)
+    end do
+
+end subroutine
+
+subroutine reinsert(s, i, j, pos)
+    implicit none
+
+    integer, dimension(*), intent(out) :: s 
+    integer :: i
+    integer :: j
+    integer :: pos
+
+    integer, allocatable :: sub (:)
+
+    integer :: sz
+    allocate(sub(j-i+1))
+
+    sub(:) = s(i:j)
+     
+    if (i < pos) then
+        sz = pos-j-1
+        call arr_shift(s, j+1, i, sz)
+        s(i+sz: pos-1) = sub(:)
+    else
+        sz = i-pos
+        call arr_shift(s, pos, j+1-sz, sz)
+        s(pos:pos+j-i) = sub(:)
+    endif
+
+end subroutine
+
 subroutine search_swap(solut, info, ret) 
     use data_types
     implicit none
     type(tSolution) :: solut
     type(tInfo) :: info
     logical, intent(out) :: ret
+
+    integer :: i
+    integer :: j
+    integer :: i_prev
+    integer :: i_next
+    integer :: j_prev
+    integer :: j_next
+
+    integer :: I_best
+    integer :: J_best
+
+    real :: cost_best 
+    real :: cost_new
+    real :: cost_concat_1
+    real :: cost_concat_2 
+    real :: cost_concat_3 
+    real :: cost_concat_4
+
+    cost_best = info%fmax
+    cost_new = 0.0
+    cost_concat_1 = 0.0
+    cost_concat_2 = 0.0
+    cost_concat_3 = 0.0
+    cost_concat_4 = 0.0
+
+    do i=2, info%dimen-1
+        i_prev = i-1
+        i_next = i+1
+
+        cost_concat_1 =                 solut%seq(1, i_prev, info%T) + info%cost(solut%s(i_prev), solut%s(i_next))
+        cost_concat_2 = cost_concat_1 + solut%seq(i, i_next, info%T) + info%cost(solut%s(i), solut%s(i_next+1))
+
+        cost_new = solut%seq(1, i_prev, info%C)                                                    + &
+                solut%seq(i, i_next, info%W)               * (cost_concat_1) + info%cost(solut%s(i_next), solut%s(i))  + &
+                solut%seq(i_next+1, info%dimen+1, info%W)   * (cost_concat_2) + solut%seq(i_next+1, info%dimen+1, info%C) 
+
+        if (cost_new < cost_best) then
+            cost_best = cost_new - EPSILON(1.0)
+            I_best = i
+            J_best = i_next
+        endif
+
+        do j=i_next+1, info%dimen
+
+            j_prev = j-1
+            j_next = j+1
+
+
+            cost_concat_1 =                 solut%seq(1, i_prev, info%T)       + info%cost(solut%s(i_prev), solut%s(j))
+            cost_concat_2 = cost_concat_1                           + info%cost(solut%s(j), solut%s(i_next))
+            cost_concat_3 = cost_concat_2 + solut%seq(i_next, j_prev, info%T)  + info%cost(solut%s(j_prev), solut%s(i))
+            cost_concat_4 = cost_concat_3                           + info%cost(solut%s(i), solut%s(j_next))
+
+
+            cost_new = solut%seq(1, i_prev, info%C)                                                 + &     ! 1st subseq
+                    cost_concat_1 + &                                                           ! concat 2nd subseq (single node)
+                    solut%seq(i_next, j_prev, info%W)      * cost_concat_2 + solut%seq(i_next, j_prev, info%C) + &    ! concat 3rd subseq
+                    cost_concat_3 + &                                                           ! concat 4th subseq (single node)
+                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_4 + solut%seq(j_next, info%dimen+1, info%C)   ! concat 5th subseq
+
+            if (cost_new < cost_best) then
+                cost_best = cost_new - EPSILON(1.0);
+                I_best = i;
+                J_best = j;
+            endif
+
+        end do
+        
+    end do
+
+    if (cost_best < solut%seq(1, info%dimen+1, info%C) - EPSILON(1.0)) then
+        call swap(solut%s, I_best, J_best)
+        call subseq_load(solut, info)
+        ret = .true.
+    endif
+
+    ret = .false.
+
 end subroutine
 
 subroutine search_two_opt(solut, info, ret) 
@@ -199,6 +336,62 @@ subroutine search_two_opt(solut, info, ret)
     type(tSolution) :: solut
     type(tInfo) :: info
     logical, intent(out) :: ret
+
+    integer :: i
+    integer :: j
+    integer :: i_prev
+    integer :: j_next
+
+    integer :: I_best
+    integer :: J_best
+
+    real :: cost_best 
+    real :: cost_new
+    real :: cost_concat_1
+    real :: cost_concat_2 
+    real :: cost_concat_3 
+    real :: cost_concat_4
+    real :: rev_seq_cost
+
+    cost_best = info%fmax
+    cost_new = 0.0
+    cost_concat_1 = 0.0
+    cost_concat_2 = 0.0
+
+    do i=2, info%dimen-1
+        i_prev = i-1
+        rev_seq_cost = solut%seq(i, i+1, info%T)
+
+        do j=i+2, info%dimen
+            j_next = j+1
+
+            rev_seq_cost = rev_seq_cost + info%cost(solut%s(j-1), solut%s(j)) * (solut%seq(i, j, info%W)-1.0)
+
+            cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(j), solut%s(i_prev))
+            cost_concat_2 = cost_concat_1 + solut%seq(i, j, info%T)        + info%cost(solut%s(j_next), solut%s(i))
+
+            cost_new = solut%seq(1, i_prev, info%C)                                                        + & !   1st subseq
+                    solut%seq(i, j, info%W)                * cost_concat_1 + rev_seq_cost                  + & ! concat 2nd subseq (reversed seq)
+                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_2 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 3rd subseq
+
+            if (cost_new < cost_best) then
+                cost_best = cost_new - EPSILON(1.0)
+                I_best = i
+                J_best = j
+            endif
+
+        end do
+
+    end do
+
+    if (cost_best < solut%seq(1, info%dimen+1, info%C)) then
+        call reverse(solut%s, I_best, J_best)
+        call subseq_load(solut, info)
+        ret = .true.
+    endif
+
+    ret = .false.
+
 end subroutine
 
 subroutine search_reinsertion(solut, info, opt, ret) 
@@ -208,6 +401,85 @@ subroutine search_reinsertion(solut, info, opt, ret)
     type(tInfo) :: info
     integer :: opt
     logical, intent(out) :: ret
+
+    integer :: i
+    integer :: j
+    integer :: k
+    integer :: i_prev
+    integer :: j_next
+    integer :: k_next
+
+    integer :: I_best
+    integer :: J_best
+    integer :: POS_best
+
+    real :: cost_best 
+    real :: cost_new
+    real :: cost_concat_1
+    real :: cost_concat_2 
+    real :: cost_concat_3 
+    real :: cost_concat_4
+
+    cost_best = info%fmax
+    cost_new = 0.0
+    cost_concat_1 = 0.0
+    cost_concat_2 = 0.0
+    cost_concat_3 = 0.0
+
+    do i=2, info%dimen-opt+1
+        j = opt+i-1
+        i_prev = i-1
+        j_next = j+1
+
+        do k=1, i_prev-1
+
+            cost_concat_1 =                 solut%seq(1, k, info%T)            + info%cost(solut%s(k), solut%s(i))
+            cost_concat_2 = cost_concat_1 + solut%seq(i, j, info%T)            + info%cost(solut%s(j), solut%s(k_next))
+            cost_concat_3 = cost_concat_2 + solut%seq(k_next, i_prev, info%T)  + info%cost(solut%s(i_prev), solut%s(j_next))
+
+            cost_new = solut%seq(1, k, info%C)                                                             + & !       1st subseq
+                    solut%seq(i, j, info%W)                * cost_concat_1 + solut%seq(i, j, info%C)                  + & ! concat 2nd subseq (reinserted seq)
+                    solut%seq(k_next, i_prev, info%W)      * cost_concat_2 + solut%seq(k_next, i_prev, info%C)        + & ! concat 3rd subseq
+                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 4th subseq
+
+            if (cost_new < cost_best) then
+                cost_best = cost_new - EPSILON(1.0)
+                I_best = i
+                J_best = j
+                POS_best = k
+            endif
+
+        end do
+
+        do k=i+opt, info%dimen-opt-1
+            k_next = k+1
+
+            cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(i_prev), solut%s(j_next))
+            cost_concat_2 = cost_concat_1 + solut%seq(j_next, k, info%T)   + info%cost(solut%s(k), solut%s(i))
+            cost_concat_3 = cost_concat_2 + solut%seq(i, j, info%T)        + info%cost(solut%s(j), solut%s(k_next))
+
+            cost_new = solut%seq(1, i_prev, info%C)                                                        + & !       1st subseq
+                    solut%seq(j_next, k, info%W)           * cost_concat_1 + solut%seq(j_next, k, info%C)             + & ! concat 2nd subseq
+                    solut%seq(i, j, info%W)                * cost_concat_2 + solut%seq(i, j, info%C)                  + & ! concat 3rd subseq (reinserted seq)
+                    solut%seq(k_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(k_next, info%dimen+1, info%C)       ! concat 4th subseq
+
+            if (cost_new < cost_best) then
+                cost_best = cost_new - EPSILON(1.0)
+                I_best = i
+                J_best = j
+                POS_best = k
+            endif
+        end do
+    end do
+
+    if (cost_best < solut%seq(1, info%dimen+1, info%C)) then
+        call reinsert(solut%s, I_best, J_best, POS_best+1)
+        call subseq_load(solut, info)
+        ret = .true.
+    endif
+
+    ret = .false.
+
 end subroutine
 
 subroutine RVND(sol, info)
@@ -371,6 +643,9 @@ program main
 
     sol%s = construction(0.2, info)
 
+    print *, sol%s
+
+    call reinsert(sol%s, 8, 12, 2)
     print *, sol%s
 
 end program
