@@ -717,15 +717,18 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
         index_ = ceiling(rnd*R_size)
         alpha = R(index_)
+        print *, "[+] Local Search ", i
+        print *, "        [+] Constructing Inital Solution.."
         sol_crnt%s = construction(alpha, info)
         call subseq_load(sol_crnt, info)
         sol_partial = sol_crnt
 
         !call exit(0)
 
+        print *, "        [+] Looking for the best Neighbor.."
         iterILS = 0
         it = 0
-        print *, sol_crnt%cost
+        !print *, sol_crnt%cost
         do while (iterILS < Iils)
             call RVND(sol_crnt, info, it)
 
@@ -741,15 +744,17 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
             iterILS = iterILS + 1
         end do
-        print *, sol_partial%cost
-        print *, "RVND it", it
-        print *, ""
+       !print *, sol_partial%cost
+       !print *, "RVND it", it
+       !print *, ""
         
         call subseq_load(sol_partial, info)
 
         if (sol_partial%cost < sol_best%cost) then
             sol_best = sol_partial
         endif
+
+        print *, "        Current best solution cost:", sol_best%cost
     
     end do
 
