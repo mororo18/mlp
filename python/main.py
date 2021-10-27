@@ -5,7 +5,7 @@ from read import *
 from random import randint
 import math
 import sys
-#globals()['__debug__'] = False
+import matplotlib.pyplot as plt 
 
 EPSILON = 1e-13
 
@@ -33,6 +33,11 @@ t_perturb = 0
 t_seq = 0
 
 improv_flag = None
+improv_reinsertion = 0
+improv_two_opt = 0
+improv_swap = 0
+improv_or_2 = 0
+improv_or_3 = 0
 
 def subseq_info_fill(n):
     matrix = [[], [], []]
@@ -170,11 +175,16 @@ def search_swap(s, seq):
 
     if cost_best < seq[C][0][n] - EPSILON:
         #print(cost_best, I, J)
+
         swap(s, I, J)
         subseq_info_load(s, seq)
         #print(seq[C][0][n])
+        if cost_best != seq[C][0][n]:
+            print("ERRR")
         global improv_flag
+        global improv_swap
         improv_flag = True
+        improv_swap += 1
 
 def search_two_opt(s, seq):
     cost_best = float('inf')
@@ -208,13 +218,19 @@ def search_two_opt(s, seq):
                 I = i
                 J = j
 
+            if i == 2 and j == 10:
+                print ("opaa")
+
     if cost_best < seq[C][0][n] - EPSILON:
         #print(cost_best)
         #print(I, J)
         reverse(s, I, J)
         subseq_info_load(s, seq)
         global improv_flag
+        global improv_two_opt
         improv_flag = True
+        improv_two_opt += 1
+
 
 
 def search_reinsertion(s, seq, OPT):
@@ -242,6 +258,8 @@ def search_reinsertion(s, seq, OPT):
 
         for k in range(0, i_prev):
             k_next = k+1
+
+            seq[C][0][n]
 
             cost_concat_1 = seq[T][0][k] + m[s[k]][s[i]]
             cost_concat_2 = cost_concat_1 + seq[T][i][j] + m[s[j]][s[k_next]]
@@ -272,6 +290,9 @@ def search_reinsertion(s, seq, OPT):
             J_arr[if_state] = j
             POS_arr[if_state] = k
             '''
+
+            if i == 11 and k == 5:
+                print ("opa")
 
 
         for k in range(i+opt, MAX - 1):
@@ -313,10 +334,55 @@ def search_reinsertion(s, seq, OPT):
         reinsert(s, I, J, POS+1)
         subseq_info_load(s, seq)
         global improv_flag
+        global improv_reinsertion
+        global improv_or_2
+        global improv_or_3
         improv_flag = True
+        print(cost_best, seq[C][0][n])
+        print (I, J, POS)
 
-def RVND(s, subseq):
+    exit(0)
 
+"""
+def plot_s_dist(s, cost, it):
+    dist = {}
+    for i in range(0, n):
+        key = str(math.floor(m[s[i]][s[i+1]]))[0]
+        #total += math.floor(m[s[i]][s[i+1]])
+        if key in dist.keys():
+            dist[key] += n-i
+        else:
+            dist[key] = n-i
+
+    for i in range(1, 10):
+        if str(i) not in dist.keys():
+            dist[str(i)] = 0
+
+    x = [int(i) for i in list(dist)]
+    y = list(dist.values())
+    total = sum(y)
+    y = [v*100/total for v in y]
+    x, y = zip(*sorted(zip(x, y)))
+    if len(x) > 9:
+        bf = [0, 30.1,17.6,12.5,9.7,7.9,6.7,5.8,5.1,4.6]
+    else:
+        bf = [30.1,17.6,12.5,9.7,7.9,6.7,5.8,5.1,4.6]
+
+    print(x, y)
+    plt.clf()
+    plt.bar(x,y)
+    plt.scatter(x, bf, zorder=100)
+    plt.suptitle(str(n) + "  " + str(cost), 
+                         fontsize = 12)
+    plt.savefig("frames/iter-"+str(it) +".png")
+
+it = 0
+"""
+
+def RVND(sl, subseq):
+
+    hash_pool = []
+    cost_pool = []
 
     global t_reinsertion
     global t_or_opt2 
@@ -325,22 +391,24 @@ def RVND(s, subseq):
     global t_two_opt 
 
     global improv_flag
-    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
+    neighbd_list = [ TWO_OPT]
+    #neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
-    '''
-        s = []
-        
-        s.append(0)
-        i = n-1
-        while i > 0:
-            s.append(i)
-            i -= 1
-        s.append(0)
-        print(s)
-        subseq_info_load(s, subseq)
+    
+    s = list(range(0, n))
+    """
+    i = n-1
+    while i > 0:
+        s.append(i)
+        i -= 1
+    """
+    s.append(0)
+    print(s)
+    subseq_info_load(s, subseq)
 
-        print(subseq[C][0][n])
-    '''
+    print(subseq[C][0][n])
+
+    #exit(0)
 
     while len(neighbd_list) > 0:
         global IT
@@ -374,6 +442,18 @@ def RVND(s, subseq):
 
         if improv_flag == True:
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
+            
+            """
+            it += 1
+            print("yesaa")
+            print(subseq[C][0][n])
+            if subseq[C][0][n] not in cost_pool and hash(tuple(s)) not in hash_pool:
+
+                plot_s_dist(s, subseq[C][0][n], it)
+                cost_pool.append(subseq[C][0][n])
+                hash_pool.append(hash(tuple(s)))
+                """
+
         else:
             neighbd_list.pop(i)
 
@@ -405,17 +485,35 @@ def perturb(sl):
 
     return s
 
+def similarity(s, p):
+
+    sim = 0.0
+
+    for i in range(0, n):
+        for j in range(0, n):
+            if s[i] == p[j] and s[i+1] == p[i+1]:
+                sim += 1.0
+                break
+
+
+    return sim / n
+
+
 def GILS_RVND(Imax, Iils, R):
 
     cost_best = float('inf')
+
     s_best = []
 
     global t_construction
     global t_perturb
 
+    local_pool = []
+
     subseq = subseq_info_fill(n)
 
     for i in range(Imax):
+        flag = False
         alpha = R[randint(0, len(R)-1)]
 
         print("[+] Local Search {}".format(i+1))
@@ -432,6 +530,13 @@ def GILS_RVND(Imax, Iils, R):
         iterILS = 0
         while iterILS < Iils:
             RVND(s, subseq)
+
+            for sol in local_pool:
+                if similarity(sol, s) > 0.8:
+                    flag = True
+
+            if flag:
+                break;
             rvnd_cost_crnt  = subseq[C][0][n] - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
@@ -445,9 +550,13 @@ def GILS_RVND(Imax, Iils, R):
             subseq_info_load(s, subseq)
             iterILS += 1
 
+        #exit(0)
+        if flag:
+            continue;
         subseq_info_load(sl, subseq)
         sl_cost = subseq[C][0][n] - EPSILON
 
+        local_pool.append(sl)
         if sl_cost < cost_best:
             s_best = sl
             cost_best = sl_cost
@@ -457,6 +566,19 @@ def GILS_RVND(Imax, Iils, R):
     print("COST: {}".format (cost_best))
     print("SOLUTION: {}".format( s_best))
     print("Total Iterations RVND {}".format(IT))
+    print("swap", improv_swap)
+    print("two_opt", improv_two_opt)
+    print("reinsertion", improv_reinsertion)
+    print("or-opt_2", improv_or_2)
+    print("or-opt_3", improv_or_3)
+
+    """
+    sys.stdout.write("DIST  [")
+    for i in range(0, n):
+        sys.stdout.write(str(m[s_best[i]][s_best[i+1]])+ ", ")
+
+    print("]")
+    """
 
 
 
