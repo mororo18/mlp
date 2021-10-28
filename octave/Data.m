@@ -34,6 +34,7 @@ function [dim, cost] = Data
             v = mat2str(str2double(str(1:pos-1)));
             v = str2double(strrep(substr(v, 2, numel(v)-2), ';', ''));
             c(i, j) = v;
+            c(j, i) = v;
             typeinfo(v);
             str = str(pos+1:end);
             %break;
