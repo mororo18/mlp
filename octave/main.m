@@ -20,9 +20,49 @@ function ret = subseq_load (sol, info)
     end
 
     sol.cost = sol.seq(1, info.dimen+1, info.C);
-    sol.cost
-    sol;
     ret = sol;
+end
+
+function ret = sort_by(arr, r, info)
+    sz = columns(arr);
+
+    for i = 1:sz
+        for j = 1:sz-i
+            if (info.cost(r, arr(j)) > info.cost(r, arr(j+1)))
+                tmp = arr(j);
+                arr(j) = arr(j+1);
+                arr(j+1) = tmp;
+            end
+        end
+    end
+
+    ret = arr;
+end
+
+function ret = construction(alpha, info)
+    s(1) = 1;
+    for i = 1:info.dimen-1
+        cL(i) = i+1;
+    end
+
+    r = 1;
+    while (columns(cL) > 0) 
+        cL = sort_by(cL, r, info);
+
+        rng = ceil(columns(cL) * alpha);
+        RND = rand(1);
+        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        index = ceil(rng * RND);
+
+        cN = cL(index);
+
+        cL(index) = [];
+        s(columns(s)+1) = cN;
+        r = cN;
+    end
+
+    s(columns(s)+1) = 1;
+    ret = s;
 end
 
 function main
@@ -39,7 +79,8 @@ function main
     sol.cost = 0;
     sol.seq = zeros(info.dimen+1, info.dimen+1, 3);
     sol = subseq_load(sol, info);
+
+    s = construction(0.1, info)
 end
 
 main();
-
