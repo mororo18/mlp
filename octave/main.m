@@ -65,6 +65,45 @@ function ret = construction(alpha, info)
     ret = s;
 end
 
+function ret = swap(s, i, j)
+    tmp = s(i)
+    s(i) = s(j)
+    s(j) = tmp
+
+    ret = s
+end
+
+function ret = reverse(s, i, j)
+   %bound = j
+    
+   %for index = i:floor((i+j)/2)
+   %    tmp = s(index)
+   %    s(index) = s(bound)
+   %    s(bound) = tmp
+   %    
+   %    bound--
+   %end
+
+    s(i:j) = flip(s(i:j))
+    ret = s
+end
+
+function ret = reinsert(s, i, j, pos)
+    if (i < pos)
+        tmp = s(i:j);
+        inter = s(j+1:pos-1);
+        s(i:i+length(inter)-1) = inter;
+        s(i+length(inter):pos-1) = tmp;
+    else
+        tmp = s(i:j);
+        inter = s(pos:i-1);
+        s(pos:pos+length(tmp)-1) = tmp;
+        s(pos+length(tmp):j) = inter;
+    end
+
+    ret = s;
+end
+
 function [solut_new, flag] = search_swap(solut, info)
 end
 
@@ -164,6 +203,10 @@ function main
     sol = subseq_load(sol, info);
 
     s = construction(0.1, info);
+    %s(2:7)
+    %s(2:7) = flip(s(2:7))
+    s
+    s = reinsert(s, 6, 11, 2)
 end
 
 main();

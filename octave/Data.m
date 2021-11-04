@@ -32,7 +32,12 @@ function [dim, cost] = Data
             end
             pos = pos(1, 1);
             v = mat2str(str2double(str(1:pos-1)));
-            v = str2double(strrep(substr(v, 2, numel(v)-2), ';', ''));
+
+            if (size(v)(1,2) > 1)
+                v = str2double(strrep(substr(v, 2, numel(v)-2), ';', ''));
+            else
+                v = str2double(v);
+            end
             c(i, j) = v;
             c(j, i) = v;
             typeinfo(v);
