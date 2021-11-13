@@ -351,59 +351,57 @@ inline void neighbor_reinsertion_better(std::vector<int> &s, std::vector<std::ve
 
 }
 
-inline void neighbd_list_repopulate(std::vector<int> &list){
-    list.clear();
-    list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
-}
+*/
 
-void RVND(std::vector<int> &s, std::vector<std::vector<struct subseq>> &seq){
+void RVND(tSolution & solut, tInfo info) {
 
-    alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {1,2,3,4,5};
-    alignas(INT_SZ) int neighbd_rand_index;
-    alignas(INT_SZ) int neighbd_rand;
-    int k = 0;
+    alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
+    alignas(INT_SZ) uint index;
+    alignas(INT_SZ) int neighbd;
+    //int k = 0;
+    bool improve_flag;
 
     while(!neighbd_list.empty()){
-        k++;
+        //k++;
 
-        neighbd_rand_index = (unsigned)rand() % neighbd_list.size();
-        neighbd_rand = neighbd_list[neighbd_rand_index];
+        index = rand() % neighbd_list.size();
+        neighbd = neighbd_list[index];
 
-        state = false;
+        improve_flag = false;
 
-        switch(neighbd_rand){
+        switch(neighbd){
             case REINSERTION:
                 //before();
-                neighbor_reinsertion_better(s, seq, REINSERTION);
+                improve_flag = search_reinsertion(solut, info, REINSERTION);
                 //after(REINSERTION);
                 break;				
             case OR_OPT2:
                 //before();
-                neighbor_reinsertion_better(s, seq, OR_OPT2);
+                improve_flag = search_reinsertion(solut, info, OR_OPT_2);
                 //after(OR_OPT2);
                 break;				
             case OR_OPT3:
                 //before();
-                neighbor_reinsertion_better(s, seq, OR_OPT3);
+                improve_flag = search_reinsertion(solut, info, OR_OPT_3);
                 //after(OR_OPT3);
                 break;				
             case SWAP:
                 //before();
-                neighbor_swap_better(s, seq);
+                improve_flag = search_reinsertion(solut, info);
                 //after(SWAP);
                 break;
             case TWO_OPT:
                 //before();
-                neighbor_two_opt_better(s, seq);
+                improve_flag = search_reinsertion(solut, info);
                 //after(TWO_OPT);
                 break;				
         }
 
-        if(state)
-            neighbd_list_repopulate(neighbd_list);
-        else
-            neighbd_list.erase(neighbd_list.begin() + neighbd_rand_index);
-        
+        if (improve_flag) {
+            neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
+        } else {
+            neighbd_list.erase(neighbd_list.begin() + index);
+        }
 
     }
 
@@ -412,7 +410,6 @@ void RVND(std::vector<int> &s, std::vector<std::vector<struct subseq>> &seq){
 
 void perturb(std::vector<int> &sl, std::vector<int> &s){
 }
-*/
 
 
 void GILS_RVND(int Imax, int Iils, tInfo info) {
@@ -440,7 +437,7 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
         //int k = 0;
         while (iterILS < Iils) {
             //k++;
-            //RVND(s, subseq_info);
+            RVND(solut_crnt, info);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
                 solut_partial = solut_crnt;
                 iterILS = 0;
