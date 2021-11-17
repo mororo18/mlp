@@ -14,13 +14,15 @@
 #include "Data.hpp"
 
 #define REINSERTION 1
-#define OR_OPT2 	2
-#define OR_OPT3 	3
+#define OR_OPT_2 	2
+#define OR_OPT_3 	3
 #define SWAP 		4
 #define TWO_OPT		5
 #define TABLE_SZ    26
 #define DBL_SZ      8
 #define INT_SZ      4
+
+using std::chrono::high_resolution_clock;
 
 typedef unsigned uint;
 
@@ -89,12 +91,12 @@ std::vector<int> construct(const double alpha, tInfo info){
                 return info.cost[i][r] < info.cost[j][r];
             });
 
-        int range = ceil(cL.size() * alpha);
-        int index = rand() % range;
+        int range = std::ceil(cL.size() * alpha);
+        int index = range > 0 ? rand() % range : 0;
         int c = cL[index];
         s.push_back(c);
+        //print_s(cL);
         r = c;
-        print_s(cL);
         cL.erase(cL.begin() + index);
     }
 
@@ -107,7 +109,7 @@ inline void swap(std::vector<int> &vec, int i, int j){
     std::iter_swap(vec.begin() + i, vec.begin() + j);
 }
 
-inline void two_opt(std::vector<int> &vec, int i, int j){
+inline void reverse(std::vector<int> &vec, int i, int j){
     std::reverse(vec.begin() + i, vec.begin() + j+1);
 }
 
@@ -125,12 +127,15 @@ inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
 
 }
 
-inline void subseq_load(tSolution & solut, tInfo info){
+inline void subseq_load(tSolution & solut, tInfo info, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     //alignas(INT_SZ) int dim = dimension+1;
     //alignas(1) bool t;
+    alignas(INT_SZ) int from = index;
+    alignas(1) bool t;
     for (i = 0; i < info.dimen+1; i++) {
         k = 1 - i - (!i);
+        t = i == from;
 
         solut.seq[i][i][info.T] = 0.0;
         solut.seq[i][i][info.C] = 0.0;
@@ -141,6 +146,7 @@ inline void subseq_load(tSolution & solut, tInfo info){
             solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C];
             solut.seq[i][j][info.W] = j + k;
         }
+        from += t;
     }
 
     solut.cost = solut.seq[0][info.dimen][info.C];
@@ -174,7 +180,7 @@ inline double cost_reverse_calc(std::vector<std::vector<struct subseq>> &seq, st
 */
 
 inline bool search_swap(tSolution & solut, tInfo info) {
-    alignas(DBL_SZ) double cost, 
+    alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
     alignas(INT_SZ) int i, j, j_prev, j_next, i_prev, i_next;
@@ -188,10 +194,10 @@ inline bool search_swap(tSolution & solut, tInfo info) {
 
         //consecutive nodes
         cost_concat_1 =                 solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[i_next]];
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][T]  + info.c[solut.s[i]][solut.s[i_next+1]];
+        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T]  + info.cost[solut.s[i]][solut.s[i_next+1]];
 
         cost_new = solut.seq[0][i_prev][info.C]                                                    +           //       1st subseq
-        solut.seq[i][i_next][info.W]               * (cost_concat_1) + info.c[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
+        solut.seq[i][i_next][info.W]               * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
         solut.seq[i_next+1][info.dimen][info.W]   * (cost_concat_2) + solut.seq[i_next+1][info.dimen][info.C];   // concat 3rd subseq
 
         if (cost_new < cost_best) {
@@ -206,10 +212,10 @@ inline bool search_swap(tSolution & solut, tInfo info) {
             j_next = j + 1;
             j_prev = j - 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]       + info.c[solut.s[i_prev]][solut.s[j]];
-            cost_concat_2 = cost_concat_1                           + info.c[solut.s[j]][solut.s[i_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T]  + info.c[solut.s[j_prev]][solut.s[i]];
-            cost_concat_4 = cost_concat_3                           + info.c[solut.s[i]][solut.s[j_next]];
+            cost_concat_1 =                 solut.seq[0][i_prev][info.T]       + info.cost[solut.s[i_prev]][solut.s[j]];
+            cost_concat_2 = cost_concat_1                           + info.cost[solut.s[j]][solut.s[i_next]];
+            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T]  + info.cost[solut.s[j_prev]][solut.s[i]];
+            cost_concat_4 = cost_concat_3                           + info.cost[solut.s[i]][solut.s[j_next]];
 
             cost_new = solut.seq[0][i_prev][info.C]                                                 +      // 1st subseq
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
@@ -227,8 +233,9 @@ inline bool search_swap(tSolution & solut, tInfo info) {
 
     if(cost_best < solut.cost - DBL_EPSILON){
         swap(solut.s, I, J);
-        subseq_load(solut, info);
+        subseq_load(solut, info, I);
         //subseq_info_load2(seq, s, i_best);
+        //std::cout << "swap\n";
         return true;
     }
 
@@ -236,14 +243,13 @@ inline bool search_swap(tSolution & solut, tInfo info) {
 }
 
 inline bool search_two_opt(tSolution & solut, tInfo info) {
-    alignas(DBL_SZ) double cost, 
+    alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
     alignas(DBL_SZ) double rev_seq_cost;
-    alignas(INT_SZ) int i, j, b, a;
+    alignas(INT_SZ) int i, j, i_prev, j_next;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
-    alignas(1) bool t = 1;
 
     for (i = 1; i < info.dimen-1; ++i) {
         i_prev = i - 1;
@@ -252,10 +258,10 @@ inline bool search_two_opt(tSolution & solut, tInfo info) {
         for (j = i + 2; j < info.dimen; ++j) {
             j_next = j + 1;
 
-            rev_seq_cost += info.c[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1.0);
+            rev_seq_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1.0);
 
-            cost_concat_1 =                 solut.seq[1][i_prev][info.T]   + info.c[solut.s[j]][solut.s[i_prev]];
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]        + info.c[solut.s[j_next]][solut.s[i]];
+            cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.cost[solut.s[j]][solut.s[i_prev]];
+            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]        + info.cost[solut.s[j_next]][solut.s[i]];
 
             cost_new = solut.seq[0][i_prev][info.C]                                                        +   //  1st subseq
                     solut.seq[i][j][info.W]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
@@ -273,6 +279,7 @@ inline bool search_two_opt(tSolution & solut, tInfo info) {
     if (cost_best < solut.cost - DBL_EPSILON) {
         reverse(solut.s, I, J);
         subseq_load(solut, info);
+        //std::cout << "two_opt\n";
         return true;
     }
 
@@ -280,9 +287,9 @@ inline bool search_two_opt(tSolution & solut, tInfo info) {
 }
 
 
-inline bool search_reinsertion(tSolution & solut, tInfo info, int opt) {
-    alignas(DBL_SZ) double cost, cost_concat_1, cost_concat_2, cost_concat_3;
-    alignas(DBL_SZ) double cost_lower = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+inline bool search_reinsertion(tSolution & solut, tInfo & info, int opt) {
+    alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
+    alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
@@ -296,9 +303,9 @@ inline bool search_reinsertion(tSolution & solut, tInfo info, int opt) {
         for(k = 0; k < i_prev; ++k){
             k_next = k+1;
 
-            cost_concat_1 =                 solut.seq[0][k][info.T]            + info.c[solut.s[k]][solut.s[i]];
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.c[solut.s[j]][solut.s[k_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.c[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_1 =                 solut.seq[0][k][info.T]            + info.cost[solut.s[k]][solut.s[i]];
+            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.cost[solut.s[j]][solut.s[k_next]];
+            cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
 
             cost_new = solut.seq[0][k][info.C]                                                             +   //       1st subseq
                 solut.seq[i][j][info.W]                * cost_concat_1 + solut.seq[i][j][info.C]                  +   //  concat 2nd subseq (reinserted seq)
@@ -316,9 +323,9 @@ inline bool search_reinsertion(tSolution & solut, tInfo info, int opt) {
         for (k = i + opt; k < info.dimen -opt -1; ++k) {
             k_next = k + 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.c[solut.s[i_prev]][solut.s[j_next]];
-            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]   + info.c[solut.s[k]][solut.s[i]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]        + info.c[solut.s[j]][solut.s[k_next]];
+            cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.cost[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]   + info.cost[solut.s[k]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]        + info.cost[solut.s[j]][solut.s[k_next]];
 
             cost_new = solut.seq[0][i_prev][info.C]                                                        +   //       1st subseq
                     solut.seq[j_next][k][info.W]           * cost_concat_1 + solut.seq[j_next][k][info.C]             +   // concat 2nd subseq
@@ -336,7 +343,8 @@ inline bool search_reinsertion(tSolution & solut, tInfo info, int opt) {
 
     if (cost_best < solut.cost - DBL_EPSILON) {
         reinsert(solut.s, I, J, POS+1);
-        subseq_load(solut, info);
+        subseq_load(solut, info, I < POS+1 ? I : POS+1);
+        //std::cout << "reinsertion\n";
         return true;
         //int ar[] = {pos_new+1, i_best};
     }
@@ -367,24 +375,24 @@ void RVND(tSolution & solut, tInfo info) {
                 improve_flag = search_reinsertion(solut, info, REINSERTION);
                 //after(REINSERTION);
                 break;				
-            case OR_OPT2:
+            case OR_OPT_2:
                 //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_2);
                 //after(OR_OPT2);
                 break;				
-            case OR_OPT3:
+            case OR_OPT_3:
                 //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_3);
                 //after(OR_OPT3);
                 break;				
             case SWAP:
                 //before();
-                improve_flag = search_reinsertion(solut, info);
+                improve_flag = search_swap(solut, info);
                 //after(SWAP);
                 break;
             case TWO_OPT:
                 //before();
-                improve_flag = search_reinsertion(solut, info);
+                improve_flag = search_two_opt(solut, info);
                 //after(TWO_OPT);
                 break;				
         }
@@ -395,12 +403,47 @@ void RVND(tSolution & solut, tInfo info) {
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
+        //std::cout << "cost  " << solut.cost << std::endl ;
+
+
     }
 
     //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
-void perturb(std::vector<int> &sl, std::vector<int> &s){
+tSolution perturb(tSolution solut, tInfo info) {
+    int A_start = 1;
+    int A_end = 1;
+    int B_start = 1;
+    int B_end = 1;
+
+    int size_max = std::floor((info.dimen+1)/10);
+    size_max = size_max >= 2 ? size_max : 2;
+    int size_min = 2;
+    //std::cout << "perturbing\n";
+    while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
+        int max = (info.dimen+1) -2 -size_max;
+        A_start = rand() % max + 1;
+        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
+
+        B_start = rand() % max + 1;
+        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
+        /*  
+        std::cout << "RAND  " << rand() << "VALUE  " <<  max % rand() + 1 << std:: endl;
+        std::cout << A_start  <<" <= "<< B_start << " e " << B_start << " <= " << A_end << "  OU  " << std::endl;
+        std::cout << (A_start <= B_start) << " e " << (B_start <= A_end) << "  ou  " << (B_start <= A_start) << " e " << (A_start <= B_end) << std:: endl;
+        */
+    }
+    //std::cout << "done\n"; 
+    if (A_start < B_start) {
+        reinsert(solut.s, B_start, B_end-1, A_end);
+        reinsert(solut.s, A_start, A_end-1, B_end);
+    } else {
+        reinsert(solut.s, A_start, A_end-1, B_end);
+        reinsert(solut.s, B_start, B_end-1, A_end);
+    }
+
+    return solut;
 }
 
 
@@ -417,6 +460,7 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
 
         printf("[+] Search %d\n", i+1);
         printf("\t[+] Constructing..\n");	
+
 
         solut_crnt.s = construct(alpha, info);
         subseq_load(solut_crnt, info);
@@ -435,8 +479,10 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
                 iterILS = 0;
             }
 
-            //perturb(sl, s);
+            solut_crnt = perturb(solut_partial, info);
             //subseq_load(solut, s);
+            //exit(0);
+            //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
 
@@ -460,7 +506,7 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
 
     }
     //std::cout << "Dimension: " << dimension << std::endl;
-    //printf("COST: %.2lf\n", solut_best.cost);
+    printf("COST: %.2lf\n", solut_best.cost);
 }
 
 int main(int argc, char **argv){
@@ -492,6 +538,14 @@ int main(int argc, char **argv){
     subseq_load(solut, info);
 
     std::cout << solut.cost << std:: endl;
+    Iils = info.dimen < 100 ? info.dimen : 100;
+    auto t1 = high_resolution_clock::now();
+    GILS_RVND(Imax, Iils, info);
+    auto t2 = high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
+
+    double res = (double)duration / 10e2;
+    std::cout << "TIME: " << res << std::endl;
 
     exit(0);
     /*
