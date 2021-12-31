@@ -114,20 +114,18 @@ inline void reverse(std::vector<int> &vec, int i, int j){
 }
 
 inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
-    std::vector<int> copy;
+    std::vector<int> seq (vec.begin() + i, vec.begin() +j+1);
     if(pos < i){
-        copy.insert(copy.begin(), vec.begin() + i, vec.begin() + j+1);
         vec.erase(vec.begin() + i, vec.begin() + j+1);
-        vec.insert(vec.begin() + pos, copy.begin(), copy.end());
+        vec.insert(vec.begin() + pos, seq.begin(), seq.end());
     }else{
-        copy.insert(copy.begin(), vec.begin() + i, vec.begin() + j+1);
-        vec.insert(vec.begin() + pos, copy.begin(), copy.end());
+        vec.insert(vec.begin() + pos, seq.begin(), seq.end());
         vec.erase(vec.begin() + i, vec.begin() + j+1);
     }
 
 }
 
-inline void subseq_load(tSolution & solut, tInfo info, int index = 0){
+inline void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     //alignas(INT_SZ) int dim = dimension+1;
     //alignas(1) bool t;
@@ -179,7 +177,7 @@ inline double cost_reverse_calc(std::vector<std::vector<struct subseq>> &seq, st
 }
 */
 
-inline bool search_swap(tSolution & solut, tInfo info) {
+inline bool search_swap(tSolution & solut, const tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -242,7 +240,7 @@ inline bool search_swap(tSolution & solut, tInfo info) {
     return false;
 }
 
-inline bool search_two_opt(tSolution & solut, tInfo info) {
+inline bool search_two_opt(tSolution & solut, const tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -287,7 +285,7 @@ inline bool search_two_opt(tSolution & solut, tInfo info) {
 }
 
 
-inline bool search_reinsertion(tSolution & solut, tInfo & info, int opt) {
+inline bool search_reinsertion(tSolution & solut, const tInfo & info, int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -353,7 +351,7 @@ inline bool search_reinsertion(tSolution & solut, tInfo & info, int opt) {
 }
 
 
-void RVND(tSolution & solut, tInfo info) {
+void RVND(tSolution & solut, const tInfo info) {
 
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
     alignas(INT_SZ) uint index;
@@ -411,7 +409,8 @@ void RVND(tSolution & solut, tInfo info) {
     //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
-tSolution perturb(tSolution solut, tInfo info) {
+std::vector<int> perturb(tSolution * solut, const tInfo info) {
+    auto s = solut->s;
     int A_start = 1;
     int A_end = 1;
     int B_start = 1;
@@ -428,22 +427,19 @@ tSolution perturb(tSolution solut, tInfo info) {
 
         B_start = rand() % max + 1;
         B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /*  
-        std::cout << "RAND  " << rand() << "VALUE  " <<  max % rand() + 1 << std:: endl;
-        std::cout << A_start  <<" <= "<< B_start << " e " << B_start << " <= " << A_end << "  OU  " << std::endl;
-        std::cout << (A_start <= B_start) << " e " << (B_start <= A_end) << "  ou  " << (B_start <= A_start) << " e " << (A_start <= B_end) << std:: endl;
-        */
     }
-    //std::cout << "done\n"; 
+    
     if (A_start < B_start) {
-        reinsert(solut.s, B_start, B_end-1, A_end);
-        reinsert(solut.s, A_start, A_end-1, B_end);
+        reinsert(s, B_start, B_end-1, A_end);
+        reinsert(s, A_start, A_end-1, B_end);
     } else {
-        reinsert(solut.s, A_start, A_end-1, B_end);
-        reinsert(solut.s, B_start, B_end-1, A_end);
+        reinsert(s, A_start, A_end-1, B_end);
+        reinsert(s, B_start, B_end-1, A_end);
     }
 
-    return solut;
+    //subseq_load(solut, info);
+
+    return s;
 }
 
 
@@ -479,12 +475,14 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
                 iterILS = 0;
             }
 
-            solut_crnt = perturb(solut_partial, info);
-            //subseq_load(solut, s);
+            solut_crnt.s = perturb(&solut_partial, info);
+            subseq_load(solut_crnt, info);
             //exit(0);
             //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
+
+        //subseq_load(solut_partial, info);
 
         if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
             solut_best = solut_partial;
