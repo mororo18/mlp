@@ -23,13 +23,45 @@ function get_instance_info()
     end
     """
 
+    rand_values = Array{Int, 1}(undef, 0)
+    rnd = false
+    sz = -1
+    name = false
+    inst = ""
+
     i = 1
     for line in eachline(f)
         #println(line)
-        if line == "EOF"
-            break
+        #
+        if sz > 0 
+            #println(line)
+            push!(rand_values, parse(Int, line))
+            continue
         end
 
+        if rnd == true
+            sz = parse(Int, line)
+            continue
+        end
+
+        if line == "RND"
+            rnd = true
+            continue
+        end
+
+        if name == true
+            println(line)
+            inst = line
+            name = false
+            continue
+            #break
+        end
+
+        if line == "EOF"
+            #break
+            name = true
+            continue
+        end
 
         j = i+1
         while length(line) > 0
@@ -60,7 +92,7 @@ function get_instance_info()
 
     close(f)
 
-    return dimension, matrix
+    return dimension, matrix, rand_values
 
 end
 

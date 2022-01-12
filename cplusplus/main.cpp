@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdint>
+#include <cstring>
 #include <cfloat>
 #include <new>
 #include <chrono>
@@ -35,18 +36,21 @@ typedef struct tInfo {
     uint T;
     uint C;
     uint W;
+    vector<int> rnd;
+    uint rnd_index;
 } tInfo;
 
 typedef struct tSolution {
     std::vector<int> s;
-    tSubseq seq;
+    double *** seq;
+    //tSubseq seq;
     double cost;
 } tSolution;
 
 tSolution Solution_init(tInfo info) {
     tSolution solut;
     solut.s = vector<int>(info.dimen+1);
-    /*
+
     solut.seq = new double ** [info.dimen+1];
     for (int i = 0; i < info.dimen+1; i++) {
         solut.seq[i] = new double * [info.dimen+1];
@@ -54,13 +58,28 @@ tSolution Solution_init(tInfo info) {
             solut.seq[i][j] = new double [3];
         }
     }
-    */
+    /*
     solut.seq = std::vector<std::vector<std::vector<double>>> (
             info.dimen+1, std::vector<std::vector<double>> (
                 info.dimen+1, std::vector<double> (3)));
+                */
     solut.cost = DBL_MAX;
 
     return solut;
+}
+
+inline void Solution_cpy( tSolution & src, tSolution & tgt, const tInfo & info) {
+
+    tgt.s = src.s;
+    tgt.cost = src.cost;
+
+    for (int i = 0; i < info.dimen+1; i++) {
+        for (int j = 0; j < info.dimen+1; j++) {
+            //memcpy(tgt.seq[i][j], src.seq[i][j], 3 * sizeof(double));
+            std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
+        }
+    }
+
 }
 
 double R_table(int i){
@@ -76,9 +95,10 @@ void print_s(std::vector<int> s) {
     std::cout << std::endl;
 }
 
-std::vector<int> construct(const double alpha, tInfo info){
+std::vector<int> construct(const double alpha, tInfo & info){
 
     std::vector<int> s = {0};
+    s.reserve(info.dimen+1);
     std::vector<int> cL(info.dimen-1);
     for(int i = 1; i < info.dimen; ++i){
         cL[i-1] = i;
@@ -86,14 +106,16 @@ std::vector<int> construct(const double alpha, tInfo info){
 
     int r = 0;
     while (!cL.empty()) {
-        std::sort(cL.begin(), cL.end(), 
+        std::stable_sort(cL.begin(), cL.end(), 
             [r, &info] (const int i, const int j) {
                 return info.cost[i][r] < info.cost[j][r];
             });
 
         int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
+        //int index = range > 0 ? rand() % range : 0;
+        int index = info.rnd[info.rnd_index++];
         int c = cL[index];
+        //std::cout << r << " " << c << " " << info.cost[r][c] << std::endl;
         s.push_back(c);
         //print_s(cL);
         r = c;
@@ -202,6 +224,7 @@ inline bool search_swap(tSolution & solut, const tInfo & info) {
             cost_best = cost_new - DBL_EPSILON;
             I = i;
             J = i_next;
+            //std::cout << cost_best << " " << I << " " << J << std::endl;
         }
 
         //if(i == dim) continue;
@@ -225,11 +248,13 @@ inline bool search_swap(tSolution & solut, const tInfo & info) {
                 cost_best = cost_new - DBL_EPSILON;
                 I = i;
                 J = j;
+                //std::cout << cost_best << " " << I << " " << J << std::endl;
             }
         }
     }
 
-    if(cost_best < solut.cost - DBL_EPSILON){
+    //std::cout << cost_best << " " << solut.cost << " " << I << " " << J << std::endl;
+    if (cost_best < solut.cost - DBL_EPSILON) {
         swap(solut.s, I, J);
         subseq_load(solut, info, I);
         //subseq_info_load2(seq, s, i_best);
@@ -285,7 +310,7 @@ inline bool search_two_opt(tSolution & solut, const tInfo & info) {
 }
 
 
-inline bool search_reinsertion(tSolution & solut, const tInfo & info, int opt) {
+inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -305,9 +330,9 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, int opt) {
             cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.cost[solut.s[j]][solut.s[k_next]];
             cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
 
-            cost_new = solut.seq[0][k][info.C]                                                             +   //       1st subseq
-                solut.seq[i][j][info.W]                * cost_concat_1 + solut.seq[i][j][info.C]                  +   //  concat 2nd subseq (reinserted seq)
-                solut.seq[k_next][i_prev][info.W]      * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   //  concat 3rd subseq
+            cost_new = solut.seq[0][k][info.C]                                                                   +   //       1st subseq
+                solut.seq[i][j][info.W]               * cost_concat_1 + solut.seq[i][j][info.C]                  +   //  concat 2nd subseq (reinserted seq)
+                solut.seq[k_next][i_prev][info.W]     * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   //  concat 3rd subseq
                 solut.seq[j_next][info.dimen][info.W] * cost_concat_3 + solut.seq[j_next][info.dimen][info.C];       // concat 4th subseq
 
             if (cost_new < cost_best) {
@@ -321,13 +346,13 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, int opt) {
         for (k = i + opt; k < info.dimen -opt -1; ++k) {
             k_next = k + 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.cost[solut.s[i_prev]][solut.s[j_next]];
-            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]   + info.cost[solut.s[k]][solut.s[i]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]        + info.cost[solut.s[j]][solut.s[k_next]];
+            cost_concat_1 =                 solut.seq[0][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]  + info.cost[solut.s[k]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]       + info.cost[solut.s[j]][solut.s[k_next]];
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                        +   //       1st subseq
-                    solut.seq[j_next][k][info.W]           * cost_concat_1 + solut.seq[j_next][k][info.C]             +   // concat 2nd subseq
-                    solut.seq[i][j][info.W]                * cost_concat_2 + solut.seq[i][j][info.C]                  +   // concat 3rd subseq (reinserted seq)
+            cost_new = solut.seq[0][i_prev][info.C]                                                                  +   //       1st subseq
+                    solut.seq[j_next][k][info.W]          * cost_concat_1 + solut.seq[j_next][k][info.C]             +   // concat 2nd subseq
+                    solut.seq[i][j][info.W]               * cost_concat_2 + solut.seq[i][j][info.C]                  +   // concat 3rd subseq (reinserted seq)
                     solut.seq[k_next][info.dimen][info.W] * cost_concat_3 + solut.seq[k_next][info.dimen][info.C];       // concat 4th subseq
 
             if (cost_new < cost_best) {
@@ -351,9 +376,10 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, int opt) {
 }
 
 
-void RVND(tSolution & solut, const tInfo info) {
+void RVND(tSolution & solut, tInfo & info) {
 
-    alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
+    alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
+    //alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
     alignas(INT_SZ) uint index;
     alignas(INT_SZ) int neighbd;
     //int k = 0;
@@ -362,8 +388,10 @@ void RVND(tSolution & solut, const tInfo info) {
     while (!neighbd_list.empty()) {
         //k++;
 
-        index = rand() % neighbd_list.size();
+        //index = rand() % neighbd_list.size();
+        index = info.rnd[info.rnd_index++];
         neighbd = neighbd_list[index];
+        //std::cout <<"aq\n";
 
         improve_flag = false;
 
@@ -394,10 +422,14 @@ void RVND(tSolution & solut, const tInfo info) {
                 //after(TWO_OPT);
                 break;				
         }
-
+        //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
-            neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
+            neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
+            //std::cout << index << "  " << neighbd_list.size() << std::endl;
+            //std::cout << solut.cost << std::endl;
+            
+            //std::cout << info.rnd_index << std::endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
@@ -406,10 +438,11 @@ void RVND(tSolution & solut, const tInfo info) {
 
     }
 
+    //exit(0);
     //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
-std::vector<int> perturb(tSolution * solut, const tInfo info) {
+std::vector<int> perturb(tSolution * solut, tInfo & info) {
     auto s = solut->s;
     int A_start = 1;
     int A_end = 1;
@@ -421,14 +454,32 @@ std::vector<int> perturb(tSolution * solut, const tInfo info) {
     int size_min = 2;
     //std::cout << "perturbing\n";
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
+        /*
         int max = (info.dimen+1) -2 -size_max;
         A_start = rand() % max + 1;
         A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
         B_start = rand() % max + 1;
         B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
+        */
+
+
+
+        //std::cout << "paa\n";
+
+        A_start = info.rnd[info.rnd_index++];
+        A_end = A_start + info.rnd[info.rnd_index++];
+        //std::cout << "A start  " << A_start << std::endl;
+        //std::cout << "A end  " << A_end << std::endl;
+
+        B_start = info.rnd[info.rnd_index++];
+        B_end = B_start + info.rnd[info.rnd_index++];
+        //std::cout << "B start  " << B_start << std::endl;
+        //std::cout << "B end  " << B_end << std::endl;
     }
     
+    //print_s(s);
+
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -443,15 +494,16 @@ std::vector<int> perturb(tSolution * solut, const tInfo info) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tInfo info) {
+void GILS_RVND(int Imax, int Iils, tInfo & info) {
 
     tSolution solut_partial = Solution_init(info);
     tSolution solut_crnt = Solution_init(info);
     tSolution solut_best = Solution_init(info);
 
     for(int i = 0; i < Imax; ++i){
-        //before();
-        int aux = (unsigned)rand() % TABLE_SZ;
+        //int aux = (unsigned)rand() % TABLE_SZ;
+        int aux = info.rnd[info.rnd_index++];
+
         double alpha = R_table(aux);
 
         printf("[+] Search %d\n", i+1);
@@ -459,9 +511,11 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
 
 
         solut_crnt.s = construct(alpha, info);
+        print_s(solut_crnt.s);
         subseq_load(solut_crnt, info);
 
-        solut_partial = solut_crnt;
+        //solut_partial = solut_crnt;
+        Solution_cpy(solut_crnt, solut_partial, info);
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
 
@@ -471,7 +525,8 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
             //k++;
             RVND(solut_crnt, info);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
-                solut_partial = solut_crnt;
+                Solution_cpy(solut_crnt, solut_partial, info);
+                //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
@@ -485,13 +540,14 @@ void GILS_RVND(int Imax, int Iils, tInfo info) {
         //subseq_load(solut_partial, info);
 
         if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
-            solut_best = solut_partial;
+            Solution_cpy(solut_partial, solut_best, info);
+            //solut_best = solut_partial;
         }
 
         //after(7);
 
         //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
-        //std::cout << "\tCurrent best cost: "<< cost_final << std::endl;
+        std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
         //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
         //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
         //std::cout << k << "  Iteracoes " << std::endl;
@@ -517,8 +573,12 @@ int main(int argc, char **argv){
         .W = 2
     };
 
+    std::vector<int> rnd;
 
-    info.dimen = loadData(&info.cost);
+    info.dimen = loadData(&info.cost, rnd);
+    info.rnd = rnd;
+    print_s(rnd);
+    info.rnd_index = 0;
 
     tSolution solut = Solution_init(info);
 
@@ -532,10 +592,6 @@ int main(int argc, char **argv){
     */
     srand(clock());
 
-    solut.s = construct(0.1, info);
-    subseq_load(solut, info);
-
-    std::cout << solut.cost << std:: endl;
     Iils = info.dimen < 100 ? info.dimen : 100;
     auto t1 = high_resolution_clock::now();
     GILS_RVND(Imax, Iils, info);
@@ -544,6 +600,8 @@ int main(int argc, char **argv){
 
     double res = (double)duration / 10e2;
     std::cout << "TIME: " << res << std::endl;
+
+    std::cout << "Tamanho RND " << rnd.size() << std::endl;
 
     exit(0);
     /*

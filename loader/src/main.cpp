@@ -1,6 +1,7 @@
 #include "readData.h"
 #include <fstream>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -27,6 +28,23 @@ int main(int argc, char ** argv){
         else
             file << "EOF" << endl;;
 
+    }
+
+    string inst(argv[1]+10);
+
+    file << inst << std::endl ;
+    //cout << inst.substr(0, inst.find('.')) << endl;
+    //cout <<    << endl;
+
+    file << "RND\n";
+
+    fstream r_values("rand_iter_values/" + inst.substr(0, inst.find('.')) + ".rnd");
+
+    string line;
+
+    int n = 0;
+    while (getline(r_values, line)) {
+        file << line << endl;
     }
 
 

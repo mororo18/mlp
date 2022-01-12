@@ -3,8 +3,9 @@ module rData
 
 contains 
 
-    subroutine load_matrix(c)
-      real , allocatable :: c (:,:)
+    subroutine load_matrix(c, rnd)
+      real, allocatable :: c (:,:)
+      integer, allocatable :: rnd (:)
 
       integer :: io
       character(len=1500) ::line
@@ -13,6 +14,8 @@ contains
       integer :: j
       integer :: blnk
       integer :: value_
+      integer :: rnd_count
+      integer :: rnd_value
 
       open(newunit=io, file="../distance_matrix", status="old", action="read") 
       read(io, "(I3)") dimen
@@ -29,6 +32,20 @@ contains
               line(:) = line(blnk+1:)
           end do
       end do
+
+      read(io, *)
+      read(io, *)
+      read(io, '(I6)') rnd_count
+
+      allocate(rnd(rnd_count))
+
+      do i = 1, rnd_count
+          read(io, '(I6)') rnd(i)
+      end do
+
+      !print *, rnd(1)
+
+      close(io)
 
     end subroutine
 

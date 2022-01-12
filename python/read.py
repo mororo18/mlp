@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 
-def matrix_fill(n):
+def matrix_fill(n:int):
     matrix = []
     for i in range(n):
         line = []
@@ -14,33 +14,33 @@ def matrix_fill(n):
     return matrix
 
 def get_instance_info(f_name='../distance_matrix'):
-    source_f = open(f_name, 'r')
+    f = open(f_name, 'r')
     cost = []
 
     i = -1  
-    dimension = None
+    #dimension = None
 
-    for line in source_f:
-        if i == -1:
-            dimension = int(line)
-            cost = matrix_fill(dimension)
+    dimension = int(f.readline())
+    cost = matrix_fill(dimension)
 
-        else:
-            j = i+1
-            while(line.find(' ') != -1):
-                index = line.find(' ')
+    for i in range(dimension):
+        line = f.readline()
+        j = i+1
+        while(line.find(' ') != -1):
+            index = line.find(' ')
 
-                cost[i][j] = float(line[:index])
-                cost[j][i] = cost[i][j]
+            cost[i][j] = float(line[:index])
+            cost[j][i] = cost[i][j]
 
-                j += 1
-                line = line[index+1:]
+            j += 1
+            line = line[index+1:]
 
-            #print(cost[i])
+    f.readline()
+    f.readline()
+    rnd_size = int(f.readline())
+    rnd = []
+    for i in range(rnd_size):
+        rnd_value = int(f.readline())
+        rnd.append(rnd_value)
 
-        i += 1
-
-    #print(dimension)
-    #exit(1)
-
-    return dimension, cost
+    return dimension, cost, rnd

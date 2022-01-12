@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ double ** matrix_allocate(size_t sz) {
     return ptr;
 }
 
-int loadData(double *** matrix) {
+int loadData(double *** matrix, vector<int> & rnd) {
     int dimension;
     fstream file;
 
@@ -27,6 +28,8 @@ int loadData(double *** matrix) {
         *matrix = matrix_allocate((size_t) dimension);
         //cout << "dimension " << dimension << endl;
 
+        bool flag = false;
+        int rnd_size = -1;
         int i = 0;
         while (getline(file, line)) {
             //cout << line << "\n";
@@ -42,6 +45,20 @@ int loadData(double *** matrix) {
             }
 
             i++;
+
+
+            if (flag) {
+
+                if (rnd_size < 0) {
+                    rnd_size = stoi(line);
+                    rnd.reserve(rnd_size);
+                } else {
+                    cout << line << endl;
+                    rnd.push_back(stoi(line));
+                }
+            }
+
+            if (line == "RND") flag = true;
         }
 
     }
