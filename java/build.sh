@@ -1,2 +1,3 @@
 #! /usr/bin/bash
-javac main.java -Xlint:unchecked 
+rm *.class
+javac -O  main.java -Xlint:unchecked 

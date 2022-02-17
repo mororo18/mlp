@@ -11,6 +11,8 @@ namespace MLP {
         //private double [,] c;
         private static double [][][] subseq;
         //private double [,,] subseq;
+        private int [] rnd;
+        private int rnd_index;
 
         private int dimension;
 
@@ -70,12 +72,15 @@ namespace MLP {
                 }
             }
 
+            rnd = data.GetRnd();
+            rnd_index = 0;
+
             rand = new Random();
 
         }
 
         private void subseq_load(List<int> s, double [][][] seq){
-            t_subseq -= Stopwatch.GetTimestamp();
+            //t_subseq -= Stopwatch.GetTimestamp();
             for(int i = 0; i < dimension+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -99,7 +104,20 @@ namespace MLP {
                 }
                 //Console.WriteLine();
             }
-            t_subseq += Stopwatch.GetTimestamp();
+            //t_subseq += Stopwatch.GetTimestamp();
+        }
+
+        private void sort(List<int> arr, int r) {
+            for (int i = 0; i < arr.Count; i++) {
+                for (int j = 0; j < arr.Count - i-1; j++) {
+                    //Console.WriteLine(arr[j+1]);
+                    if (c[r][arr[j]] > c[r][arr[j+1]]) {
+                        int tmp = arr[j];
+                        arr[j] = arr[j+1];
+                        arr[j+1] = tmp;
+                    }
+                }
+            }
         }
 
         private List<int> construction(double alpha){
@@ -115,9 +133,14 @@ namespace MLP {
                 // bug ae (geralmente apos muitas comparacoes)
                 //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
                 cList = cList.OrderBy(i => c[r][ i]).ToList();
+                //sort(cList, r);
                 //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
                 int range = (int)(((double)cList.Count) * alpha) +1;
-                int cN = cList[rand.Next(range)];
+
+                int r_value = rand.Next(range);
+                r_value = rnd[rnd_index++];
+
+                int cN = cList[r_value];
                 s.Add(cN);
                 cList.Remove(cN);
                 r = cN;
@@ -329,7 +352,7 @@ namespace MLP {
 
         private void RVND(List<int> s, double [][][] subseq){
             //List<int> neighbd_list = new List<int> {TWO_OPT};
-            List<int> neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
+            List<int> neighbd_list = new List<int> {SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3};
             var t = new List<int>();
             for(int i = 0; i < dimension; i++)
                 t.Add(i);
@@ -339,6 +362,8 @@ namespace MLP {
 
             while(neighbd_list.Count != 0){
                 int i_rand = rand.Next(neighbd_list.Count);
+                i_rand = rnd[rnd_index++];
+
                 int neighbd = neighbd_list[i_rand];
 
                 improv_flag = false;
@@ -346,29 +371,29 @@ namespace MLP {
 
                 switch(neighbd){
                     case REINSERTION:
-                        t_reinsertion -= Stopwatch.GetTimestamp();
+                        //t_reinsertion -= Stopwatch.GetTimestamp();
                         search_reinsertion(s, subseq, REINSERTION);
-                        t_reinsertion += Stopwatch.GetTimestamp();
+                        //t_reinsertion += Stopwatch.GetTimestamp();
                         break;
                     case OR_OPT2:
-                        t_or_opt2 -= Stopwatch.GetTimestamp();
+                        //t_or_opt2 -= Stopwatch.GetTimestamp();
                         search_reinsertion(s, subseq, OR_OPT2);
-                        t_or_opt2 += Stopwatch.GetTimestamp();
+                        //t_or_opt2 += Stopwatch.GetTimestamp();
                         break;
                     case OR_OPT3:
-                        t_or_opt3 -= Stopwatch.GetTimestamp();
+                        //t_or_opt3 -= Stopwatch.GetTimestamp();
                         search_reinsertion(s, subseq, OR_OPT3);
-                        t_or_opt3 += Stopwatch.GetTimestamp();
+                        //t_or_opt3 += Stopwatch.GetTimestamp();
                         break;
                     case SWAP:
-                        t_swap -= Stopwatch.GetTimestamp();
+                        //t_swap -= Stopwatch.GetTimestamp();
                         search_swap(s, subseq);
-                        t_swap += Stopwatch.GetTimestamp();
+                        //t_swap += Stopwatch.GetTimestamp();
                         break;
                     case TWO_OPT:
-                        t_two_opt -= Stopwatch.GetTimestamp();
+                        //t_two_opt -= Stopwatch.GetTimestamp();
                         search_two_opt(s, subseq);
-                        t_two_opt += Stopwatch.GetTimestamp();
+                        //t_two_opt += Stopwatch.GetTimestamp();
                         break;
                 }
 
@@ -376,7 +401,7 @@ namespace MLP {
 
                 if(improv_flag){
                     //neighbd_list.Clear();
-                    neighbd_list = new List<int> {SWAP, REINSERTION, OR_OPT2, OR_OPT3, TWO_OPT};
+                    neighbd_list = new List<int> {SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3};
                     //Console.WriteLine("not Removed " + i_rand);
                 }else{
                     //Console.WriteLine("Removed " + i_rand);
@@ -401,11 +426,18 @@ namespace MLP {
                 A_end = A_start + rand.Next(size_max - size_min + 1) + size_min;
                 B_start = rand.Next(max) + 1;
                 B_end = B_start + rand.Next(size_max - size_min + 1) + size_min;
+
+                A_start = rnd[rnd_index++];
+                A_end = A_start + rnd[rnd_index++];
+                
+                B_start = rnd[rnd_index++];
+                B_end = B_start + rnd[rnd_index++];
             }
-            if(A_start < B_start){
+
+            if(A_start < B_start) {
                 reinsert(s, B_start, B_end-1, A_end);
                 reinsert(s, A_start, A_end-1, B_end);
-            }else{
+            } else {
                 reinsert(s, A_start, A_end-1, B_end);
                 reinsert(s, B_start, B_end-1, A_end);
             }
@@ -432,12 +464,23 @@ namespace MLP {
             var s_best = new List<int>();
 
             for(int i = 0; i < Imax; i++){
-                double alpha = R[rand.Next(R_size)];
+                int index = rand.Next(R_size);
+                index = rnd[rnd_index++];
+                double alpha = R[index];
+
                 Console.WriteLine("[+] Local Search " + (i+1));
                 Console.WriteLine("\t[+] Constructing Inital Solution..");
-                t_construction -= Stopwatch.GetTimestamp();
+
+                //t_construction -= Stopwatch.GetTimestamp();
                 var s = construction(alpha);
-                t_construction += Stopwatch.GetTimestamp();
+
+                /*
+                for (int j = 0; j < dimension; j++) {
+                    Console.Write(s[j] + " ");
+                }
+                Console.WriteLine();
+                */
+                //t_construction += Stopwatch.GetTimestamp();
                 var sl = new List<int>(s);
 
                 subseq_load(s, subseq);

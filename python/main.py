@@ -6,7 +6,7 @@ from random import randint
 import math
 import sys
 #import matplotlib.pyplot as plt 
-from typing import List
+from typing import List, NoReturn
 
 Matrix = List[List[float]]
 
@@ -67,7 +67,10 @@ def construction(alpha : float, info : tInfo) -> List[int]:
 
         c_list = sorted(c_list, key = lambda k : info.cost[k][r], reverse=False)
 
-        #c = c_list[randint(0, i-1)]
+        ##
+        c = c_list[randint(0, i-1)]
+        ##
+
         r_value = info.rnd[info.rnd_index]
         info.rnd_index += 1
 
@@ -81,7 +84,7 @@ def construction(alpha : float, info : tInfo) -> List[int]:
 
     return s
 
-def subseq_load(solut : tSolution, info : tInfo):
+def subseq_load(solut : tSolution, info : tInfo) -> NoReturn:
     for i in range(0, info.dimen+1):
         k : int = 1 - i - int(not i)
 
@@ -102,13 +105,13 @@ def subseq_load(solut : tSolution, info : tInfo):
 
     solut.cost = solut.seq[0][info.dimen][info.C] - info.EPSILON
 
-def swap(s : List[int], i : int, j : int):
+def swap(s : List[int], i : int, j : int) -> NoReturn:
     s[i], s[j] = s[j], s[i]
 
-def reverse(s : List[int], i : int, j : int):
+def reverse(s : List[int], i : int, j : int) -> NoReturn:
     s[i:j+1] = s[i:j+1][::-1]
 
-def reinsert(s : List[int], i : int, j : int, pos : int):
+def reinsert(s : List[int], i : int, j : int, pos : int) -> NoReturn:
     if i < pos:
         s[pos:pos] = s[i:j+1]
         s[:] = s[:i] + s[j+1:]
@@ -345,7 +348,7 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
 
     return False
 
-def RVND(solut : tSolution, info : tInfo):
+def RVND(solut : tSolution, info : tInfo) -> NoReturn:
 
    #global t_reinsertion
    #global t_or_opt2 
@@ -360,7 +363,9 @@ def RVND(solut : tSolution, info : tInfo):
     #print(solut.s)
 
     while len(neighbd_list) > 0:
-        #i = randint(0, len(neighbd_list)-1)
+        ##
+        i = randint(0, len(neighbd_list)-1)
+        ##
         i = info.rnd[info.rnd_index]
         #print(info.rnd_index, i )
         #print(neighbd_list)
@@ -400,8 +405,6 @@ def RVND(solut : tSolution, info : tInfo):
         else:
             neighbd_list.pop(i)
 
-    return None
-
 def perturb(sl : List[int], info : tInfo) -> List[int]:
     s = sl.copy()
 
@@ -412,13 +415,13 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
     size_min = 2
 
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        """
+        ##
         A_start = randint(1, len(s) - 1 - size_max)
         A_end = A_start + randint(size_min, size_max)
 
         B_start = randint(1, len(s) - 1 - size_max)
         B_end = B_start + randint(size_min, size_max)
-        """
+        ##
 
         A_start = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -439,14 +442,17 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
 
     return s
 
-def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
+def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn:
 
     solut_partial : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
     solut_crnt : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
     solut_best : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), float('inf'))
 
     for i in range(Imax):
-        #alpha : float = R[randint(0, len(R)-1)]
+        ##
+        alpha : float = R[randint(0, len(R)-1)]
+        ##
+
         r_value = info.rnd[info.rnd_index]
         print(r_value)
         info.rnd_index += 1
@@ -495,9 +501,7 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
    #print("or-opt_2", improv_or_2)
    #print("or-opt_3", improv_or_3)
 
-    return None
-
-def main():
+def main() -> NoReturn:
     dimension :int
     cost : Matrix
 

@@ -2,8 +2,8 @@
 BITS_OPTION = -m64
 
 #### define o compilador
-CPPC = clang++
-#CPPC = g++
+#CPPC = clang++
+CPPC = g++
 #############################
 
 #### opcoes de compilacao e includes

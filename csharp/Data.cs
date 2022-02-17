@@ -5,17 +5,21 @@ namespace MLP {
     class Data {
         private int dimension;
         private double [,] matrix;
+        private int [] rnd;
+
         public Data(){
             dimension = 0;
         }
 
         public void loadData(){
             string [] file = ReadAllLines("../distance_matrix");
-            dimension = Int32.Parse(file[0]);
+            int file_line = 0;
+            dimension = Int32.Parse(file[file_line++]);
             matrix = new double [dimension, dimension];
 
             for(int i = 1; i < dimension; i++){
                 //Console.WriteLine(file[i]);
+                file_line++;
                 int j = i;
                 while(file[i].IndexOf(" ") != -1){
                     int index = file[i].IndexOf(" ");
@@ -29,6 +33,15 @@ namespace MLP {
             }
             matrix[dimension-1, dimension-1] = 0.0;
             
+            file_line++;
+            file_line++;
+            file_line++;
+            int rnd_size = Int32.Parse(file[file_line]);
+            file_line++;
+            rnd = new int [rnd_size];
+            for (int i = 0; i < rnd_size; i++) {
+                rnd[i] = Int32.Parse(file[file_line++]);
+            }
             /*
             for(int i = 0; i < dimension; i++){
                 for(int j = i+1; j < dimension; j++){
@@ -39,12 +52,14 @@ namespace MLP {
             */
         }
 
-        public double getDistance(int i, int j){
+        public double getDistance(int i, int j) {
             return matrix[i, j];
         }
 
-        public int getDimension(){
+        public int getDimension() {
             return dimension;
         }
+
+        public int [] GetRnd() {return rnd;}
     }
 }

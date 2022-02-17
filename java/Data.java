@@ -5,6 +5,8 @@ import java.util.Scanner;
 class Data{
     private int dimension;
     private double [][] matrix;
+    private int [] rnd;
+    private int rnd_size;
 
     Data(){
         dimension = 0;
@@ -12,6 +14,8 @@ class Data{
 
     public int      getDimension()              {return dimension;}
     public double   getDistance(int i, int j)   {return matrix[i][j];}
+    public int []   getRnd()                    {return rnd;}
+    public int      getRndSize()                {return rnd_size;}
     
     //programacao orientada a spaghetti
     public void loadData(){
@@ -20,17 +24,15 @@ class Data{
             File file = new File(file_name);
             Scanner f_reader = new Scanner(file);
 
-            int i = 0;
-            while(f_reader.hasNextLine()){
-                String line = f_reader.nextLine();
+            String line = f_reader.nextLine();
 
-                if(dimension == 0){
-                    dimension = Integer.parseInt(line);
-                    matrix = new double [dimension][dimension];
-                    for(int k = 0; k < dimension; k++) matrix[k][k] = 0.0;
-                    //System.out.println(dimension); 
-                    continue;
-                }
+            dimension = Integer.parseInt(line);
+            matrix = new double [dimension][dimension];
+            for(int k = 0; k < dimension; k++) matrix[k][k] = 0.0;
+
+            //while(f_reader.hasNextLine()){
+            for (int i = 0; i < dimension; i++) {
+                line = f_reader.nextLine();
 
                 int j = i + 1;
                 while(line.indexOf(' ') != -1){
@@ -44,8 +46,23 @@ class Data{
                     //System.out.print(cost + " ");
                 }
                 //System.out.println(); 
-                i++;
             }
+
+
+            line = f_reader.nextLine();
+            line = f_reader.nextLine();
+            line = f_reader.nextLine();
+
+            System.out.println(line); 
+            rnd_size = Integer.parseInt(line);
+            rnd = new int[rnd_size];
+
+            for (int i = 0; i < rnd_size; i++) {
+                line = f_reader.nextLine();
+                rnd[i] = Integer.parseInt(line);
+            }
+
+
             f_reader.close();
 
         }catch (FileNotFoundException e){

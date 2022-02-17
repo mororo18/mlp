@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.lang.Math;
 
 class GILS_RVND {
+    private int     []  rnd;
+    private int     rnd_index;
     private final double EPSILON = 1e-16;
     private int     dimension;
     private double  [][] c;
@@ -53,6 +55,9 @@ class GILS_RVND {
             }
             //System.out.println(i);
         }
+        System.out.println(Integer.toString(data.getRndSize()));
+        rnd = data.getRnd();
+        rnd_index = 0;
 
         subseq = new double [dimension+1][dimension+1][3];
         Iils = (dimension < 100 ? dimension : 100);
@@ -61,7 +66,7 @@ class GILS_RVND {
     }
 
     private void subseq_load(ArrayList<Integer> s, double [][][] seq){
-        t_subseq -= System.nanoTime();
+        //t_subseq -= System.nanoTime();
         for(int i = 0; i < dimension+1; i++){
             int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -85,7 +90,7 @@ class GILS_RVND {
             }
             //System.out.println();
         }
-        t_subseq += System.nanoTime();
+        //t_subseq += System.nanoTime();
     }
 
     private ArrayList<Integer> construction(double alpha){
@@ -104,8 +109,10 @@ class GILS_RVND {
             //cList.sort((Integer i, Integer j) -> Double.compare (c[i][r], c[j][r]));
 
             int range = (int)(((double)cList.size()) * alpha)+1;
-            //System.out.println(range);
+
             int c = cList.get(rand.nextInt(range));
+            c = cList.get(rnd[rnd_index++]);
+
             s.add(c);
             cList.remove(Integer.valueOf(c));
             r = c;
@@ -326,56 +333,57 @@ class GILS_RVND {
 
     private void RVND(ArrayList<Integer> s, double [][][] subseq){
         ArrayList<Integer> neighbd_list = new ArrayList<>() {{
+            add(SWAP);
+            add(TWO_OPT);
             add(REINSERTION);
             add(OR_OPT2);
             add(OR_OPT3);
-            add(SWAP);
-            add(TWO_OPT);
         }};
 
         while(!neighbd_list.isEmpty()){
             
             int i_rand = rand.nextInt(neighbd_list.size());
+            i_rand = rnd[rnd_index++];
             int neighbd = neighbd_list.get(i_rand);
 
             improv_flag = false;
 
             switch(neighbd){
                 case REINSERTION:
-                    t_reinsertion -= System.nanoTime();
+                    //t_reinsertion -= System.nanoTime();
                     search_reinsertion(s, subseq, REINSERTION);
-                    t_reinsertion += System.nanoTime();
+                    //t_reinsertion += System.nanoTime();
                     break;
                 case OR_OPT2:
-                    t_or_opt2 -= System.nanoTime();
+                    //t_or_opt2 -= System.nanoTime();
                     search_reinsertion(s, subseq, OR_OPT2);
-                    t_or_opt2 += System.nanoTime();
+                    //t_or_opt2 += System.nanoTime();
                     break;
                 case OR_OPT3:
-                    t_or_opt3 -= System.nanoTime();
+                    //t_or_opt3 -= System.nanoTime();
                     search_reinsertion(s, subseq, OR_OPT3);
-                    t_or_opt3 += System.nanoTime();
+                    //t_or_opt3 += System.nanoTime();
                     break;
                 case SWAP:
-                    t_swap -= System.nanoTime();
+                    //t_swap -= System.nanoTime();
                     search_swap(s, subseq);
-                    t_swap += System.nanoTime();
+                    //t_swap += System.nanoTime();
                     break;
                 case TWO_OPT:
-                    t_two_opt -= System.nanoTime();
+                    //t_two_opt -= System.nanoTime();
                     search_two_opt(s, subseq);
-                    t_two_opt += System.nanoTime();
+                    //t_two_opt += System.nanoTime();
                     break;
             }
 
             if(improv_flag){
                 neighbd_list.clear();
                 neighbd_list = new ArrayList<>() {{
+                    add(SWAP);
+                    add(TWO_OPT);
                     add(REINSERTION);
                     add(OR_OPT2);
                     add(OR_OPT3);
-                    add(SWAP);
-                    add(TWO_OPT);
                 }};
             }else
                 neighbd_list.remove(i_rand);
@@ -399,6 +407,14 @@ class GILS_RVND {
 
             B_start = rand.nextInt(max) + 1;
             B_end = B_start + rand.nextInt(size_max - size_min + 1) + size_min;
+
+
+
+            A_start = rnd[rnd_index++];
+            A_end = A_start + rnd[rnd_index++];
+
+            B_start = rnd[rnd_index++];
+            B_end = B_start + rnd[rnd_index++];
         }
 
         if(A_start < B_start){
@@ -417,13 +433,14 @@ class GILS_RVND {
         ArrayList<Integer> s_best = new ArrayList<>();
         for(int i = 0; i < Imax; i++){
             double alpha = R[rand.nextInt(R_size)];
+            alpha = R[rnd[rnd_index++]];
 
             System.out.print("[+] Local Search ");
             System.out.println(i+1);
             System.out.println("\t[+] Constructing Inital Solution..");
-            t_construction -= System.nanoTime();
+            //t_construction -= System.nanoTime();
             ArrayList<Integer> s = construction(alpha);
-            t_construction += System.nanoTime();
+            //t_construction += System.nanoTime();
             ArrayList<Integer> sl = new ArrayList<>(s); 
             subseq_load(s, subseq); 
             double rvnd_cost_best = subseq[0][dimension][C] - EPSILON;

@@ -77,8 +77,8 @@ function construction(alpha::Float64, info::tInfo)::Array{Int, 1}
 
         i = convert(Int, floor(length(cList)*alpha + 1))
         ###
-       #r_value = rand(1:i)
-       #push!(info.rand_values, r_value-1)
+        r_value = rand(1:i)
+        #push!(info.rand_values, r_value-1)
         ###
         r_value = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
@@ -304,7 +304,10 @@ function RVND(solut::tSolution, info::tInfo)
 
     while length(neighbd_list) > 0
         # global it += 1
-        #i = rand(1:length(neighbd_list))
+        ###
+        i = rand(1:length(neighbd_list))
+        ###
+        
         i = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
         
@@ -364,13 +367,13 @@ function perturb(solut_partial::tSolution, info::tInfo)::tSolution
     size_min = 2
 
     while (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)
-        #=
+        #= =#
         A_start = rand(2:length(s)-1-size_max)
         A_end = A_start + rand(size_min:size_max)
 
         B_start = rand(2:length(s)-1-size_max)
         B_end = B_start + rand(size_min:size_max)
-        =#
+        #= =#
 
         A_start = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
@@ -409,7 +412,7 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
 
     for i in 1:Imax
         ###
-        #r_value = rand(1:26)
+        r_value = rand(1:26)
         #push!(info.rand_values, r_value - 1)
         ###
         r_value = info.rnd[info.rnd_index] + 1

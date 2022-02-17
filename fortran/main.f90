@@ -175,9 +175,12 @@ function construction(alpha, info) result(ret)
         call sort(cL, cL_size, r, info)
 
        !rng = ceiling(cL_size * alpha)
-       !call random_number(RND)
-       !RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
-       !index_ = ceiling(rng * RND)
+        !!!
+        call random_number(RND)
+        RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
+        index_ = ceiling(rng * RND)
+        !!!
+
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
 
@@ -544,9 +547,12 @@ subroutine RVND(sol, info, it)
     yes = .false.
     total = 0
     do while (nl_size > 0)
-       !call random_number(rnd)
-       !rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-       !index_ = ceiling(rnd*nl_size)
+        !!!
+        call random_number(rnd)
+        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
+        index_ = ceiling(rnd*nl_size)
+        !!!
+
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
 
@@ -638,16 +644,18 @@ function perturb(solut, info) result(ret)
     size_min = 2
 
     do while ((A_start <= B_start .and. B_start <= A_end) .or. (B_start <= A_start .and. A_start <= B_end))
-       !max_ = (info%dimen+1) -2 -size_max
-       !call notnull_rnd(rnd)
-       !A_start = ceiling(max_ * rnd) + 1
-       !call notnull_rnd(rnd)
-       !A_end = A_start + ceiling(((size_max-size_min) * rnd) + size_min)
+        !!!
+       max_ = (info%dimen+1) -2 -size_max
+       call notnull_rnd(rnd)
+       A_start = ceiling(max_ * rnd) + 1
+       call notnull_rnd(rnd)
+       A_end = A_start + ceiling(((size_max-size_min) * rnd) + size_min)
 
-       !call notnull_rnd(rnd)
-       !B_start = ceiling(max_ * rnd) + 1
-       !call notnull_rnd(rnd)
-       !B_end = B_start + ceiling(((size_max-size_min) * rnd) + size_min)
+       call notnull_rnd(rnd)
+       B_start = ceiling(max_ * rnd) + 1
+       call notnull_rnd(rnd)
+       B_end = B_start + ceiling(((size_max-size_min) * rnd) + size_min)
+       !!!
 
 
        A_start = info%rnd(info%rnd_index) + 1
@@ -739,9 +747,11 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
     Tit = 0
     do i=1, Imax
-       !call random_number(rnd)
-       !rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-       !index_ = ceiling(rnd*R_size)
+        !!!
+        call random_number(rnd)
+        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
+        index_ = ceiling(rnd*R_size)
+        !!!
 
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1

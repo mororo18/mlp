@@ -111,9 +111,12 @@ std::vector<int> construct(const double alpha, tInfo & info){
                 return info.cost[i][r] < info.cost[j][r];
             });
 
+        /**/
         int range = std::ceil(cL.size() * alpha);
-        //int index = range > 0 ? rand() % range : 0;
-        int index = info.rnd[info.rnd_index++];
+        int index = range > 0 ? rand() % range : 0;
+        /**/
+
+        index = info.rnd[info.rnd_index++];
         int c = cL[index];
         //std::cout << r << " " << c << " " << info.cost[r][c] << std::endl;
         s.push_back(c);
@@ -379,7 +382,6 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int 
 void RVND(tSolution & solut, tInfo & info) {
 
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
-    //alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {REINSERTION, OR_OPT_2, OR_OPT_3, SWAP, TWO_OPT};
     alignas(INT_SZ) uint index;
     alignas(INT_SZ) int neighbd;
     //int k = 0;
@@ -388,7 +390,7 @@ void RVND(tSolution & solut, tInfo & info) {
     while (!neighbd_list.empty()) {
         //k++;
 
-        //index = rand() % neighbd_list.size();
+        /**/ index = rand() % neighbd_list.size();
         index = info.rnd[info.rnd_index++];
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
@@ -454,14 +456,14 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
     int size_min = 2;
     //std::cout << "perturbing\n";
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /*
+        /**/
         int max = (info.dimen+1) -2 -size_max;
         A_start = rand() % max + 1;
         A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
         B_start = rand() % max + 1;
         B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        */
+        /**/
 
 
 
@@ -501,8 +503,8 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
     tSolution solut_best = Solution_init(info);
 
     for(int i = 0; i < Imax; ++i){
-        //int aux = (unsigned)rand() % TABLE_SZ;
-        int aux = info.rnd[info.rnd_index++];
+        /**/ int aux = (unsigned)rand() % TABLE_SZ;
+        aux = info.rnd[info.rnd_index++];
 
         double alpha = R_table(aux);
 
