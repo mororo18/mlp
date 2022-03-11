@@ -86,6 +86,18 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
 }
 
 
+fn sort(arr : &mut Vec<usize>, r : usize, info : & tInfo) {
+    for i in 0..arr.len() {
+        for j in 0..(arr.len()-1) {
+            if info.c[r][arr[j]] > info.c[r][arr[j+1]] {
+                let tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+}
+
 fn construction(alpha : f64, info : &mut tInfo) -> Vec<usize> {
     let mut s = vec![0; 1];
 
@@ -98,11 +110,13 @@ fn construction(alpha : f64, info : &mut tInfo) -> Vec<usize> {
     let mut rng = rand::thread_rng();
     let mut r : usize = 0;
     while c_list.is_empty() == false {
-        c_list.sort_by(|i, j| 
+        sort(&mut c_list, r, & info);
+        /*c_list.sort_by(|i, j| 
                     if info.c[*i as usize][r] < info.c[*j as usize][r] 
                         {Ordering::Less} 
                     else 
                         {Ordering::Greater});
+        */
 
         let range = (c_list.len() as f64 * alpha + 1.0) as usize;
         let mut index = rng.gen::<usize>() % range;
@@ -522,9 +536,12 @@ fn RVND(solut : &mut tSolution, info : &mut tInfo) {
         index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
 
+        //println!("{} {}", info.rnd_index, index);
+
         let neighbd : usize = neighbd_list[index];
 
-        //println!("{:?} \n", s);
+
+        improv_flag = false;
 
         if neighbd == info.SWAP {
             improv_flag = search_swap(solut, info);
@@ -583,6 +600,9 @@ fn perturb(sl : & Vec<usize>, info : &mut tInfo) -> Vec<usize> {
         info.rnd_index += 1;
         B_end = B_start + info.rnd[info.rnd_index];
         info.rnd_index += 1;
+
+
+        //println!("perturbaa");
     }
 
     if A_start < B_start {
@@ -634,7 +654,8 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
 
         println!("[+] Local Search {}", _i);
         solut_crnt.s = construction(alpha, info);
-        //println!("{:?}", solut_crnt.s);
+        println!("{:?}", solut_crnt.s);
+        //exit(0);
         subseq_load(&mut solut_crnt, info);
         println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
         solut_partial.s = solut_crnt.s.clone();
@@ -653,6 +674,8 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
                 solut_partial.s = solut_crnt.s.clone();
                 solut_partial.cost = solut_crnt.cost;
                 iterILS = 0;
+
+                //println!("{}  {:?}", solut_partial.cost, solut_partial.s);
             }
 
             solut_crnt.s = perturb(&solut_partial.s, info);
@@ -739,7 +762,7 @@ fn main() {
     println!("TEST");
 
     let Imax = 10;
-    let Iils = if dimension < 100 {dimension} else {dimension};
+    let Iils = if dimension < 100 {dimension} else {100};
 
     let R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
             0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25];

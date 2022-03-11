@@ -316,6 +316,7 @@ function RVND(solut::tSolution, info::tInfo)
         ###
         
         neighbd = neighbd_list[i]
+        #println(info.rnd_index, " ", i)
 
         improve = false
 
@@ -391,6 +392,7 @@ function perturb(solut_partial::tSolution, info::tInfo)::tSolution
        #push!(info.rand_values, B_start-1)
        #push!(info.rand_values, B_end - B_start)
         ###
+        #
     end
 
     if A_start < B_start
@@ -437,6 +439,8 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
             if solut_crnt.cost < solut_partial.cost - info.EPSILON
                 solut_partial = deepcopy(solut_crnt)
                 iterILS = 0
+
+                #println(solut_partial.cost, solut_partial.s);
             end
 
             solut_crnt = perturb(solut_partial, info)
@@ -444,6 +448,8 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
 
             iterILS += 1
         end
+
+        #exit(0)
 
         subseq_load(solut_partial, info)
 
