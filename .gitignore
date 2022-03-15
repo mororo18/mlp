@@ -1,1 +1,10 @@
 .*.sw*
+
+rust/main_/target/*
+python/__pycache__/
+*.mem
+*.class
+*.pyo
+*.pyc
+*.prof
+*.o
