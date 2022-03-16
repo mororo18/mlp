@@ -1,0 +1,21 @@
+10/03 -- Utilização de arrays #d de tamanha fixo (500) alocados na heap (Box<T>) até então parece ser a melhor solução. Alguns resultados: 
+        rat99       1.89s
+        pr152       6.44s
+        gil262      45.52s  
+
+14/03 -- Utilização de arrays #d de tamanha fixo (300). Alguns resultados: 
+        rat99       1.80s
+        pr152       6.17s
+        gil262      42.13s  
+
+
+        obs: preciso verificar/trabalhar novamente a ideia do flat-vector (luc)
+             verificar tbm usar a funcao to_1D sem o parametro de referencia para tInfo.
+
+        Utilização de flat vector apenas na função subseq_load, com algumas tentativas de microotimização. Alguns resultados:
+                    standart    into_slice_box
+        rat99       5.08s       5.00s
+        pr152       16.56s      20.36s
+        gil262      134.62s     131.9s
+
+
