@@ -1,9 +1,9 @@
-10/03 -- Utilização de arrays #d de tamanha fixo (500) alocados na heap (Box<T>) até então parece ser a melhor solução. Alguns resultados: 
+10/03 - Utilização de arrays #d de tamanha fixo (500) alocados na heap (Box<T>) até então parece ser a melhor solução. Alguns resultados: 
         rat99       1.89s
         pr152       6.44s
         gil262      45.52s  
 
-14/03 -- Utilização de arrays #d de tamanha fixo (300). Alguns resultados: 
+14/03 - Utilização de arrays #d de tamanha fixo (300). Alguns resultados: 
         rat99       1.80s
         pr152       6.17s
         gil262      42.13s  
@@ -12,10 +12,45 @@
         obs: preciso verificar/trabalhar novamente a ideia do flat-vector (luc)
              verificar tbm usar a funcao to_1D sem o parametro de referencia para tInfo.
 
-        Utilização de flat vector apenas na função subseq_load, com algumas tentativas de microotimização. Alguns resultados:
-                    standart    into_slice_box
+     -- Utilização de flat vector apenas na função subseq_load, com algumas tentativas de microotimização. Alguns resultados:
+                    standart    into_boxed_slice
         rat99       5.08s       5.00s
         pr152       16.56s      20.36s
         gil262      134.62s     131.9s
+
+15/03 - Utilização de flat-vector em todas as funções de busca, utilizando funcao to_1D para conversão de coordenadas. Obs: Um dos parâmetros da funcao é a referencia para a estrutura do tipo tInfo.
+        Utilização do método get_unchecked para acessar a estutura 'seq' do tipo Box<[f64]>, com o auxílio do escopo unsafe.
+        seq : Box<[f64]>,
+        s : Vec<usize>
+
+        Testes:
+
+        rat99   3.81s
+        pr152   12.41s
+        gil262  92.88s
+
+        Obs: praticamente o dobro do tempo levado pela melhor versão;
+
+    - Removendo da funcao to_1D o parametro q é a referencia da estrutura do tipo tInfo. Resultados:
+
+        rat99   3.89s
+        pr152   13.24s
+        gil262  101.0s
+
+17/03 - Comparacao entre o uso e o nao uso do metodo into_boxed_slice no vector.
+        
+        Com uso:
+
+        rat99   3.21s
+        pr152   10.89s
+        gil262  71.51s
+
+        Sem uso:
+        
+        rat99   3.21s
+        pr152   10.91s
+        gil262  72.62s
+
+        Obs: menos abas abertas no navegador em comparacao com o teste da anotacao anterior
 
 

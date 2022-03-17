@@ -28,8 +28,8 @@ struct tInfo {
 #[derive(Debug, Clone)]
 struct tSolution {
     //seq : Box<[[[f64; 3]; 300]; 300]>,
-    seq : Box<[f64]>,
-   // seq : Vec<f64>,
+    //seq : Box<[f64]>,
+    seq : Vec<f64>,
     //seq : [[[f64; 3]; 500]; 500],
     //seq : Vec<Vec<[f64; 3]>>,
     //seq : Vec<Vec<Vec<f64>>>,
@@ -684,7 +684,7 @@ fn perturb(sl : & Vec<usize>, info : &mut tInfo) -> Vec<usize> {
 fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
 
     let mut solut_best = tSolution {
-        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
+        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
         //seq : Box::new([[[0.0; 3]; 300]; 300]),
         //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
@@ -693,7 +693,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     };
 
     let mut solut_partial = tSolution {
-        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
+        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
         //seq : Box::new([[[0.0; 3]; 300]; 300]),
         //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
@@ -702,7 +702,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     };
 
     let mut solut_crnt = tSolution {
-        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
+        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
         //seq : Box::new([[[0.0; 3]; 300]; 300]),
         //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
