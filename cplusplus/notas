@@ -1,1 +1,15 @@
 15/03 - Testar 1D vector no lugar de array3D seq.
+
+17/03 - Comparação de "seq" como 1D e 3D array:
+        
+        3D array
+        rat99       1.75s
+        pr152       6.39s
+        gil262      42.82s
+
+        1D array
+        rat99       1.5s
+        pr152       5.4s
+        gil262      38.89s
+
+        Obs: melhora aparente por volta de ~ -10%.
