@@ -53,7 +53,7 @@ int loadData(double *** matrix, vector<int> & rnd) {
                     rnd_size = stoi(line);
                     rnd.reserve(rnd_size);
                 } else {
-                    cout << line << endl;
+                    //cout << line << endl;
                     rnd.push_back(stoi(line));
                 }
             }

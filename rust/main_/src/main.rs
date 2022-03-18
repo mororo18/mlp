@@ -40,7 +40,7 @@ struct tSolution {
 #[inline(always)]
 fn to_1D(x : usize, y : usize, z : usize, size : usize) -> usize {
 
-    return x*(size+1)*(3) + y * (3) +  z;
+    return x * (size+1) * (3) + y * (3) +  z;
     //return x + (size+1) * (y + (size+1) * z);
 }
 

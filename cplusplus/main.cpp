@@ -42,15 +42,25 @@ typedef struct tInfo {
 
 typedef struct tSolution {
     std::vector<int> s;
-    double *** seq;
+    double * seq;
+    //double *** seq;
     //tSubseq seq;
     double cost;
 } tSolution;
+
+inline unsigned to_1D(int x, int y, int z, int size) {
+    return x*(size+1)*3 + y*3 + z;
+}
 
 tSolution Solution_init(tInfo info) {
     tSolution solut;
     solut.s = vector<int>(info.dimen+1);
 
+    // 1D version 
+    solut.seq = new double [(info.dimen+1) * (info.dimen+1) *3];
+
+    // 3D version
+    /*
     solut.seq = new double ** [info.dimen+1];
     for (int i = 0; i < info.dimen+1; i++) {
         solut.seq[i] = new double * [info.dimen+1];
@@ -58,6 +68,7 @@ tSolution Solution_init(tInfo info) {
             solut.seq[i][j] = new double [3];
         }
     }
+    */
     /*
     solut.seq = std::vector<std::vector<std::vector<double>>> (
             info.dimen+1, std::vector<std::vector<double>> (
@@ -73,12 +84,14 @@ inline void Solution_cpy( tSolution & src, tSolution & tgt, const tInfo & info) 
     tgt.s = src.s;
     tgt.cost = src.cost;
 
+    /*
     for (int i = 0; i < info.dimen+1; i++) {
         for (int j = 0; j < info.dimen+1; j++) {
             //memcpy(tgt.seq[i][j], src.seq[i][j], 3 * sizeof(double));
             std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
         }
     }
+    */
 
 }
 
@@ -159,20 +172,29 @@ inline void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
     for (i = 0; i < info.dimen+1; i++) {
         k = 1 - i - (!i);
         t = i == from;
+      //solut.seq[i][i][info.T] = 0.0;
+      //solut.seq[i][i][info.C] = 0.0;
+      //solut.seq[i][i][info.W] = (double) !(i == 0);
 
-        solut.seq[i][i][info.T] = 0.0;
-        solut.seq[i][i][info.C] = 0.0;
-        solut.seq[i][i][info.W] = (double) !(i == 0);
+        solut.seq[to_1D(i, i, info.T, info.dimen)] = 0.0;
+        solut.seq[to_1D(i, i, info.C, info.dimen)] = 0.0;
+        solut.seq[to_1D(i, i, info.W, info.dimen)] = (double) !(i == 0);
         for (j = i+1; j < info.dimen+1; j++) {
             j_prev = j-1;
-            solut.seq[i][j][info.T] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T];
-            solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C];
-            solut.seq[i][j][info.W] = j + k;
+            
+          //solut.seq[i][j][info.T] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T];
+          //solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C];
+          //solut.seq[i][j][info.W] = j + k;
+
+            solut.seq[to_1D(i, j, info.T, info.dimen)] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[to_1D(i, j_prev, info.T, info.dimen)];
+            solut.seq[to_1D(i, j, info.C, info.dimen)] = solut.seq[to_1D(i, j, info.T, info.dimen)] + solut.seq[to_1D(i, j_prev, info.C, info.dimen)];
+            solut.seq[to_1D(i, j, info.W, info.dimen)] = j + k;
         }
         from += t;
     }
 
-    solut.cost = solut.seq[0][info.dimen][info.C];
+    solut.cost = solut.seq[to_1D(0, info.dimen, info.C, info.dimen)];
+    //solut.cost = solut.seq[0][info.dimen][info.C];
 }
 
 /*
@@ -216,12 +238,20 @@ inline bool search_swap(tSolution & solut, const tInfo & info) {
         i_next = i + 1;
 
         //consecutive nodes
-        cost_concat_1 =                 solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[i_next]];
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T]  + info.cost[solut.s[i]][solut.s[i_next+1]];
+      //cost_concat_1 =                 solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[i_next]];
+      //cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T]  + info.cost[solut.s[i]][solut.s[i_next+1]];
 
-        cost_new = solut.seq[0][i_prev][info.C]                                                    +           //       1st subseq
-        solut.seq[i][i_next][info.W]               * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
-        solut.seq[i_next+1][info.dimen][info.W]   * (cost_concat_2) + solut.seq[i_next+1][info.dimen][info.C];   // concat 3rd subseq
+      //cost_new = solut.seq[0][i_prev][info.C]                                                    +           //       1st subseq
+      //solut.seq[i][i_next][info.W]               * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
+      //solut.seq[i_next+1][info.dimen][info.W]   * (cost_concat_2) + solut.seq[i_next+1][info.dimen][info.C];   // concat 3rd subseq
+
+        //consecutive nodes
+        cost_concat_1 =                 solut.seq[to_1D(0, i_prev, info.T, info.dimen)] + info.cost[solut.s[i_prev]][solut.s[i_next]];
+        cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, i_next, info.T, info.dimen)]  + info.cost[solut.s[i]][solut.s[i_next+1]];
+
+        cost_new = solut.seq[to_1D(0, i_prev, info.C, info.dimen)]                                                    +           //       1st subseq
+        solut.seq[to_1D(i, i_next, info.W, info.dimen)]               * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
+        solut.seq[to_1D(i_next+1, info.dimen, info.W, info.dimen)]   * (cost_concat_2) + solut.seq[to_1D(i_next+1, info.dimen, info.C, info.dimen)];   // concat 3rd subseq
 
         if (cost_new < cost_best) {
             cost_best = cost_new - DBL_EPSILON;
@@ -236,16 +266,27 @@ inline bool search_swap(tSolution & solut, const tInfo & info) {
             j_next = j + 1;
             j_prev = j - 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]       + info.cost[solut.s[i_prev]][solut.s[j]];
+          //cost_concat_1 =                 solut.seq[0][i_prev][info.T]       + info.cost[solut.s[i_prev]][solut.s[j]];
+          //cost_concat_2 = cost_concat_1                           + info.cost[solut.s[j]][solut.s[i_next]];
+          //cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T]  + info.cost[solut.s[j_prev]][solut.s[i]];
+          //cost_concat_4 = cost_concat_3                           + info.cost[solut.s[i]][solut.s[j_next]];
+
+          //cost_new = solut.seq[0][i_prev][info.C]                                                 +      // 1st subseq
+          //cost_concat_1 +                                                             // concat 2nd subseq (single node)
+          //solut.seq[i_next][j_prev][info.W]      * cost_concat_2 + solut.seq[i_next][j_prev][info.C] +      // concat 3rd subseq
+          //cost_concat_3 +                                                             // concat 4th subseq (single node)
+          //solut.seq[j_next][info.dimen][info.W] * cost_concat_4 + solut.seq[j_next][info.dimen][info.C];   // concat 5th subseq
+
+            cost_concat_1 =                 solut.seq[to_1D(0, i_prev, info.T, info.dimen)]       + info.cost[solut.s[i_prev]][solut.s[j]];
             cost_concat_2 = cost_concat_1                           + info.cost[solut.s[j]][solut.s[i_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T]  + info.cost[solut.s[j_prev]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i_next, j_prev, info.T, info.dimen)]  + info.cost[solut.s[j_prev]][solut.s[i]];
             cost_concat_4 = cost_concat_3                           + info.cost[solut.s[i]][solut.s[j_next]];
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                 +      // 1st subseq
+            cost_new = solut.seq[to_1D(0, i_prev, info.C, info.dimen)]                                                 +      // 1st subseq
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
-            solut.seq[i_next][j_prev][info.W]      * cost_concat_2 + solut.seq[i_next][j_prev][info.C] +      // concat 3rd subseq
+            solut.seq[to_1D(i_next, j_prev, info.W, info.dimen)]      * cost_concat_2 + solut.seq[to_1D(i_next, j_prev, info.C, info.dimen)] +      // concat 3rd subseq
             cost_concat_3 +                                                             // concat 4th subseq (single node)
-            solut.seq[j_next][info.dimen][info.W] * cost_concat_4 + solut.seq[j_next][info.dimen][info.C];   // concat 5th subseq
+            solut.seq[to_1D(j_next, info.dimen, info.W, info.dimen)] * cost_concat_4 + solut.seq[to_1D(j_next, info.dimen, info.C, info.dimen)];   // concat 5th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -280,18 +321,29 @@ inline bool search_two_opt(tSolution & solut, const tInfo & info) {
     for (i = 1; i < info.dimen-1; ++i) {
         i_prev = i - 1;
 
-        rev_seq_cost = solut.seq[i][i+1][info.T];
+        rev_seq_cost = solut.seq[to_1D(i, i+1, info.T, info.dimen)];
+        //rev_seq_cost = solut.seq[i][i+1][info.T];
         for (j = i + 2; j < info.dimen; ++j) {
             j_next = j + 1;
 
-            rev_seq_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1.0);
+            rev_seq_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[to_1D(i, j, info.W, info.dimen)]-1.0);
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.cost[solut.s[j]][solut.s[i_prev]];
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]        + info.cost[solut.s[j_next]][solut.s[i]];
+            cost_concat_1 =                 solut.seq[to_1D(0, i_prev, info.T, info.dimen)]   + info.cost[solut.s[j]][solut.s[i_prev]];
+            cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, j, info.T, info.dimen)]        + info.cost[solut.s[j_next]][solut.s[i]];
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                        +   //  1st subseq
-                    solut.seq[i][j][info.W]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
-                    solut.seq[j_next][info.dimen][info.W] * cost_concat_2 + solut.seq[j_next][info.dimen][info.C];      // concat 3rd subseq
+            cost_new = solut.seq[to_1D(0, i_prev, info.C, info.dimen)]                                                        +   //  1st subseq
+                    solut.seq[to_1D(i, j, info.W, info.dimen)]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
+                    solut.seq[to_1D(j_next, info.dimen, info.W, info.dimen)] * cost_concat_2 + solut.seq[to_1D(j_next, info.dimen, info.C, info.dimen)];      // concat 3rd subseq
+
+
+          //rev_seq_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1.0);
+
+          //cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.cost[solut.s[j]][solut.s[i_prev]];
+          //cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]        + info.cost[solut.s[j_next]][solut.s[i]];
+
+          //cost_new = solut.seq[0][i_prev][info.C]                                                        +   //  1st subseq
+          //    solut.seq[i][j][info.W]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
+          //    solut.seq[j_next][info.dimen][info.W] * cost_concat_2 + solut.seq[j_next][info.dimen][info.C];      // concat 3rd subseq
 
             
             if (cost_new < cost_best) {
@@ -329,14 +381,23 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int 
         for(k = 0; k < i_prev; ++k){
             k_next = k+1;
 
-            cost_concat_1 =                 solut.seq[0][k][info.T]            + info.cost[solut.s[k]][solut.s[i]];
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.cost[solut.s[j]][solut.s[k_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
+          //cost_concat_1 =                 solut.seq[0][k][info.T]            + info.cost[solut.s[k]][solut.s[i]];
+          //cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.cost[solut.s[j]][solut.s[k_next]];
+          //cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
 
-            cost_new = solut.seq[0][k][info.C]                                                                   +   //       1st subseq
-                solut.seq[i][j][info.W]               * cost_concat_1 + solut.seq[i][j][info.C]                  +   //  concat 2nd subseq (reinserted seq)
-                solut.seq[k_next][i_prev][info.W]     * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   //  concat 3rd subseq
-                solut.seq[j_next][info.dimen][info.W] * cost_concat_3 + solut.seq[j_next][info.dimen][info.C];       // concat 4th subseq
+          //cost_new = solut.seq[0][k][info.C]                                                                   +   //       1st subseq
+          //    solut.seq[i][j][info.W]               * cost_concat_1 + solut.seq[i][j][info.C]                  +   //  concat 2nd subseq (reinserted seq)
+          //    solut.seq[k_next][i_prev][info.W]     * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   //  concat 3rd subseq
+          //    solut.seq[j_next][info.dimen][info.W] * cost_concat_3 + solut.seq[j_next][info.dimen][info.C];       // concat 4th subseq
+
+            cost_concat_1 =                 solut.seq[to_1D(0, k, info.T, info.dimen)]            + info.cost[solut.s[k]][solut.s[i]];
+            cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, j, info.T, info.dimen)]            + info.cost[solut.s[j]][solut.s[k_next]];
+            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(k_next, i_prev, info.T, info.dimen)]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
+
+            cost_new = solut.seq[to_1D(0, k, info.C, info.dimen)]                                                                   +   //       1st subseq
+                solut.seq[to_1D(i, j, info.W, info.dimen)]               * cost_concat_1 + solut.seq[to_1D(i, j, info.C, info.dimen)]                  +   //  concat 2nd subseq (reinserted seq)
+                solut.seq[to_1D(k_next, i_prev, info.W, info.dimen)]     * cost_concat_2 + solut.seq[to_1D(k_next, i_prev, info.C, info.dimen)]        +   //  concat 3rd subseq
+                solut.seq[to_1D(j_next, info.dimen, info.W, info.dimen)] * cost_concat_3 + solut.seq[to_1D(j_next, info.dimen, info.C, info.dimen)];       // concat 4th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -349,14 +410,25 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int 
         for (k = i + opt; k < info.dimen -opt -1; ++k) {
             k_next = k + 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
-            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]  + info.cost[solut.s[k]][solut.s[i]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]       + info.cost[solut.s[j]][solut.s[k_next]];
+          //cost_concat_1 =                 solut.seq[0][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
+          //cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]  + info.cost[solut.s[k]][solut.s[i]];
+          //cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]       + info.cost[solut.s[j]][solut.s[k_next]];
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                                  +   //       1st subseq
-                    solut.seq[j_next][k][info.W]          * cost_concat_1 + solut.seq[j_next][k][info.C]             +   // concat 2nd subseq
-                    solut.seq[i][j][info.W]               * cost_concat_2 + solut.seq[i][j][info.C]                  +   // concat 3rd subseq (reinserted seq)
-                    solut.seq[k_next][info.dimen][info.W] * cost_concat_3 + solut.seq[k_next][info.dimen][info.C];       // concat 4th subseq
+          //cost_new = solut.seq[0][i_prev][info.C]                                                                  +   //       1st subseq
+          //        solut.seq[j_next][k][info.W]          * cost_concat_1 + solut.seq[j_next][k][info.C]             +   // concat 2nd subseq
+          //        solut.seq[i][j][info.W]               * cost_concat_2 + solut.seq[i][j][info.C]                  +   // concat 3rd subseq (reinserted seq)
+          //        solut.seq[k_next][info.dimen][info.W] * cost_concat_3 + solut.seq[k_next][info.dimen][info.C];       // concat 4th subseq
+          //
+
+            cost_concat_1 =                 solut.seq[to_1D(0, i_prev, info.T, info.dimen)]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_2 = cost_concat_1 + solut.seq[to_1D(j_next, k, info.T, info.dimen)]  + info.cost[solut.s[k]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i, j, info.T, info.dimen)]       + info.cost[solut.s[j]][solut.s[k_next]];
+
+            cost_new = solut.seq[to_1D(0, i_prev, info.C, info.dimen)]                                                                  +   //       1st subseq
+                solut.seq[to_1D(j_next, k, info.W, info.dimen)]          * cost_concat_1 + solut.seq[to_1D(j_next, k, info.C, info.dimen)]             +   // concat 2nd subseq
+                solut.seq[to_1D(i, j, info.W, info.dimen)]               * cost_concat_2 + solut.seq[to_1D(i, j, info.C, info.dimen)]                  +   // concat 3rd subseq (reinserted seq)
+                solut.seq[to_1D(k_next, info.dimen, info.W, info.dimen)] * cost_concat_3 + solut.seq[to_1D(k_next, info.dimen, info.C, info.dimen)];       // concat 4th subseq
+
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -390,7 +462,7 @@ void RVND(tSolution & solut, tInfo & info) {
     while (!neighbd_list.empty()) {
         //k++;
 
-        /**/ index = rand() % neighbd_list.size();
+        index = rand() % neighbd_list.size();
         index = info.rnd[info.rnd_index++];
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
@@ -575,11 +647,12 @@ int main(int argc, char **argv){
         .W = 2
     };
 
+
     std::vector<int> rnd;
 
     info.dimen = loadData(&info.cost, rnd);
     info.rnd = rnd;
-    print_s(rnd);
+    //print_s(rnd);
     info.rnd_index = 0;
 
     tSolution solut = Solution_init(info);
@@ -592,6 +665,8 @@ int main(int argc, char **argv){
         std::cout << std::endl;
     }
     */
+
+
     srand(clock());
 
     Iils = info.dimen < 100 ? info.dimen : 100;
