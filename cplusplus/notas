@@ -15,3 +15,24 @@
 
         Obs: melhora aparente por volta de ~ -10%.
 
+22/03 - Repetindo o teste anterior, porem adicionando mais instancias desta vez.
+
+        2o teste
+        1D Array
+
+        rat99       1.525s
+        pr152       5.442s
+        gil262      38.93s
+        lin318      48.70s 
+        pr299       41.09s
+
+
+        3D Array
+
+        rat99       1.81s
+        pr152       6.53s
+        gil262      43.05s
+        lin318      57.14s
+        pr299       49.69s
+
+

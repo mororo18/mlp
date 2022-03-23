@@ -585,7 +585,6 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
 
 
         solut_crnt.s = construct(alpha, info);
-        cout << "aq" << endl;
         print_s(solut_crnt.s);
         subseq_load(solut_crnt, info);
 
