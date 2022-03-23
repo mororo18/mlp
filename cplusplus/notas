@@ -2,6 +2,7 @@
 
 17/03 - Comparação de "seq" como 1D e 3D array:
         
+        1o teste (Mais de 1h de intervalo):
         3D array
         rat99       1.75s
         pr152       6.39s
@@ -13,3 +14,4 @@
         gil262      38.89s
 
         Obs: melhora aparente por volta de ~ -10%.
+
