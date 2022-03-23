@@ -49,7 +49,10 @@ typedef struct tSolution {
 } tSolution;
 
 inline unsigned to_1D(int x, int y, int z, int size) {
-    return x*(size+1)*3 + y*3 + z;
+    int ret = 3*(x*((size+1) - (float)(x+1)/2) + y) + z;
+    //int a = 3*(x*(size+1) - x*(x+1)/2 + y) + z;
+    //cout << ret << "   " << a << endl;
+    return ret;
 }
 
 tSolution Solution_init(tInfo info) {
