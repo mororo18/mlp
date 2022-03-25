@@ -1,3 +1,4 @@
 OK - 17/03 - CPP: Testar novamente, e cm várias instâncias, 1D e 3D arrays.
 OK - 22/03 - GLOBAL: Fazer executável que escreve a matriz da instância checar se já foi gerada uma sequência rnd para aquela instância.
 OK - 22/03 - CPP: Testar um pouco mais o 1D array compacto.
+25/03 - Criar arquivo para discriminar quais sao os commits das implementacoes das tres categorias (ingenua, consciente, especifica) 
