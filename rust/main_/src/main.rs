@@ -10,7 +10,7 @@ use std::cmp::Ordering;
 
 #[derive(Debug, Clone)]
 struct tInfo {
-    c : Box<[[f64; 300]; 300]>,
+    c : Box<[[f64; 350]; 350]>,
     //c : Vec<Vec<f64>>,
     dimen : usize,
     T : usize,
@@ -37,10 +37,10 @@ struct tSolution {
     cost : f64,
 }
 
-#[inline(always)]
+//#[inline(always)]
 fn to_1D(x : usize, y : usize, z : usize, size : usize) -> usize {
 
-    return x * (size+1) * (3) + y * (3) +  z;
+    return 3 * (x * (size+1) + y) +  z;
     //return x + (size+1) * (y + (size+1) * z);
 }
 
@@ -771,7 +771,7 @@ fn print_type_of<T>(_: &T) {
 
 fn main() {
     let mut dimension : usize = 0;
-    let mut c = Box::new([[0.0; 300]; 300]);
+    let mut c = Box::new([[0.0; 350]; 350]);
     //let mut c : [[f64; 500]; 500] = [[0.0; 500]; 500];
     //let mut c : Vec<Vec<f64>> = vec![vec![];0];
 

@@ -38,7 +38,13 @@ int main(int argc, char ** argv){
 
     file << "RND\n";
 
-    fstream r_values("rand_iter_values/" + inst.substr(0, inst.find('.')) + ".rnd");
+    fstream r_values("rand_iter_values/" + inst.substr(0, inst.find('.')) + ".rnd", ios_base::in);
+
+    //cout << "Good state: " << r_values.good() << endl;
+    if (r_values.good() == false) {
+        cout << "Aborted: Ainda nao arquivo \'.rnd\' para essa instancia.\n"; 
+        exit(0);
+    }
 
     string line;
 
