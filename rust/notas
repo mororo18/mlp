@@ -54,4 +54,10 @@
         Obs: menos abas abertas no navegador em comparacao com o teste da anotacao anterior
 
 23/03 - (Discuss'ao em forum relacionada) https://users.rust-lang.org/t/very-fast-initialization-of-a-vec-of-vecs/41301
+25/03 - (Sobre memoria) https://medium.com/@robertgrosse/optimizing-rc-memory-usage-in-rust-6652de9e119e
 
+25/03 - Utilização de flat vector, porem desta vez removendo o 3o indice d acesso e criando um vector de structs com membros T, W e C, visando diminuir problemas com bound checking  e afins, e ate mesmo facilitando a auto-vectorization.
+
+        rat99   2.2s
+        pr152   7.7s
+        gil262  50.27s

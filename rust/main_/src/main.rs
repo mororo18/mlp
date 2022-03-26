@@ -13,9 +13,9 @@ struct tInfo {
     c : Box<[[f64; 350]; 350]>,
     //c : Vec<Vec<f64>>,
     dimen : usize,
-    T : usize,
-    C : usize,
-    W : usize,
+  //T : usize,
+  //C : usize,
+  //W : usize,
     SWAP         : usize ,
     REINSERTION  : usize ,
     OR_OPT_2     : usize ,
@@ -26,21 +26,28 @@ struct tInfo {
 }
 
 #[derive(Debug, Clone)]
+struct tSeqInfo {
+    T : f64,
+    C : f64,
+    W : f64,
+}
+
+#[derive(Debug, Clone)]
 struct tSolution {
     //seq : Box<[[[f64; 3]; 300]; 300]>,
     //seq : Box<[f64]>,
-    seq : Vec<f64>,
-    //seq : [[[f64; 3]; 500]; 500],
+    //seq : Vec<f64>,
+    seq : Vec<tSeqInfo>,
     //seq : Vec<Vec<[f64; 3]>>,
-    //seq : Vec<Vec<Vec<f64>>>,
     s : Vec<usize>,
     cost : f64,
 }
 
-//#[inline(always)]
-fn to_1D(x : usize, y : usize, z : usize, size : usize) -> usize {
+#[inline(always)]
+unsafe
+fn to_1D(x : usize, y : usize, size : usize) -> usize {
 
-    return 3 * (x * (size+1) + y) +  z;
+    return x * (size+1) + y;
     //return x + (size+1) * (y + (size+1) * z);
 }
 
@@ -50,9 +57,11 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
 
         // Flat[x + HEIGHT* (y + WIDTH* z)] = Original[x, y, z]
 
-        solut.seq[to_1D(i, i, info.T, info.dimen)] = 0.0;
-        solut.seq[to_1D(i, i, info.C, info.dimen)] = 0.0;
-        solut.seq[to_1D(i, i, info.W, info.dimen)] = if i != 0 {1.0} else {0.0};
+        unsafe {
+        solut.seq[to_1D(i, i,  info.dimen)].T = 0.0;
+        solut.seq[to_1D(i, i,  info.dimen)].C = 0.0;
+        solut.seq[to_1D(i, i,  info.dimen)].W = if i != 0 {1.0} else {0.0};
+        }
 
       //solut.seq[i][i][info.T] = 0.0;
       //solut.seq[i][i][info.C] = 0.0;
@@ -76,9 +85,9 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
           //solut.seq[to_1D(i, j, info.T, info)] = info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[to_1D(i, j_prev, info.T, info)];
           //solut.seq[to_1D(i, j, info.C, info)] = solut.seq[to_1D(i, j, info.T, info)] + solut.seq[to_1D(i, j_prev, info.C, info)];
           //solut.seq[to_1D(i, j, info.W, info)] = (j as i32 + k) as f64;
-            *solut.seq.get_unchecked_mut(pos_i_j + info.T) = info.c.get_unchecked(*solut.s.get_unchecked(j_prev)).get_unchecked(*solut.s.get_unchecked(j)) + solut.seq.get_unchecked(pos_i_jprev +  info.T);
-            *solut.seq.get_unchecked_mut(pos_i_j +  info.C) = solut.seq.get_unchecked(pos_i_j + info.T) + solut.seq.get_unchecked(pos_i_jprev + info.C);
-            *solut.seq.get_unchecked_mut(pos_i_j + info.W) = (j as i32 + k) as f64;
+            solut.seq.get_unchecked_mut(to_1D(i, j,  info.dimen)).T = info.c.get_unchecked(*solut.s.get_unchecked(j_prev)).get_unchecked(*solut.s.get_unchecked(j)) + solut.seq.get_unchecked(to_1D(i, j_prev, info.dimen)).T ; 
+            solut.seq.get_unchecked_mut(to_1D(i, j,  info.dimen)).C = solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).T + solut.seq.get_unchecked(to_1D(i, j_prev, info.dimen)).C; 
+            solut.seq.get_unchecked_mut(to_1D(i, j,  info.dimen)).W = (j as i32 + k) as f64;
             }
 
             /*
@@ -96,7 +105,7 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
     }
 
     //solut.cost = solut.seq[0][info.dimen][info.C];
-    unsafe{solut.cost = *solut.seq.get_unchecked(to_1D(0, info.dimen, info.C,  info.dimen));}
+    unsafe{solut.cost = solut.seq.get_unchecked(to_1D(0, info.dimen, info.dimen)).C;}
 }
 
 
@@ -259,12 +268,12 @@ fn search_swap(solut : &mut tSolution, info : & tInfo) -> bool {
       //    + solut.seq[to_1D(i_next+1, info.dimen, info.W, &info)] * cost_concat_2 + solut.seq[to_1D(i_next+1, info.dimen ,info.C, &info)];
 
         unsafe {
-        cost_concat_1 = solut.seq.get_unchecked(to_1D(0, i_prev, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(i_next));
-        cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(i, i_next, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(i)).get_unchecked(*solut.s.get_unchecked(i_next+1));
+        cost_concat_1 = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(i_next));
+        cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(i, i_next, info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(i)).get_unchecked(*solut.s.get_unchecked(i_next+1));
 
-        cost_new = solut.seq.get_unchecked(to_1D(0, i_prev, info.C, info.dimen))
-            + solut.seq.get_unchecked(to_1D(i, i_next, info.W, info.dimen))     * cost_concat_1 + info.c.get_unchecked(*solut.s.get_unchecked(i_next)).get_unchecked(*solut.s.get_unchecked(i))
-            + solut.seq.get_unchecked(to_1D(i_next+1, info.dimen, info.W, info.dimen)) * cost_concat_2 + solut.seq.get_unchecked(to_1D(i_next+1, info.dimen ,info.C, info.dimen));
+        cost_new = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).C
+            + solut.seq.get_unchecked(to_1D(i, i_next,  info.dimen)).W     * cost_concat_1 + info.c.get_unchecked(*solut.s.get_unchecked(i_next)).get_unchecked(*solut.s.get_unchecked(i))
+            + solut.seq.get_unchecked(to_1D(i_next+1, info.dimen,  info.dimen)).W * cost_concat_2 + solut.seq.get_unchecked(to_1D(i_next+1, info.dimen , info.dimen)).C;
         }
 
         if cost_new < cost_best {
@@ -289,16 +298,16 @@ fn search_swap(solut : &mut tSolution, info : & tInfo) -> bool {
           //        + solut.seq[to_1D(j_next, info.dimen, info.W, &info)] * cost_concat_4 + solut.seq[to_1D(j_next, info.dimen, info.C, &info)];
 
             unsafe {
-            cost_concat_1 = solut.seq.get_unchecked(to_1D(0, i_prev, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j)) ;
+            cost_concat_1 = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j)) ;
             cost_concat_2 = cost_concat_1 + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(i_next));
-            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i_next, j_prev, info.T, info.dimen)] + info.c.get_unchecked(*solut.s.get_unchecked(j_prev)).get_unchecked(*solut.s.get_unchecked(i));
+            cost_concat_3 = cost_concat_2 + solut.seq.get_unchecked(to_1D(i_next, j_prev,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(j_prev)).get_unchecked(*solut.s.get_unchecked(i));
             cost_concat_4 = cost_concat_3  + info.c.get_unchecked(*solut.s.get_unchecked(i)).get_unchecked(*solut.s.get_unchecked(j_next));
 
-            cost_new = solut.seq.get_unchecked(to_1D(0, i_prev, info.C, info.dimen))
+            cost_new = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).C
                     + cost_concat_1
-                    + solut.seq.get_unchecked(to_1D(i_next, j_prev, info.W, info.dimen)) * cost_concat_2 + solut.seq.get_unchecked(to_1D(i_next, j_prev, info.C, info.dimen))
+                    + solut.seq.get_unchecked(to_1D(i_next, j_prev,  info.dimen)).W * cost_concat_2 + solut.seq.get_unchecked(to_1D(i_next, j_prev,  info.dimen)).C
                     + cost_concat_3
-                    + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.W, info.dimen)) * cost_concat_4 + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.C, info.dimen));
+                    + solut.seq.get_unchecked(to_1D(j_next, info.dimen,  info.dimen)).W * cost_concat_4 + solut.seq.get_unchecked(to_1D(j_next, info.dimen,  info.dimen)).C;
             }
 
             if cost_new < cost_best {
@@ -372,7 +381,7 @@ fn search_two_opt(solut : &mut tSolution, info : & tInfo) -> bool {
     for i in 1..info.dimen-1 {
         let i_prev : usize = i - 1;
         unsafe { 
-        let mut rev_seq_cost : f64 = *solut.seq.get_unchecked(to_1D(i, i+1, info.T, info.dimen));
+        let mut rev_seq_cost : f64 = solut.seq.get_unchecked(to_1D(i, i+1,  info.dimen)).T;
 
         for j in i+2..info.dimen {
             let j_next = j + 1;
@@ -386,14 +395,14 @@ fn search_two_opt(solut : &mut tSolution, info : & tInfo) -> bool {
           //        + solut.seq[to_1D(i, j, info.W, &info)]      * cost_concat_1 + rev_seq_cost
           //        + solut.seq[to_1D(j_next, info.dimen, info.W, &info)] * cost_concat_2 + solut.seq[to_1D(j_next, info.dimen, info.C, &info)];
 
-            rev_seq_cost += info.c.get_unchecked(*solut.s.get_unchecked(j-1)).get_unchecked(*solut.s.get_unchecked(j)) * (solut.seq.get_unchecked(to_1D(i, j, info.W, info.dimen))-1.0);
+            rev_seq_cost += info.c.get_unchecked(*solut.s.get_unchecked(j-1)).get_unchecked(*solut.s.get_unchecked(j)) * (solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).W-1.0);
 
-            cost_concat_1 =  solut.seq.get_unchecked(to_1D(0, i_prev, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(i_prev));
-            cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(i, j, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(j_next)).get_unchecked(*solut.s.get_unchecked(i));
+            cost_concat_1 =  solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(i_prev));
+            cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(j_next)).get_unchecked(*solut.s.get_unchecked(i));
 
-            cost_new = solut.seq.get_unchecked(to_1D(0, i_prev, info.C, info.dimen))
-                    + solut.seq.get_unchecked(to_1D(i, j, info.W, info.dimen))      * cost_concat_1 + rev_seq_cost
-                    + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.W, info.dimen)) * cost_concat_2 + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.C, info.dimen));
+            cost_new = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).C
+                    + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).W      * cost_concat_1 + rev_seq_cost
+                    + solut.seq.get_unchecked(to_1D(j_next, info.dimen,  info.dimen)).W * cost_concat_2 + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.dimen)).C;
 
             if cost_new < cost_best {
                 cost_best = cost_new - f64::EPSILON;
@@ -526,14 +535,14 @@ fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & tInfo) -> bo
           //    + solut.seq[to_1D(j_next, info.dimen, info.W, &info)] * cost_concat_3 + solut.seq[to_1D(j_next, info.dimen, info.C, &info)];    /* concat 4th subseq */
 
             unsafe {
-            cost_concat_1 = solut.seq.get_unchecked(to_1D(0, k, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(k)).get_unchecked(*solut.s.get_unchecked(i));
-            cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(i, j, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(k_next));
-            cost_concat_3 = cost_concat_2 + solut.seq.get_unchecked(to_1D(k_next, i_prev, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j_next));
+            cost_concat_1 = solut.seq.get_unchecked(to_1D(0, k,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(k)).get_unchecked(*solut.s.get_unchecked(i));
+            cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(k_next));
+            cost_concat_3 = cost_concat_2 + solut.seq.get_unchecked(to_1D(k_next, i_prev,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j_next));
 
-            cost_new = solut.seq.get_unchecked(to_1D(0, k, info.C, info.dimen))                                                             /*        1st subseq */
-                + solut.seq.get_unchecked(to_1D(i, j, info.W, info.dimen))              * cost_concat_1 + solut.seq.get_unchecked(to_1D(i, j, info.C, info.dimen))                  /* concat 2nd subseq (reinserted seq) */
-                + solut.seq.get_unchecked(to_1D(k_next, i_prev, info.W, info.dimen))    * cost_concat_2 + solut.seq.get_unchecked(to_1D(k_next, i_prev, info.C, info.dimen))        /* concat 3rd subseq */
-                + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.W, info.dimen)) * cost_concat_3 + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.C, info.dimen));    /* concat 4th subseq */
+            cost_new = solut.seq.get_unchecked(to_1D(0, k,  info.dimen)).C                                                             /*        1st subseq */
+                + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).W              * cost_concat_1 + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).C                  /* concat 2nd subseq (reinserted seq) */
+                + solut.seq.get_unchecked(to_1D(k_next, i_prev,  info.dimen)).W    * cost_concat_2 + solut.seq.get_unchecked(to_1D(k_next, i_prev,  info.dimen)).C
+                + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.dimen)).W * cost_concat_3 + solut.seq.get_unchecked(to_1D(j_next, info.dimen, info.dimen)).C;    /* concat 4th subseq */
             }
 
             if cost_new < cost_best {
@@ -557,14 +566,14 @@ fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & tInfo) -> bo
           //    + solut.seq[to_1D(k_next, info.dimen, info.W, &info)] * cost_concat_3 + solut.seq[to_1D(k_next, info.dimen, info.C, &info)];    /* concat 4th subseq */
             unsafe {
 
-            cost_concat_1 = solut.seq.get_unchecked(to_1D(0, i_prev, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j_next));
-            cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(j_next, k, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(k)).get_unchecked(*solut.s.get_unchecked(i));
-            cost_concat_3 = cost_concat_2 + solut.seq.get_unchecked(to_1D(i, j, info.T, info.dimen)) + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(k_next));
+            cost_concat_1 = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j_next));
+            cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(to_1D(j_next, k,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(k)).get_unchecked(*solut.s.get_unchecked(i));
+            cost_concat_3 = cost_concat_2 + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).T + info.c.get_unchecked(*solut.s.get_unchecked(j)).get_unchecked(*solut.s.get_unchecked(k_next));
 
-            cost_new = solut.seq.get_unchecked(to_1D(0, i_prev, info.C, info.dimen))                                                        /*      1st subseq */
-                + solut.seq.get_unchecked(to_1D(j_next, k, info.W, info.dimen))         * cost_concat_1 + solut.seq.get_unchecked(to_1D(j_next, k, info.C, info.dimen))             /* concat 2nd subseq */
-                + solut.seq.get_unchecked(to_1D(i, j, info.W, info.dimen))              * cost_concat_2 + solut.seq.get_unchecked(to_1D(i, j, info.C, info.dimen))                  /* concat 3rd subseq (reinserted seq) */
-                + solut.seq.get_unchecked(to_1D(k_next, info.dimen, info.W, info.dimen)) * cost_concat_3 + solut.seq.get_unchecked(to_1D(k_next, info.dimen, info.C, info.dimen));    /* concat 4th subseq */
+            cost_new = solut.seq.get_unchecked(to_1D(0, i_prev,  info.dimen)).C                                                        /*      1st subseq */
+                + solut.seq.get_unchecked(to_1D(j_next, k,  info.dimen)).W         * cost_concat_1 + solut.seq.get_unchecked(to_1D(j_next, k,  info.dimen)).C             /* concat 2nd subseq */
+                + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).W              * cost_concat_2 + solut.seq.get_unchecked(to_1D(i, j,  info.dimen)).C                  /* concat 3rd subseq (reinserted seq) */
+                + solut.seq.get_unchecked(to_1D(k_next, info.dimen,  info.dimen)).W * cost_concat_3 + solut.seq.get_unchecked(to_1D(k_next, info.dimen,  info.dimen)).C;    /* concat 4th subseq */
             }
 
             if cost_new < cost_best {
@@ -684,7 +693,7 @@ fn perturb(sl : & Vec<usize>, info : &mut tInfo) -> Vec<usize> {
 fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
 
     let mut solut_best = tSolution {
-        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3],
+        seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0} ; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
         //seq : Box::new([[[0.0; 3]; 300]; 300]),
         //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
@@ -693,7 +702,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     };
 
     let mut solut_partial = tSolution {
-        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3],
+        seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
         //seq : Box::new([[[0.0; 3]; 300]; 300]),
         //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
@@ -702,7 +711,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     };
 
     let mut solut_crnt = tSolution {
-        seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3],
+        seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
         //seq : Box::new([[[0.0; 3]; 300]; 300]),
         //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
@@ -782,9 +791,9 @@ fn main() {
     let mut info = tInfo {
         dimen : dimension,
         c : c.clone(),
-        T : 0,
-        C : 1,
-        W : 2,
+      //T : 0,
+      //C : 1,
+      //W : 2,
         SWAP : 0,
         REINSERTION : 1,
         OR_OPT_2 : 2,
