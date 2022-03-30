@@ -56,8 +56,22 @@
 23/03 - (Discuss'ao em forum relacionada) https://users.rust-lang.org/t/very-fast-initialization-of-a-vec-of-vecs/41301
 25/03 - (Sobre memoria) https://medium.com/@robertgrosse/optimizing-rc-memory-usage-in-rust-6652de9e119e
 
-25/03 - Utilização de flat vector, porem desta vez removendo o 3o indice d acesso e criando um vector de structs com membros T, W e C, visando diminuir problemas com bound checking  e afins, e ate mesmo facilitando a auto-vectorization.
+25/03 - Utilização de flat vector (get_unchecked), porem desta vez removendo o 3o indice d acesso e criando um vector de structs (tSeqInfo) com membros T, W e C, visando diminuir problemas com bound checking  e afins, e ate mesmo facilitando a auto-vectorization.
 
         rat99   2.2s
         pr152   7.7s
         gil262  50.27s
+
+29/03 - Comparação entre matriz vector e matriz array (uso de structs em ambos -- tSeqInfo) com uso do 'get_unchecked'.
+    
+        MATRIX vector
+        rat99   1.82s
+        pr152   6.51s
+        gil262  42.27s
+        lin318  52.29s
+
+        MATRIX array
+        rat99   1.56s
+        pr152   5.34s
+        gil262  39.49s
+        lin318  43.24s
