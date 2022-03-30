@@ -4,9 +4,9 @@ OK - 22/03 - CPP: Testar um pouco mais o 1D array compacto.
 25/03 - Criar arquivo para discriminar quais sao os commits das implementacoes das tres categorias (ingenua, consciente, especifica) 
 25/03 - RUST: Comparar 3D vector e 3D array, porem utilizando o metodo '.get_unchekced' em ambos.
 26/03 - JULIA: Encontrar maneira mais justa de medir o consumo médio de memória desconsiderando a utilizada pelo ambiente.
-27/03 - Adaptar as seguintes implementacoes para ler arquivos '.rnd':
+29/03 - Adaptar as seguintes implementacoes para ler arquivos '.rnd':
     -- Lua
     -- Javascript
     -- Octave
-27/03 - CPP: testar flat-vector de structs (com membros float T, C, W).
-27/03 - RUST: testar matrix (tamanho fixo) de structs (com membros float T, C, W).
+29/03 - CPP: testar flat-vector de structs (com membros float T, C, W).
+29/03 - RUST: testar matrix (tamanho fixo) de structs (com membros float T, C, W).
