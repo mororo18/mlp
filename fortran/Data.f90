@@ -8,7 +8,7 @@ contains
       integer, allocatable :: rnd (:)
 
       integer :: io
-      character(len=1500) ::line
+      character(len=2500) ::line
       integer :: dimen
       integer :: i
       integer :: j
@@ -23,6 +23,7 @@ contains
       allocate(c(dimen, dimen))
 
       do i = 1, dimen
+      !! "(A)" -> Read w=len(variable) characters as a string.
           read(io, "(A)") line
           do j = i + 1, dimen
               blnk = index(line, ' ')
@@ -35,9 +36,11 @@ contains
 
       read(io, *)
       read(io, *)
-      read(io, '(I6)') rnd_count
+      read(io, '(I8)') rnd_count
 
       allocate(rnd(rnd_count))
+
+      print *, "qntd rnd  ", rnd_count
 
       do i = 1, rnd_count
           read(io, '(I6)') rnd(i)

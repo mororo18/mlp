@@ -42,11 +42,12 @@ subroutine print_matrix(c)
     nxm = shape(c)
     dimen = nxm(1)
 
-    do i=1, dimen
+    do i=1, 2
         do j=1, dimen 
-            write(*, "(F6.1, a)", advance="no") c(i,j),  ''
+            write(*, "(F6.1, a)", advance="no") c(i,j),  ' '
         end do
         print *, new_line('A')
+        print *, ''
     end do
 
 end subroutine
@@ -159,6 +160,10 @@ function construction(alpha, info) result(ret)
     integer :: rng
     integer :: index_
     real :: RND
+    integer :: cnt
+
+
+    cnt = 0
 
     cL_size = info%dimen-1
 
@@ -173,7 +178,10 @@ function construction(alpha, info) result(ret)
     r = 1
     do j=2, info%dimen
         call sort(cL, cL_size, r, info)
-
+        !print *, info%cost(1,318)
+        !!print *, info%cost(r, cL(1)-1)
+        !print *, cL
+        !call exit(0)
        !rng = ceiling(cL_size * alpha)
         !!!
         call random_number(RND)
@@ -186,6 +194,8 @@ function construction(alpha, info) result(ret)
 
         cN = cL(index_)
 
+        !print *, "Novo noh", cN
+
         ! memmove on cL
         call arr_shift(cL, index_+1, index_, cL_size-index_)
         cL_size = cL_size-1
@@ -194,6 +204,7 @@ function construction(alpha, info) result(ret)
         r = cN
     end do
 
+    !call exit(0)
     s(info%dimen+1) = 1
 
     ret = s(:)
@@ -664,9 +675,12 @@ function perturb(solut, info) result(ret)
        info%rnd_index = info%rnd_index + 1
 
        B_start = info%rnd(info%rnd_index) + 1
+       !print *, info%rnd_index, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
        B_end = B_start + info%rnd(info%rnd_index) 
+       !!print *, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
+
     end do
 
     if (A_start < B_start) then
@@ -676,6 +690,12 @@ function perturb(solut, info) result(ret)
         call reinsert (solut_pert%s, A_start, A_end - 1, B_end)
         call reinsert (solut_pert%s, B_start, B_end - 1, A_end)
     end if
+
+   !if (B_start == 1) then !! .or. B_start == 1) then
+   !    !print *, " opaaaaaa"
+   !    print *, solut_pert%s
+   !    call exit(0)
+   !end if
 
     call subseq_load(solut_pert, info)
 
@@ -758,10 +778,10 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
         alpha = R(index_)
         print *, "[+] Local Search ", i
-        print *, "        [+] Constructing Inital Solution.."
         sol_crnt%s = construction(alpha, info)
         call subseq_load(sol_crnt, info)
         sol_partial = sol_crnt
+        print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
 
         !call exit(0)
 
@@ -842,11 +862,23 @@ program main
             type(tInfo) :: info
             type(tSolution) :: ret
             end function
+subroutine print_matrix(c)
+    implicit none
+    real, allocatable :: c(:,:)
+
+    integer, allocatable :: nxm(:)
+    integer :: dimen
+    integer :: i
+    integer :: j
+    end subroutine
+
     end interface
 
     call load_matrix(info%cost, info%rnd)
 
-    print *, info%rnd(2)
+    !call print_matrix(info%cost)
+    !call exit(0)
+    !print *, info%rnd(2)
 
     dimensions = shape(info%cost(:,:))
     info%dimen = dimensions(1)
