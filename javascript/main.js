@@ -479,11 +479,9 @@ function main() {
     //console.log(rnd);
     //process.exit(0);
 
-    console.time("opa");
     var start = new Date();
     GILS_RVND(Iils, Imax, R, info);
     var end = new Date();
-    console.timeEnd("opa");
 
     console.log("TIME: ", (end-start)/1000);
 }
