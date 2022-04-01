@@ -1,6 +1,7 @@
 #! /usr/bin/julia
 using Printf
 using Profile, PProf
+using BenchmarkTools
 include("Data.jl")
 
 mutable struct tInfo
@@ -505,7 +506,7 @@ function main()
 
 end
 
-main()
+@btime main()
 
 # using ProfileView, Profile, PProf
 #=

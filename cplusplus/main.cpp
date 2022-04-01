@@ -53,7 +53,7 @@ inline unsigned to_1D(int x, int y, int z, int size) {
     //int a = 3*(x*(size+1) - (x*(x+1))/2 + y) + z;
     int b = 3*x*(size+1) + 3*y + z;
     //cout << ret << "   " << a << endl;
-    return a;
+    return b;
 }
 
 tSolution Solution_init(tInfo info) {

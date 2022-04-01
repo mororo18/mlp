@@ -31,6 +31,18 @@ function subseq_load(s, seq, info) {
     //console.log(seq);
 }
 
+function sort(arr, r, info) {
+    for (var i = 0; i < arr.length; i++) {
+        for (var j = 0; j < arr.length-1; i++) {
+            if (info.c[r][arr[j]] > info.c[r][arr[j+1]]) {
+                let tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+}
+
 function construction(alpha, info) {
     s = [0];
     //var cList = [...Array(info.dimension).keys()];
@@ -38,10 +50,12 @@ function construction(alpha, info) {
 
     var r = 0;
     while (cList.length > 0) {
-        cList.sort((i, j) => info.c[i][r] - info.c[j][r]);
+        //cList.sort((i, j) => info.c[i][r] - info.c[j][r]);
+        sort(cList, r, info);
 
         var a = Math.random()*(cList.length)*alpha;
         var i = parseInt(a);
+        i = info.rnd[info.rnd_index++];
         var c = cList.splice(i, 1);
         c = c[0];
         //console.log(c);
@@ -284,7 +298,7 @@ function RVND(s, subseq, info) {
     const TWO_OPT     = 4;
 
     //neighbd_list = [TWO_OPT];//, OR_OPT_2, OR_OPT_3, TWO_OPT];
-    neighbd_list = [SWAP, REINSERTION, OR_OPT_2, OR_OPT_3, TWO_OPT];
+    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
     /*
     var s = Array.from({length: info.dimension}, (_, i) => i);
     s[info.dimension] = 0;
@@ -300,29 +314,30 @@ function RVND(s, subseq, info) {
     while (neighbd_list.length > 0) {
         ITER++;
         let i = parseInt(Math.random() * neighbd_list.length);
+        i = info.rnd[info.rnd_index++];
         let neighbd = neighbd_list[i];
         //console.log("Current cost: ", subseq[0][info.dimension][info.C]);
 
         switch (neighbd) {
             case SWAP:
-                improv = search_swap(s, subseq, info);
+                improve = search_swap(s, subseq, info);
                 break;
             case REINSERTION:
-                improv = search_reinsertion(s, subseq, info, REINSERTION);
+                improve = search_reinsertion(s, subseq, info, REINSERTION);
                 break;
             case OR_OPT_2:
-                improv = search_reinsertion(s, subseq, info, OR_OPT_2);
+                improve = search_reinsertion(s, subseq, info, OR_OPT_2);
                 break;
             case OR_OPT_3:
-                improv = search_reinsertion(s, subseq, info, OR_OPT_3);
+                improve = search_reinsertion(s, subseq, info, OR_OPT_3);
                 break;
             case TWO_OPT:
-                improv = search_two_opt(s, subseq, info);
+                improve = search_two_opt(s, subseq, info);
                 break;
         }
 
-        if (improv) {
-            neighbd_list = [SWAP, REINSERTION, OR_OPT_2, OR_OPT_3, TWO_OPT];
+        if (improve) {
+            neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
         } else {
             //console.log(neighbd_list);
             neighbd_list.splice(i, 1);
@@ -337,7 +352,7 @@ function RVND(s, subseq, info) {
 
 }
 
-function perturb(sl) {
+function perturb(sl, info) {
     var s = [...sl];
 
     var A_start = 1, A_end = 1;
@@ -354,6 +369,13 @@ function perturb(sl) {
 
         B_start = parseInt(Math.random()*max) + 1;
         B_end = B_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
+
+
+        A_start = info.rnd[info.rnd_index++];
+        A_end = A_start + info.rnd[info.rnd_index++];
+
+        B_start = info.rnd[info.rnd_index++];
+        B_end = B_start + info.rnd[info.rnd_index++];
     }
 
     if(A_start < B_start){
@@ -378,6 +400,7 @@ function GILS_RVND(Iils, Imax, R, info) {
 
     for (var i = 0; i < Imax; i++) {
         var alpha = R[parseInt(Math.random() * 26)];
+        alpha = R[info.rnd[info.rnd_index++]];
         console.log("[+] Local Search ", i+1);
         console.log("\t[+] Constructing Inital Solution..");
         var s = construction(alpha, info);
@@ -398,7 +421,7 @@ function GILS_RVND(Iils, Imax, R, info) {
                 iterILS = 0;
             }
 
-            s = perturb(sl);
+            s = perturb(sl, info);
             subseq_load(s, subseq, info);
             iterILS++;
         }
@@ -421,9 +444,10 @@ function GILS_RVND(Iils, Imax, R, info) {
 function main() {
     var dimension;
     var c = [];
+    var rnd = [];
     var Data = require("./Data"); 
 
-    dimension = Data.info_load(c);
+    dimension = Data.info_load(c, rnd);
     Iils = Math.min(dimension, 100);
     const Imax = 10;
     const R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21,0.22, 0.23, 0.24, 0.25];
@@ -436,13 +460,16 @@ function main() {
     s[dimension] = 0;
     */
 
-    var info = Object.freeze({
+    //var info = Object.freeze({
+    var info = {
         c : c,
         dimension : dimension, 
         T : 0,
         C : 1, 
-        W : 2
-    });
+        W : 2, 
+        rnd : rnd,
+        rnd_index : 0
+    };
 
     console.time("opa");
     var start = new Date();
