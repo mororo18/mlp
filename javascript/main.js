@@ -33,7 +33,7 @@ function subseq_load(s, seq, info) {
 
 function sort(arr, r, info) {
     for (var i = 0; i < arr.length; i++) {
-        for (var j = 0; j < arr.length-1; i++) {
+        for (var j = 0; j < arr.length-1; j++) {
             if (info.c[r][arr[j]] > info.c[r][arr[j+1]]) {
                 let tmp = arr[j];
                 arr[j] = arr[j+1];
@@ -58,12 +58,13 @@ function construction(alpha, info) {
         i = info.rnd[info.rnd_index++];
         var c = cList.splice(i, 1);
         c = c[0];
-        //console.log(c);
+        //console.log(i, c);
         s.push(c);
         r = c;
     }
 
     s[info.dimension] = 0;
+     //console.log(s);
 
     return s;
 }
@@ -408,7 +409,7 @@ function GILS_RVND(Iils, Imax, R, info) {
 
         subseq_load(s, subseq, info);
         var rvnd_cost_best = subseq[0][info.dimension][info.C] - Number.EPSILON;
-        //console.log("Construction cost", rvnd_cost_best);
+        console.log("Construction cost", rvnd_cost_best);
         var iterILS = 0;
 
         console.log("\t[+] Looking for the best Neighbor..");
@@ -435,6 +436,7 @@ function GILS_RVND(Iils, Imax, R, info) {
             cost_best = sl_cost;
         }
         console.log("\tcurrent best solution cost",  cost_best);
+        console.log();
     }
 
     //console.log(s_best, cost_best);
@@ -447,7 +449,9 @@ function main() {
     var rnd = [];
     var Data = require("./Data"); 
 
-    dimension = Data.info_load(c, rnd);
+    var t = Data.info_load(c);
+    dimension = t.dimension;
+    rnd = t.rnd;
     Iils = Math.min(dimension, 100);
     const Imax = 10;
     const R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21,0.22, 0.23, 0.24, 0.25];
@@ -463,13 +467,17 @@ function main() {
     //var info = Object.freeze({
     var info = {
         c : c,
+        rnd : rnd,
         dimension : dimension, 
         T : 0,
         C : 1, 
         W : 2, 
-        rnd : rnd,
         rnd_index : 0
     };
+
+
+    //console.log(rnd);
+    //process.exit(0);
 
     console.time("opa");
     var start = new Date();

@@ -9,7 +9,7 @@ function matrix_fill(matrix, n) {
 }
 
 module.exports = {
-    info_load: function(c, rnd) {
+    info_load: function(c) {
         let index = 0;
         console.log(file[index]);
 
@@ -31,13 +31,13 @@ module.exports = {
         index++;
         console.log(file[index]);
         let rnd_size = parseInt(file[index++]);
-        rnd = new Array(rnd_size);
+        var rnd = new Array(rnd_size);
 
         for (var i = 0; i < rnd_size; i++) {
-            rnd[i] = file[index++];
+            rnd[i] = parseInt(file[index++]);
         }
 
-        console.log(rnd);
+        //console.log(rnd);
 
         /*
         for (var i = -1; i+1 < file.length; i++) {
@@ -66,7 +66,10 @@ module.exports = {
         }
         c[dimension-1][dimension-1] = 0.0;
         */
-        return dimension;
+        return {
+            dimension: dimension, 
+            rnd : rnd
+        };
     }
 
 }
