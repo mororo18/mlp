@@ -1,0 +1,54 @@
+###############################################################################################################
+#####  ProFi, a lua profiler. This profile was generated on: Fri Sep 17 17:48:01 2021
+#####  ProFi is created by Luke Perkin 2012 under the MIT Licence, www.locofilm.co.uk
+#####  Version 1.2. Get the most recent version at this gist: https://gist.github.com/2838755
+###############################################################################################################
+
+| TOTAL TIME = 0.714769
+| FILE                                              : FUNCTION                                : LINE                : TIME        : RELATIVE    : CALLED      |
+| main.lua                                          : main                                    :  496                : 0.715       : 100.00%     :       1     |
+| main.lua                                          : GILS_RVND                               :  424                : 0.708       : 99.04%      :       1     |
+| main.lua                                          : RVND                                    :  350                : 0.555       : 77.68%      :     623     |
+| main.lua                                          : subseq_load                             :   51                : 0.439       : 61.36%      :    6021     |
+| [builtin:remove]                                  : remove                                  :   -1                : 0.378       : 52.91%      :    7638     |
+| main.lua                                          : search_reinsertion                      :  251                : 0.367       : 51.41%      :    4860     |
+| main.lua                                          : search_two_opt                          :  207                : 0.084       : 11.81%      :    1813     |
+| main.lua                                          : search_swap                             :  141                : 0.068       : 9.48%       :    1711     |
+| main.lua                                          : anonymous                               :   85                : 0.052       : 7.23%       :   48482     |
+| main.lua                                          : reinsert                                :  125                : 0.037       : 5.11%       :    4234     |
+| main.lua                                          : perturb                                 :  393                : 0.025       : 3.44%       :     623     |
+| main.lua                                          : reverse                                 :  116                : 0.021       : 2.89%       :    1190     |
+| main.lua                                          : swap                                    :  112                : 0.010       : 1.39%       :    8373     |
+| Data.lua                                          : readData                                :    1                : 0.007       : 0.95%       :       1     |
+| main.lua                                          : clone                                   :   22                : 0.004       : 0.52%       :     733     |
+| main.lua                                          : solut_clone                             :   32                : 0.001       : 0.14%       :      55     |
+| main.lua                                          : subseq_fill                             :   42                : 0.000       : 0.05%       :       1     |
+| main.lua                                          : construction                            :   22                : 0.000       : 0.01%       :      10     |
+| ./ProFi.lua                                       : shouldReturn                            :  160                : 0.000       : 0.00%       :       1     |
+| [C]                                               : floor                                   :   -1                : 0.000       : 0.00%       :    2283     |
+| ./ProFi.lua                                       : startHooks                              :  195                : 0.000       : 0.00%       :       0     |
+| [C]                                               : sort                                    :   -1                : 0.000       : 0.00%       :     470     |
+| [C]                                               : insert                                  :   -1                : 0.000       : 0.00%       :    9442     |
+| ./ProFi.lua                                       : stop                                    :   68                : 0.000       : 0.00%       :       1     |
+| [C]                                               : print                                   :   -1                : 0.000       : 0.00%       :       1     |
+| main.lua                                          : construction                            :   71                : 0.000       : 0.00%       :      10     |
+| [C]                                               : type                                    :   -1                : 0.000       : 0.00%       :     743     |
+| [C]                                               : unpack                                  :   -1                : 0.000       : 0.00%       :     743     |
+| [C]                                               : read                                    :   -1                : 0.000       : 0.00%       :       1     |
+| [C]                                               : close                                   :   -1                : 0.000       : 0.00%       :       1     |
+| [C]                                               : gmatch                                  :   -1                : 0.000       : 0.00%       :      48     |
+| [C]                                               : assert                                  :   -1                : 0.000       : 0.00%       :       2     |
+| ./ProFi.lua                                       : start                                   :   50                : 0.000       : 0.00%       :       0     |
+| [C]                                               : open                                    :   -1                : 0.000       : 0.00%       :       1     |
+| [C]                                               : getTime                                 :   -1                : 0.000       : 0.00%       :       2     |
+| [C]                                               : random                                  :   -1                : 0.000       : 0.00%       :   11764     |
+| [C]                                               : (for generator)                         :   -1                : 0.000       : 0.00%       :    1275     |
+| [C]                                               : tonumber                                :   -1                : 0.000       : 0.00%       :    2257     |
+| [C]                                               : protect                                 :   -1                : 0.000       : 0.00%       :       1     |
+| ./ProFi.lua                                       : stopHooks                               :  199                : 0.000       : 0.00%       :       1     |
+| [C]                                               : ipairs                                  :   -1                : 0.000       : 0.00%       :       1     |
+| main.lua                                          : protect                                 :  486                : 0.000       : 0.00%       :       1     |
+| [C]                                               : randomseed                              :   -1                : 0.000       : 0.00%       :       1     |
+| [C]                                               : min                                     :   -1                : 0.000       : 0.00%       :       1     |
+| [C]                                               : time                                    :   -1                : 0.000       : 0.00%       :       1     |
+| [C]                                               : sethook                                 :   -1                : 0.000       : 0.00%       :       1     |

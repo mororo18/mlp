@@ -1,0 +1,10 @@
+
+
+Julia: 
+    func sort() compara os valores utilizando um "<=" aparentemente
+
+GERAL: Algoritmos de ordenação distintos na construção quebram cm a sequência dos números aleatórios.
+
+Python:
+    Tipagem em python inútil para fins performáticos
+    (python) desenrolar loops -> meio inutil cm o interpretador (funciona apenas cm JIT) AA ser verificado
