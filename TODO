@@ -6,7 +6,7 @@ OK - 25/03 - RUST: Comparar 3D vector e 3D array, porem utilizando o metodo '.ge
 26/03 - JULIA: Encontrar maneira mais justa de medir o consumo médio de memória desconsiderando a utilizada pelo ambiente.
 29/03 - Adaptar as seguintes implementacoes para ler arquivos '.rnd':
     (OK!) -- Lua
-    -- Javascript
+    (OK!) -- Javascript
     -- Octave
 29/03 - CPP: testar flat-vector de structs (com membros float T, C, W).
 29/03 - RUST: testar matrix (tamanho fixo) de structs (com membros float T, C, W).
