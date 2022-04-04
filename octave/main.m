@@ -39,7 +39,7 @@ function ret = sort_by(arr, r, info)
     ret = arr;
 end
 
-function ret = construction(alpha, info)
+function [ret, index_new] = construction(alpha, info)
     s(1) = 1;
     for i = 1:info.dimen-1
         cL(i) = i+1;
@@ -53,6 +53,9 @@ function ret = construction(alpha, info)
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(rng * RND);
+        
+        index = info.rnd(info.rnd_index) + 1;
+        info.rnd_index = info.rnd_index+1;
 
         cN = cL(index);
 
@@ -63,6 +66,7 @@ function ret = construction(alpha, info)
 
     s(columns(s)+1) = 1;
     ret = s;
+    index_new = info.rnd_index;
 end
 
 function ret = swap(s, i, j)
@@ -275,14 +279,17 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt)
 
 end
 
-function ret = RVND(solut, info)
+function [ret, index_new] = RVND(solut, info)
 
-    neighbd_list = [info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3, info.TWO_OPT, info.SWAP];
+    neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
 
     while (columns(neighbd_list) > 0)
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(RND*columns(neighbd_list));
+        index = info.rnd(info.rnd_index) + 1;
+        info.rnd_index = info.rnd_index + 1;
+
         neighbd = neighbd_list(index);
 
         improve_flag = false;
@@ -300,14 +307,15 @@ function ret = RVND(solut, info)
         end
 
         if (improve_flag)
-            neighbd_list = [info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3, info.TWO_OPT, info.SWAP];
-            solut.cost
+            neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
+            index
         else
             neighbd_list(index) = [];
         end
     end
 
-    ret = solut;
+    ret = solut.s;
+    index_new = info.rnd_index;
 end
 
 function ret = notnull_rnd()
@@ -316,13 +324,11 @@ function ret = notnull_rnd()
     ret = RND;
 end
 
-function ret = perturb(solut, info)
+function [ret, index_new] = perturb(solut, info)
     A_start = 1;
     A_end = 1;
     B_start = 1;
     B_end = 1;
-
-    solut_pert = solut;
 
     size_max = ceil((info.dimen+1) / 10);
     size_max = [2, size_max]((size_max >= 2) + 1);
@@ -339,6 +345,17 @@ function ret = perturb(solut, info)
         B_start = ceil(max_ * rnd) + 1;
         rnd = notnull_rnd();
         B_end = B_start + ceil(((size_max-size_min) * rnd) + size_min);
+
+
+        A_start = info.rnd(info.rnd_index) + 1;
+        info.rnd_index = info.rnd_index + 1;
+        A_end = A_start + info.rnd(info.rnd_index);
+        info.rnd_index = info.rnd_index + 1;
+
+        B_start = info.rnd(info.rnd_index) + 1;
+        info.rnd_index = info.rnd_index + 1;
+        B_end = B_start + info.rnd(info.rnd_index);
+        info.rnd_index = info.rnd_index + 1;
     end
 
     if (A_start < B_start)
@@ -349,9 +366,8 @@ function ret = perturb(solut, info)
         solut.s = reinsert(solut.s, B_start, B_end - 1, A_end);
     end
 
-    solut = subseq_load(solut, info);
-
-    ret = solut;
+    ret = solut.s;
+    index_new = info.rnd_index;
 end
 
 function ret = solut_init(info)
@@ -371,24 +387,30 @@ function ret = GILS_RVND(Imax, Iils, R, info)
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(columns(R) * RND);
+        index = info.rnd(info.rnd_index) + 1;
+        info.rnd_index = info.rnd_index + 1;
         alpha = R(index);
 
         "ITER ", i
 
-        solut_crnt.s = construction(alpha, info);
+        [solut_crnt.s, info.rnd_index] = construction(alpha, info);
+        %solut_crnt.s
         solut_crnt = subseq_load(solut_crnt, info);
+        %solut_crnt.cost
 
         solut_partial = solut_crnt;
         iterILS = 0;
         while (iterILS < Iils)
-            solut_crnt = RVND(solut_crnt, info);
+            [solut_crnt.s, info.rnd_index] = RVND(solut_crnt, info);
 
             if (solut_crnt.cost < solut_partial.cost - eps)
-                solut_partial = solut_crnt;
+                solut_partial.s = solut_crnt.s;
+                solut_partial.cost = solut_crnt.cost;
                 iterILS = 0;
             end
 
-            solut_crnt = perturb(solut_partial, info);
+            [solut_crnt.s, info.rnd_index] = perturb(solut_partial, info);
+            solut_crnt = subseq_load(solut_crnt, info);
             iterILS++;
         end
 
@@ -403,7 +425,7 @@ function ret = GILS_RVND(Imax, Iils, R, info)
 end
 
 function main
-    [info.dimen, info.cost] = Data();
+    [info.dimen, info.cost, info.rnd] = Data();
     info;
     info.fmax = Inf(1);
     info.T = 1;
@@ -414,6 +436,7 @@ function main
     info.OR_OPT_3 = 3;
     info.SWAP = 4;
     info.TWO_OPT = 5;
+    info.rnd_index = 1;
 
    %for i = 1:info.dimen
    %    sol.s(i) = i;
@@ -433,7 +456,7 @@ function main
     Iils = [100, info.dimen]((info.dimen < 100) +1);
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
     s = GILS_RVND(Imax, Iils, R, info);
-    s
+    s.s
 end
 
 %val = jit_enable(1)
