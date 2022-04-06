@@ -55,6 +55,7 @@ function [ret, index_new] = construction(alpha, info)
         index = ceil(rng * RND);
         
         index = info.rnd(info.rnd_index) + 1;
+        info.rnd(info.rnd_index);
         info.rnd_index = info.rnd_index+1;
 
         cN = cL(index);
@@ -282,11 +283,11 @@ end
 function [ret, index_new] = RVND(solut, info)
 
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
-
     while (columns(neighbd_list) > 0)
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(RND*columns(neighbd_list));
+        info.rnd(info.rnd_index);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
 
@@ -308,13 +309,13 @@ function [ret, index_new] = RVND(solut, info)
 
         if (improve_flag)
             neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
-            index
+            index;
         else
             neighbd_list(index) = [];
         end
     end
 
-    ret = solut.s;
+    ret = solut;
     index_new = info.rnd_index;
 end
 
@@ -348,13 +349,17 @@ function [ret, index_new] = perturb(solut, info)
 
 
         A_start = info.rnd(info.rnd_index) + 1;
+        info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         A_end = A_start + info.rnd(info.rnd_index);
+        info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
 
         B_start = info.rnd(info.rnd_index) + 1;
+        info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         B_end = B_start + info.rnd(info.rnd_index);
+        info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
     end
 
@@ -394,14 +399,13 @@ function ret = GILS_RVND(Imax, Iils, R, info)
         "ITER ", i
 
         [solut_crnt.s, info.rnd_index] = construction(alpha, info);
-        %solut_crnt.s
         solut_crnt = subseq_load(solut_crnt, info);
-        %solut_crnt.cost
 
         solut_partial = solut_crnt;
+
         iterILS = 0;
         while (iterILS < Iils)
-            [solut_crnt.s, info.rnd_index] = RVND(solut_crnt, info);
+            [solut_crnt, info.rnd_index] = RVND(solut_crnt, info);
 
             if (solut_crnt.cost < solut_partial.cost - eps)
                 solut_partial.s = solut_crnt.s;
