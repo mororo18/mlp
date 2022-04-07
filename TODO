@@ -1,7 +1,7 @@
 07/04 - Comparar desempenho das implementações entre q6 e hp-laptop.
 29/03 - CPP: testar flat-vector de structs (com membros float T, C, W).
 29/03 - RUST: testar matrix (tamanho fixo) de structs (com membros float T, C, W).
-30/03 - CPP: testar matriz de structs (com membros float T, C, W).
+OK - 30/03 - CPP: testar matriz de structs (com membros float T, C, W).
 26/03 - JULIA: Encontrar maneira mais justa de medir o consumo médio de memória desconsiderando a utilizada pelo ambiente.
 25/03 - Criar arquivo para discriminar quais sao os commits das implementacoes das tres categorias (ingenua, consciente, especifica) 
 OK - 17/03 - CPP: Testar novamente, e cm várias instâncias, 1D e 3D arrays.
