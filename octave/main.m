@@ -1,5 +1,14 @@
 1;
 
+function print_s(s)
+    sz = columns(s);
+
+    for i = 1:sz
+        printf('%d ', s(i))
+    end
+    printf('\n')
+end
+
 function ret = subseq_load (sol, info)
     tern1 = [1, 0];
     tern2 = [0, 1];
@@ -55,7 +64,7 @@ function [ret, index_new] = construction(alpha, info)
         index = ceil(rng * RND);
         
         index = info.rnd(info.rnd_index) + 1;
-        info.rnd(info.rnd_index);
+        %info.rnd(info.rnd_index);
         info.rnd_index = info.rnd_index+1;
 
         cN = cL(index);
@@ -76,7 +85,7 @@ function ret = swap(s, i, j)
     s(j) = tmp;
 
     ret = s;
-end
+    end
 
 function ret = reverse(s, i, j)
     s(i:j) = flip(s(i:j));
@@ -280,14 +289,14 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt)
 
 end
 
-function [ret, index_new] = RVND(solut, info)
+function [s, cost, index_new] = RVND(solut, info)
 
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
     while (columns(neighbd_list) > 0)
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(RND*columns(neighbd_list));
-        info.rnd(info.rnd_index);
+        %info.rnd(info.rnd_index);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
 
@@ -315,7 +324,8 @@ function [ret, index_new] = RVND(solut, info)
         end
     end
 
-    ret = solut;
+    s = solut.s;
+    cost = solut.cost;
     index_new = info.rnd_index;
 end
 
@@ -349,17 +359,17 @@ function [ret, index_new] = perturb(solut, info)
 
 
         A_start = info.rnd(info.rnd_index) + 1;
-        info.rnd(info.rnd_index)
+        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         A_end = A_start + info.rnd(info.rnd_index);
-        info.rnd(info.rnd_index)
+        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
 
         B_start = info.rnd(info.rnd_index) + 1;
-        info.rnd(info.rnd_index)
+        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         B_end = B_start + info.rnd(info.rnd_index);
-        info.rnd(info.rnd_index)
+        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
     end
 
@@ -396,16 +406,20 @@ function ret = GILS_RVND(Imax, Iils, R, info)
         info.rnd_index = info.rnd_index + 1;
         alpha = R(index);
 
-        "ITER ", i
+        printf("[+] Search %d\n", i)
+        printf("\t[+] Constructing..\n");
+        %"ITER ", i
 
         [solut_crnt.s, info.rnd_index] = construction(alpha, info);
         solut_crnt = subseq_load(solut_crnt, info);
 
         solut_partial = solut_crnt;
+        printf("\t[+] Looking for the best Neighbor..\n")
+        printf("\t    Construction Cost: %.2f\n", solut_partial.cost)
 
         iterILS = 0;
         while (iterILS < Iils)
-            [solut_crnt, info.rnd_index] = RVND(solut_crnt, info);
+            [solut_crnt.s, solut_crnt.cost, info.rnd_index] = RVND(solut_crnt, info);
 
             if (solut_crnt.cost < solut_partial.cost - eps)
                 solut_partial.s = solut_crnt.s;
@@ -422,8 +436,13 @@ function ret = GILS_RVND(Imax, Iils, R, info)
             solut_best = solut_partial;
         end
 
-        solut_best.cost
+        printf("\tCurrent best cost: %.2f\n", solut_best.cost)
+        printf('SOLUCAO: ')
+        print_s(solut_best.s)
+        %typeinfo(solut_crnt.s)
     end
+
+    printf('COST: %.2f\n', solut_best.cost)
 
     ret = solut_best;
 end
@@ -456,11 +475,14 @@ function main
    %%s(2:7) = flip(s(2:7))
    %s = reinsert(s, 6, 11, 2);
 
-    Imax = 10
+    Imax = 10;
     Iils = [100, info.dimen]((info.dimen < 100) +1);
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
+    t0 = clock ();
     s = GILS_RVND(Imax, Iils, R, info);
-    s.s
+    elapsed_time = etime (clock (), t0);
+    printf('TIME: %.2f\n', elapsed_time)
+    s.s;
 end
 
 %val = jit_enable(1)

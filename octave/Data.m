@@ -8,7 +8,7 @@ function [dim, cost, ret_rnd] = Data
 
     index = 1;
     dimension = mat2str(str2double(lines{index}(:)));
-    dimension = str2double(strrep(substr(dimension, 2, numel(dimension)-2), ';', ''))
+    dimension = str2double(strrep(substr(dimension, 2, numel(dimension)-2), ';', ''));
     index = index + 1;
 
     c = zeros(dimension, dimension);
@@ -18,7 +18,7 @@ function [dim, cost, ret_rnd] = Data
 
         str = lines(index){1}(:);
         for j = i+1:dimension
-            lines(index){1}
+            lines(index){1};
             typeinfo(str);
             
             pos = strfind(str, " ");
