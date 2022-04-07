@@ -43,3 +43,32 @@
 
         A performance assemelha-se à performance do 3D array.
 
+07/04 - Testes q6 (processo praxedes rodando)
+        1D array
+        rat99       1.83s 
+        pr152       6.64s
+        gil262      48.22s
+        lin318      67.91s
+        pr299       58.74s
+
+        3D array
+        rat99       1.98s
+        pr152       6.95s
+        gil262      46.88s
+        lin318      66.09s
+
+07/04 - (q6) Comparacao entre Matriz e Array de structs
+        Array
+        rat99       1.76      
+        pr152       6.34s
+        gil262      44.33s
+        lin318      61.44s
+        pr299       54.04s
+
+        Matriz
+        rat99       1.72s      
+        pr152       6.33s
+        gil262      44.20s
+        lin318      64.70s
+        pr299       51.71s
+
