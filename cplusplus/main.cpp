@@ -133,7 +133,7 @@ std::vector<int> construct(const double alpha, tInfo & info){
         int index = range > 0 ? rand() % range : 0;
         /**/
 
-        std::cout << info.rnd[info.rnd_index]<< std::endl;
+        //std::cout << info.rnd[info.rnd_index]<< std::endl;
         index = info.rnd[info.rnd_index++];
         int c = cL[index];
         s.push_back(c);
@@ -463,12 +463,12 @@ void RVND(tSolution & solut, tInfo & info) {
     //int k = 0;
     bool improve_flag;
 
-    cout << "RVND" << endl;
+    //cout << "RVND" << endl;
     while (!neighbd_list.empty()) {
         //k++;
 
         index = rand() % neighbd_list.size();
-        cout << info.rnd[info.rnd_index] << endl;
+        //cout << info.rnd[info.rnd_index] << endl;
         index = info.rnd[info.rnd_index++];
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
@@ -505,7 +505,6 @@ void RVND(tSolution & solut, tInfo & info) {
         //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
-            std::cout << "  " << solut.cost << std::endl;
         } else {
             //std::cout << index << "  " << neighbd_list.size() << std::endl;
             //std::cout << solut.cost << std::endl;
@@ -533,8 +532,8 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
     int size_max = std::floor((info.dimen+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
     int size_min = 2;
-    std::cout << "perturbing\n";
-    print_s(s);
+    //std::cout << "perturbing\n";
+    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
         /**/
         int max = (info.dimen+1) -2 -size_max;
@@ -549,22 +548,22 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
 
         //std::cout << "paa\n";
 
-        cout << info.rnd[info.rnd_index] << endl;
+        //cout << info.rnd[info.rnd_index] << endl;
         A_start = info.rnd[info.rnd_index++];
-        cout << info.rnd[info.rnd_index] << endl;
+        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + info.rnd[info.rnd_index++];
         //std::cout << "A start  " << A_start << std::endl;
         //std::cout << "A end  " << A_end << std::endl;
 
-        cout << info.rnd[info.rnd_index] << endl;
+        //cout << info.rnd[info.rnd_index] << endl;
         B_start = info.rnd[info.rnd_index++];
-        cout << info.rnd[info.rnd_index] << endl;
+        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + info.rnd[info.rnd_index++];
         //std::cout << "B start  " << B_start << std::endl;
         //std::cout << "B end  " << B_end << std::endl;
     }
     
-    cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
+    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
 
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
@@ -574,7 +573,7 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
         reinsert(s, B_start, B_end-1, A_end);
     }
 
-    print_s(s);
+    //print_s(s);
     //subseq_load(solut, info);
 
     return s;
@@ -598,7 +597,7 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
 
 
         solut_crnt.s = construct(alpha, info);
-        print_s(solut_crnt.s);
+        //print_s(solut_crnt.s);
         subseq_load(solut_crnt, info);
 
         //solut_partial = solut_crnt;
@@ -611,7 +610,6 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
         while (iterILS < Iils) {
             //k++;
             RVND(solut_crnt, info);
-            print_s(solut_crnt.s);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
                 Solution_cpy(solut_crnt, solut_partial, info);
                 //solut_partial = solut_crnt;
@@ -624,7 +622,6 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
             //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
-    exit(0);
 
         //subseq_load(solut_partial, info);
 
