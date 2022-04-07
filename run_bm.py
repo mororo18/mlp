@@ -158,9 +158,7 @@ def main():
             }
     """
     
-    print("opa")
     for inst in instances:
-        print("opa")
         os.system("./load " + inst)
 
         for lang in sources:
