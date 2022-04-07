@@ -7,7 +7,7 @@ OK - 25/03 - RUST: Comparar 3D vector e 3D array, porem utilizando o metodo '.ge
 29/03 - Adaptar as seguintes implementacoes para ler arquivos '.rnd':
     (OK!) -- Lua
     (OK!) -- Javascript
-    -- Octave
+    (OK!) -- Octave
 29/03 - CPP: testar flat-vector de structs (com membros float T, C, W).
 29/03 - RUST: testar matrix (tamanho fixo) de structs (com membros float T, C, W).
 (RESOLVIDO) 29/03 - FORTRAN: BUG!! ver resultado da instancia lin318.
