@@ -233,7 +233,7 @@ inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reverse(s, I, J);
-        subseq_load(s, seq, I);  // d olho aq hein
+        subseq_load(s, seq);//, I);  // d olho aq hein
         return true;
     }
 
@@ -345,6 +345,7 @@ void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
         if (improve_flag) {
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
+            cout << index << endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
@@ -356,6 +357,7 @@ std::vector<int> perturb(vector<int> & s, tRnd & rnd) {
     int A_end = 1;
     int B_start = 1;
     int B_end = 1;
+
 
     int size_max = std::floor((dimen+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
@@ -455,6 +457,7 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
             }
 
             solut_crnt = perturb(solut_partial, rnd);
+            cout << "perturb" << endl;
             subseq_load(solut_crnt, seq);
 
             iterILS++;
