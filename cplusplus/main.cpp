@@ -89,7 +89,6 @@ std::vector<int> construct(const double alpha, tRnd & rnd){
         r = c;
         cL.erase(cL.begin() + index);
     }
-    cout << "sai" << endl;
 
     s.push_back(0);
 
@@ -139,7 +138,10 @@ inline void subseq_load(vector<int> & s, tSubseq & seq, int index = 0){
     }
 }
 
-inline bool search_swap(vector<int> & s, tSubseq & seq) {
+bool improve = false;
+
+void search_swap(vector<int> & s, tSubseq & seq) {
+//inline bool search_swap(vector<int> & s, tSubseq & seq) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -192,13 +194,19 @@ inline bool search_swap(vector<int> & s, tSubseq & seq) {
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         swap(s, I, J);
         subseq_load(s, seq, I);
-        return true;
+        if (cost_best != seq[0][dimen].C) {
+            cout << "difere " << endl;
+        }
+
+        //return true;
+        improve = true;
     }
 
-    return false;
+    //return false;
 }
 
-inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
+//inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
+void search_two_opt(vector<int> & s, tSubseq & seq) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -234,13 +242,19 @@ inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reverse(s, I, J);
         subseq_load(s, seq);//, I);  // d olho aq hein
-        return true;
+        if (cost_best != seq[0][dimen].C) {
+            cout << "difere " << endl;
+        }
+
+        //return true;
+        improve = true;
     }
 
-    return false;
+    //return false;
 }
 
-inline bool search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
+void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
+//inline bool search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -298,13 +312,27 @@ inline bool search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reinsert(s, I, J, POS+1);
         subseq_load(s, seq, I < POS+1 ? I : POS+1);
-        return true;
+
+        if (cost_best != seq[0][dimen].C) {
+            cout << "difere " << endl;
+        }
+
+        improve = true;
+        //return true;
     }
 
-    return false;
+    //return false;
 }
 
 void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
+
+    vector<string> nome (6);
+
+    nome[SWAP] = "SWAP";
+    nome[TWO_OPT] = "TWO_OPT";
+    nome[REINSERTION] = "REINSERTION";
+    nome[OR_OPT_2] = "OR_OPT_2";
+    nome[OR_OPT_3] = "OR_OPT_3";
 
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     alignas(INT_SZ) uint index;
@@ -312,51 +340,60 @@ void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
     //int k = 0;
     bool improve_flag;
 
-    //cout << "RVND" << endl;
     while (!neighbd_list.empty()) {
         //k++;
 
         index = rand() % neighbd_list.size();
         //cout << info.rnd[info.rnd_index] << endl;
         index = rnd.rnd[rnd.rnd_index++];
+        //cout << index << endl;
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
 
-        improve_flag = false;
+        //improve_flag = false;
+        improve = false;
 
         switch(neighbd){
             case REINSERTION:
-                improve_flag = search_reinsertion(s, seq, REINSERTION);
+                search_reinsertion(s, seq, REINSERTION);
+                //improve_flag = search_reinsertion(s, seq, REINSERTION);
                 break;				
             case OR_OPT_2:
-                improve_flag = search_reinsertion(s, seq, OR_OPT_2);
+                search_reinsertion(s, seq, OR_OPT_2);
+                //improve_flag = search_reinsertion(s, seq, OR_OPT_2);
                 break;				
             case OR_OPT_3:
-                improve_flag = search_reinsertion(s, seq, OR_OPT_3);
+                search_reinsertion(s, seq, OR_OPT_3);
+                //improve_flag = search_reinsertion(s, seq, OR_OPT_3);
                 break;				
             case SWAP:
-                improve_flag = search_swap(s, seq);
+                search_swap(s, seq);
+                //improve_flag = search_swap(s, seq);
                 break;
             case TWO_OPT:
-                improve_flag = search_two_opt(s, seq);
+                search_two_opt(s, seq);
+                //improve_flag = search_two_opt(s, seq);
                 break;				
         }
 
-        if (improve_flag) {
+        if (improve) {
+            //cout << "improv  " << nome[neighbd] << endl;
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
-            cout << index << endl;
+            //cout << "delete  " << nome[neighbd] << endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
     }
 }
 
-std::vector<int> perturb(vector<int> & s, tRnd & rnd) {
+std::vector<int> perturb(vector<int> & sl, tRnd & rnd) {
     int A_start = 1;
     int A_end = 1;
     int B_start = 1;
     int B_end = 1;
+
+    auto s = sl;
 
 
     int size_max = std::floor((dimen+1)/10);
@@ -435,7 +472,6 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
         solut_partial = solut_crnt;
 
         subseq_load(solut_crnt, seq);
-        cout << "nah\n" ;
         cost_crnt = seq[0][dimen].C;
         cost_partial = seq[0][dimen].C;
 
@@ -456,9 +492,10 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
                 iterILS = 0;
             }
 
+
             solut_crnt = perturb(solut_partial, rnd);
-            cout << "perturb" << endl;
             subseq_load(solut_crnt, seq);
+            //cout << "perturb  " << seq[0][dimen].C << endl;
 
             iterILS++;
         }
