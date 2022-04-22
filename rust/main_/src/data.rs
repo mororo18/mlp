@@ -8,7 +8,7 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>())
 }
 
-pub fn load(dimension : &mut usize, c : &mut [[f64; 350]; 350], rnd : &mut Vec<usize>) {
+pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize>) {
 //pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize>) {
 
     let filename = "../../distance_matrix";
@@ -25,7 +25,7 @@ pub fn load(dimension : &mut usize, c : &mut [[f64; 350]; 350], rnd : &mut Vec<u
     }
 
     *dimension = lines[line_i].parse::<usize>().unwrap();
-    //for k in 0..*dimension {c.push(vec![0.0; *dimension]);}
+    for k in 0..*dimension {c.push(vec![0.0; *dimension]);}
     line_i += 1;
 
     //print_type_of(&lines[line_i].parse::<usize>().unwrap());
