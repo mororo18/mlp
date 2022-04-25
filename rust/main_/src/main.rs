@@ -499,7 +499,7 @@ fn main() {
 
     data::load(&mut dimension, &mut c, &mut rnd_vec);
 
-    println!("{:?}", c);
+    //println!("{:?}", c);
 
     let mut rnd = tRnd {
         rnd : rnd_vec,
@@ -520,7 +520,7 @@ fn main() {
 
 
 
-    println!("TEST");
+    //println!("TEST");
 
     let Imax = 10;
     let Iils = if dimension < 100 {dimension} else {100};
