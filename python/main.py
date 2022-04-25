@@ -5,76 +5,76 @@ from read import *
 from random import randint
 import math
 import sys
-#import matplotlib.pyplot as plt 
-from typing import List, NoReturn
 
-Matrix = List[List[float]]
-
-class tInfo:
-    IT : int = 0
-    dimen : int
-    cost : Matrix
-
-    T : int = 0
-    C : int = 1
-    W : int = 2
-
-    SWAP : int = 0
-    REINSERTION : int = 1
-    OR_OPT_2 : int = 2
-    OR_OPT_3 : int = 3
-    TWO_OPT : int = 4
-
-    EPSILON : float = 1e-13
-
-    rnd : List[int]
-    rnd_index : int = 0
-
-    def __init__(self, dimension : int, cost : Matrix, rnd : List[int]):
-        self.dimen = dimension
-        self.cost = cost
+class tRnd:
+    def __init__(self, rnd):
         self.rnd = rnd
+        self.rnd_index = 0
 
-class tSolution:
-    s : List[int]
-    seq : List[List[List[float]]]
-    cost : float
+EPSILON = 1e-13
 
-    def __init__(self, s : List[int], seq : List[List[List[float]]], cost : float):
-        self.s = s
-        self.seq = seq
-        self.cost = cost
+SWAP        = 0
+TWO_OPT     = 1
+REINSERTION = 2
+OR_OPT_2    = 3
+OR_OPT_3    = 4
 
+n, m, rnd = get_instance_info()
 
-def subseq_fill(info : tInfo) -> List[List[List[float]]]:
-    arr = []
+W = 0
+T = 1
+C = 2
 
-    for i in range(info.dimen+1):
-        arr.append([])
-        for j in range(info.dimen+1):
-            arr[i].append([0.0, 0.0, 0.0])
+IT = 0
 
-    return arr
+t_reinsertion = 0
+t_or_opt2 = 0
+t_or_opt3 = 0
+t_swap = 0
+t_two_opt = 0
+t_construction = 0
+t_perturb = 0
+t_seq = 0
 
-def construction(alpha : float, info : tInfo) -> List[int]:
-    s : List[int] = [0]
-    c_list : List[int] = list(range(1, info.dimen))
+improv_flag = None
+
+def subseq_info_fill(n):
+    matrix = []
+
+    for i in range(n+1):
+        matrix.append([])
+        for j in range(n+1):
+            matrix[i].append([0.0, 0.0, 0.0])
+
+    '''
+    for i in range(n+1):
+        matrix[W].append([])
+        matrix[T].append([])
+        matrix[C].append([])
+        for j in range(n+1):
+            matrix[W][i].append(0.0)
+            matrix[T][i].append(0.0)
+            matrix[C][i].append(0.0)
+            '''
+
+    return matrix
+
+def construction(alpha, rnd):
+    s = [0]
+    c_list = list(range(1, n))
 
     r = 0
     while len(c_list) > 0:
 
         i = int(len(c_list)*alpha) + 1
 
-        c_list = sorted(c_list, key = lambda k : info.cost[k][r], reverse=False)
+        c_list = sorted(c_list, key = lambda n : m[n][r], reverse=False)
 
-        ##
         c = c_list[randint(0, i-1)]
-        ##
 
-        r_value = info.rnd[info.rnd_index]
-        info.rnd_index += 1
-
-        c = c_list[r_value]
+        index = rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
+        c = c_list[index]
 
         s.append(c)
         r = c
@@ -84,34 +84,44 @@ def construction(alpha : float, info : tInfo) -> List[int]:
 
     return s
 
-def subseq_load(solut : tSolution, info : tInfo) -> NoReturn:
-    for i in range(0, info.dimen+1):
-        k : int = 1 - i - int(not i)
+def subseq_info_load(sol, seq):
+    i = 0
+    d = n + 1
+    W = 0
+    T = 1
+    C = 2
+    while i < d:
+        k = 1 - i - int(not i)
 
-        solut.seq[i][i][info.T] = 0.0
-        solut.seq[i][i][info.C] = 0.0
-        solut.seq[i][i][info.W] = float(int(not (i == 0)))
+        seq[i][i][T] = 0.0
+        seq[i][i][C] = 0.0
+        seq[i][i][W] = int(not (i == 0))
 
-        for j in range(i+1, info.dimen+1):
-        #while j < d:
-            #print(i, j)
-            j_prev : int = j - 1
+        j = i + 1
+        while j < d:
+            a = j - 1
 
-            solut.seq[i][j][info.T] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T]
-            solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C]
-            solut.seq[i][j][info.W] = float(j + k)
+            seq[i][j][T] = m[sol[a]][sol[j]] + seq[i][a][T]
+            seq[i][j][C] = seq[i][j][T] + seq[i][a][C]
+            seq[i][j][W] = j + k
 
-        #exit(0)
+            """
+            seq[T][j][i] = seq[T][i][j]
+            seq[C][j][i] = seq[C][i][j]
+            seq[W][j][i] = seq[W][i][j]
+            """
 
-    solut.cost = solut.seq[0][info.dimen][info.C] - info.EPSILON
+            j += 1
 
-def swap(s : List[int], i : int, j : int) -> NoReturn:
+        i += 1
+
+def swap(s, i, j):
     s[i], s[j] = s[j], s[i]
 
-def reverse(s : List[int], i : int, j : int) -> NoReturn:
+def reverse(s, i, j):
     s[i:j+1] = s[i:j+1][::-1]
 
-def reinsert(s : List[int], i : int, j : int, pos : int) -> NoReturn:
+def reinsert(s, i, j, pos):
     if i < pos:
         s[pos:pos] = s[i:j+1]
         s[:] = s[:i] + s[j+1:]
@@ -121,293 +131,238 @@ def reinsert(s : List[int], i : int, j : int, pos : int) -> NoReturn:
         s[pos:pos] = sub
 
 
-def search_swap(solut : tSolution, info : tInfo) -> bool:
-    cost_new : float
-    cost_concat_1 : float
-    cost_concat_2 : float
-    cost_concat_3 : float
-    cost_concat_4 : float
+def search_swap(s, seq):
+    cost_best = float('inf')
+    I = None
+    J = None
 
-    cost_best : float = float('inf')
-    I : int = -1
-    J : int = -1
+    for i in range(1, (n-1) ):
+        i_prev = i - 1
+        i_next = i + 1
 
-    for i in range(1, (info.dimen-1)):
-        i_prev : int = i - 1
-        i_next : int = i + 1
+        cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[i_next]]
+        cost_concat_2 = cost_concat_1 + seq[i][i_next][T] + m[s[i]][s[i_next+1]]
 
-        cost_concat_1 = solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[i_next]]
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T] + info.cost[solut.s[i]][solut.s[i_next+1]]
+        cost = seq[0][i_prev][C]                                            + \
+                seq[i][i_next][W]   * (cost_concat_1) + m[s[i_next]][s[i]]  + \
+                seq[i_next+1][n][W] * (cost_concat_2) + seq[i_next+1][n][C]
 
-        cost_new = solut.seq[0][i_prev][info.C]                                            + \
-                solut.seq[i][i_next][info.W]   * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  + \
-                solut.seq[i_next+1][info.dimen][info.W] * (cost_concat_2) + solut.seq[i_next+1][info.dimen][info.C]
-
-        if cost_new < cost_best:
-            cost_best = cost_new - info.EPSILON
+        if cost < cost_best:
+            cost_best = cost - EPSILON
             I = i
             J = i_next
-            #print(cost_best, I, J)
 
-        for j in range(i_next+1, (info.dimen)):
-            j_next : int = j + 1
-            j_prev : int = j - 1
+        for j in range(i_next+1, (n)):
+            j_next = j + 1
+            j_prev = j - 1
 
-            cost_concat_1 = solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j]]
-            cost_concat_2 = cost_concat_1 + info.cost[solut.s[j]][solut.s[i_next]]
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T] + info.cost[solut.s[j_prev]][solut.s[i]]
-            cost_concat_4 = cost_concat_3 + info.cost[solut.s[i]][solut.s[j_next]]
+            cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[j]]
+            cost_concat_2 = cost_concat_1 + m[s[j]][s[i_next]]
+            cost_concat_3 = cost_concat_2 + seq[i_next][j_prev][T] + m[s[j_prev]][s[i]]
+            cost_concat_4 = cost_concat_3 + m[s[i]][s[j_next]]
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                + \
+            """
+            cost = 1st subseq                       +
+                    concat 2nd subseq (sigle node)  + 
+                    concat 3rd subseq               +
+                    concat 4th subseq (single node) +
+                    concat 5th subseq
+            """
+
+            cost = seq[0][i_prev][C]                                                + \
                     cost_concat_1                                                   + \
-                    solut.seq[i_next][j_prev][info.W] * cost_concat_2 + solut.seq[i_next][j_prev][info.C] + \
+                    seq[i_next][j_prev][W] * cost_concat_2 + seq[i_next][j_prev][C] + \
                     cost_concat_3                                                   + \
-                    solut.seq[j_next][info.dimen][info.W] * cost_concat_4 + solut.seq[j_next][info.dimen][info.C]
+                    seq[j_next][n][W] * cost_concat_4 + seq[j_next][n][C]
 
-            if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+            if cost < cost_best:
+                cost_best = cost - EPSILON
                 I = i
                 J = j
-                #print(cost_best, I, J)
 
-    #print(cost_best, solut.cost, I, J)
-    if cost_best < solut.cost - info.EPSILON:
-        swap(solut.s, I, J)
-        subseq_load(solut, info)
-        return True
-    #print(seq[C][0][n])
-        #if cost_best != seq[C][0][n]:
-        #   print("ERRR")
-       #global improv_flag
-       #global improv_swap
-       #print("\nswap")
-       #print(cost_best)
-       #print(solut.cost)
+    if cost_best < seq[0][n][C] - EPSILON:
+        #print(cost_best, I, J)
+        swap(s, I, J)
+        subseq_info_load(s, seq)
+        #print(seq[C][0][n])
+        global improv_flag
+        improv_flag = True
 
-    return False
-
-def search_two_opt(solut : tSolution, info : tInfo) -> bool:
-    cost_new : float
-    cost_concat_1 : float
-    cost_concat_2 : float
+def search_two_opt(s, seq):
     cost_best = float('inf')
-    I : int
-    J : int
 
-    for i in range(1, info.dimen-1):
-        i_prev : int = i - 1
+    for i in range(1, n-1):
+        i_prev = i - 1
         
-        reverse_cost : float = solut.seq[i][i+1][info.T]
-        for j in range(i+2, info.dimen):
-            j_next : int = j + 1
+        reverse_cost = seq[i][i+1][T]
+        for j in range(i+2, n):
+            j_next = j + 1
 
-            reverse_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1)
+            reverse_cost += m[s[j-1]][s[j]] * (seq[i][j][W]-1)
 
-            cost_concat_1 = solut.seq[0][i_prev][info.T] + info.cost[solut.s[j]][solut.s[i_prev]]
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T] + info.cost[solut.s[j_next]][solut.s[i]]
+            cost_concat_1 = seq[0][i_prev][T] + m[s[j]][s[i_prev]]
+            cost_concat_2 = cost_concat_1 + seq[i][j][T] + m[s[j_next]][s[i]]
 
-            cost_new = solut.seq[0][i_prev][info.C]                                        + \
-                    solut.seq[i][j][info.W] * cost_concat_1 + reverse_cost             + \
-                    solut.seq[j_next][info.dimen][info.W] * (cost_concat_2) + solut.seq[j_next][info.dimen][info.C]
+            """
+            cost = 1st subseq                           +
+                    concat 2nd subseq (reversed seq)    + 
+                    concat 3rd subseq               
+            """
+
+            cost = seq[0][i_prev][C]                                        + \
+                    seq[i][j][W] * cost_concat_1 + reverse_cost             + \
+                    seq[j_next][n][W] * (cost_concat_2) + seq[j_next][n][C]
 
             #print(cost, i, "        ", j)
             #print(seq[C][0][i_prev], seq[W][i][j] * cost_concat_1,seq[W][j_next][n] * (cost_concat_2), seq[C][j_next][n] )
-            if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+            if cost < cost_best:
+                cost_best = cost - EPSILON
                 I = i
                 J = j
 
-            #if i == 2 and j == 10:
-                #print ("opaa")
-
-    if cost_best < solut.cost - info.EPSILON:
+    if cost_best < seq[0][n][C] - EPSILON:
         #print(cost_best)
         #print(I, J)
-        reverse(solut.s, I, J)
-        subseq_load(solut, info)
-#       global improv_flag
-#       global improv_two_opt
-#       improv_flag = True
-#       improv_two_opt += 1
-       #print("\ntwo_opt")
-       #print(cost_best)
-       #print(solut.cost)
-        return True
-
-    return False
-
-"""
-Movimento avalido me maneira incorreta (nesse caso). Os que presenciei aparentavam realizar a avaliacao de maneira correta
-[0, 7, 8, 10, 12, 6, 5, 4, 1, 2, 3, 11, 13, 9, 0]
-[0, 7, 8, 10, 12, 6, 11, 5, 4, 1, 2, 3, 13, 9, 0]
-
-reinsertion 1
-15752.0
-24694.0
-11 11 5
-"""
-
-# TODO (EUEU) testar acessando as infos das estruturas pelo 1o indice do array3D. Ex: seq[C][...
-
-#def search_reinsertion(solut , info , opt , seq ) :
-def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[List[List[float]]]) -> bool:
-    """
-    cost_concat_1 : float
-    cost_concat_2 : float
-    cost_concat_3 : float
-    cost_new : float
-    """
-
-    cost_best : float = float('inf')
-    #cost_best : float = float('inf')
-
-    """
-    I : int 
-    J : int 
-    POS : int
-    MAX : int = info.dimen - opt 
-    """
-    I = -1
-    J  = -1 
-    POS  = -1
-    MAX = info.dimen - opt 
+        reverse(s, I, J)
+        subseq_info_load(s, seq)
+        global improv_flag
+        improv_flag = True
 
 
-    #seq = solut.seq
+def search_reinsertion(s, seq, OPT):
+    cost_best = float('inf')
+    I = None
+    J = None
+    POS = None
+    opt = OPT - 1 
+    MAX = n - opt 
+
+    '''
+    #branchless approach
+    BEST = 1
+    J_arr = [None, None]
+    I_arr = [None, None]
+    POS_arr = [None, None]
+    COST_arr=[None, cost_best]
+    '''
 
     for i in range(1, MAX + 1):
-        j  = opt + i - 1
-        #j : int = opt + i - 1
+        j = opt + i - 1
 
-        j_next  = j+1
-        i_prev  = i-1
-       #j_next : int = j+1
-       #i_prev : int = i-1
+        j_next = j+1
+        i_prev = i-1
 
         for k in range(0, i_prev):
-            k_next  = k+1
-            #k_next : int = k+1
+            k_next = k+1
 
+            cost_concat_1 = seq[0][k][T] + m[s[k]][s[i]]
+            cost_concat_2 = cost_concat_1 + seq[i][j][T] + m[s[j]][s[k_next]]
+            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][T] + m[s[i_prev]][s[j_next]]
 
-            cost_concat_1 =                 seq[0]     [k]     [info.T] + info.cost[solut.s[k]]     [solut.s[i]]
-            cost_concat_2 = cost_concat_1 + seq[i]     [j]     [info.T] + info.cost[solut.s[j]]     [solut.s[k_next]]
-            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
+            """
+            cost = 1st subseq                           +
+                    concat 2nd subseq (reinserted seq)  + 
+                    concat 3rd subseq                   +
+                    concat 4th subseq  
+            """
 
+            cost = seq[0][k][C]                                                         + \
+                    seq[i][j][W]            * cost_concat_1 + seq[i][j][C]              + \
+                    seq[k_next][i_prev][W]  * cost_concat_2 + seq[k_next][i_prev][C]    + \
+                    seq[j_next][n][W]       * cost_concat_3 + seq[j_next][n][C]
 
-            cost_new = seq[0][k][info.C]                                                                     + \
-                    seq[i]     [j]         [info.W]  * cost_concat_1 + seq[i]     [j]         [info.C] + \
-                    seq[k_next][i_prev]    [info.W]  * cost_concat_2 + seq[k_next][i_prev]    [info.C] + \
-                    seq[j_next][info.dimen][info.W]  * cost_concat_3 + seq[j_next][info.dimen][info.C]
-
-            if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+            if cost < cost_best:
+                cost_best = cost - EPSILON
                 I = i
                 J = j
                 POS = k
-            #if i == 11 and k == 5:
-                #print ("opa")
+            '''
+            #branchless approach
+            if_state = int(cost < COST_arr[BEST])
+            COST_arr[if_state] = cost - EPSILON
+            I_arr[if_state] = i
+            J_arr[if_state] = j
+            POS_arr[if_state] = k
+            '''
 
 
         for k in range(i+opt, MAX - 1):
             k_next = k+1
-            #k_next : int = k+1
 
-            cost_concat_1 =                 seq[0]     [i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
-            cost_concat_2 = cost_concat_1 + seq[j_next][k]     [info.T] + info.cost[solut.s[k]]     [solut.s[i]]
-            cost_concat_3 = cost_concat_2 + seq[i]     [j]     [info.T] + info.cost[solut.s[j]]     [solut.s[k_next]]
+            cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[j_next]]
+            cost_concat_2 = cost_concat_1 + seq[j_next][k][T] + m[s[k]][s[i]]
+            cost_concat_3 = cost_concat_2 + seq[i][j][T] + m[s[j]][s[k_next]]
 
+            """
+            cost = 1st subseq                           +
+                    concat 2nd subseq                   + 
+                    concat 3rd subseq  (reinserted seq) +
+                    concat 4th subseq  
+            """
 
-            cost_new = seq[0][i_prev][info.C]                                        + \
-                    seq[j_next][k][info.W]   * cost_concat_1 + seq[j_next][k][info.C] + \
-                    seq[i][j][info.W]        * cost_concat_2 + seq[i][j][info.C]      + \
-                    seq[k_next][info.dimen][info.W]   * cost_concat_3 + seq[k_next][info.dimen][info.C]
+            cost = seq[0][i_prev][C]                                        + \
+                    seq[j_next][k][W]   * cost_concat_1 + seq[j_next][k][C] + \
+                    seq[i][j][W]        * cost_concat_2 + seq[i][j][C]      + \
+                    seq[k_next][n][W]   * cost_concat_3 + seq[k_next][n][C]
 
-            if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+            if cost < cost_best:
+                cost_best = cost - EPSILON
                 I = i
                 J = j
                 POS = k
+            '''
+            #branchless approach
+            if_state = int(cost < COST_arr[BEST])
+            COST_arr[if_state] = cost - EPSILON
+            I_arr[if_state] = i
+            J_arr[if_state] = j
+            POS_arr[if_state] = k
+            '''
 
     #if COST_arr[BEST] < seq[C][0][n] - EPSILON:
-    if cost_best < solut.cost - info.EPSILON:
+    if cost_best < seq[0][n][C] - EPSILON:
         #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
-        #print(solut.s)
-        reinsert(solut.s, I, J, POS+1)
-        #print(solut.s)
-        subseq_load(solut, info)
-        """
-        print("\nreinsertion", opt)
-        print(cost_best)
-        print(solut.cost)
-        """
+        reinsert(s, I, J, POS+1)
+        subseq_info_load(s, seq)
+        global improv_flag
+        improv_flag = True
 
-       #if(cost_best != solut.cost):
-       #    print(I, J, POS)
-       #    exit(0)
-        return True
+def RVND(s, subseq, rnd):
 
-    return False
-
-def RVND(solut : tSolution, info : tInfo) -> NoReturn:
-
-   #global t_reinsertion
-   #global t_or_opt2 
-   #global t_or_opt3 
-   #global t_swap 
-   #global t_two_opt 
-
-   #global improv_flag
-    #neighbd_list = [ TWO_OPT]
-    neighbd_list : List[int] = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
-
-    #print(solut.s)
+    global improv_flag
+    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
     while len(neighbd_list) > 0:
-        ##
         i = randint(0, len(neighbd_list)-1)
-        ##
-        i = info.rnd[info.rnd_index]
-        #print(info.rnd_index, i )
-        #print(neighbd_list)
-        info.rnd_index += 1
 
+        i = rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
 
         neighbd = neighbd_list[i]
 
-        improve : bool = False
+        improv_flag = False
 
-        if neighbd == info.SWAP:
-            #t_swap -= time.time()
-            improve = search_swap(solut, info)
-            #t_swap += time.time()
-        elif neighbd == info.TWO_OPT:
-           #t_two_opt -= time.time()
-            improve = search_two_opt(solut, info)
-           #t_two_opt += time.time()
-        elif neighbd == info.REINSERTION:
-           #t_reinsertion -= time.time()
-            improve = search_reinsertion(solut, info, info.REINSERTION, solut.seq)
-           #t_reinsertion += time.time()
-        elif neighbd == info.OR_OPT_2:
-           #t_or_opt2 -= time.time()
-            improve = search_reinsertion(solut, info, info.OR_OPT_2, solut.seq)
-           #t_or_opt2 += time.time()
-        elif neighbd == info.OR_OPT_3:
-           #t_or_opt3 -= time.time()
-            improve = search_reinsertion(solut, info, info.OR_OPT_3, solut.seq)
-           #t_or_opt3 += time.time()
+        if neighbd == SWAP:
+            search_swap(s, subseq)
+        elif neighbd == TWO_OPT:
+            search_two_opt(s, subseq)
+        elif neighbd == REINSERTION:
+            search_reinsertion(s, subseq, REINSERTION)
+        elif neighbd == OR_OPT_2:
+            search_reinsertion(s, subseq, OR_OPT_2)
+        elif neighbd == OR_OPT_3:
+            search_reinsertion(s, subseq, OR_OPT_3)
 
-        #print(improve)
-
-        if improve == True:
-            neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
-            
+        if improv_flag == True:
+            neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
         else:
             neighbd_list.pop(i)
 
-def perturb(sl : List[int], info : tInfo) -> List[int]:
-    s = sl.copy()
+    return s
 
+def perturb(sl, rnd):
+    s = sl[:]
+    #s = sl.copy()
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
@@ -415,23 +370,22 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
     size_min = 2
 
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        ##
         A_start = randint(1, len(s) - 1 - size_max)
         A_end = A_start + randint(size_min, size_max)
 
         B_start = randint(1, len(s) - 1 - size_max)
         B_end = B_start + randint(size_min, size_max)
-        ##
 
-        A_start = info.rnd[info.rnd_index]
-        info.rnd_index += 1
-        A_end = A_start + info.rnd[info.rnd_index]
-        info.rnd_index += 1
 
-        B_start = info.rnd[info.rnd_index]
-        info.rnd_index += 1
-        B_end = B_start + info.rnd[info.rnd_index]
-        info.rnd_index += 1
+        A_start = rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
+        A_end = A_start + rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
+
+        B_start = rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
+        B_end = B_start + rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
 
     if A_start < B_start:
         reinsert(s, B_start, B_end-1, A_end)
@@ -440,106 +394,73 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
         reinsert(s, A_start, A_end-1, B_end)
         reinsert(s, B_start, B_end-1, A_end )
 
+
     return s
 
-def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn:
+def GILS_RVND(Imax, Iils, R, rnd):
 
-    solut_partial : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
-    solut_crnt : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
-    solut_best : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), float('inf'))
+    cost_best = float('inf')
+    s_best = []
+
+
+    subseq = subseq_info_fill(n)
 
     for i in range(Imax):
-        ##
-        alpha : float = R[randint(0, len(R)-1)]
-        ##
+        alpha = R[randint(0, len(R)-1)]
 
-        r_value = info.rnd[info.rnd_index]
-        print(r_value)
-        info.rnd_index += 1
+        index = rnd.rnd[rnd.rnd_index]
+        rnd.rnd_index += 1
 
-        alpha : float = R[r_value]
+        alpha = R[index]
 
         print("[+] Local Search {}".format(i+1))
-        solut_crnt.s = construction(alpha, info)
-        subseq_load(solut_crnt, info)
-
-        solut_partial.s = solut_crnt.s.copy()
-        solut_partial.cost = solut_crnt.cost
-        print("\t[+] Constructing Inital Solution..", solut_crnt.cost)
+        print("\t[+] Constructing Inital Solution..")
+        s = construction(alpha, rnd)
+        subseq_info_load(s, subseq)
+        sl = s[:]
+        #sl = s.copy()
+        rvnd_cost_best = subseq[0][n][C] - EPSILON
 
         print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
-            #print("ILS")
-            RVND(solut_crnt, info)
-
-            if solut_crnt.cost < solut_partial.cost:
-                solut_partial.s = (solut_crnt.s).copy()
-                solut_partial.cost = solut_crnt.cost
+            RVND(s, subseq, rnd)
+            rvnd_cost_crnt  = subseq[0][n][C] - EPSILON
+            if rvnd_cost_crnt < rvnd_cost_best:
+                rvnd_cost_best = rvnd_cost_crnt
+                sl = s[:]
+                #sl = s.copy()
                 iterILS = 0
 
-            #t_perturb -= time.time()
-            solut_crnt.s = perturb(solut_partial.s, info)
-            #t_perturb += time.time()
-            subseq_load(solut_crnt, info)
+            s = perturb(sl, rnd)
+            subseq_info_load(s, subseq)
             iterILS += 1
 
-        subseq_load(solut_partial, info)
+        subseq_info_load(sl, subseq)
+        sl_cost = subseq[0][n][C] - EPSILON
 
-        if solut_partial.cost < solut_best.cost:
-            solut_best.s = solut_partial.s.copy()
-            solut_best.cost = solut_partial.cost
+        if sl_cost < cost_best:
+            s_best = sl
+            cost_best = sl_cost
 
-        print("\tCurrent best solution cost: {}".format(solut_best.cost))
+        print("\tCurrent best solution cost: {}".format(cost_best))
 
-    print("COST: {}".format (solut_best.cost))
-    print("SOLUTION: {}".format(solut_best.s))
-   #print("Total Iterations RVND {}".format(IT))
-   #print("swap", improv_swap)
-   #print("two_opt", improv_two_opt)
-   #print("reinsertion", improv_reinsertion)
-   #print("or-opt_2", improv_or_2)
-   #print("or-opt_3", improv_or_3)
+    print("COST: {}".format (cost_best))
+    print("SOLUTION: {}".format( s_best))
+    print("Total Iterations RVND {}".format(IT))
 
-def main() -> NoReturn:
-    dimension :int
-    cost : Matrix
 
-    dimension , cost, rnd  = get_instance_info()
 
-    R : List[float] = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
 
-    Imax : int = 10
-    Iils : int = min(dimension, 100)
+def main(rnd):
 
-    info = tInfo(dimension, cost, rnd)
+    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
 
-    """
-    test = deepcopy(info)
+    Imax = 10
+    Iils = min(n, 100)
 
-    print(test.dimen)
+    GILS_RVND(Imax, Iils, R, tRnd(rnd))
 
-    solut = tSolution([i for i in range(info.dimen)], subseq_fill(info), 0)
-
-    solut.s.append(0)
-    subseq_load(solut, info)
-
-    print(solut.s, solut.seq, solut.cost)
-
-"""
-
-    start = time.time()
-    GILS_RVND(Imax, Iils, R, info)
-    print("TIME: %s " % (time.time() - start))
-
-    print("ITERACOES: ", info.IT)
-
-main()
-"""
-print("SWAP %s" % t_swap)
-print("Reinsert %s" % t_reinsertion)
-print("or_opt2 %s" % t_or_opt2)
-print("or_opt3 %s" % t_or_opt3)
-print("two_opt %s" % t_two_opt)
-print("subseq_load %s" % t_seq)
-"""
+start = time.time()
+main(rnd)
+print("TIME %s " % (time.time() - start))
