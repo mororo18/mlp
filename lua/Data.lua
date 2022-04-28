@@ -102,5 +102,5 @@ function readData(c, rnd)
     end
     --]]
 
-    return dimension, rnd_size
+    return dimension
 end
