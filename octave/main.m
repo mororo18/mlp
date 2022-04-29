@@ -1,5 +1,19 @@
 1;
 
+global dimen = 0;
+global cost;
+global fmax = Inf(1);
+
+global T = 1;
+global C = 2;
+global W = 3;
+
+global REINSERTION = 1;
+global OR_OPT_2 = 2;
+global OR_OPT_3 = 3;
+global SWAP = 4;
+global TWO_OPT = 5;
+    
 function print_s(s)
     sz = columns(s);
 
@@ -9,35 +23,42 @@ function print_s(s)
     printf('\n')
 end
 
-function ret = subseq_load (sol, info)
+function ret = subseq_load (s)
+global dimen;
+global cost;
+global T;
+global C;
+global W;
     tern1 = [1, 0];
     tern2 = [0, 1];
-    for i = 1:info.dimen+1
+
+    seq = zeros(dimen+1, dimen+1, 3);
+    for i = 1:dimen+1
         k = 1 - i - tern1((i != 1) + 1);
 
-        sol.seq(i, i, info.T) = 0.0;
-        sol.seq(i, i, info.C) = 0.0;
-        sol.seq(i, i, info.W) = tern2((i != 1) + 1);
-        for j = i+1:info.dimen+1
+        seq(i, i, T) = 0.0;
+        seq(i, i, C) = 0.0;
+        seq(i, i, W) = tern2((i != 1) + 1);
+        for j = i+1:dimen+1
             j_prev = j-1;
 
-            sol.seq(i, j, info.T) = info.cost(sol.s(j_prev), sol.s(j)) + sol.seq(i, j_prev, info.T);
-            sol.seq(i, j, info.C) = sol.seq(i, j, info.T) + sol.seq(i, j_prev, info.C);
-            sol.seq(i, j, info.W) = j+k;
+            seq(i, j, T) = cost(s(j_prev), s(j)) + seq(i, j_prev, T);
+            seq(i, j, C) = seq(i, j, T) + seq(i, j_prev, C);
+            seq(i, j, W) = j+k;
 
         end
     end
 
-    sol.cost = sol.seq(1, info.dimen+1, info.C);
-    ret = sol;
+    ret = seq;
 end
 
-function ret = sort_by(arr, r, info)
+function ret = sort_by(arr, r)
+    global cost
     sz = columns(arr);
 
     for i = 1:sz
         for j = 1:sz-i
-            if (info.cost(r, arr(j)) > info.cost(r, arr(j+1)))
+            if (cost(r, arr(j)) > cost(r, arr(j+1)))
                 tmp = arr(j);
                 arr(j) = arr(j+1);
                 arr(j+1) = tmp;
@@ -48,24 +69,25 @@ function ret = sort_by(arr, r, info)
     ret = arr;
 end
 
-function [ret, index_new] = construction(alpha, info)
+function [ret, index_new] = construction(alpha, rnd)
+    global dimen
     s(1) = 1;
-    for i = 1:info.dimen-1
+    for i = 1:dimen-1
         cL(i) = i+1;
     end
 
     r = 1;
     while (columns(cL) > 0) 
-        cL = sort_by(cL, r, info);
+        cL = sort_by(cL, r );
 
         rng = ceil(columns(cL) * alpha);
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(rng * RND);
         
-        index = info.rnd(info.rnd_index) + 1;
+        index = rnd.rnd(rnd.rnd_index) + 1;
         %info.rnd(info.rnd_index);
-        info.rnd_index = info.rnd_index+1;
+        rnd.rnd_index = rnd.rnd_index+1;
 
         cN = cL(index);
 
@@ -76,7 +98,7 @@ function [ret, index_new] = construction(alpha, info)
 
     s(columns(s)+1) = 1;
     ret = s;
-    index_new = info.rnd_index;
+    index_new = rnd.rnd_index;
 end
 
 function ret = swap(s, i, j)
@@ -108,24 +130,31 @@ function ret = reinsert(s, i, j, pos)
     ret = s;
 end
 
-function [solut_new, ret] = search_swap(solut, info)
-    cost_best = info.fmax;
+function [solut_new, seq_new, ret] = search_swap(s, seq)
+    global fmax;
+    global dimen;
+    global cost;
+    global T;
+    global C;
+    global W;
+
+    cost_best = fmax;
     cost_new = 0.0;
     cost_concat_1 = 0.0;
     cost_concat_2 = 0.0;
     cost_concat_3 = 0.0;
     cost_concat_4 = 0.0;
 
-    for i = 2:info.dimen-1
+    for i = 2:dimen-1
         i_prev = i-1;
         i_next = i+1;
 
-        cost_concat_1 =                 solut.seq(1, i_prev, info.T) + info.cost(solut.s(i_prev), solut.s(i_next));
-        cost_concat_2 = cost_concat_1 + solut.seq(i, i_next, info.T) + info.cost(solut.s(i), solut.s(i_next+1));
+        cost_concat_1 =                 seq(1, i_prev, T) + cost(s(i_prev), s(i_next));
+        cost_concat_2 = cost_concat_1 + seq(i, i_next, T) + cost(s(i), s(i_next+1));
 
-        cost_new = solut.seq(1, i_prev, info.C)                                                    + ...
-                solut.seq(i, i_next, info.W)               * (cost_concat_1) + info.cost(solut.s(i_next), solut.s(i))  + ...
-                solut.seq(i_next+1, info.dimen+1, info.W)   * (cost_concat_2) + solut.seq(i_next+1, info.dimen+1, info.C);
+        cost_new = seq(1, i_prev, C)                                                    + ...
+                seq(i, i_next, W)               * (cost_concat_1) + cost(s(i_next), s(i))  + ...
+                seq(i_next+1, dimen+1, W)   * (cost_concat_2) + seq(i_next+1, dimen+1, C);
 
         if (cost_new < cost_best)
             cost_best = cost_new - eps;
@@ -133,23 +162,23 @@ function [solut_new, ret] = search_swap(solut, info)
             J_best = i_next;
         end
 
-        for j = i_next+1:info.dimen
+        for j = i_next+1:dimen
 
             j_prev = j-1;
             j_next = j+1;
 
 
-            cost_concat_1 =                 solut.seq(1, i_prev, info.T)       + info.cost(solut.s(i_prev), solut.s(j));
-            cost_concat_2 = cost_concat_1                           + info.cost(solut.s(j), solut.s(i_next));
-            cost_concat_3 = cost_concat_2 + solut.seq(i_next, j_prev, info.T)  + info.cost(solut.s(j_prev), solut.s(i));
-            cost_concat_4 = cost_concat_3                           + info.cost(solut.s(i), solut.s(j_next));
+            cost_concat_1 =                 seq(1, i_prev, T)       + cost(s(i_prev), s(j));
+            cost_concat_2 = cost_concat_1                           + cost(s(j), s(i_next));
+            cost_concat_3 = cost_concat_2 + seq(i_next, j_prev, T)  + cost(s(j_prev), s(i));
+            cost_concat_4 = cost_concat_3                           + cost(s(i), s(j_next));
 
 
-            cost_new = solut.seq(1, i_prev, info.C)                                                 + ...     % 1st subseq
+            cost_new = seq(1, i_prev, C)                                                 + ...     % 1st subseq
                     cost_concat_1 + ...                                                           % concat 2nd subseq (single node)
-                    solut.seq(i_next, j_prev, info.W)      * cost_concat_2 + solut.seq(i_next, j_prev, info.C) + ...    % concat 3rd subseq
+                    seq(i_next, j_prev, W)      * cost_concat_2 + seq(i_next, j_prev, C) + ...    % concat 3rd subseq
                     cost_concat_3 + ...                                                           % concat 4th subseq (single node)
-                    solut.seq(j_next, info.dimen+1, info.W) * cost_concat_4 + solut.seq(j_next, info.dimen+1, info.C);   % concat 5th subseq
+                    seq(j_next, dimen+1, W) * cost_concat_4 + seq(j_next, dimen+1, C);   % concat 5th subseq
 
             if (cost_new < cost_best)
                 cost_best = cost_new - eps;
@@ -161,42 +190,51 @@ function [solut_new, ret] = search_swap(solut, info)
         
     end
 
-    if (cost_best < solut.cost - eps)
+    if (cost_best < seq(1, dimen+1, C) - eps)
         %cost_best
-        solut.s = swap(solut.s, I_best, J_best);
-        solut = subseq_load(solut, info);
+        s = swap(s, I_best, J_best);
+        seq = subseq_load(s);
         %solut.cost
-        solut_new = solut;
+        solut_new = s;
+        seq_new = seq;
         ret = true;
     else
-        solut_new = solut;
+        solut_new = s;
+        seq_new = seq;
         ret = false;
     end
 
 end
 
-function [solut_new, ret] = search_two_opt(solut, info)
+function [solut_new, seq_new ret] = search_two_opt(s, seq)
+    global fmax;
+    global dimen;
+    global cost;
 
-    cost_best = info.fmax;
+    global T;
+    global C;
+    global W;
+
+    cost_best = fmax;
     cost_new = 0.0;
     cost_concat_1 = 0.0;
     cost_concat_2 = 0.0;
 
-    for i = 2:info.dimen-1
+    for i = 2:dimen-1
         i_prev = i-1;
-        rev_seq_cost = solut.seq(i, i+1, info.T);
+        rev_seq_cost = seq(i, i+1, T);
 
-        for j = i+2:info.dimen
+        for j = i+2:dimen
             j_next = j+1;
 
-            rev_seq_cost = rev_seq_cost + info.cost(solut.s(j-1), solut.s(j)) * (solut.seq(i, j, info.W)-1.0);
+            rev_seq_cost = rev_seq_cost + cost(s(j-1), s(j)) * (seq(i, j, W)-1.0);
 
-            cost_concat_1 =                 solut.seq(1, i_prev, info.T)   + info.cost(solut.s(j), solut.s(i_prev));
-            cost_concat_2 = cost_concat_1 + solut.seq(i, j, info.T)        + info.cost(solut.s(j_next), solut.s(i));
+            cost_concat_1 =                 seq(1, i_prev, T)   + cost(s(j), s(i_prev));
+            cost_concat_2 = cost_concat_1 + seq(i, j, T)        + cost(s(j_next), s(i));
 
-            cost_new = solut.seq(1, i_prev, info.C)                                                        + ... %   1st subseq
-                    solut.seq(i, j, info.W)                * cost_concat_1 + rev_seq_cost                  + ... % concat 2nd subseq (reversed seq)
-                    solut.seq(j_next, info.dimen+1, info.W) * cost_concat_2 + solut.seq(j_next, info.dimen+1, info.C);       % concat 3rd subseq
+            cost_new = seq(1, i_prev, C)                                                        + ... %   1st subseq
+                    seq(i, j, W)                * cost_concat_1 + rev_seq_cost                  + ... % concat 2nd subseq (reversed seq)
+                    seq(j_next, dimen+1, W) * cost_concat_2 + seq(j_next, dimen+1, C);       % concat 3rd subseq
 
             if (cost_new < cost_best)
                 cost_best = cost_new - eps;
@@ -206,28 +244,38 @@ function [solut_new, ret] = search_two_opt(solut, info)
         end
     end
 
-    if (cost_best < solut.cost - eps)
+    if (cost_best < seq(1, dimen+1, C) - eps)
         %cost_best
-        solut.s = reverse(solut.s, I_best, J_best);
-        solut = subseq_load(solut, info);
+        s = reverse(s, I_best, J_best);
+        seq = subseq_load(s);
         %solut.cost
-        solut_new = solut;
+        solut_new = s;
+        seq_new = seq;
         ret = true;
     else
-        solut_new = solut;
+        solut_new = s;
+        seq_new = seq;
         ret = false;
     end
 
 end
 
-function [solut_new, ret] = search_reinsertion(solut, info, opt)
-    cost_best = info.fmax;
+function [solut_new, seq_new, ret] = search_reinsertion(s, seq, opt)
+    global fmax;
+    global dimen;
+    global cost;
+
+    global T;
+    global C;
+    global W;
+
+    cost_best = fmax;
     cost_new = 0.0;
     cost_concat_1 = 0.0;
     cost_concat_2 = 0.0;
     cost_concat_3 = 0.0;
 
-    for i = 2:info.dimen-opt+1
+    for i = 2:dimen-opt+1
         j = opt+i-1;
         i_prev = i-1;
         j_next = j+1;
@@ -235,15 +283,15 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt)
         for k = 1:i_prev-1
             k_next = k+1;
 
-            cost_new =  solut.seq(1, info.dimen+1, info.C);
-            cost_concat_1 =                 solut.seq(1, k, info.T)            + info.cost(solut.s(k), solut.s(i));
-            cost_concat_2 = cost_concat_1 + solut.seq(i, j, info.T)            + info.cost(solut.s(j), solut.s(k_next));
-            cost_concat_3 = cost_concat_2 + solut.seq(k_next, i_prev, info.T)  + info.cost(solut.s(i_prev), solut.s(j_next));
+            cost_new =  seq(1, dimen+1, C);
+            cost_concat_1 =                 seq(1, k, T)            + cost(s(k), s(i));
+            cost_concat_2 = cost_concat_1 + seq(i, j, T)            + cost(s(j), s(k_next));
+            cost_concat_3 = cost_concat_2 + seq(k_next, i_prev, T)  + cost(s(i_prev), s(j_next));
 
-            cost_new = solut.seq(1, k, info.C)                                                             + ... %       1st subseq
-                    solut.seq(i, j, info.W)                * cost_concat_1 + solut.seq(i, j, info.C)                  + ... % concat 2nd subseq (reinserted seq)
-                    solut.seq(k_next, i_prev, info.W)      * cost_concat_2 + solut.seq(k_next, i_prev, info.C)        + ... % concat 3rd subseq
-                    solut.seq(j_next, info.dimen+1, info.W) * cost_concat_3 + solut.seq(j_next, info.dimen+1, info.C);      % concat 4th subseq
+            cost_new = seq(1, k, C)                                                             + ... %       1st subseq
+                    seq(i, j, W)                * cost_concat_1 + seq(i, j, C)                  + ... % concat 2nd subseq (reinserted seq)
+                    seq(k_next, i_prev, W)      * cost_concat_2 + seq(k_next, i_prev, C)        + ... % concat 3rd subseq
+                    seq(j_next, dimen+1, W) * cost_concat_3 + seq(j_next, dimen+1, C);      % concat 4th subseq
 
             if (cost_new < cost_best)
                 cost_best = cost_new - eps;
@@ -254,17 +302,17 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt)
 
         end
 
-        for k = i+opt:info.dimen-opt-1
+        for k = i+opt:dimen-opt-1
             k_next = k+1;
 
-            cost_concat_1 =                 solut.seq(1, i_prev, info.T)   + info.cost(solut.s(i_prev), solut.s(j_next));
-            cost_concat_2 = cost_concat_1 + solut.seq(j_next, k, info.T)   + info.cost(solut.s(k), solut.s(i));
-            cost_concat_3 = cost_concat_2 + solut.seq(i, j, info.T)        + info.cost(solut.s(j), solut.s(k_next));
+            cost_concat_1 =                 seq(1, i_prev, T)   + cost(s(i_prev), s(j_next));
+            cost_concat_2 = cost_concat_1 + seq(j_next, k, T)   + cost(s(k), s(i));
+            cost_concat_3 = cost_concat_2 + seq(i, j, T)        + cost(s(j), s(k_next));
 
-            cost_new = solut.seq(1, i_prev, info.C)                                                        + ... %       1st subseq
-                    solut.seq(j_next, k, info.W)           * cost_concat_1 + solut.seq(j_next, k, info.C)             + ... % concat 2nd subseq
-                    solut.seq(i, j, info.W)                * cost_concat_2 + solut.seq(i, j, info.C)                  + ... % concat 3rd subseq (reinserted seq)
-                    solut.seq(k_next, info.dimen+1, info.W) * cost_concat_3 + solut.seq(k_next, info.dimen+1, info.C);      % concat 4th subseq
+            cost_new = seq(1, i_prev, C)                                                        + ... %       1st subseq
+                    seq(j_next, k, W)           * cost_concat_1 + seq(j_next, k, C)             + ... % concat 2nd subseq
+                    seq(i, j, W)                * cost_concat_2 + seq(i, j, C)                  + ... % concat 3rd subseq (reinserted seq)
+                    seq(k_next, dimen+1, W) * cost_concat_3 + seq(k_next, dimen+1, C);      % concat 4th subseq
 
             if (cost_new < cost_best)
                 cost_best = cost_new - eps;
@@ -275,58 +323,68 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt)
         end
     end
 
-    if (cost_best < solut.cost)
+    if (cost_best < seq(1, dimen+1, C))
         %cost_best
-        solut.s = reinsert(solut.s, I_best, J_best, POS_best+1);
-        solut = subseq_load(solut, info);
+        s = reinsert(s, I_best, J_best, POS_best+1);
+        seq = subseq_load(s);
         %solut.cost
-        solut_new = solut;
+
+        solut_new = s;
+        seq_new = seq;
         ret = true;
     else
-        solut_new = solut;
+        solut_new = s;
+        seq_new = seq;
         ret = false;
     end
 
 end
 
-function [s, cost, index_new] = RVND(solut, info)
+function [s, cost, index_new] = RVND(solut, seq, rnd)
+    global SWAP;
+    global TWO_OPT;
+    global REINSERTION;
+    global OR_OPT_2;
+    global OR_OPT_3;
+    global C;
+    global dimen;
 
-    neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
+    neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
     while (columns(neighbd_list) > 0)
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(RND*columns(neighbd_list));
         %info.rnd(info.rnd_index);
-        index = info.rnd(info.rnd_index) + 1;
-        info.rnd_index = info.rnd_index + 1;
+        index = rnd.rnd(rnd.rnd_index) + 1;
+        rnd.rnd_index = rnd.rnd_index + 1;
 
         neighbd = neighbd_list(index);
 
         improve_flag = false;
         switch (neighbd)
-            case info.REINSERTION
-                [solut, improve_flag] = search_reinsertion(solut, info, info.REINSERTION);
-            case info.OR_OPT_2
-                [solut, improve_flag] = search_reinsertion(solut, info, info.OR_OPT_2);
-            case info.OR_OPT_3
-                [solut, improve_flag] = search_reinsertion(solut, info, info.OR_OPT_3);
-            case info.SWAP
-                [solut, improve_flag] = search_swap(solut, info);
-            case info.TWO_OPT
-                [solut, improve_flag] = search_two_opt(solut, info);
+            case REINSERTION
+                [solut, seq, improve_flag] = search_reinsertion(solut, seq, REINSERTION);
+            case OR_OPT_2
+                [solut, seq, improve_flag] = search_reinsertion(solut, seq, OR_OPT_2);
+            case OR_OPT_3
+                [solut, seq, improve_flag] = search_reinsertion(solut, seq, OR_OPT_3);
+            case SWAP
+                [solut, seq, improve_flag] = search_swap(solut, seq);
+            case TWO_OPT
+                [solut, seq, improve_flag] = search_two_opt(solut, seq);
         end
 
         if (improve_flag)
-            neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
+            neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
             index;
         else
             neighbd_list(index) = [];
         end
     end
 
-    s = solut.s;
-    cost = solut.cost;
-    index_new = info.rnd_index;
+    s = solut;
+    cost = seq(1, dimen+1, C);
+    index_new = rnd.rnd_index;
 end
 
 function ret = notnull_rnd()
@@ -335,54 +393,55 @@ function ret = notnull_rnd()
     ret = RND;
 end
 
-function [ret, index_new] = perturb(solut, info)
+function [ret, index_new] = perturb(s, rnd)
+    global dimen;
     A_start = 1;
     A_end = 1;
     B_start = 1;
     B_end = 1;
 
-    size_max = ceil((info.dimen+1) / 10);
+    size_max = ceil((dimen+1) / 10);
     size_max = [2, size_max]((size_max >= 2) + 1);
     size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
-        max_ = (info.dimen+1) -2 -size_max;
-        rnd = notnull_rnd();
-        A_start = ceil(max_ * rnd) + 1;
-        rnd = notnull_rnd();
-        A_end = A_start + ceil(((size_max-size_min) * rnd) + size_min);
+        max_ = (dimen+1) -2 -size_max;
+        RND = notnull_rnd();
+        A_start = ceil(max_ * RND) + 1;
+        RND = notnull_rnd();
+        A_end = A_start + ceil(((size_max-size_min) * RND) + size_min);
 
-        rnd = notnull_rnd();
-        B_start = ceil(max_ * rnd) + 1;
-        rnd = notnull_rnd();
-        B_end = B_start + ceil(((size_max-size_min) * rnd) + size_min);
+        RND = notnull_rnd();
+        B_start = ceil(max_ * RND) + 1;
+        RND = notnull_rnd();
+        B_end = B_start + ceil(((size_max-size_min) * RND) + size_min);
 
 
-        A_start = info.rnd(info.rnd_index) + 1;
+        A_start = rnd.rnd(rnd.rnd_index) + 1;
         %info.rnd(info.rnd_index)
-        info.rnd_index = info.rnd_index + 1;
-        A_end = A_start + info.rnd(info.rnd_index);
+        rnd.rnd_index = rnd.rnd_index + 1;
+        A_end = A_start + rnd.rnd(rnd.rnd_index);
         %info.rnd(info.rnd_index)
-        info.rnd_index = info.rnd_index + 1;
+        rnd.rnd_index = rnd.rnd_index + 1;
 
-        B_start = info.rnd(info.rnd_index) + 1;
+        B_start = rnd.rnd(rnd.rnd_index) + 1;
         %info.rnd(info.rnd_index)
-        info.rnd_index = info.rnd_index + 1;
-        B_end = B_start + info.rnd(info.rnd_index);
+        rnd.rnd_index = rnd.rnd_index + 1;
+        B_end = B_start + rnd.rnd(rnd.rnd_index);
         %info.rnd(info.rnd_index)
-        info.rnd_index = info.rnd_index + 1;
+        rnd.rnd_index = rnd.rnd_index + 1;
     end
 
     if (A_start < B_start)
-        solut.s = reinsert(solut.s, B_start, B_end - 1, A_end);
-        solut.s = reinsert(solut.s, A_start, A_end - 1, B_end);
+        s = reinsert(s, B_start, B_end - 1, A_end);
+        s = reinsert(s, A_start, A_end - 1, B_end);
     else
-        solut.s = reinsert(solut.s, A_start, A_end - 1, B_end);
-        solut.s = reinsert(solut.s, B_start, B_end - 1, A_end);
+        s = reinsert(s, A_start, A_end - 1, B_end);
+        s = reinsert(s, B_start, B_end - 1, A_end);
     end
 
-    ret = solut.s;
-    index_new = info.rnd_index;
+    ret = s;
+    index_new = rnd.rnd_index;
 end
 
 function ret = solut_init(info)
@@ -393,73 +452,76 @@ function ret = solut_init(info)
     ret = s;
 end
 
-function ret = GILS_RVND(Imax, Iils, R, info)
-    solut_crnt = solut_init(info);
-    solut_partial = solut_init(info);
-    solut_best = solut_init(info);
+function ret = GILS_RVND(Imax, Iils, R, rnd)
+    global dimen;
+    global C;
+    solut_crnt = zeros(dimen+1);
+    solut_partial = zeros(dimen+1);
+    solut_best = zeros(dimen+1);
+
+    cost_crnt = 0;
+    cost_partial = 0;
+    cost_best = Inf(1);
+
+    seq = zeros(dimen+1, dimen+1, 3);
 
     for i = 1:Imax
         RND = rand(1);
         RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(columns(R) * RND);
-        index = info.rnd(info.rnd_index) + 1;
-        info.rnd_index = info.rnd_index + 1;
+        index = rnd.rnd(rnd.rnd_index) + 1;
+        rnd.rnd_index = rnd.rnd_index + 1;
         alpha = R(index);
 
         printf("[+] Search %d\n", i)
         printf("\t[+] Constructing..\n");
         %"ITER ", i
 
-        [solut_crnt.s, info.rnd_index] = construction(alpha, info);
-        solut_crnt = subseq_load(solut_crnt, info);
+        [solut_crnt, rnd.rnd_index] = construction(alpha, rnd);
+        seq = subseq_load(solut_crnt);
+
+        cost_crnt = seq(1, dimen+1, C);
+        cost_partial = cost_crnt;
 
         solut_partial = solut_crnt;
         printf("\t[+] Looking for the best Neighbor..\n")
-        printf("\t    Construction Cost: %.2f\n", solut_partial.cost)
+        printf("\t    Construction Cost: %.2f\n", cost_partial)
 
         iterILS = 0;
         while (iterILS < Iils)
-            [solut_crnt.s, solut_crnt.cost, info.rnd_index] = RVND(solut_crnt, info);
+            [solut_crnt, cost_crnt, rnd.rnd_index] = RVND(solut_crnt, seq, rnd);
 
-            if (solut_crnt.cost < solut_partial.cost - eps)
-                solut_partial.s = solut_crnt.s;
-                solut_partial.cost = solut_crnt.cost;
+            if (cost_crnt < cost_partial - eps)
+                solut_partial = solut_crnt;
+                cost_partial = cost_crnt;
                 iterILS = 0;
             end
 
-            [solut_crnt.s, info.rnd_index] = perturb(solut_partial, info);
-            solut_crnt = subseq_load(solut_crnt, info);
+            [solut_crnt, rnd.rnd_index] = perturb(solut_partial, rnd);
+            seq = subseq_load(solut_crnt);
             iterILS++;
         end
 
-        if (solut_partial.cost < solut_best.cost)
+        if (cost_partial < cost_best)
             solut_best = solut_partial;
+            cost_best = cost_partial;
         end
 
-        printf("\tCurrent best cost: %.2f\n", solut_best.cost)
+        printf("\tCurrent best cost: %.2f\n", cost_best)
         printf('SOLUCAO: ')
-        print_s(solut_best.s)
-        %typeinfo(solut_crnt.s)
+        print_s(solut_best)
     end
 
-    printf('COST: %.2f\n', solut_best.cost)
+    printf('COST: %.2f\n', cost_best)
 
     ret = solut_best;
 end
 
 function main
-    [info.dimen, info.cost, info.rnd] = Data();
-    info;
-    info.fmax = Inf(1);
-    info.T = 1;
-    info.C = 2;
-    info.W = 3;
-    info.REINSERTION = 1;
-    info.OR_OPT_2 = 2;
-    info.OR_OPT_3 = 3;
-    info.SWAP = 4;
-    info.TWO_OPT = 5;
-    info.rnd_index = 1;
+    global dimen
+    global cost
+    [dimen, cost, rnd.rnd] = Data();
+    rnd.rnd_index = 1;
 
    %for i = 1:info.dimen
    %    sol.s(i) = i;
@@ -476,13 +538,12 @@ function main
    %s = reinsert(s, 6, 11, 2);
 
     Imax = 10;
-    Iils = [100, info.dimen]((info.dimen < 100) +1);
+    Iils = [100, dimen]((dimen < 100) +1);
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
     t0 = clock ();
-    s = GILS_RVND(Imax, Iils, R, info);
+    s = GILS_RVND(Imax, Iils, R, rnd);
     elapsed_time = etime (clock (), t0);
     printf('TIME: %.2f\n', elapsed_time)
-    s.s;
 end
 
 %val = jit_enable(1)
