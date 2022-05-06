@@ -3,9 +3,10 @@ module rData
 
 contains 
 
-    subroutine load_matrix(c, rnd)
+    subroutine load_matrix(c, rnd, dimen_ret)
       real, allocatable :: c (:,:)
       integer, allocatable :: rnd (:)
+      integer, intent(out) :: dimen_ret
 
       integer :: io
       character(len=2500) ::line
@@ -45,6 +46,8 @@ contains
       do i = 1, rnd_count
           read(io, '(I6)') rnd(i)
       end do
+
+      dimen_ret = dimen
 
       !print *, rnd(1)
 

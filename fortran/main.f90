@@ -1,6 +1,11 @@
 module data_types
     implicit none
 
+    type tRnd
+        integer, allocatable :: rnd(:)
+        integer :: rnd_index = 1
+    end type
+
     type tInfo
         integer :: dimen
         real, allocatable :: cost (:,:)
@@ -67,41 +72,48 @@ subroutine print_info(info)
 
 end subroutine
 
-subroutine subseq_load(sol, info)
+subroutine subseq_load(s, seq, dimen, cost)
     use data_types
-    type(tSolution) :: sol
-    type(tInfo) :: info
+    integer :: dimen
+    integer, dimension(dimen+1) :: s
+    real, dimension(dimen+1, dimen+1, 3) :: seq
+    real, dimension(dimen, dimen) :: cost
+
+    integer :: T = 1
+    integer :: C = 2
+    integer :: W = 3
+    real :: fmax = 3.4028235E+38
+
     integer :: i
     integer :: j
     integer :: k
     integer :: j_prev
 
-    do i = 1, info%dimen+1
+    do i = 1, dimen+1
         k = 1 - i - merge(0, 1, i /= 1)
 
-        sol%seq(i, i, info%T) = 0.0
-        sol%seq(i, i, info%C) = 0.0
-        sol%seq(i, i, info%W) = merge(1.0, 0.0, i /= 1)
-        do j = i+1, info%dimen+1
+        seq(i, i, T) = 0.0
+        seq(i, i, C) = 0.0
+        seq(i, i, W) = merge(1.0, 0.0, i /= 1)
+        do j = i+1, dimen+1
             j_prev = j-1
 
-            sol%seq(i,j,info%T) = info%cost(sol%s(j_prev), sol%s(j)) + sol%seq(i,j_prev,info%T)
-            sol%seq(i,j,info%C) = sol%seq(i,j,info%T) + sol%seq(i,j_prev,info%C)
-            sol%seq(i,j,info%W) = j+k
+            seq(i,j,T) = cost(s(j_prev), s(j)) + seq(i,j_prev,T)
+            seq(i,j,C) = seq(i,j,T) + seq(i,j_prev,C)
+            seq(i,j,W) = j+k
 
         end do
     end do
 
-    sol%cost = sol%seq(1, info%dimen+1, info%C)
-
 end subroutine
 
-subroutine sort(cL, lmt, r, info)
+subroutine sort(cL, lmt, r, dimen, cost)
     use data_types
     implicit none
 
-    type(tInfo) :: info
-    integer, dimension(info%dimen-1), intent(out) :: cL
+    integer :: dimen
+    real, dimension(dimen, dimen) :: cost(:,:)
+    integer, dimension(dimen-1), intent(out) :: cL
     integer :: lmt
     integer :: r
 
@@ -111,7 +123,7 @@ subroutine sort(cL, lmt, r, info)
 
     do i=1, lmt
         do j=1, lmt-i
-            if (info%cost(r, cL(j)) > info%cost(r, cL(j+1))) then
+            if (cost(r, cL(j)) > cost(r, cL(j+1))) then
                 tmp = cL(j)
                 cL(j) = cL(j+1)
                 cL(j+1) = tmp
@@ -142,33 +154,50 @@ subroutine arr_shift(arr, src, tgt, sz)
 
 end subroutine
 
-function construction(alpha, info) result(ret)
+function construction(alpha, dimen, cost, rnd) result(ret)
     use data_types
     implicit none
 
     real :: alpha
-    type(tInfo) :: info
-    integer, dimension(info%dimen+1) :: ret 
+    integer :: dimen
+    real, dimension(dimen, dimen) :: cost
+    type(tRnd) :: rnd
+
+    integer, dimension(dimen+1) :: ret 
 
     integer :: i
     integer :: j
-    integer, dimension(info%dimen+1) :: s
-    integer, dimension(info%dimen-1) :: cL
+    integer, dimension(dimen+1) :: s
+    integer, dimension(dimen-1) :: cL
     integer :: cL_size
     integer :: cN
     integer :: r
     integer :: rng
     integer :: index_
-    real :: RND
+    real :: RND_v
     integer :: cnt
 
+    interface
+
+        subroutine sort(cL, lmt, r, dimen, cost)
+            use data_types
+            implicit none
+
+            integer :: dimen
+            real, dimension(dimen, dimen) :: cost(:,:)
+            integer, dimension(dimen-1), intent(out) :: cL
+            integer :: lmt
+            integer :: r
+        end subroutine
+
+    end interface
 
     cnt = 0
 
-    cL_size = info%dimen-1
+    cL_size = dimen-1
 
     ! init cL
-    cL = (/ (I, I=2, info%dimen) /)
+    cL = (/ (I, I=2, dimen) /)
     !print *, cl
    !do i=2, info%dimen
    !    cL(i-1) = i
@@ -176,21 +205,17 @@ function construction(alpha, info) result(ret)
 
     s(1) = 1
     r = 1
-    do j=2, info%dimen
-        call sort(cL, cL_size, r, info)
-        !print *, info%cost(1,318)
-        !!print *, info%cost(r, cL(1)-1)
-        !print *, cL
-        !call exit(0)
-       !rng = ceiling(cL_size * alpha)
+    do j=2, dimen
+        call sort(cL, cL_size, r, dimen, cost)
+
         !!!
-        call random_number(RND)
-        RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
-        index_ = ceiling(rng * RND)
+        call random_number(RND_v)
+        RND_v = merge(RND_v+0.0000000001, RND_v, RND_v < 0.0000000001)
+        index_ = ceiling(rng * RND_v)
         !!!
 
-        index_ = info%rnd(info%rnd_index) + 1
-        info%rnd_index = info%rnd_index + 1
+        index_ = rnd%rnd(rnd%rnd_index) + 1
+        rnd%rnd_index = rnd%rnd_index + 1
 
         cN = cL(index_)
 
@@ -205,7 +230,7 @@ function construction(alpha, info) result(ret)
     end do
 
     !call exit(0)
-    s(info%dimen+1) = 1
+    s(dimen+1) = 1
 
     ret = s(:)
 
@@ -271,12 +296,21 @@ subroutine reinsert(s, i, j, pos)
 
 end subroutine
 
-subroutine search_swap(solut, info, ret) 
+subroutine search_swap(s, seq, dimen, cost, ret) 
     use data_types
     implicit none
-    type(tSolution) :: solut
-    type(tInfo) :: info
+
+    integer :: dimen
+    integer, dimension(dimen+1) :: s
+    real, dimension(dimen+1, dimen+1, 3) :: seq
+    real, dimension(dimen, dimen) :: cost
+
     logical, intent(out) :: ret
+
+    integer :: T = 1
+    integer :: C = 2
+    integer :: W = 3
+    real :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -295,23 +329,33 @@ subroutine search_swap(solut, info, ret)
     real :: cost_concat_3 
     real :: cost_concat_4
 
-    cost_best = info%fmax
+    interface
+        subroutine subseq_load(s, seq, dimen, cost)
+            use data_types
+            integer :: dimen
+            integer, dimension(dimen+1) :: s
+            real, dimension(dimen+1, dimen+1, 3) :: seq
+            real, dimension(dimen, dimen) :: cost
+        end subroutine
+    end interface
+
+    cost_best = fmax
     cost_new = 0.0
     cost_concat_1 = 0.0
     cost_concat_2 = 0.0
     cost_concat_3 = 0.0
     cost_concat_4 = 0.0
 
-    do i=2, info%dimen-1
+    do i=2, dimen-1
         i_prev = i-1
         i_next = i+1
 
-        cost_concat_1 =                 solut%seq(1, i_prev, info%T) + info%cost(solut%s(i_prev), solut%s(i_next))
-        cost_concat_2 = cost_concat_1 + solut%seq(i, i_next, info%T) + info%cost(solut%s(i), solut%s(i_next+1))
+        cost_concat_1 =                 seq(1, i_prev, T) + cost(s(i_prev), s(i_next))
+        cost_concat_2 = cost_concat_1 + seq(i, i_next, T) + cost(s(i), s(i_next+1))
 
-        cost_new = solut%seq(1, i_prev, info%C)                                                    + &
-                solut%seq(i, i_next, info%W)               * (cost_concat_1) + info%cost(solut%s(i_next), solut%s(i))  + &
-                solut%seq(i_next+1, info%dimen+1, info%W)   * (cost_concat_2) + solut%seq(i_next+1, info%dimen+1, info%C) 
+        cost_new = seq(1, i_prev, C)                                                    + &
+                seq(i, i_next, W)               * (cost_concat_1) + cost(s(i_next), s(i))  + &
+                seq(i_next+1, dimen+1, W)   * (cost_concat_2) + seq(i_next+1, dimen+1, C) 
 
         if (cost_new < cost_best) then
             cost_best = cost_new - EPSILON(1.0)
@@ -319,23 +363,23 @@ subroutine search_swap(solut, info, ret)
             J_best = i_next
         endif
 
-        do j=i_next+1, info%dimen
+        do j=i_next+1, dimen
 
             j_prev = j-1
             j_next = j+1
 
 
-            cost_concat_1 =                 solut%seq(1, i_prev, info%T)       + info%cost(solut%s(i_prev), solut%s(j))
-            cost_concat_2 = cost_concat_1                           + info%cost(solut%s(j), solut%s(i_next))
-            cost_concat_3 = cost_concat_2 + solut%seq(i_next, j_prev, info%T)  + info%cost(solut%s(j_prev), solut%s(i))
-            cost_concat_4 = cost_concat_3                           + info%cost(solut%s(i), solut%s(j_next))
+            cost_concat_1 =                 seq(1, i_prev, T)       + cost(s(i_prev), s(j))
+            cost_concat_2 = cost_concat_1                           + cost(s(j), s(i_next))
+            cost_concat_3 = cost_concat_2 + seq(i_next, j_prev, T)  + cost(s(j_prev), s(i))
+            cost_concat_4 = cost_concat_3                           + cost(s(i), s(j_next))
 
 
-            cost_new = solut%seq(1, i_prev, info%C)                                                 + &     ! 1st subseq
+            cost_new = seq(1, i_prev, C)                                                 + &     ! 1st subseq
                     cost_concat_1 + &                                                           ! concat 2nd subseq (single node)
-                    solut%seq(i_next, j_prev, info%W)      * cost_concat_2 + solut%seq(i_next, j_prev, info%C) + &    ! concat 3rd subseq
+                    seq(i_next, j_prev, W)      * cost_concat_2 + seq(i_next, j_prev, C) + &    ! concat 3rd subseq
                     cost_concat_3 + &                                                           ! concat 4th subseq (single node)
-                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_4 + solut%seq(j_next, info%dimen+1, info%C)   ! concat 5th subseq
+                    seq(j_next, dimen+1, W) * cost_concat_4 + seq(j_next, dimen+1, C)   ! concat 5th subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0);
@@ -347,9 +391,9 @@ subroutine search_swap(solut, info, ret)
         
     end do
 
-    if (cost_best < solut%cost - EPSILON(1.0)) then
-        call swap(solut%s, I_best, J_best)
-        call subseq_load(solut, info)
+    if (cost_best < seq(1, dimen+1, C) - EPSILON(1.0)) then
+        call swap(s, I_best, J_best)
+        call subseq_load(s, seq, dimen, cost)
         !print *, "swap", cost_best, solut%cost
         ret = .true.
     else
@@ -358,12 +402,20 @@ subroutine search_swap(solut, info, ret)
 
 end subroutine
 
-subroutine search_two_opt(solut, info, ret) 
+subroutine search_two_opt(s, seq, dimen, cost, ret) 
     use data_types
     implicit none
-    type(tSolution) :: solut
-    type(tInfo) :: info
+
+    integer :: dimen
+    integer, dimension(dimen+1) :: s 
+    real, dimension(dimen+1, dimen+1, 3) :: seq
+    real, dimension(dimen, dimen) :: cost 
     logical, intent(out) :: ret
+
+    integer :: T = 1
+    integer :: C = 2
+    integer :: W = 3
+    real :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -381,26 +433,36 @@ subroutine search_two_opt(solut, info, ret)
     real :: cost_concat_4
     real :: rev_seq_cost
 
-    cost_best = info%fmax
+    interface
+        subroutine subseq_load(s, seq, dimen, cost)
+            use data_types
+            integer :: dimen
+            integer, dimension(dimen+1) :: s
+            real, dimension(dimen+1, dimen+1, 3) :: seq
+            real, dimension(dimen, dimen) :: cost
+        end subroutine
+    end interface
+
+    cost_best = fmax
     cost_new = 0.0
     cost_concat_1 = 0.0
     cost_concat_2 = 0.0
 
-    do i=2, info%dimen-1
+    do i=2, dimen-1
         i_prev = i-1
-        rev_seq_cost = solut%seq(i, i+1, info%T)
+        rev_seq_cost = seq(i, i+1, T)
 
-        do j=i+2, info%dimen
+        do j=i+2, dimen
             j_next = j+1
 
-            rev_seq_cost = rev_seq_cost + info%cost(solut%s(j-1), solut%s(j)) * (solut%seq(i, j, info%W)-1.0)
+            rev_seq_cost = rev_seq_cost + cost(s(j-1), s(j)) * (seq(i, j, W)-1.0)
 
-            cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(j), solut%s(i_prev))
-            cost_concat_2 = cost_concat_1 + solut%seq(i, j, info%T)        + info%cost(solut%s(j_next), solut%s(i))
+            cost_concat_1 =                 seq(1, i_prev, T)   + cost(s(j), s(i_prev))
+            cost_concat_2 = cost_concat_1 + seq(i, j, T)        + cost(s(j_next), s(i))
 
-            cost_new = solut%seq(1, i_prev, info%C)                                                        + & !   1st subseq
-                    solut%seq(i, j, info%W)                * cost_concat_1 + rev_seq_cost                  + & ! concat 2nd subseq (reversed seq)
-                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_2 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 3rd subseq
+            cost_new = seq(1, i_prev, C)                                                        + & !   1st subseq
+                    seq(i, j, W)                * cost_concat_1 + rev_seq_cost                  + & ! concat 2nd subseq (reversed seq)
+                    seq(j_next, dimen+1, W) * cost_concat_2 + seq(j_next, dimen+1, C)       ! concat 3rd subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0)
@@ -412,9 +474,9 @@ subroutine search_two_opt(solut, info, ret)
 
     end do
 
-    if (cost_best < solut%cost) then
-        call reverse(solut%s, I_best, J_best)
-        call subseq_load(solut, info)
+    if (cost_best < seq(1, dimen+1, C)) then
+        call reverse(s, I_best, J_best)
+        call subseq_load(s, seq, dimen, cost)
         !print *,  "reverse", cost_best, solut%cost
         !print *, I_best, J_best
         ret = .true.
@@ -424,13 +486,21 @@ subroutine search_two_opt(solut, info, ret)
 
 end subroutine
 
-subroutine search_reinsertion(solut, info, opt, ret) 
+subroutine search_reinsertion(s, seq, dimen, cost, opt, ret) 
     use data_types
     implicit none
-    type(tSolution) :: solut
-    type(tInfo) :: info
+
+    integer :: dimen
+    integer, dimension(dimen+1) :: s
+    real, dimension(dimen+1, dimen+1, 3) :: seq
+    real, dimension(dimen, dimen) :: cost
     integer :: opt
     logical, intent(out) :: ret
+
+    integer :: T = 1
+    integer :: C = 2
+    integer :: W = 3
+    real :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -450,15 +520,26 @@ subroutine search_reinsertion(solut, info, opt, ret)
     real :: cost_concat_3 
     real :: cost_concat_4
 
-    info%reinsert_call = info%reinsert_call + 1
+    interface
+        subroutine subseq_load(s, seq, dimen, cost)
+            use data_types
+            integer :: dimen
+            integer, dimension(dimen+1) :: s
+            real, dimension(dimen+1, dimen+1, 3) :: seq
+            real, dimension(dimen, dimen) :: cost
+        end subroutine
 
-    cost_best = info%fmax
+    end interface
+
+    !info%reinsert_call = info%reinsert_call + 1
+
+    cost_best = fmax
     cost_new = 0.0
     cost_concat_1 = 0.0
     cost_concat_2 = 0.0
     cost_concat_3 = 0.0
 
-    do i=2, info%dimen-opt+1
+    do i=2, dimen-opt+1
         j = opt+i-1
         i_prev = i-1
         j_next = j+1
@@ -466,15 +547,15 @@ subroutine search_reinsertion(solut, info, opt, ret)
         do k=1, i_prev-1
             k_next = k+1
 
-            cost_new =  solut%seq(1, info%dimen+1, info%C)
-            cost_concat_1 =                 solut%seq(1, k, info%T)            + info%cost(solut%s(k), solut%s(i))
-            cost_concat_2 = cost_concat_1 + solut%seq(i, j, info%T)            + info%cost(solut%s(j), solut%s(k_next))
-            cost_concat_3 = cost_concat_2 + solut%seq(k_next, i_prev, info%T)  + info%cost(solut%s(i_prev), solut%s(j_next))
+            cost_new =  seq(1, dimen+1, C)
+            cost_concat_1 =                 seq(1, k, T)            + cost(s(k), s(i))
+            cost_concat_2 = cost_concat_1 + seq(i, j, T)            + cost(s(j), s(k_next))
+            cost_concat_3 = cost_concat_2 + seq(k_next, i_prev, T)  + cost(s(i_prev), s(j_next))
 
-            cost_new = solut%seq(1, k, info%C)                                                             + & !       1st subseq
-                    solut%seq(i, j, info%W)                * cost_concat_1 + solut%seq(i, j, info%C)                  + & ! concat 2nd subseq (reinserted seq)
-                    solut%seq(k_next, i_prev, info%W)      * cost_concat_2 + solut%seq(k_next, i_prev, info%C)        + & ! concat 3rd subseq
-                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 4th subseq
+            cost_new = seq(1, k, C)                                                             + & !       1st subseq
+                    seq(i, j, W)                * cost_concat_1 + seq(i, j, C)                  + & ! concat 2nd subseq (reinserted seq)
+                    seq(k_next, i_prev, W)      * cost_concat_2 + seq(k_next, i_prev, C)        + & ! concat 3rd subseq
+                    seq(j_next, dimen+1, W) * cost_concat_3 + seq(j_next, dimen+1, C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0)
@@ -489,17 +570,17 @@ subroutine search_reinsertion(solut, info, opt, ret)
 
         end do
 
-        do k=i+opt, info%dimen-opt-1
+        do k=i+opt, dimen-opt-1
             k_next = k+1
 
-            cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(i_prev), solut%s(j_next))
-            cost_concat_2 = cost_concat_1 + solut%seq(j_next, k, info%T)   + info%cost(solut%s(k), solut%s(i))
-            cost_concat_3 = cost_concat_2 + solut%seq(i, j, info%T)        + info%cost(solut%s(j), solut%s(k_next))
+            cost_concat_1 =                 seq(1, i_prev, T)   + cost(s(i_prev), s(j_next))
+            cost_concat_2 = cost_concat_1 + seq(j_next, k, T)   + cost(s(k), s(i))
+            cost_concat_3 = cost_concat_2 + seq(i, j, T)        + cost(s(j), s(k_next))
 
-            cost_new = solut%seq(1, i_prev, info%C)                                                        + & !       1st subseq
-                    solut%seq(j_next, k, info%W)           * cost_concat_1 + solut%seq(j_next, k, info%C)             + & ! concat 2nd subseq
-                    solut%seq(i, j, info%W)                * cost_concat_2 + solut%seq(i, j, info%C)                  + & ! concat 3rd subseq (reinserted seq)
-                    solut%seq(k_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(k_next, info%dimen+1, info%C)       ! concat 4th subseq
+            cost_new = seq(1, i_prev, C)                                                        + & !       1st subseq
+                    seq(j_next, k, W)           * cost_concat_1 + seq(j_next, k, C)             + & ! concat 2nd subseq
+                    seq(i, j, W)                * cost_concat_2 + seq(i, j, C)                  + & ! concat 3rd subseq (reinserted seq)
+                    seq(k_next, dimen+1, W) * cost_concat_3 + seq(k_next, dimen+1, C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0)
@@ -510,9 +591,9 @@ subroutine search_reinsertion(solut, info, opt, ret)
         end do
     end do
 
-    if (cost_best < solut%cost) then
-        call reinsert(solut%s, I_best, J_best, POS_best+1)
-        call subseq_load(solut, info)
+    if (cost_best < seq(1, dimen+1, C)) then
+        call reinsert(s, I_best, J_best, POS_best+1)
+        call subseq_load(s, seq, dimen, cost)
         !print *, "reinsertion", cost_best, solut%cost
         !print *, "reinsertion", I_best, J_best, POS_best
         ret = .true.
@@ -523,15 +604,18 @@ subroutine search_reinsertion(solut, info, opt, ret)
 
 end subroutine
 
-subroutine RVND(sol, info, it)
+subroutine RVND(sol, seq, dimen, cost, rnd)
     use data_types
     implicit none
 
-    type(tSolution) :: sol
-    type(tInfo) :: info
-    integer, intent(out) :: it
+    integer :: dimen
+    integer, dimension(dimen+1) :: sol
+    real, dimension(dimen+1, dimen+1, 3) :: seq
+    real, dimension(dimen, dimen) :: cost
+    type(tRnd) :: rnd
 
-    real :: rnd
+    real :: RND_v
+
 
     integer, dimension(5) :: neighbd_list
     integer :: nl_size
@@ -544,6 +628,52 @@ subroutine RVND(sol, info, it)
     logical :: yes
 
     integer, dimension(5) :: improv
+
+    integer :: REINSERTION  = 1
+    integer :: OR_OPT_2     = 2
+    integer :: OR_OPT_3     = 3 
+    integer :: SWAP         = 4
+    integer :: TWO_OPT      = 5
+
+    interface
+        subroutine search_reinsertion(s, seq, dimen, cost, opt, ret) 
+            use data_types
+            implicit none
+
+            integer :: dimen
+            integer, dimension(dimen+1) :: s
+            real, dimension(dimen+1, dimen+1, 3) :: seq
+            real, dimension(dimen, dimen) :: cost
+            integer :: opt
+            logical, intent(out) :: ret
+        end subroutine 
+        subroutine search_two_opt(s, seq, dimen, cost, ret) 
+            use data_types
+            implicit none
+
+            integer :: dimen
+            integer, dimension(dimen+1) :: s
+            real, dimension(dimen+1, dimen+1, 3) :: seq
+            real, dimension(dimen, dimen) :: cost
+
+            logical, intent(out) :: ret
+        end subroutine
+        subroutine search_swap(s, seq, dimen, cost, ret) 
+            use data_types
+            implicit none
+
+            integer :: dimen
+            integer, dimension(dimen+1) :: s
+            real, dimension(dimen+1, dimen+1, 3) :: seq
+            real, dimension(dimen, dimen) :: cost
+
+            logical, intent(out) :: ret
+
+        end subroutine
+
+
+    end interface
+
     improv = 0.0
 
   !sol%s = (/ (i, i=1, info%dimen+1) /)
@@ -552,20 +682,18 @@ subroutine RVND(sol, info, it)
   !call subseq_load(sol, info)
   !!!call exit(0)
     nl_size = 5
-  ! nl_size = 1
-  ! neighbd_list = (/  info%TWO_OPT, info%OR_OPT_2, info%OR_OPT_3, info%SWAP, info%TWO_OPT /)
-    neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
+    neighbd_list = (/ SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3 /)
     yes = .false.
     total = 0
     do while (nl_size > 0)
         !!!
-        call random_number(rnd)
-        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-        index_ = ceiling(rnd*nl_size)
+        call random_number(RND_v)
+        RND_v = merge(RND_v+0.0000000001, RND_v, RND_v < 0.0000000001)
+        index_ = ceiling(RND_v*nl_size)
         !!!
 
-        index_ = info%rnd(info%rnd_index) + 1
-        info%rnd_index = info%rnd_index + 1
+        index_ = rnd%rnd(rnd%rnd_index) + 1
+        rnd%rnd_index = rnd%rnd_index + 1
 
         neighbd = neighbd_list(index_)
         
@@ -577,20 +705,20 @@ subroutine RVND(sol, info, it)
 
         !print *, neighbd
         improve_flag = .false.
-        if (neighbd == info%REINSERTION) then
-            call search_reinsertion(sol, info, info%REINSERTION, improve_flag)
-        else if (neighbd == info%OR_OPT_2) then
-            call search_reinsertion(sol, info, info%OR_OPT_2, improve_flag)
-        else if (neighbd == info%OR_OPT_3) then
-            call search_reinsertion(sol, info, info%OR_OPT_3, improve_flag)
-        else if (neighbd == info%SWAP) then
-            call search_swap(sol, info, improve_flag)
-        else if (neighbd == info%TWO_OPT) then
-            call search_two_opt(sol, info, improve_flag)
+        if (neighbd == REINSERTION) then
+            call search_reinsertion(sol, seq, dimen, cost,  REINSERTION, improve_flag)
+        else if (neighbd == OR_OPT_2) then
+            call search_reinsertion(sol, seq, dimen, cost,  OR_OPT_2, improve_flag)
+        else if (neighbd == OR_OPT_3) then
+            call search_reinsertion(sol, seq, dimen, cost, OR_OPT_3, improve_flag)
+        else if (neighbd == SWAP) then
+            call search_swap(sol, seq, dimen, cost, improve_flag)
+        else if (neighbd == TWO_OPT) then
+            call search_two_opt(sol, seq, dimen, cost, improve_flag)
         endif
 
         if (improve_flag .eqv. .true.) then
-            neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
+            neighbd_list = (/ SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3 /)
             nl_size = 5
             !print *, "IMPROV", sol%cost
             improv(neighbd) = improv(neighbd) + 1
@@ -603,8 +731,6 @@ subroutine RVND(sol, info, it)
         endif
         !print *, nl_size
 
-        it = it + 1
-        
     end do
 
    !if (yes .eqv. .true.) then
@@ -625,70 +751,72 @@ subroutine notnull_rnd(rnd)
     RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
 end subroutine
 
-function perturb(solut, info) result(ret)
+function perturb(sl, dimen, rnd) result(ret)
     use data_types
 
     implicit none
-    type(tSolution) :: solut
-    type(tInfo) :: info
+    integer :: dimen
+    integer, dimension(dimen+1) :: sl
+    type(tRnd) :: rnd
 
-    type(tSolution) :: ret
+    integer, dimension(dimen+1) :: ret
 
-    type(tSolution) :: solut_pert
-
+    integer, dimension(dimen+1) :: s
     integer :: A_start, A_end
     integer :: B_start, B_end
     integer :: size_max
     integer :: size_min
     integer :: max_
-    real :: rnd
+    real :: RND_v
 
     A_start = 1
     A_end = 1
     B_start = 1
     B_end = 1
 
-    solut_pert = solut
+    s = sl
 
-    size_max = (info%dimen+1) / 10
+    size_max = (dimen+1) / 10
     size_max = merge(size_max, 2, size_max >= 2)
     size_min = 2
 
     do while ((A_start <= B_start .and. B_start <= A_end) .or. (B_start <= A_start .and. A_start <= B_end))
         !!!
-       max_ = (info%dimen+1) -2 -size_max
-       call notnull_rnd(rnd)
-       A_start = ceiling(max_ * rnd) + 1
-       call notnull_rnd(rnd)
-       A_end = A_start + ceiling(((size_max-size_min) * rnd) + size_min)
+       max_ = (dimen+1) -2 -size_max
+       call notnull_rnd(RND_v)
+       A_start = ceiling(max_ * RND_v) + 1
+       call notnull_rnd(RND_v)
+       A_end = A_start + ceiling(((size_max-size_min) * RND_v) + size_min)
 
-       call notnull_rnd(rnd)
-       B_start = ceiling(max_ * rnd) + 1
-       call notnull_rnd(rnd)
-       B_end = B_start + ceiling(((size_max-size_min) * rnd) + size_min)
+       call notnull_rnd(RND_v)
+       B_start = ceiling(max_ * RND_v) + 1
+       call notnull_rnd(RND_v)
+       B_end = B_start + ceiling(((size_max-size_min) * RND_v) + size_min)
        !!!
 
 
-       A_start = info%rnd(info%rnd_index) + 1
-       info%rnd_index = info%rnd_index + 1
-       A_end = A_start + info%rnd(info%rnd_index) 
-       info%rnd_index = info%rnd_index + 1
+       A_start = rnd%rnd(rnd%rnd_index) + 1
+       rnd%rnd_index = rnd%rnd_index + 1
+       A_end = A_start + rnd%rnd(rnd%rnd_index) 
+       rnd%rnd_index = rnd%rnd_index + 1
 
-       B_start = info%rnd(info%rnd_index) + 1
+       B_start = rnd%rnd(rnd%rnd_index) + 1
        !print *, info%rnd_index, info%rnd(info%rnd_index)
-       info%rnd_index = info%rnd_index + 1
-       B_end = B_start + info%rnd(info%rnd_index) 
+       rnd%rnd_index = rnd%rnd_index + 1
+       B_end = B_start + rnd%rnd(rnd%rnd_index) 
        !!print *, info%rnd(info%rnd_index)
-       info%rnd_index = info%rnd_index + 1
+       rnd%rnd_index = rnd%rnd_index + 1
 
     end do
 
+    !! TODO: Verificar se o valor d rnd%rnd_index eh modificado apos essa funcao
+
     if (A_start < B_start) then
-        call reinsert (solut_pert%s, B_start, B_end - 1, A_end)
-        call reinsert (solut_pert%s, A_start, A_end - 1, B_end)
+        call reinsert (s, B_start, B_end - 1, A_end)
+        call reinsert (s, A_start, A_end - 1, B_end)
     else
-        call reinsert (solut_pert%s, A_start, A_end - 1, B_end)
-        call reinsert (solut_pert%s, B_start, B_end - 1, A_end)
+        call reinsert (s, A_start, A_end - 1, B_end)
+        call reinsert (s, B_start, B_end - 1, A_end)
     end if
 
    !if (B_start == 1) then !! .or. B_start == 1) then
@@ -697,25 +825,23 @@ function perturb(solut, info) result(ret)
    !    call exit(0)
    !end if
 
-    call subseq_load(solut_pert, info)
-
-    ret = solut_pert
+    ret = s
 
 end function
 
-subroutine solut_init(solut, info)
-    use data_types
-    implicit none
+!subroutine solut_init(solut, info)
+!   use data_types
+!   implicit none
 
-    type(tSolution), intent(out) :: solut
-    type(tInfo) :: info
+!   type(tSolution), intent(out) :: solut
+!   type(tInfo) :: info
 
-    allocate(solut%s(info%dimen+1))
-    allocate(solut%seq(info%dimen+1, info%dimen+1, 3))
+!   allocate(solut%s(info%dimen+1))
+!   allocate(solut%seq(info%dimen+1, info%dimen+1, 3))
 
-end subroutine
+!end subroutine
 
-function GILS_RVND(Imax, Iils, R, info) result(ret)
+function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
     use data_types
 
     implicit none
@@ -724,102 +850,126 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     integer :: Imax
     integer :: Iils
     real, dimension(26) :: R
-    type(tInfo) :: info
-    type(tSolution) :: ret
+    integer :: dimen
+    real, allocatable :: cost (:,:)
+    type(tRnd) :: rnd
+
+    integer, allocatable :: ret(:)
 
     !! solutions
-    type(tSolution) :: sol_best
-    type(tSolution) :: sol_partial
-    type(tSolution) :: sol_crnt
+    integer, dimension(dimen+1) :: sol_best
+    integer, dimension(dimen+1) :: sol_partial
+    integer, dimension(dimen+1) :: sol_crnt
+
+    real, allocatable :: seq (:,:,:)
+
+    real :: cost_best
+    real :: cost_partial
+    real :: cost_crnt
 
     !! aux variables
     integer :: i
     integer :: index_
     integer :: R_size = 26
     real :: alpha
-    real :: rnd
+    real :: RND_v
     integer :: iterILS
 
+    integer :: C = 2
+
+    real :: fmax = 3.4028235E+38
+
     integer :: it
-    integer :: Tit
+    integer :: Tit ! eita
 
     interface
-        function construction(alpha, info) result (ret)
+        function construction(alpha, dimen, cost, rnd) result(ret)
             use data_types
             implicit none
             real :: alpha
-            type(tInfo) :: info
-            integer, dimension(info%dimen+1) :: ret 
+            type(tRnd) :: rnd
+            integer :: dimen
+            real, dimension(dimen, dimen) :: cost 
+            integer, dimension(dimen+1) :: ret 
         end function
-        function perturb(solut, info) result(ret)
+        function perturb(sl, dimen, rnd) result(ret)
             use data_types
+
             implicit none
-            type(tSolution) :: solut
-            type(tInfo) :: info
-            type(tSolution) :: ret
+            integer :: dimen
+            integer, dimension(dimen+1) :: sl
+            type(tRnd) :: rnd
+
+            integer, dimension(dimen+1) :: ret
         end function
     end interface
 
-    call solut_init(sol_best, info)
-    call solut_init(sol_partial, info)
-    call solut_init(sol_crnt, info)
-    sol_best%cost = info%fmax
+    !call solut_init(sol_best, info)
+    !call solut_init(sol_partial, info)
+    !call solut_init(sol_crnt, info)
+    cost_best = fmax
 
-    Tit = 0
+
+  !!allocate(sol_best(dimen+1))
+  !!allocate(sol_crnt(dimen+1))
+  !!allocate(sol_partial(dimen+1))
+
     do i=1, Imax
+
         !!!
-        call random_number(rnd)
-        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-        index_ = ceiling(rnd*R_size)
+        call random_number(RND_v)
+        RND_v = merge(RND_v+0.0000000001, RND_v, RND_v < 0.0000000001)
+        index_ = ceiling(RND_v*R_size)
         !!!
 
-        index_ = info%rnd(info%rnd_index) + 1
-        info%rnd_index = info%rnd_index + 1
+        index_ = rnd%rnd(rnd%rnd_index) + 1
+        rnd%rnd_index = rnd%rnd_index + 1
 
         alpha = R(index_)
         print *, "[+] Local Search ", i
-        sol_crnt%s = construction(alpha, info)
-        call subseq_load(sol_crnt, info)
+        sol_crnt = construction(alpha, dimen, cost, rnd)
         sol_partial = sol_crnt
-        print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
 
-        !call exit(0)
+        call subseq_load(sol_crnt, seq, dimen, cost)
+        cost_crnt = seq(1, dimen+1, C)
+        cost_partial = cost_crnt
 
+        print *, "        [+] Constructing Inital Solution..", cost_crnt
         print *, "        [+] Looking for the best Neighbor.."
-        iterILS = 0
-        it = 0
-        !print *, sol_crnt%cost
-        do while (iterILS < Iils)
-            call RVND(sol_crnt, info, it)
 
-            if (sol_crnt%cost < sol_partial%cost - EPSILON(1.0)) then
+        iterILS = 0
+        !it = 0
+        !print *, sol_crnt%cost
+
+        do while (iterILS < Iils)
+            call RVND(sol_crnt, seq, dimen, cost, rnd)
+
+            cost_crnt = seq(1, dimen+1, C)
+            if (cost_crnt < cost_partial - EPSILON(1.0)) then
                 sol_partial = sol_crnt
-                sol_partial%cost = sol_partial%cost - EPSILON(1.0)
+                cost_partial = cost_partial - EPSILON(1.0)
                 iterILS = 0
                 !print *, sol_partial%cost
             endif
 
-            sol_crnt = perturb(sol_partial, info)
-            !print *, "perturbed", sol_crnt%cost
+            sol_crnt = perturb(sol_partial, dimen, rnd)
+            call subseq_load(sol_crnt, seq, dimen, cost)
 
+            !print *, "perturbed", sol_crnt%cost
             iterILS = iterILS + 1
         end do
-        Tit = Tit + it
-       !print *, sol_partial%cost
-       !print *, ""
-        
-        call subseq_load(sol_partial, info)
 
-        if (sol_partial%cost < sol_best%cost) then
+        if (cost_partial < cost_best) then
             sol_best = sol_partial
+            cost_best = cost_partial
         endif
 
-        print *, "        Current best solution cost:", sol_best%cost
+        print *, "        Current best solution cost:", cost_best
     
     end do
 
-    print *, sol_best%s
-    print *, "RVND it", Tit
+    print *, sol_best
+    !print *, "RVND it", Tit
 
     ret = sol_best
 
@@ -831,26 +981,32 @@ program main
 
     implicit none
 
-    integer, allocatable :: dimensions (:)
-    integer, allocatable :: rnd (:)
+    !integer, allocatable :: dimensions (:)
     type(tInfo) :: info
-    type(tSolution) :: sol
+    !!type(tSolution) :: sol
+    type(tRnd) :: rnd
     real, dimension(26) :: r
     integer :: Iils
     integer :: Imax
     integer :: i
 
+    integer :: dimen
+    real, allocatable :: cost (:,:)
+    integer, allocatable :: sol(:)
+
     INTEGER :: begin, end_, rate
 
     interface
-        function construction(alpha, info) result (ret)
+        function construction(alpha, dimen, cost, rnd) result(ret)
             use data_types
             implicit none
             real :: alpha
-            type(tInfo) :: info
-            integer, dimension(info%dimen+1) :: ret 
+            type(tRnd) :: rnd
+            integer :: dimen
+            real, dimension(dimen, dimen) :: cost 
+            integer, dimension(dimen+1) :: ret 
         end function
-        function GILS_RVND(Imax, Iils, R, info) result(ret)
+        function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
             use data_types
 
             implicit none
@@ -859,41 +1015,41 @@ program main
             integer :: Imax
             integer :: Iils
             real, dimension(26) :: R
-            type(tInfo) :: info
-            type(tSolution) :: ret
-            end function
-subroutine print_matrix(c)
-    implicit none
-    real, allocatable :: c(:,:)
+            integer :: dimen
+            real, allocatable :: cost (:,:)
+            type(tRnd) :: rnd
 
-    integer, allocatable :: nxm(:)
-    integer :: dimen
-    integer :: i
-    integer :: j
-    end subroutine
+            integer, dimension(dimen+1) :: ret
+        end function
+        subroutine print_matrix(c)
+            implicit none
+            real, allocatable :: c(:,:)
+
+            integer, allocatable :: nxm(:)
+            integer :: dimen
+            integer :: i
+            integer :: j
+        end subroutine
 
     end interface
 
-    call load_matrix(info%cost, info%rnd)
+    call load_matrix(cost, rnd%rnd, dimen)
 
+    allocate(sol(dimen))
     !call print_matrix(info%cost)
     !call exit(0)
     !print *, info%rnd(2)
 
-    dimensions = shape(info%cost(:,:))
-    info%dimen = dimensions(1)
-
     !call print_info(info)
 
-
     R = (/ (i/100.0 + 0.000000001, i=1, 26) /)
-    Iils = min(100, info%dimen)
+    Iils = min(100, dimen)
     Imax = 10
     !call solut_init(sol, info)
     CALL SYSTEM_CLOCK(begin, rate)
-    sol = GILS_RVND(Imax, Iils, R, info)
+    sol = GILS_RVND(Imax, Iils, R, dimen, cost, rnd)
     CALL SYSTEM_CLOCK(end_)
-    print *, sol%cost
+    !print *, sol%cost
 
     print *, "elapsed time: ", real(end_ - begin) / real(rate)
 
