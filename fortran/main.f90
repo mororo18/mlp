@@ -600,6 +600,7 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
     else
         ret = .false.
     endif
+
     !call exit(0)
 
 end subroutine
@@ -623,11 +624,11 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
 
     integer :: index_
     integer :: i
-    integer :: total
+    !integer :: total
     logical :: improve_flag
-    logical :: yes
+    !logical :: yes
 
-    integer, dimension(5) :: improv
+    !integer, dimension(5) :: improv
 
     integer :: REINSERTION  = 1
     integer :: OR_OPT_2     = 2
@@ -674,7 +675,9 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
 
     end interface
 
-    improv = 0.0
+    rnd%rnd(rnd%rnd_index) = rnd%rnd(rnd%rnd_index)
+
+    !improv = 0.0
 
   !sol%s = (/ (i, i=1, info%dimen+1) /)
   !sol%s(info%dimen+1) = 1
@@ -683,15 +686,20 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
   !!!call exit(0)
     nl_size = 5
     neighbd_list = (/ SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3 /)
-    yes = .false.
-    total = 0
+    !yes = .false.
+    !total = 0
+
+    !print *, "rvnd RND index", rnd%rnd_index
+    !print *, "solucao", sol
     do while (nl_size > 0)
+        !print *, nl_size
         !!!
         call random_number(RND_v)
         RND_v = merge(RND_v+0.0000000001, RND_v, RND_v < 0.0000000001)
         index_ = ceiling(RND_v*nl_size)
         !!!
 
+        !!print *, rnd%rnd(1)
         index_ = rnd%rnd(rnd%rnd_index) + 1
         rnd%rnd_index = rnd%rnd_index + 1
 
@@ -707,27 +715,32 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
         improve_flag = .false.
         if (neighbd == REINSERTION) then
             call search_reinsertion(sol, seq, dimen, cost,  REINSERTION, improve_flag)
+            !print *, "reinsertion", seq(1, dimen+1, 2)
         else if (neighbd == OR_OPT_2) then
             call search_reinsertion(sol, seq, dimen, cost,  OR_OPT_2, improve_flag)
+            !print *, "or_opt_2", seq(1, dimen+1, 2)
         else if (neighbd == OR_OPT_3) then
             call search_reinsertion(sol, seq, dimen, cost, OR_OPT_3, improve_flag)
+            !print *, "or_opt_3", seq(1, dimen+1, 2)
         else if (neighbd == SWAP) then
             call search_swap(sol, seq, dimen, cost, improve_flag)
+            !print *, "swap", seq(1, dimen+1, 2)
         else if (neighbd == TWO_OPT) then
             call search_two_opt(sol, seq, dimen, cost, improve_flag)
+            !print *, "two_opt", seq(1, dimen+1, 2)
         endif
 
         if (improve_flag .eqv. .true.) then
             neighbd_list = (/ SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3 /)
             nl_size = 5
             !print *, "IMPROV", sol%cost
-            improv(neighbd) = improv(neighbd) + 1
-            yes = .true.
+            !improv(neighbd) = improv(neighbd) + 1
+            !yes = .true.
 
         else
             call arr_shift(neighbd_list, index_+1, index_, nl_size-index_)
             nl_size = nl_size-1
-            total = total + 1
+            !total = total + 1
         endif
         !print *, nl_size
 
@@ -841,7 +854,7 @@ end function
 
 !end subroutine
 
-function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
+subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
     use data_types
 
     implicit none
@@ -854,14 +867,14 @@ function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
     real, allocatable :: cost (:,:)
     type(tRnd) :: rnd
 
-    integer, allocatable :: ret(:)
+    integer, allocatable, intent(out) :: ret(:)
 
     !! solutions
     integer, dimension(dimen+1) :: sol_best
     integer, dimension(dimen+1) :: sol_partial
     integer, dimension(dimen+1) :: sol_crnt
 
-    real, allocatable :: seq (:,:,:)
+    real, dimension(dimen+1, dimen+1, 3) :: seq
 
     real :: cost_best
     real :: cost_partial
@@ -878,9 +891,6 @@ function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
     integer :: C = 2
 
     real :: fmax = 3.4028235E+38
-
-    integer :: it
-    integer :: Tit ! eita
 
     interface
         function construction(alpha, dimen, cost, rnd) result(ret)
@@ -927,8 +937,12 @@ function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
 
         alpha = R(index_)
         print *, "[+] Local Search ", i
+        !print *, "RND index", rnd%rnd_index
         sol_crnt = construction(alpha, dimen, cost, rnd)
+        !print *, "RND index", rnd%rnd_index
         sol_partial = sol_crnt
+
+        !print *, sol_crnt
 
         call subseq_load(sol_crnt, seq, dimen, cost)
         cost_crnt = seq(1, dimen+1, C)
@@ -942,20 +956,28 @@ function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
         !print *, sol_crnt%cost
 
         do while (iterILS < Iils)
+            !print *, "rnd index Antes RVND", rnd%rnd_index
             call RVND(sol_crnt, seq, dimen, cost, rnd)
+            !print *, "rnd index Depois RVND", rnd%rnd_index
 
             cost_crnt = seq(1, dimen+1, C)
             if (cost_crnt < cost_partial - EPSILON(1.0)) then
+                !print *, "PARTIAL antes", sol_partial
                 sol_partial = sol_crnt
-                cost_partial = cost_partial - EPSILON(1.0)
+                cost_partial = cost_crnt - EPSILON(1.0)
+                !print *, "PARTIAL dps", sol_partial
                 iterILS = 0
                 !print *, sol_partial%cost
             endif
 
+            !print *, "pre - perturb  ", rnd%rnd_index
+            !print *, "pre - perturb - sol ", sol_partial
             sol_crnt = perturb(sol_partial, dimen, rnd)
+            !!print *, rnd%rnd_index
             call subseq_load(sol_crnt, seq, dimen, cost)
 
-            !print *, "perturbed", sol_crnt%cost
+            !print *, "CUsto perturbed", seq(1, dimen+1, C)
+            !call exit(0)
             iterILS = iterILS + 1
         end do
 
@@ -971,9 +993,9 @@ function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
     print *, sol_best
     !print *, "RVND it", Tit
 
-    ret = sol_best
+    ret = sol_best(:)
 
-end function
+end subroutine
 
 program main
     use rData
@@ -1006,7 +1028,7 @@ program main
             real, dimension(dimen, dimen) :: cost 
             integer, dimension(dimen+1) :: ret 
         end function
-        function GILS_RVND(Imax, Iils, R, dimen, cost, rnd) result(ret)
+        subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
             use data_types
 
             implicit none
@@ -1018,9 +1040,8 @@ program main
             integer :: dimen
             real, allocatable :: cost (:,:)
             type(tRnd) :: rnd
-
-            integer, dimension(dimen+1) :: ret
-        end function
+            integer, allocatable, intent(out) :: ret(:)
+        end subroutine
         subroutine print_matrix(c)
             implicit none
             real, allocatable :: c(:,:)
@@ -1034,6 +1055,8 @@ program main
     end interface
 
     call load_matrix(cost, rnd%rnd, dimen)
+    !!print *, rnd%rnd
+    rnd%rnd_index = 1
 
     allocate(sol(dimen))
     !call print_matrix(info%cost)
@@ -1047,11 +1070,11 @@ program main
     Imax = 10
     !call solut_init(sol, info)
     CALL SYSTEM_CLOCK(begin, rate)
-    sol = GILS_RVND(Imax, Iils, R, dimen, cost, rnd)
+    call GILS_RVND(Imax, Iils, R, dimen, cost, rnd, sol)
     CALL SYSTEM_CLOCK(end_)
     !print *, sol%cost
 
     print *, "elapsed time: ", real(end_ - begin) / real(rate)
 
-    print *, "reinsert Calls ", info%reinsert_call
+    !print *, "reinsert Calls ", info%reinsert_call
 end program
