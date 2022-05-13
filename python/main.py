@@ -304,13 +304,10 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
                 I = i
                 J = j
                 POS = k
-            #if i == 11 and k == 5:
-                #print ("opa")
 
 
         for k in range(i+opt, MAX - 1):
             k_next = k+1
-            #k_next : int = k+1
 
             cost_concat_1 =                 seq[0]     [i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
             cost_concat_2 = cost_concat_1 + seq[j_next][k]     [info.T] + info.cost[solut.s[k]]     [solut.s[i]]
@@ -328,47 +325,27 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
                 J = j
                 POS = k
 
-    #if COST_arr[BEST] < seq[C][0][n] - EPSILON:
     if cost_best < solut.cost - info.EPSILON:
-        #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
-        #print(solut.s)
         reinsert(solut.s, I, J, POS+1)
-        #print(solut.s)
         subseq_load(solut, info)
         """
         print("\nreinsertion", opt)
         print(cost_best)
         print(solut.cost)
         """
-
-       #if(cost_best != solut.cost):
-       #    print(I, J, POS)
-       #    exit(0)
         return True
 
     return False
 
 def RVND(solut : tSolution, info : tInfo) -> NoReturn:
 
-   #global t_reinsertion
-   #global t_or_opt2 
-   #global t_or_opt3 
-   #global t_swap 
-   #global t_two_opt 
-
-   #global improv_flag
-    #neighbd_list = [ TWO_OPT]
     neighbd_list : List[int] = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
-
-    #print(solut.s)
 
     while len(neighbd_list) > 0:
         ##
         i = randint(0, len(neighbd_list)-1)
         ##
         i = info.rnd[info.rnd_index]
-        #print(info.rnd_index, i )
-        #print(neighbd_list)
         info.rnd_index += 1
 
 
@@ -377,27 +354,15 @@ def RVND(solut : tSolution, info : tInfo) -> NoReturn:
         improve : bool = False
 
         if neighbd == info.SWAP:
-            #t_swap -= time.time()
             improve = search_swap(solut, info)
-            #t_swap += time.time()
         elif neighbd == info.TWO_OPT:
-           #t_two_opt -= time.time()
             improve = search_two_opt(solut, info)
-           #t_two_opt += time.time()
         elif neighbd == info.REINSERTION:
-           #t_reinsertion -= time.time()
             improve = search_reinsertion(solut, info, info.REINSERTION, solut.seq)
-           #t_reinsertion += time.time()
         elif neighbd == info.OR_OPT_2:
-           #t_or_opt2 -= time.time()
             improve = search_reinsertion(solut, info, info.OR_OPT_2, solut.seq)
-           #t_or_opt2 += time.time()
         elif neighbd == info.OR_OPT_3:
-           #t_or_opt3 -= time.time()
             improve = search_reinsertion(solut, info, info.OR_OPT_3, solut.seq)
-           #t_or_opt3 += time.time()
-
-        #print(improve)
 
         if improve == True:
             neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
@@ -494,12 +459,6 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
 
     print("COST: {}".format (solut_best.cost))
     print("SOLUTION: {}".format(solut_best.s))
-   #print("Total Iterations RVND {}".format(IT))
-   #print("swap", improv_swap)
-   #print("two_opt", improv_two_opt)
-   #print("reinsertion", improv_reinsertion)
-   #print("or-opt_2", improv_or_2)
-   #print("or-opt_3", improv_or_3)
 
 def main() -> NoReturn:
     dimension :int
@@ -514,19 +473,6 @@ def main() -> NoReturn:
 
     info = tInfo(dimension, cost, rnd)
 
-    """
-    test = deepcopy(info)
-
-    print(test.dimen)
-
-    solut = tSolution([i for i in range(info.dimen)], subseq_fill(info), 0)
-
-    solut.s.append(0)
-    subseq_load(solut, info)
-
-    print(solut.s, solut.seq, solut.cost)
-
-"""
 
     start = time.time()
     GILS_RVND(Imax, Iils, R, info)
