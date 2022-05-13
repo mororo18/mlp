@@ -1,6 +1,5 @@
 #! /usr/bin/julia
 using Printf
-using Profile, PProf
 using BenchmarkTools
 include("Data.jl")
 
@@ -33,14 +32,14 @@ mutable struct tSolution
 end
 
 @inline function subseq_load(solut::tSolution, info::tInfo) # dimension::Int, c::Matrix{Float64})
-    @fastmath @inbounds @simd for i in 1:info.dimen+1
+    for i in 1:info.dimen+1
         k::Int = 1 - i - (i==1)#convert(Int, i==0)
 
         solut.seq[i, i, info.T] = 0.0
         solut.seq[i, i, info.C] = 0.0
         solut.seq[i, i, info.W] = i!=1#convert(Float64, i != 0)
 
-        @simd for j in i+1:info.dimen+1
+        for j in i+1:info.dimen+1
             j_prev = j-1
 
             solut.seq[i, j, info.T] = info.cost[solut.s[j_prev], solut.s[j]] + solut.seq[i, j_prev, info.T]
@@ -130,7 +129,7 @@ function search_swap(solut::tSolution, info::tInfo)::Bool
     cost_concat_4 = 0.0
     cost_new = 0.0
 
-    @fastmath @inbounds @simd for i in 2:info.dimen-1
+    for i in 2:info.dimen-1
             i_prev::Int = i - 1
             i_next::Int = i + 1
 
@@ -147,7 +146,7 @@ function search_swap(solut::tSolution, info::tInfo)::Bool
                 J = i_next
             end
 
-            @simd for j in i_next+1:info.dimen
+            for j in i_next+1:info.dimen
                 j_prev = j-1
                 j_next = j+1
 
@@ -170,7 +169,7 @@ function search_swap(solut::tSolution, info::tInfo)::Bool
                     J = j;
                 end
 
-        end
+            end
     end
 
     if cost_best < solut.cost - info.EPSILON
@@ -191,10 +190,10 @@ function search_two_opt(solut::tSolution, info::tInfo)::Bool
     cost_concat_2 = 0.0
     cost_new = 0.0
 
-    @fastmath @inbounds @simd for i in 2:info.dimen-1
+    for i in 2:info.dimen-1
         i_prev = i - 1
         rev_seq_cost = solut.seq[i, i+1, info.T]
-        @simd for j in i+2:info.dimen
+        for j in i+2:info.dimen
             j_next = j+1
 
             rev_seq_cost += info.cost[solut.s[j-1], solut.s[j]] * (solut.seq[i, j, info.W]-1.0)
@@ -235,12 +234,12 @@ function search_reinsertion(solut::tSolution, info::tInfo, opt::Int)::Bool
     cost_concat_3 = 0.0
     cost_new = 0.0
 
-    @fastmath @inbounds @simd for i in 2:info.dimen-opt+1
+    for i in 2:info.dimen-opt+1
         j = opt+i-1
         i_prev = i-1
         j_next = j+1
 
-        @simd for k in 1:i_prev-1
+        for k in 1:i_prev-1
                 k_next = k+1
 
                 cost_concat_1 =                 solut.seq[1, k, info.T]            + info.cost[solut.s[k], solut.s[i]]
@@ -261,7 +260,7 @@ function search_reinsertion(solut::tSolution, info::tInfo, opt::Int)::Bool
 
         end
 
-        @simd for k in i+opt:info.dimen-opt-1
+        for k in i+opt:info.dimen-opt-1
                 k_next = k+1
 
                 cost_concat_1 =                 solut.seq[1, i_prev, info.T]   + info.cost[solut.s[i_prev], solut.s[j_next]]
@@ -450,8 +449,6 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
             iterILS += 1
         end
 
-        #exit(0)
-
         subseq_load(solut_partial, info)
 
         if solut_partial.cost < solut_best.cost
@@ -506,7 +503,7 @@ function main()
 
 end
 
-@btime main()
+main()
 
 # using ProfileView, Profile, PProf
 #=
