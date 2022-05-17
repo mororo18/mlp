@@ -523,13 +523,13 @@ subroutine search_reinsertion(solut, info, opt, ret)
 
 end subroutine
 
-subroutine RVND(sol, info, it)
+subroutine RVND(sol, info)
     use data_types
     implicit none
 
     type(tSolution) :: sol
     type(tInfo) :: info
-    integer, intent(out) :: it
+    !integer, intent(out) :: it
 
     real :: rnd
 
@@ -603,8 +603,6 @@ subroutine RVND(sol, info, it)
         endif
         !print *, nl_size
 
-        it = it + 1
-        
     end do
 
    !if (yes .eqv. .true.) then
@@ -740,9 +738,6 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     real :: rnd
     integer :: iterILS
 
-    integer :: it
-    integer :: Tit
-
     interface
         function construction(alpha, info) result (ret)
             use data_types
@@ -765,7 +760,6 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     call solut_init(sol_crnt, info)
     sol_best%cost = info%fmax
 
-    Tit = 0
     do i=1, Imax
         !!!
         call random_number(rnd)
@@ -787,10 +781,9 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
         print *, "        [+] Looking for the best Neighbor.."
         iterILS = 0
-        it = 0
         !print *, sol_crnt%cost
         do while (iterILS < Iils)
-            call RVND(sol_crnt, info, it)
+            call RVND(sol_crnt, info)
 
             if (sol_crnt%cost < sol_partial%cost - EPSILON(1.0)) then
                 sol_partial = sol_crnt
@@ -804,7 +797,6 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
             iterILS = iterILS + 1
         end do
-        Tit = Tit + it
        !print *, sol_partial%cost
        !print *, ""
         
@@ -819,7 +811,6 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     end do
 
     print *, sol_best%s
-    print *, "RVND it", Tit
 
     ret = sol_best
 
@@ -861,16 +852,16 @@ program main
             real, dimension(26) :: R
             type(tInfo) :: info
             type(tSolution) :: ret
-            end function
-subroutine print_matrix(c)
-    implicit none
-    real, allocatable :: c(:,:)
+        end function
+        subroutine print_matrix(c)
+            implicit none
+            real, allocatable :: c(:,:)
 
-    integer, allocatable :: nxm(:)
-    integer :: dimen
-    integer :: i
-    integer :: j
-    end subroutine
+            integer, allocatable :: nxm(:)
+            integer :: dimen
+            integer :: i
+            integer :: j
+        end subroutine
 
     end interface
 
