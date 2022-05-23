@@ -1,3 +1,3 @@
 #! /bin/bash
-gfortran -c Data.f90
-gfortran -O3 main.f90 Data.o -o main -g 
+gfortran-7 -c Data.f90
+gfortran-7 -O3 main.f90 Data.o -o main -g 

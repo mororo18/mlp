@@ -53,7 +53,7 @@ class Data{
             line = f_reader.nextLine();
             line = f_reader.nextLine();
 
-            System.out.println(line); 
+            //System.out.println(line); 
             rnd_size = Integer.parseInt(line);
             rnd = new int[rnd_size];
 
