@@ -51,14 +51,14 @@ function readData(c, rnd)
     index = index + 3
     
     local rnd_size = tonumber(lines[index])
-    print(lines[index], #rnd)
+    --print(lines[index], #rnd)
 
     local final = 0;
     for i = 1, rnd_size do
         rnd[#rnd+1] = lines[index+i]
         final = i
     end
-    print(rnd[rnd_size])
+    --print(rnd[rnd_size])
 
     --[[
     for index, l in ipairs(lines) do

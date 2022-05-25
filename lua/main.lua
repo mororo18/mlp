@@ -542,7 +542,7 @@ function main()
 
     local a =0;
     info.dimension, a = readData(info.c, info.rnd)
-    print(info.rnd[a])
+    --print(info.rnd[a])
     math.randomseed(os.time()) 
 
     local Imax = 10
