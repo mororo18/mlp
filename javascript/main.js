@@ -12,23 +12,24 @@ function subseq_fill(dimension) {
     return seq;
 }
 
-function subseq_load(s, seq, info) {
+function subseq_load(solut, info) {
     //console.log(info);
     for (var i = 0; i < info.dimension+1; i++) {
         var k = 1 - i - (i != 0 ? 0 : 1);
 
-        seq[i][i][info.T] = 0.0;
-        seq[i][i][info.C] = 0.0;
-        seq[i][i][info.W] = (i != 0 ? 1.0 : 0.0);
+        solut.seq[i][i][info.T] = 0.0;
+        solut.seq[i][i][info.C] = 0.0;
+        solut.seq[i][i][info.W] = (i != 0 ? 1.0 : 0.0);
 
         for (var j = i+1; j < info.dimension+1; j++) {
             let j_prev = j-1;
-            seq[i][j][info.T] = info.c[s[j_prev]][s[j]] + seq[i][j_prev][info.T];
-            seq[i][j][info.C] = seq[i][j][info.T] + seq[i][j_prev][info.C];
-            seq[i][j][info.W] = j + k;
+            solut.seq[i][j][info.T] = info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T];
+            solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C];
+            solut.seq[i][j][info.W] = j + k;
         }
     }
-    //console.log(seq);
+
+    solut.cost = solut.seq[0][info.dimension][info.C];
 }
 
 function sort(arr, r, info) {
@@ -90,7 +91,7 @@ function reinsert(s, i, j, pos) {
     }
 }
 
-function search_swap(s, seq, info) {
+function search_swap(solut, info) {
     var cost_best = Number.MAX_VALUE;
     var cost_new;
     var cost_concat_1;
@@ -106,12 +107,12 @@ function search_swap(s, seq, info) {
 
         // immediate nodes case
 
-        cost_concat_1 =                 seq[0][i_prev][info.T] + info.c[s[i_prev]][s[i_next]];
-        cost_concat_2 = cost_concat_1 + seq[i][i_next][info.T] + info.c[s[i]][s[i_next+1]];
+        cost_concat_1 =                 solut.seq[0][i_prev][info.T] + info.c[solut.s[i_prev]][solut.s[i_next]];
+        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T] + info.c[solut.s[i]][solut.s[i_next+1]];
 
-        cost_new = seq[0][i_prev][info.C]                                                            // 1st subseq 
-            + seq[i][i_next][info.W]           * (cost_concat_1) + info.c[s[i_next]][s[i]]              // concat 2nd subseq
-            + seq[i_next+1][info.dimension][info.W] * (cost_concat_2) + seq[i_next+1][info.dimension][info.C];  // concat 3rd subseq
+        cost_new = solut.seq[0][i_prev][info.C]                                                            // 1st subseq 
+            + solut.seq[i][i_next][info.W]           * (cost_concat_1) + info.c[solut.s[i_next]][solut.s[i]]              // concat 2nd subseq
+            + solut.seq[i_next+1][info.dimension][info.W] * (cost_concat_2) + solut.seq[i_next+1][info.dimension][info.C];  // concat 3rd subseq
 
         if(cost_new < cost_best){
             cost_best = cost_new - Number.EPSILON;
@@ -123,16 +124,16 @@ function search_swap(s, seq, info) {
             var j_next = j+1;
             var j_prev = j-1;
 
-            cost_concat_1 = seq[0][i_prev][info.T] + info.c[s[i_prev]][s[j]];
-            cost_concat_2 = cost_concat_1 + info.c[s[j]][s[i_next]];
-            cost_concat_3 = cost_concat_2 + seq[i_next][j_prev][info.T] + info.c[s[j_prev]][s[i]];
-            cost_concat_4 = cost_concat_3 + info.c[s[i]][s[j_next]];
+            cost_concat_1 = solut.seq[0][i_prev][info.T] + info.c[solut.s[i_prev]][solut.s[j]];
+            cost_concat_2 = cost_concat_1 + info.c[solut.s[j]][solut.s[i_next]];
+            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T] + info.c[solut.s[j_prev]][solut.s[i]];
+            cost_concat_4 = cost_concat_3 + info.c[solut.s[i]][solut.s[j_next]];
 
-            cost_new = seq[0][i_prev][info.C]                                                        /* first subseq */
+            cost_new = solut.seq[0][i_prev][info.C]                                                        /* first subseq */
                 + cost_concat_1                                                             /* concatenate second subseq (single node) */
-                + seq[i_next][j_prev][info.W] * cost_concat_2 + seq[i_next][j_prev][info.C]           /* concatenate third subseq */
+                + solut.seq[i_next][j_prev][info.W] * cost_concat_2 + solut.seq[i_next][j_prev][info.C]           /* concatenate third subseq */
                 + cost_concat_3                                                             /* concatenate fourth subseq (single node) */
-                + seq[j_next][info.dimension][info.W] * cost_concat_4 + seq[j_next][info.dimension][info.C];    /* concatenate fifth subseq */
+                + solut.seq[j_next][info.dimension][info.W] * cost_concat_4 + solut.seq[j_next][info.dimension][info.C];    /* concatenate fifth subseq */
 
             if(cost_new < cost_best){
                 cost_best = cost_new - Number.EPSILON;
@@ -145,13 +146,13 @@ function search_swap(s, seq, info) {
     }
 
 
-    if(cost_best < seq[0][info.dimension][info.C] - Number.EPSILON){
-        swap(s, I, J);
+    if(cost_best < solut.cost - Number.EPSILON){
+        swap(solut.s, I, J);
         /*
         console.log("swap");
         console.log(cost_best);
         */
-        subseq_load(s, seq, info);
+        subseq_load(solut, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         console.log();
@@ -163,7 +164,7 @@ function search_swap(s, seq, info) {
     return false;
 }
 
-function search_two_opt(s, seq, info) {
+function search_two_opt(solut, info) {
     var I = -1;
     var J = -1;
     var cost_best = Number.MAX_VALUE;
@@ -173,20 +174,20 @@ function search_two_opt(s, seq, info) {
 
     for(var i = 1; i < info.dimension-1; i++){
         var i_prev = i -1;
-        var rev_seq_cost = seq[i][i+1][info.T];
+        var rev_seq_cost = solut.seq[i][i+1][info.T];
 
         for(var j = i+2; j < info.dimension; j++){
             var j_next = j+1;
             var j_prev = j-1;
 
-            rev_seq_cost += info.c[s[j_prev]][s[j]] * (seq[i][j][info.W]-1);
+            rev_seq_cost += info.c[solut.s[j_prev]][solut.s[j]] * (solut.seq[i][j][info.W]-1);
 
-            cost_concat_1 =                 seq[0][i_prev][info.T] + info.c[s[j]][s[i_prev]];
-            cost_concat_2 = cost_concat_1 + seq[i][j][info.T] + info.c[s[j_next]][s[i]];
+            cost_concat_1 =                 solut.seq[0][i_prev][info.T] + info.c[solut.s[j]][solut.s[i_prev]];
+            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T] + info.c[solut.s[j_next]][solut.s[i]];
 
-            cost_new = seq[0][i_prev][info.C]                                                        /*        1st subseq */
-                + seq[i][j][info.W]              * cost_concat_1 + rev_seq_cost                  /* concat 2nd subseq (reversed seq) */
-                + seq[j_next][info.dimension][info.W] * cost_concat_2 + seq[j_next][info.dimension][info.C];    /* concat 3rd subseq */
+            cost_new = solut.seq[0][i_prev][info.C]                                                        /*        1st subseq */
+                + solut.seq[i][j][info.W]              * cost_concat_1 + rev_seq_cost                  /* concat 2nd subseq (reversed seq) */
+                + solut.seq[j_next][info.dimension][info.W] * cost_concat_2 + solut.seq[j_next][info.dimension][info.C];    /* concat 3rd subseq */
 
             if(cost_new < cost_best){
                 cost_best = cost_new - Number.EPSILON;
@@ -196,13 +197,13 @@ function search_two_opt(s, seq, info) {
         }
     }
 
-    if(cost_best < seq[0][info.dimension][info.C] - Number.EPSILON){
-        reverse(s, I, J);
+    if(cost_best < solut.cost - Number.EPSILON){
+        reverse(solut.s, I, J);
         /*
         console.log("two opt");
         console.log(cost_best);
         */
-        subseq_load(s, seq, info);
+        subseq_load(solut, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         console.log();
@@ -213,7 +214,7 @@ function search_two_opt(s, seq, info) {
     return false;
 }
 
-function search_reinsertion(s, seq, info, opt) {
+function search_reinsertion(solut, info, opt) {
     var cost_best = Number.MAX_VALUE;
     var cost_new;
     var cost_concat_1;
@@ -232,14 +233,14 @@ function search_reinsertion(s, seq, info, opt) {
         for (var k = 0; k < i_prev; k++) {
             var k_next = k+1;
 
-            cost_concat_1 = seq[0][k][info.T] + info.c[s[k]][s[i]];
-            cost_concat_2 = cost_concat_1 + seq[i][j][info.T] + info.c[s[j]][s[k_next]];
-            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][info.T] + info.c[s[i_prev]][s[j_next]];
+            cost_concat_1 = solut.seq[0][k][info.T] + info.c[solut.s[k]][solut.s[i]];
+            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T] + info.c[solut.s[j]][solut.s[k_next]];
+            cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T] + info.c[solut.s[i_prev]][solut.s[j_next]];
 
-            cost_new = seq[0][k][info.C]                                                             /*        1st subseq */
-                + seq[i][j][info.W]              * cost_concat_1 + seq[i][j][info.C]                  /* concat 2nd subseq (reinserted seq) */
-                + seq[k_next][i_prev][info.W]    * cost_concat_2 + seq[k_next][i_prev][info.C]        /* concat 3rd subseq */
-                + seq[j_next][info.dimension][info.W] * cost_concat_3 + seq[j_next][info.dimension][info.C];    /* concat 4th subseq */
+            cost_new = solut.seq[0][k][info.C]                                                             /*        1st subseq */
+                + solut.seq[i][j][info.W]              * cost_concat_1 + solut.seq[i][j][info.C]                  /* concat 2nd subseq (reinserted seq) */
+                + solut.seq[k_next][i_prev][info.W]    * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        /* concat 3rd subseq */
+                + solut.seq[j_next][info.dimension][info.W] * cost_concat_3 + solut.seq[j_next][info.dimension][info.C];    /* concat 4th subseq */
 
             if(cost_new < cost_best){
                 cost_best = cost_new - Number.EPSILON;
@@ -252,14 +253,14 @@ function search_reinsertion(s, seq, info, opt) {
         for (var k = i+opt; k < info.dimension - opt - 1; k++) {
             var k_next = k+1;
 
-            cost_concat_1 = seq[0][i_prev][info.T] + info.c[s[i_prev]][s[j_next]];
-            cost_concat_2 = cost_concat_1 + seq[j_next][k][info.T] + info.c[s[k]][s[i]];
-            cost_concat_3 = cost_concat_2 + seq[i][j][info.T] + info.c[s[j]][s[k_next]];
+            cost_concat_1 = solut.seq[0][i_prev][info.T] + info.c[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T] + info.c[solut.s[k]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T] + info.c[solut.s[j]][solut.s[k_next]];
 
-            cost_new = seq[0][i_prev][info.C]                                                        /*      1st subseq */
-                + seq[j_next][k][info.W]         * cost_concat_1 + seq[j_next][k][info.C]             /* concat 2nd subseq */
-                + seq[i][j][info.W]              * cost_concat_2 + seq[i][j][info.C]                  /* concat 3rd subseq (reinserted seq) */
-                + seq[k_next][info.dimension][info.W] * cost_concat_3 + seq[k_next][info.dimension][info.C];    /* concat 4th subseq */
+            cost_new = solut.seq[0][i_prev][info.C]                                                        /*      1st subseq */
+                + solut.seq[j_next][k][info.W]         * cost_concat_1 + solut.seq[j_next][k][info.C]             /* concat 2nd subseq */
+                + solut.seq[i][j][info.W]              * cost_concat_2 + solut.seq[i][j][info.C]                  /* concat 3rd subseq (reinserted seq) */
+                + solut.seq[k_next][info.dimension][info.W] * cost_concat_3 + solut.seq[k_next][info.dimension][info.C];    /* concat 4th subseq */
 
             if(cost_new < cost_best){
                 cost_best = cost_new - Number.EPSILON;
@@ -271,14 +272,14 @@ function search_reinsertion(s, seq, info, opt) {
     }
     //console.log("cost best
 
-    if(cost_best < seq[0][info.dimension][info.C] - Number.EPSILON){
-        reinsert(s, I, J, POS+1);
+    if(cost_best < solut.cost - Number.EPSILON){
+        reinsert(solut.s, I, J, POS+1);
         /*
         console.log("reinsertion", I, POS+1, opt);
         //console.log(s);
         console.log(cost_best);
         */
-        subseq_load(s, seq, info);
+        subseq_load(solut, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         //console.log(s);
@@ -291,7 +292,7 @@ function search_reinsertion(s, seq, info, opt) {
     return false;
 }
 
-function RVND(s, subseq, info) {
+function RVND(solut, info) {
     const SWAP        = 0;
     const REINSERTION = 1;
     const OR_OPT_2    = 2;
@@ -309,11 +310,9 @@ function RVND(s, subseq, info) {
     console.log(subseq[0][info.dimension][info.C]);
     */
     var improve = false;
-    var ITER = 0;
 
     //console.log("opa");
     while (neighbd_list.length > 0) {
-        ITER++;
         let i = parseInt(Math.random() * neighbd_list.length);
         i = info.rnd[info.rnd_index++];
         let neighbd = neighbd_list[i];
@@ -321,19 +320,19 @@ function RVND(s, subseq, info) {
 
         switch (neighbd) {
             case SWAP:
-                improve = search_swap(s, subseq, info);
+                improve = search_swap(solut, info);
                 break;
             case REINSERTION:
-                improve = search_reinsertion(s, subseq, info, REINSERTION);
+                improve = search_reinsertion(solut, info, REINSERTION);
                 break;
             case OR_OPT_2:
-                improve = search_reinsertion(s, subseq, info, OR_OPT_2);
+                improve = search_reinsertion(solut, info, OR_OPT_2);
                 break;
             case OR_OPT_3:
-                improve = search_reinsertion(s, subseq, info, OR_OPT_3);
+                improve = search_reinsertion(solut, info, OR_OPT_3);
                 break;
             case TWO_OPT:
-                improve = search_two_opt(s, subseq, info);
+                improve = search_two_opt(solut, info);
                 break;
         }
 
@@ -348,8 +347,6 @@ function RVND(s, subseq, info) {
     }
     //process.exit();
     //console.log(s, subseq[0][info.dimension][info.C]);
-    //
-    return ITER;
 
 }
 
@@ -393,49 +390,65 @@ function perturb(sl, info) {
 
 function GILS_RVND(Iils, Imax, R, info) {
 
-    subseq = subseq_fill(info.dimension);
-    var s_best = [];
-    var cost_best = Number.MAX_VALUE;
+    seq_a = subseq_fill(info.dimension);
+    seq_b = subseq_fill(info.dimension);
+    seq_c = subseq_fill(info.dimension);
 
-    var ITER = 0;
+    var solut_crnt = {
+        seq : seq_a,
+        s   : Array(info.dimension+1),
+        cost : 0};
+
+    var solut_partial = {
+        seq : seq_b,
+        s   : Array(info.dimension+1),
+        cost : 0};
+
+    var solut_best = {
+        seq : seq_c,
+        s   : Array(info.dimension+1),
+        cost : Number.MAX_VALUE};
 
     for (var i = 0; i < Imax; i++) {
         var alpha = R[parseInt(Math.random() * 26)];
         alpha = R[info.rnd[info.rnd_index++]];
         console.log("[+] Local Search ", i+1);
         console.log("\t[+] Constructing Inital Solution..");
-        var s = construction(alpha, info);
-        var sl = [...s];
+        solut_crnt.s = construction(alpha, info);
+        subseq_load(solut_crnt, info);
 
-        subseq_load(s, subseq, info);
-        var rvnd_cost_best = subseq[0][info.dimension][info.C] - Number.EPSILON;
-        console.log("Construction cost", rvnd_cost_best);
+        solut_partial.s = [...solut_crnt.s];
+        solut_partial.cost = solut_crnt.cost;
+
+        //var rvnd_cost_best = subseq[0][info.dimension][info.C] - Number.EPSILON;
+        console.log("Construction cost", solut_partial.cost);
         var iterILS = 0;
 
         console.log("\t[+] Looking for the best Neighbor..");
         while (iterILS < Iils) {
-            ITER += RVND(s, subseq, info);
-            var rvnd_cost_crnt = subseq[0][info.dimension][info.C] - Number.EPSILON;
-            if (rvnd_cost_crnt < rvnd_cost_best) {
-                rvnd_cost_best = rvnd_cost_crnt;// -  Number.EPSILON;
-                sl = [...s];
+            RVND(solut_crnt, info);
+
+            if (solut_crnt.cost < solut_partial.cost) {
+                solut_partial.cost = solut_crnt.cost;// -  Number.EPSILON;
+                solut_partial.s = [...solut_crnt.s];
                 iterILS = 0;
             }
 
-            s = perturb(sl, info);
-            subseq_load(s, subseq, info);
+            solut_crnt.s = perturb(solut_partial.s, info);
+            subseq_load(solut_crnt, info);
             iterILS++;
         }
 
 
-        subseq_load(sl, subseq, info);
-        var sl_cost = subseq[0][info.dimension][info.C] - Number.EPSILON;
+        //subseq_load(sl, subseq, info);
+        //var sl_cost = subseq[0][info.dimension][info.C] - Number.EPSILON;
 
-        if (sl_cost < cost_best) {
-            s_best = sl;
-            cost_best = sl_cost;
+        if (solut_partial.cost < solut_best.cost) {
+            solut_best.s = [...solut_partial.s];
+            solut_best.cost = solut_partial.cost;
         }
-        console.log("\tcurrent best solution cost",  cost_best);
+
+        console.log("\tcurrent best solution cost",  solut_best.cost);
         console.log();
     }
 
