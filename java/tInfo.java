@@ -20,6 +20,7 @@ class tInfo {
         rnd = rnd_arr;
         dimension = dimen;
         c = cost;
+        rnd_index = 0;
     }
 
     int getDimen()                  {return dimension;}

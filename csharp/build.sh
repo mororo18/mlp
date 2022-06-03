@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#! /bin/bash
 # using mono
 mcs -optimize+ main.cs Data.cs GILS_RVND.cs  
 
