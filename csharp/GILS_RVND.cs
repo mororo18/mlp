@@ -33,17 +33,6 @@ namespace MLP {
 
             Iils = (dimension < 100 ? dimension : 100);
 
-            //subseq = new double [dimension+1, dimension+1, 3];
-            //subseq = new double [dimension+1][][];
-            /*
-            for(int i = 0; i < dimension+1; i++){
-                subseq[i] = new double [dimension+1][];
-
-                for(int j = 0; j < dimension+1; j++){
-                    subseq[i][j] = new double [3];
-                }
-            }
-            */
 
             int [] rnd = data.GetRnd();
 
@@ -52,7 +41,6 @@ namespace MLP {
         }
 
         private void subseq_load(tSolution solut, tInfo info){
-            //t_subseq -= Stopwatch.GetTimestamp();
             for(int i = 0; i < info.GetDimen()+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -226,12 +214,6 @@ namespace MLP {
                             + solut.GetSeq(i, j, tInfo.W)              * cost_concat_1 + rev_seq_cost
                             + solut.GetSeq(j_next, info.GetDimen(), tInfo.W) * cost_concat_2 + solut.GetSeq(j_next, info.GetDimen(), tInfo.C);
 
-                    /*
-                    Console.WriteLine("REV_cost " + rev_seq_cost);
-                    Console.WriteLine("concat 1 " + cost_concat_1);
-                    Console.WriteLine("concat 2 "  + cost_concat_2);
-                    Console.WriteLine(cost_new);
-                    */
                     if(cost_new < cost_best){
                         cost_best = cost_new - tInfo.EPSILON;
                         I = i;
@@ -320,7 +302,6 @@ namespace MLP {
         }
 
         private void RVND(tSolution solut, tInfo info){
-            //List<int> neighbd_list = new List<int> {TWO_OPT};
             List<int> neighbd_list = new List<int> {tInfo.SWAP, tInfo.TWO_OPT, tInfo.REINSERTION, tInfo.OR_OPT2, tInfo.OR_OPT3};
 
             /*
