@@ -1,4 +1,4 @@
-#! /usr/bin/julia
+#! /opt/julia-1.4.2/bin/julia
 using Printf
 using BenchmarkTools
 include("Data.jl")
@@ -260,7 +260,7 @@ function search_reinsertion(solut::tSolution, info::tInfo, opt::Int)::Bool
 
         end
 
-        for k in i+opt:info.dimen-opt-1
+        for k in i+opt:info.dimen
                 k_next = k+1
 
                 cost_concat_1 =                 solut.seq[1, i_prev, info.T]   + info.cost[solut.s[i_prev], solut.s[j_next]]

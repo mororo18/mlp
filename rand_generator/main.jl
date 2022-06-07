@@ -1,6 +1,5 @@
-#! /usr/bin/julia
+#! /opt/julia-1.4.2/bin/julia
 using Printf
-using Profile, PProf
 include("Data.jl")
 
 mutable struct tInfo
@@ -253,7 +252,7 @@ function search_reinsertion(solut::tSolution, info::tInfo, opt::Int)::Bool
 
         end
 
-        @simd for k in i+opt:info.dimen-opt-1
+        @simd for k in i+opt:info.dimen
                 k_next = k+1
 
                 cost_concat_1 =                 solut.seq[1, i_prev, info.T]   + info.cost[solut.s[i_prev], solut.s[j_next]]
