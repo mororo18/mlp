@@ -1,2 +1,2 @@
-#! /usr/bin/bash
+#! /bin/bash
 pypy3 main.py
