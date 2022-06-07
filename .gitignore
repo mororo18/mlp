@@ -2,6 +2,7 @@
 
 rust/main_/target/*
 python/__pycache__/
+*.mod
 *.mem
 *.class
 *.pyo
