@@ -1,3 +1,3 @@
 #! /bin/bash
 
-make clear && make
+make clean && make
