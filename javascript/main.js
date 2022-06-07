@@ -250,7 +250,7 @@ function search_reinsertion(solut, info, opt) {
             }
         }
 
-        for (var k = i+opt; k < info.dimension - opt - 1; k++) {
+        for (var k = i+opt; k < info.dimension; k++) {
             var k_next = k+1;
 
             cost_concat_1 = solut.seq[0][i_prev][info.T] + info.c[solut.s[i_prev]][solut.s[j_next]];

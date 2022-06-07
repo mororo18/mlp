@@ -304,7 +304,7 @@ function search_reinsertion(solut, info, opt)
             end
         end
 
-        for k = i+opt,info.dimension-opt-1 do
+        for k = i+opt,info.dimension do
             local k_next = k+1
 
             cost_concat_1 =                 solut.seq[1][i_prev][info.T]   + info.c[solut.s[i_prev]][solut.s[j_next]];

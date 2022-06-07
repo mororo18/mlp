@@ -267,7 +267,7 @@ namespace MLP {
                     }
                 }
 
-                for(int k = i+opt; k < info.GetDimen() - opt - 1; k++){
+                for(int k = i+opt; k < info.GetDimen(); k++){
                     int k_next = k+1;
 
                     cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solut.GetSolut()[i_prev], solut.GetSolut()[j_next]);

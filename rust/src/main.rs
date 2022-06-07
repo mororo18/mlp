@@ -261,7 +261,7 @@ fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & tInfo) -> bo
             }
         }
 
-        for k in i+opt..info.dimen-opt-1 {
+        for k in i+opt..info.dimen {
             let k_next : usize = k+1;
 
             cost_concat_1 = solut.seq[0][ i_prev][info.T] + info.c[solut.s[i_prev]][solut.s[j_next]];

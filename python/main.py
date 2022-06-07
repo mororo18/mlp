@@ -306,7 +306,7 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
                 POS = k
 
 
-        for k in range(i+opt, MAX - 1):
+        for k in range(i+opt, info.dimen):
             k_next = k+1
 
             cost_concat_1 =                 seq[0]     [i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
