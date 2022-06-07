@@ -570,7 +570,7 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
 
         end do
 
-        do k=i+opt, dimen-opt-1
+        do k=i+opt, dimen
             k_next = k+1
 
             cost_concat_1 =                 seq(1, i_prev, T)   + cost(s(i_prev), s(j_next))

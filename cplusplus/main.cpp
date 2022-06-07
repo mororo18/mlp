@@ -287,7 +287,7 @@ void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
             }
         }
 
-        for (k = i + opt; k < dimen -opt -1; ++k) {
+        for (k = i + opt; k < dimen ; ++k) {
             k_next = k + 1;
 
             cost_concat_1 =                 seq[0][ i_prev].T  + cost[s[i_prev]][s[j_next]];

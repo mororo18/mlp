@@ -292,7 +292,7 @@ fn search_reinsertion(s : &mut Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, opt : 
             }
         }
 
-        for k in i+opt..dimen-opt-1 {
+        for k in i+opt..dimen {
             let k_next : usize = k+1;
             cost_concat_1 = seq[0][i_prev].T + c[s[i_prev]][s[j_next]];
             cost_concat_2 = cost_concat_1 + seq[j_next][ k].T + c[s[k]][s[i]];

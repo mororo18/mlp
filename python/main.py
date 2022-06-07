@@ -286,7 +286,7 @@ def search_reinsertion(s, seq, OPT):
             '''
 
 
-        for k in range(i+opt, MAX - 1):
+        for k in range(i+opt, n):
             k_next = k+1
 
             cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[j_next]]

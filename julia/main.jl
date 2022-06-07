@@ -1,4 +1,4 @@
-#! /usr/bin/julia
+#! /opt/julia-1.4.2/bin/julia
 using Printf
 include("Data.jl")
 
@@ -250,7 +250,7 @@ function search_reinsertion(s::Array{Int64,1}, seq::Array{Float64,3}, opt::Int64
             end
         end
 
-        for k in i+opt:dimension-opt-1
+        for k in i+opt:dimension
             k_next = k+1
 
             cost_concat_1 = seq[1, i_prev, T] + c[s[i_prev], s[j_next]]

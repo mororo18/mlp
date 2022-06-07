@@ -314,7 +314,7 @@ function search_reinsertion(s, seq, opt)
             end
         end
 
-        for k = i+opt,dimension-opt-1 do
+        for k = i+opt,dimension do
             local k_next = k+1
 
             cost_concat_1 =                 seq[1][i_prev][T]   + c[s[i_prev]][s[j_next]];

@@ -302,7 +302,7 @@ function [solut_new, seq_new, ret] = search_reinsertion(s, seq, opt)
 
         end
 
-        for k = i+opt:dimen-opt-1
+        for k = i+opt:dimen
             k_next = k+1;
 
             cost_concat_1 =                 seq(1, i_prev, T)   + cost(s(i_prev), s(j_next));

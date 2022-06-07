@@ -318,7 +318,7 @@ namespace MLP {
                     }
                 }
 
-                for(int k = i+opt; k < dimension - opt - 1; k++){
+                for(int k = i+opt; k < dimension ; k++){
                     int k_next = k+1;
 
                     cost_concat_1 = seq[0][ i_prev][ T] + c[s[i_prev]][ s[j_next]];;
