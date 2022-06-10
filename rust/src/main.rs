@@ -458,7 +458,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
 
 
     println!("{:?}", solut_best.s);
-    println!("COST {}", solut_best.cost);
+    println!("COST: {}", solut_best.cost);
 }
 
 fn print_type_of<T>(_: &T) {
@@ -542,7 +542,7 @@ fn main() {
     GILS_RVND(Imax, Iils, R, &mut info);
 
     let new_now = Instant::now();
-    println!("{}", new_now.duration_since(now).as_secs_f64());
+    println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
 
     /*
     for i in 0..dimension {

@@ -586,9 +586,6 @@ int main(int argc, char **argv){
     double res = (double)duration / 10e2;
     std::cout << "TIME: " << res << std::endl;
 
-    std::cout << "Tamanho RND " << rnd.size() << std::endl;
-
-    exit(0);
     /*
     flag = true;
 

@@ -481,7 +481,7 @@ function main
     t0 = clock ();
     s = GILS_RVND(Imax, Iils, R, info);
     elapsed_time = etime (clock (), t0);
-    printf('TIME: %.2f\n', elapsed_time)
+    printf('TIME: %.4f\n', elapsed_time)
     s.s;
 end
 

@@ -884,9 +884,9 @@ program main
     CALL SYSTEM_CLOCK(begin, rate)
     sol = GILS_RVND(Imax, Iils, R, info)
     CALL SYSTEM_CLOCK(end_)
-    print *, sol%cost
+    print *, "COST: ", sol%cost
 
-    print *, "elapsed time: ", real(end_ - begin) / real(rate)
+    print *, "TIME: ", real(end_ - begin) / real(rate)
 
     print *, "reinsert Calls ", info%reinsert_call
 end program

@@ -149,7 +149,12 @@ def main():
             "python3": "python",
             "pypy": "python",
             "julia": "julia",
-            "cpp" : "cplusplus"
+            "cpp" : "cplusplus",
+            "fortran" : "fortran",
+            "node" : "javascript",
+            "lua" : "lua",
+            "luajit" : "lua",
+            "rust" : "rust"
             }
 
     """
