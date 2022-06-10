@@ -9,3 +9,8 @@ python/__pycache__/
 *.pyc
 *.prof
 *.o
+csharp/bin/*
+csharp/dotnet_output/*
+csharp/obj/*
+*.csproj
+*.exe
