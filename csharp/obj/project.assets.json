@@ -8,19 +8,23 @@
     "net5.0": []
   },
   "packageFolders": {
-    "/home/victor/.nuget/packages/": {}
+    "/home/vmororo/.nuget/packages/": {},
+    "/usr/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/victor/repos/mlp/csharp/csharp.csproj",
+      "projectUniqueName": "/home/vmororo/repos/mlp/csharp/csharp.csproj",
       "projectName": "csharp",
-      "projectPath": "/home/victor/repos/mlp/csharp/csharp.csproj",
-      "packagesPath": "/home/victor/.nuget/packages/",
-      "outputPath": "/home/victor/repos/mlp/csharp/obj/",
+      "projectPath": "/home/vmororo/repos/mlp/csharp/csharp.csproj",
+      "packagesPath": "/home/vmororo/.nuget/packages/",
+      "outputPath": "/home/vmororo/repos/mlp/csharp/obj/",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "/home/victor/.nuget/NuGet/NuGet.Config"
+        "/home/vmororo/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
@@ -53,12 +57,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[5.0.0, 5.0.0]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[5.0.15, 5.0.15]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[5.0.0, 5.0.0]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/5.0.404/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.201/RuntimeIdentifierGraph.json"
       }
     }
   }
