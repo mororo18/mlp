@@ -463,4 +463,4 @@ def main(rnd):
 
 start = time.time()
 main(rnd)
-print("TIME %s " % (time.time() - start))
+print("TIME: %s " % (time.time() - start))

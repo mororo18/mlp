@@ -415,7 +415,7 @@ function main(rnd::Array{Int, 1})
 
     time = @elapsed GILS_RVND(Imax, Iils, R, tRnd(rnd, 1))
 
-    @printf "TIME %.6lf\n" time
+    @printf "TIME: %.6lf\n" time
 
 end
 

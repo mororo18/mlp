@@ -992,6 +992,7 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
 
     print *, sol_best
     !print *, "RVND it", Tit
+    print *, "COST: ", cost_best
 
     ret = sol_best(:)
 
@@ -1074,7 +1075,7 @@ program main
     CALL SYSTEM_CLOCK(end_)
     !print *, sol%cost
 
-    print *, "elapsed time: ", real(end_ - begin) / real(rate)
+    print *, "TIME: ", real(end_ - begin) / real(rate)
 
     !print *, "reinsert Calls ", info%reinsert_call
 end program
