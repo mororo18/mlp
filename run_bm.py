@@ -125,7 +125,7 @@ def main():
     args = parser.parse_args()
 
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp",
-            "fortran", "node", "lua", "luajit", "rust"]
+            "fortran", "node", "lua", "luajit", "rust", "octave"]
 
     for i in args.lang:
         if i not in sources:
@@ -154,7 +154,8 @@ def main():
             "node" : "javascript",
             "lua" : "lua",
             "luajit" : "lua",
-            "rust" : "rust"
+            "rust" : "rust",
+            "octave" : "octave"
             }
 
     """
