@@ -452,7 +452,7 @@ function GILS_RVND(Iils, Imax, R, info) {
         console.log();
     }
 
-    console.log("COST: ", cost_best);
+    console.log("COST: ", solut_best.cost);
     //console.log("\tRVND ITER ", ITER);
 }
 
