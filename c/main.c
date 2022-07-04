@@ -101,6 +101,27 @@ void sort(int * arr, int arr_size, int r) {
     }
 }
 
+void shift(int * vec, int from, int to, int sz) {
+    if (from < to) {
+        int dist = to - from;
+
+        for (int i = from+sz-1, j = to+sz-1; i >= from; i--,j--) {
+            vec[j] = vec[i];
+        }
+    } else {
+        for (int i = from, j = to; i < from+sz; i++, j++) {
+            vec[j] = vec[i];
+        }
+    }
+
+}
+
+void cpy(int * from, int * to, int sz) {
+    for (int i = 0; i < sz; i++) {
+        *(to+i) = *(from+i);
+    }
+}
+
 void construct(int * ret, const double alpha, tRnd * rnd){
 
     int s[dimen+1];
@@ -129,7 +150,8 @@ void construct(int * ret, const double alpha, tRnd * rnd){
         s[j] = c;
         //print_s(cL);
         r = c;
-        memmove(cL+index, cL+index+1, sizeof(int)*(cL_size-index));
+        //memmove(cL+index, cL+index+1, sizeof(int)*(cL_size-index));
+        shift(cL, index+1, index, cL_size-index);
         cL_size--;
     }
 
@@ -156,12 +178,16 @@ void reinsert(int * vec, int i, int j, int pos){
 
     if(pos < i){
         int sz = i-pos;
-        memmove(vec + j+1-sz, vec + pos, sizeof(int)*sz);
-        memcpy(vec + pos, seq, sizeof(int)*(j-i+1));
+        shift(vec, vec + pos, vec + j+1-sz, sz);
+        //memmove(vec + j+1-sz, vec + pos, sizeof(int)*sz);
+        cpy(seq, vec + pos, j-i+1);
+        //memcpy(vec + pos, seq, sizeof(int)*(j-i+1));
     }else{
         int sz = pos-j-1;
-        memmove(vec + i, vec + j+1, sizeof(int)*sz);
-        memcpy(vec + i+sz, seq, sizeof(int)*(j-i+1));
+        shift(vec, vec + j+1, vec + i, sz);
+        //memmove(vec + i, vec + j+1, sizeof(int)*sz);
+        cpy(seq, vec+i+sz, j-i+1);
+        //memcpy(vec + i+sz, seq, sizeof(int)*(j-i+1));
     }
 }
 
@@ -542,7 +568,7 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
         printf("\t[+] Constructing..\n");	
 
         construct(s_crnt, alpha, rnd);
-        //print_s(solut_crnt.s);
+        print_s(s_crnt, dimen+1);
         cost_crnt = subseq_load(s_crnt, seq);
 
         memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
