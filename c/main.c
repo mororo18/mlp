@@ -118,7 +118,7 @@ void shift(int * vec, int from, int to, int sz) {
 
 void cpy(int * from, int * to, int sz) {
     for (int i = 0; i < sz; i++) {
-        *(to+i) = *(from+i);
+        to[i] = from[i];
     }
 }
 
@@ -155,7 +155,8 @@ void construct(int * ret, const double alpha, tRnd * rnd){
         cL_size--;
     }
 
-    memcpy(ret, s, sizeof(int)*(dimen+1));
+    cpy(s, ret, (dimen+1));
+    //memcpy(ret, s, sizeof(int)*(dimen+1));
 }	
 
 void swap(int * vec, int i, int j){
@@ -174,17 +175,18 @@ void reverse(int * vec, int i, int j){
 
 void reinsert(int * vec, int i, int j, int pos){
     int seq[j-i+1];
-    memcpy(seq, vec + i, sizeof(int)*(j-i+1));
+    //memcpy(seq, vec + i, sizeof(int)*(j-i+1));
+    cpy(vec + i, seq, (j-i+1));
 
     if(pos < i){
         int sz = i-pos;
-        shift(vec, vec + pos, vec + j+1-sz, sz);
+        shift(vec, pos, j+1-sz, sz);
         //memmove(vec + j+1-sz, vec + pos, sizeof(int)*sz);
         cpy(seq, vec + pos, j-i+1);
         //memcpy(vec + pos, seq, sizeof(int)*(j-i+1));
     }else{
         int sz = pos-j-1;
-        shift(vec, vec + j+1, vec + i, sz);
+        shift(vec, j+1, i, sz);
         //memmove(vec + i, vec + j+1, sizeof(int)*sz);
         cpy(seq, vec+i+sz, j-i+1);
         //memcpy(vec + i+sz, seq, sizeof(int)*(j-i+1));
@@ -468,7 +470,8 @@ void RVND(int * solut, tSubseq seq[][dimen+1], tRnd * rnd) {
             //std::cout << solut.cost << std::endl;
             
             //std::cout << info.rnd_index << std::endl;
-            memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
+            //memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
+            shift(neighbd_list, index+1, index, (nl_size-index-1));
             nl_size--;
         }
 
@@ -483,7 +486,7 @@ void RVND(int * solut, tSubseq seq[][dimen+1], tRnd * rnd) {
 
 void perturb(int * s_crnt, int * s_partial, tRnd * rnd) {
     int s[dimen+1];
-    memmove(s, s_partial, sizeof(int)*(dimen+1));
+    cpy(s_partial, s, (dimen+1));
 
     int A_start = 1;
     int A_end = 1;
@@ -537,7 +540,8 @@ void perturb(int * s_crnt, int * s_partial, tRnd * rnd) {
     //print_s(s);
     //subseq_load(solut, info);
 
-    memcpy(s_crnt, s, sizeof(int)*(dimen+1));
+    cpy(s, s_crnt, (dimen+1));
+    //memcpy(s_crnt, s, sizeof(int)*(dimen+1));
 }
 
 
@@ -571,7 +575,8 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
         print_s(s_crnt, dimen+1);
         cost_crnt = subseq_load(s_crnt, seq);
 
-        memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
+        cpy(s_crnt, s_partial, (dimen+1));
+        //memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
         cost_partial = cost_crnt;
 
         printf("\t[+] Looking for the best Neighbor..\n");
@@ -585,7 +590,8 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
             cost_crnt = seq[0][dimen].C;
             if(cost_crnt < cost_partial - DBL_EPSILON){
                 //Solution_cpy(&solut_crnt, &solut_partial, info);
-                memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
+                cpy(s_crnt, s_partial, (dimen+1));
+                //memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
                 cost_partial = cost_crnt;
                 //solut_partial = solut_crnt;
                 iterILS = 0;
@@ -601,7 +607,8 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
         //subseq_load(solut_partial, info);
 
         if (cost_partial < cost_best - DBL_EPSILON) {
-            memcpy(s_best, s_partial, sizeof(int)*(dimen+1));
+            cpy(s_partial, s_best, (dimen+1));
+            //memcpy(s_best, s_partial, sizeof(int)*(dimen+1));
             cost_best = cost_partial;
             //solut_best = solut_partial;
         }
