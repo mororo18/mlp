@@ -1,6 +1,6 @@
-#! /usr/bin/julia
+#! /opt/julia-1.4.2/bin/julia
 using Printf
-using Profile, PProf
+#using Profile, PProf
 include("Data.jl")
 
 mutable struct tInfo

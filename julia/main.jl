@@ -1,6 +1,6 @@
-#! /usr/bin/julia
+#! /opt/julia-1.4.2/bin/julia
 using Printf
-using Profile, PProf
+#using Profile, PProf
 using BenchmarkTools
 include("Data.jl")
 
@@ -506,7 +506,7 @@ function main()
 
 end
 
-@btime main()
+main()
 
 # using ProfileView, Profile, PProf
 #=
