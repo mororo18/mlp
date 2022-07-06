@@ -90,7 +90,7 @@ double R_table(int i){
 void print_s(int * s, int sz) {
 
     for (int i = 0; i < sz; i++)
-        printf("%d ", s[i]+1);
+        printf("%d ", s[i]);
     printf("\n");
 }
 
@@ -107,7 +107,7 @@ void sort(int * arr, int arr_size, int r, tInfo * info) {
     }
 }
 
-void construct(int ** ret, const double alpha, tInfo * info){
+void construct(int * ret, const double alpha, tInfo * info){
 
     int s[info->dimen+1];
 
@@ -139,7 +139,7 @@ void construct(int ** ret, const double alpha, tInfo * info){
         cL_size--;
     }
 
-    memcpy(*ret, s, sizeof(int)*(info->dimen+1));
+    memcpy(ret, s, sizeof(int)*(info->dimen+1));
 }	
 
 void swap(int * vec, int i, int j){
@@ -382,12 +382,30 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
     if (cost_best < solut->cost - DBL_EPSILON) {
         reinsert(solut->s, I, J, POS+1);
         subseq_load_b(solut, info, I < POS+1 ? I : POS+1);
+        if (cost_best == 21575.0) {
+            puts("pa");
+        }
         return TRUE;
     }
 
     return FALSE;
 }
 
+
+char feasible(int * s, int sz) {
+    int count[sz]; 
+
+    memset(count, 0, sizeof(int)*sz);
+
+    for (int i = 0; i < sz; i++)
+        count[s[i]] += 1;
+
+    for (int i = 0; i < sz; i++)
+        if (count[i] != 1) 
+            return FALSE;
+
+    return TRUE;
+}
 
 void RVND(tSolution * solut, tInfo * info) {
 
@@ -397,10 +415,10 @@ void RVND(tSolution * solut, tInfo * info) {
     int neighbd;
     char improve_flag;
 
-    //cout << "RVND" << endl;
+    printf("RVND\n");
     while (nl_size > 0) {
         //k++;
-
+        printf("\t%.0lf\n", solut->cost);
         index = rand() % nl_size;
         index = info->rnd[info->rnd_index++];
         neighbd = neighbd_list[index];
@@ -412,28 +430,37 @@ void RVND(tSolution * solut, tInfo * info) {
             case REINSERTION:
                 //before();
                 improve_flag = search_reinsertion(solut, info, REINSERTION);
-                //after(REINSERTION);
+                printf("REINSERTION");
                 break;				
             case OR_OPT_2:
                 //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_2);
-                //after(OR_OPT2);
+                //after();
+                printf("OR_OPT2\t");
                 break;				
             case OR_OPT_3:
                 //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_3);
                 //after(OR_OPT3);
+                printf("OR_OPT3\t");
                 break;				
             case SWAP:
                 //before();
                 improve_flag = search_swap(solut, info);
                 //after(SWAP);
+                printf("SWAP\t");
                 break;
             case TWO_OPT:
                 //before();
                 improve_flag = search_two_opt(solut, info);
                 //after(TWO_OPT);
+                printf("TWO_OPT\t");
                 break;				
+        }
+
+        if (feasible(solut->s, info->dimen+1)) {
+            printf("qebrad\n");
+            exit(0);
         }
         //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
@@ -443,11 +470,14 @@ void RVND(tSolution * solut, tInfo * info) {
             neighbd_list[3] = OR_OPT_2;
             neighbd_list[4] = OR_OPT_3;
             nl_size = 5;
+
+            //print_s(solut->s, info->dimen+1);
         } else {
             //std::cout << index << "  " << neighbd_list.size() << std::endl;
             //std::cout << solut.cost << std::endl;
             
             //std::cout << info.rnd_index << std::endl;
+            //print_s(neighbd_list, nl_size);
             memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
             nl_size--;
         }
@@ -537,8 +567,8 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         printf("\t[+] Constructing..\n");	
 
 
-        construct(&solut_crnt.s, alpha, info);
-        //print_s(solut_crnt.s);
+        construct(solut_crnt.s, alpha, info);
+        print_s(solut_crnt.s, info->dimen+1);
         subseq_load(&solut_crnt, info);
 
         //solut_partial = solut_crnt;
@@ -551,6 +581,7 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         while (iterILS < Iils) {
             //k++;
             RVND(&solut_crnt, info);
+            printf("%.2lf\n", solut_crnt.cost);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
                 Solution_cpy(&solut_crnt, &solut_partial, info);
                 //solut_partial = solut_crnt;
@@ -610,14 +641,12 @@ int main(int argc, char **argv){
     tSolution solut = Solution_init(info);
 
     //exit(0);
-    /*
-    for (int i = 0; i <=n; i++) {
-        for (int j = i+1; j <=n; j++) {
-            std::cout << matrix[i][j] << " ";
+    for (int i = 0; i < info.dimen; i++) {
+        for (int j = 0; j < info.dimen; j++) {
+            printf("%.0lf ",info.cost[i][j]);
         }
-        std::cout << std::endl;
+        puts("");
     }
-    */
 
 
     srand(clock());
