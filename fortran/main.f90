@@ -489,7 +489,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
 
         end do
 
-        do k=i+opt, info%dimen-opt-1
+        do k=i+opt, info%dimen
             k_next = k+1
 
             cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(i_prev), solut%s(j_next))

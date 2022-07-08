@@ -347,7 +347,7 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int 
             }
         }
 
-        for (k = i + opt; k < info.dimen -opt -1; ++k) {
+        for (k = i + opt; k < info.dimen; ++k) {
             k_next = k + 1;
 
             cost_concat_1 =                 solut.seq[to_1D(0, i_prev, info.dimen)].T  + info.cost[solut.s[i_prev]][solut.s[j_next]];

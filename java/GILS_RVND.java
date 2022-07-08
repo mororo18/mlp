@@ -301,7 +301,7 @@ class GILS_RVND {
                 }
             }
 
-            for(int k = i+opt; k < dimension - opt - 1; k++){
+            for(int k = i+opt; k < dimension; k++){
                 int k_next = k+1;
                 int s_k = s.get(k);
                 int s_k_next = s.get(k_next);

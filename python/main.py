@@ -308,7 +308,7 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
                 #print ("opa")
 
 
-        for k in range(i+opt, MAX - 1):
+        for k in range(i+opt, info.dimen):
             k_next = k+1
             #k_next : int = k+1
 

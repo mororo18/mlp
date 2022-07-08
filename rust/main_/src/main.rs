@@ -482,7 +482,7 @@ fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & tInfo) -> bo
             }
         }
 
-        for k in i+opt..info.dimen-opt-1 {
+        for k in i+opt..info.dimen {
             let k_next : usize = k+1;
 
             cost_concat_1 = solut.seq.get_unchecked(0).get_unchecked(i_prev).T + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(j_next));
