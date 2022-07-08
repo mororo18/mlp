@@ -1,0 +1,26 @@
+[package]
+name = "main_"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev]
+
+opt-level = 3
+#lto = "fat"
+codegen-units = 1
+debug = 1
+
+[profile.release]
+
+opt-level = 3
+#lto = "fat"
+codegen-units = 1
+debug = 1
+
+panic = "abort" 
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8.0"
+ndarray = "0.15.4"
