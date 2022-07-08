@@ -124,7 +124,8 @@ def main():
     parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
     args = parser.parse_args()
 
-    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp"]
+    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp",
+            "fortran", "node", "lua", "luajit", "rust", "octave"]
 
     for i in args.lang:
         if i not in sources:
@@ -148,7 +149,13 @@ def main():
             "python3": "python",
             "pypy": "python",
             "julia": "julia",
-            "cpp" : "cplusplus"
+            "cpp" : "cplusplus",
+            "fortran" : "fortran",
+            "node" : "javascript",
+            "lua" : "lua",
+            "luajit" : "lua",
+            "rust" : "rust",
+            "octave" : "octave"
             }
 
     """
