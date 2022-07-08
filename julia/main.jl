@@ -1,4 +1,4 @@
-#! /opt/julia-1.4.2/bin/julia
+#! /usr/bin/julia
 using Printf
 #using Profile, PProf
 using BenchmarkTools

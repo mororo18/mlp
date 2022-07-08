@@ -819,7 +819,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     end do
 
     print *, sol_best%s
-    print *, "RVND it", Tit
+    !print *, "RVND it", Tit
 
     ret = sol_best
 
@@ -893,9 +893,9 @@ subroutine print_matrix(c)
     CALL SYSTEM_CLOCK(begin, rate)
     sol = GILS_RVND(Imax, Iils, R, info)
     CALL SYSTEM_CLOCK(end_)
-    print *, sol%cost
+    print *, "COST: ", sol%cost
 
-    print *, "elapsed time: ", real(end_ - begin) / real(rate)
+    print *, "TIME: ", real(end_ - begin) / real(rate)
 
-    print *, "reinsert Calls ", info%reinsert_call
+    !print *, "reinsert Calls ", info%reinsert_call
 end program
