@@ -1,8 +1,5 @@
 use std::fs;
-use std::process::exit;
-use std::fmt::format;
 use std::fs::File;
-use std::io::prelude::*;
 use std::io::Write;
 
 fn main() {
