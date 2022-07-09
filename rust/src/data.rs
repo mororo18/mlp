@@ -1,3 +1,5 @@
+pub mod sz;
+
 use std::process::exit;
 use std::fs;
 use std::vec;
@@ -8,7 +10,9 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>())
 }
 
-pub fn load(dimension : &mut usize, c : &mut [[f64; 350]; 350], rnd : &mut Vec<usize>) {
+//pub const SIZE : usize = 319;
+
+pub fn load(dimension : &mut usize, c : &mut [[f64; sz::SIZE]; sz::SIZE], rnd : &mut Vec<usize>) {
 //pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize>) {
 
     let filename = "../distance_matrix";

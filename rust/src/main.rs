@@ -1,18 +1,17 @@
+//mod sz;
 mod data;
 extern crate rand;
-extern crate ndarray;
 
+use data::sz;
 use ndarray::array;
 use std::time::Instant;
 use std::process::exit;
 use rand::Rng;
 use std::cmp::Ordering;
 
-static SIZE : usize = 319;
-
 #[derive(Debug, Clone)]
 struct tInfo {
-    c : Box<[[f64; 350]; 350]>,
+    c : Box<[[f64; sz::SIZE]; sz::SIZE]>,
     //c : Vec<Vec<f64>>,
     dimen : usize,
   //T : usize,
@@ -39,7 +38,7 @@ struct tSolution {
     //seq : Box<[f64]>,
     //seq : Vec<f64>,
     //seq : Vec<tSeqInfo>,
-    seq : Box<[[tSeqInfo; 319]; 319]>,
+    seq : Box<[[tSeqInfo; sz::SIZE+1]; sz::SIZE+1]>,
     //seq : Vec<Vec<tSeqInfo>>,
     s : Vec<usize>,
     cost : f64,
@@ -693,7 +692,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     let mut solut_best = tSolution {
         //seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0} ; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
-        seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; 319]; 319]),
+        seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; sz::SIZE+1]; sz::SIZE+1]),
         //seq : vec![vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; info.dimen+1]; info.dimen+1],
         s : vec![0; info.dimen],
         cost : f64::MAX,
@@ -702,7 +701,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     let mut solut_partial = tSolution {
         //seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
-        seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; 319]; 319]),
+        seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; sz::SIZE+1]; sz::SIZE+1]),
         //seq : vec![vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; info.dimen+1]; info.dimen+1],
         s : vec![0; info.dimen],
         cost : 0.0,
@@ -711,7 +710,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     let mut solut_crnt = tSolution {
         //seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
-        seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; 319]; 319]),
+        seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; sz::SIZE+1]; sz::SIZE+1]),
         //seq : vec![vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; info.dimen+1]; info.dimen+1],
         s : vec![0; info.dimen],
         cost : 0.0,
@@ -778,7 +777,7 @@ fn print_type_of<T>(_: &T) {
 
 fn main() {
     let mut dimension : usize = 0;
-    let mut c = Box::new([[0.0; 350]; 350]);
+    let mut c = Box::new([[0.0; sz::SIZE]; sz::SIZE]);
     //let mut c : [[f64; 500]; 500] = [[0.0; 500]; 500];
     //let mut c : Vec<Vec<f64>> = vec![vec![];0];
 

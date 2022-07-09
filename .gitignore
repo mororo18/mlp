@@ -1,6 +1,7 @@
 .*.sw*
 
 rust/target/*
+rust/target/
 python/__pycache__/
 *.mem
 *.class
