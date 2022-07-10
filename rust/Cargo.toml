@@ -24,4 +24,5 @@ panic = "abort"
 
 [dependencies]
 rand = "0.8.0"
-ndarray = "0.15.4"
+#ndarray = "0.15.4"
+cpu-time = "1.0.0"

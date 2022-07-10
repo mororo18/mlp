@@ -1,48 +1,27 @@
 //mod sz;
 mod data;
-extern crate rand;
+mod types;
+
+use types::tSeqInfo;
+use types::tInfo;
+use types::tSolution;
+use types::tSeqData;
+
+use types::Access;
+use types::Test;
 
 use data::sz;
-use ndarray::array;
+
+
 use std::time::Instant;
 use std::process::exit;
-use rand::Rng;
 use std::cmp::Ordering;
+use rand::Rng;
 
-#[derive(Debug, Clone)]
-struct tInfo {
-    c : Box<[[f64; sz::SIZE]; sz::SIZE]>,
-    //c : Vec<Vec<f64>>,
-    dimen : usize,
-  //T : usize,
-  //C : usize,
-  //W : usize,
-    SWAP         : usize ,
-    REINSERTION  : usize ,
-    OR_OPT_2     : usize ,
-    OR_OPT_3     : usize ,
-    TWO_OPT      : usize ,
-    rnd : Vec<usize>,
-    rnd_index : usize,
-}
+use std::time::Duration;
+use cpu_time::ProcessTime;
 
-#[derive(Debug, Copy, Clone)]
-struct tSeqInfo {
-    T : f64,
-    C : f64,
-    W : f64,
-}
 
-#[derive(Debug, Clone)]
-struct tSolution {
-    //seq : Box<[f64]>,
-    //seq : Vec<f64>,
-    //seq : Vec<tSeqInfo>,
-    seq : Box<[[tSeqInfo; sz::SIZE+1]; sz::SIZE+1]>,
-    //seq : Vec<Vec<tSeqInfo>>,
-    s : Vec<usize>,
-    cost : f64,
-}
 
 #[inline(always)]
 unsafe
@@ -82,9 +61,25 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
           //solut.seq[to_1D(i, j, info.T, info)] = info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[to_1D(i, j_prev, info.T, info)];
           //solut.seq[to_1D(i, j, info.C, info)] = solut.seq[to_1D(i, j, info.T, info)] + solut.seq[to_1D(i, j_prev, info.C, info)];
           //solut.seq[to_1D(i, j, info.W, info)] = (j as i32 + k) as f64;
-            solut.seq.get_unchecked_mut(i).get_unchecked_mut(j).T = info.c.get_unchecked(*solut.s.get_unchecked(j_prev)).get_unchecked(*solut.s.get_unchecked(j)) + solut.seq.get_unchecked(i).get_unchecked( j_prev).T ; 
-            solut.seq.get_unchecked_mut(i).get_unchecked_mut( j).C = solut.seq.get_unchecked(i).get_unchecked(j).T + solut.seq.get_unchecked(i).get_unchecked( j_prev).C; 
-            solut.seq.get_unchecked_mut(i).get_unchecked_mut( j).W = (j as i32 + k) as f64;
+
+
+
+
+
+            //solut.seq.get_unchecked_mut(i).get_unchecked_mut(j).T = info.c.get_unchecked(solut.s.get(j_prev)).get_unchecked(solut.s.get(j)) + solut.seq.get_unchecked(i).get_unchecked( j_prev).T ; 
+            let T = info.c.get_unchecked(solut.s.get(j_prev)).get_unchecked(solut.s.get(j)) + solut.seq.get_T(i, j_prev); 
+            solut.seq.set_T(i, j, T);
+
+            let C = solut.seq.get_T(i, j) + solut.seq.get_C(i, j_prev); 
+            solut.seq.set_C(i, j, C);
+
+            let W = (j as i32 + k) as f64;
+            solut.seq.set_W(i, j, W);
+
+
+
+            //solut.seq.get_unchecked_mut(i).get_unchecked_mut( j).W = (j as i32 + k) as f64;
+            //print_type_of(solut.seq.get_unchecked_mut(i).get_unchecked_mut( j).W);
             }
 
             /*
@@ -102,7 +97,8 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
     }
 
     //solut.cost = solut.seq[0][info.dimen][info.C];
-    unsafe{solut.cost = solut.seq.get_unchecked(0).get_unchecked( info.dimen).C;}
+    solut.cost = solut.seq.get_C(0, info.dimen);
+    //unsafe{solut.cost = solut.seq.get_unchecked(0).get_unchecked( info.dimen).C;}
 }
 
 
@@ -192,7 +188,7 @@ fn search_swap(solut : &mut tSolution, info : & tInfo) -> bool {
         let i_prev : usize = i - 1;
         let i_next : usize = i + 1;
 
-        cost_concat_1 = solut.seq.get_unchecked(0).get_unchecked( i_prev).T + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(i_next));
+        cost_concat_1 = solut.seq.get_T(0, i_prev) + info.c.get_unchecked(*solut.s.get_unchecked(i_prev)).get_unchecked(*solut.s.get_unchecked(i_next));
         cost_concat_2 = cost_concat_1 + solut.seq.get_unchecked(i).get_unchecked( i_next).T + info.c.get_unchecked(*solut.s.get_unchecked(i)).get_unchecked(*solut.s.get_unchecked(i_next+1));
 
         cost_new = solut.seq.get_unchecked(0).get_unchecked( i_prev).C
@@ -710,6 +706,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
     let mut solut_crnt = tSolution {
         //seq : vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; (info.dimen+1)*(info.dimen+1)],
         //seq : vec![0.0; (info.dimen+1)*(info.dimen+1)*3].into_boxed_slice(),
+        //seq : tSeqData::new(sz::SIZE+1),
         seq : Box::new([[tSeqInfo {C:0.0, W:0.0, T:0.0}; sz::SIZE+1]; sz::SIZE+1]),
         //seq : vec![vec![tSeqInfo {C:0.0, W:0.0, T:0.0}; info.dimen+1]; info.dimen+1],
         s : vec![0; info.dimen],
@@ -846,14 +843,16 @@ fn main() {
     let R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
             0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25];
 
-    let now = Instant::now();
+    let start = ProcessTime::try_now().expect("Getting process time failed");
+    //let start = Instant::now();
 
 
     //test!();
     GILS_RVND(Imax, Iils, R, &mut info);
 
-    let new_now = Instant::now();
-    println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
+    let cpu_time: Duration = start.try_elapsed().expect("Getting process time failed");
+    println!("TIME: {:?}", cpu_time.as_secs_f64());
+    //println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
 
     /*
     for i in 0..dimension {
