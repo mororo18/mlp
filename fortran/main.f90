@@ -252,10 +252,12 @@ subroutine reinsert(s, i, j, pos)
     integer :: j
     integer :: pos
 
-    integer, allocatable :: sub (:)
+    integer, dimension(j-i+1) :: sub 
+    !integer, allocatable :: sub (:)
 
+    !integer :: sub_sz = j-i+1
     integer :: sz
-    allocate(sub(j-i+1))
+    !allocate(sub(j-i+1))
 
     sub(:) = s(i:j)
      
@@ -544,7 +546,7 @@ subroutine RVND(sol, info, it)
     logical :: yes
 
     integer, dimension(5) :: improv
-    improv = 0.0
+    !improv = 0.0
 
   !sol%s = (/ (i, i=1, info%dimen+1) /)
   !sol%s(info%dimen+1) = 1
@@ -566,6 +568,10 @@ subroutine RVND(sol, info, it)
 
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
+
+        if (index_ > nl_size) then
+            call exit(0)
+        endif
 
         neighbd = neighbd_list(index_)
         
@@ -590,7 +596,12 @@ subroutine RVND(sol, info, it)
         endif
 
         if (improve_flag .eqv. .true.) then
-            neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
+            !neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
+            neighbd_list(1) = info%SWAP
+            neighbd_list(2) = info%TWO_OPT
+            neighbd_list(3) = info%REINSERTION
+            neighbd_list(4) = info%OR_OPT_2
+            neighbd_list(5) = info%OR_OPT_3
             nl_size = 5
             !print *, "IMPROV", sol%cost
             improv(neighbd) = improv(neighbd) + 1
@@ -625,17 +636,17 @@ subroutine notnull_rnd(rnd)
     RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
 end subroutine
 
-function perturb(solut, info) result(ret)
+subroutine perturb(solut_crnt, solut_part, info)! result(ret)
     use data_types
 
     implicit none
-    type(tSolution) :: solut
+    type(tSolution) :: solut_crnt
+    type(tSolution) :: solut_part
     type(tInfo) :: info
 
     type(tSolution) :: ret
 
-    type(tSolution) :: solut_pert
-
+    !integer, dimension(info%dimen+1) :: s
     integer :: A_start, A_end
     integer :: B_start, B_end
     integer :: size_max
@@ -648,7 +659,7 @@ function perturb(solut, info) result(ret)
     B_start = 1
     B_end = 1
 
-    solut_pert = solut
+    solut_crnt%s(:) = solut_part%s(:)
 
     size_max = (info%dimen+1) / 10
     size_max = merge(size_max, 2, size_max >= 2)
@@ -684,11 +695,11 @@ function perturb(solut, info) result(ret)
     end do
 
     if (A_start < B_start) then
-        call reinsert (solut_pert%s, B_start, B_end - 1, A_end)
-        call reinsert (solut_pert%s, A_start, A_end - 1, B_end)
+        call reinsert (solut_crnt%s, B_start, B_end - 1, A_end)
+        call reinsert (solut_crnt%s, A_start, A_end - 1, B_end)
     else
-        call reinsert (solut_pert%s, A_start, A_end - 1, B_end)
-        call reinsert (solut_pert%s, B_start, B_end - 1, A_end)
+        call reinsert (solut_crnt%s, A_start, A_end - 1, B_end)
+        call reinsert (solut_crnt%s, B_start, B_end - 1, A_end)
     end if
 
    !if (B_start == 1) then !! .or. B_start == 1) then
@@ -697,11 +708,10 @@ function perturb(solut, info) result(ret)
    !    call exit(0)
    !end if
 
-    call subseq_load(solut_pert, info)
 
-    ret = solut_pert
+    !ret = solut_pert
 
-end function
+end subroutine
 
 subroutine solut_init(solut, info)
     use data_types
@@ -751,13 +761,14 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
             type(tInfo) :: info
             integer, dimension(info%dimen+1) :: ret 
         end function
-        function perturb(solut, info) result(ret)
-            use data_types
-            implicit none
-            type(tSolution) :: solut
-            type(tInfo) :: info
-            type(tSolution) :: ret
-        end function
+        
+       !function perturb(solut, info) result(ret)
+       !    use data_types
+       !    implicit none
+       !    type(tSolution) :: solut
+       !    type(tInfo) :: info
+       !    type(tSolution) :: ret
+       !end function
     end interface
 
     call solut_init(sol_best, info)
@@ -793,13 +804,15 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
             call RVND(sol_crnt, info, it)
 
             if (sol_crnt%cost < sol_partial%cost - EPSILON(1.0)) then
-                sol_partial = sol_crnt
-                sol_partial%cost = sol_partial%cost - EPSILON(1.0)
+                sol_partial%s(:) = sol_crnt%s(:)
+                sol_partial%cost = sol_crnt%cost - EPSILON(1.0)
                 iterILS = 0
                 !print *, sol_partial%cost
             endif
 
-            sol_crnt = perturb(sol_partial, info)
+            call perturb(sol_crnt, sol_partial, info)
+
+            call subseq_load(sol_crnt, info)
             !print *, "perturbed", sol_crnt%cost
 
             iterILS = iterILS + 1
@@ -808,7 +821,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
        !print *, sol_partial%cost
        !print *, ""
         
-        call subseq_load(sol_partial, info)
+        !call subseq_load(sol_partial, info)
 
         if (sol_partial%cost < sol_best%cost) then
             sol_best = sol_partial
@@ -861,16 +874,16 @@ program main
             real, dimension(26) :: R
             type(tInfo) :: info
             type(tSolution) :: ret
-            end function
-subroutine print_matrix(c)
-    implicit none
-    real, allocatable :: c(:,:)
+        end function
+        subroutine print_matrix(c)
+            implicit none
+            real, allocatable :: c(:,:)
 
-    integer, allocatable :: nxm(:)
-    integer :: dimen
-    integer :: i
-    integer :: j
-    end subroutine
+            integer, allocatable :: nxm(:)
+            integer :: dimen
+            integer :: i
+            integer :: j
+        end subroutine
 
     end interface
 
@@ -897,5 +910,5 @@ subroutine print_matrix(c)
 
     print *, "TIME: ", real(end_ - begin) / real(rate)
 
-    !print *, "reinsert Calls ", info%reinsert_call
+    print *, "reinsert Calls ", info%reinsert_call
 end program
