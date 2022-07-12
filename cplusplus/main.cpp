@@ -23,7 +23,7 @@
 #define DBL_SZ      8
 #define INT_SZ      4
 
-#define FLAT
+#define MATRIX
 
 using std::chrono::high_resolution_clock;
 
@@ -102,7 +102,7 @@ tSolution Solution_init(tInfo info) {
     return solut;
 }
 
-inline void Solution_cpy( tSolution & src, tSolution & tgt, const tInfo & info) {
+void Solution_cpy( tSolution & src, tSolution & tgt, const tInfo & info) {
 
     tgt.s = src.s;
     tgt.cost = src.cost;
@@ -166,15 +166,15 @@ std::vector<int> construct(const double alpha, tInfo & info){
     return s;
 }	
 
-inline void swap(std::vector<int> &vec, int i, int j){
+void swap(std::vector<int> &vec, int i, int j){
     std::iter_swap(vec.begin() + i, vec.begin() + j);
 }
 
-inline void reverse(std::vector<int> &vec, int i, int j){
+void reverse(std::vector<int> &vec, int i, int j){
     std::reverse(vec.begin() + i, vec.begin() + j+1);
 }
 
-inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
+void reinsert(std::vector<int> &vec, int i, int j, int pos){
     std::vector<int> seq (vec.begin() + i, vec.begin() +j+1);
     if(pos < i){
         vec.erase(vec.begin() + i, vec.begin() + j+1);
@@ -188,7 +188,7 @@ inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
 
 #ifdef FLAT
 
-inline void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
+void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
@@ -213,7 +213,7 @@ inline void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
     solut.cost = solut.seq[to_1D(0, info.dimen, info.dimen)].C;
 }
 
-inline bool search_swap(tSolution & solut, const tInfo & info) {
+bool search_swap(tSolution & solut, const tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -272,7 +272,7 @@ inline bool search_swap(tSolution & solut, const tInfo & info) {
     return false;
 }
 
-inline bool search_two_opt(tSolution & solut, const tInfo & info) {
+bool search_two_opt(tSolution & solut, const tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -314,7 +314,7 @@ inline bool search_two_opt(tSolution & solut, const tInfo & info) {
     return false;
 }
 
-inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int opt) {
+bool search_reinsertion(tSolution & solut, const tInfo & info, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -380,7 +380,7 @@ inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int 
 
 #elif defined(MATRIX)
 
-inline void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
+void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
@@ -406,7 +406,7 @@ inline void subseq_load(tSolution & solut, const tInfo & info, int index = 0){
     solut.cost = solut.seq[0][info.dimen].C;
 }
 
-inline bool search_swap(tSolution & solut, const tInfo & info) {
+bool search_swap(tSolution & solut, const tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -465,7 +465,7 @@ inline bool search_swap(tSolution & solut, const tInfo & info) {
     return false;
 }
 
-inline bool search_two_opt(tSolution & solut, const tInfo & info) {
+bool search_two_opt(tSolution & solut, const tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -509,7 +509,7 @@ inline bool search_two_opt(tSolution & solut, const tInfo & info) {
     return false;
 }
 
-inline bool search_reinsertion(tSolution & solut, const tInfo & info, const int opt) {
+bool search_reinsertion(tSolution & solut, const tInfo & info, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -799,12 +799,15 @@ int main(int argc, char **argv){
 
     Iils = info.dimen < 100 ? info.dimen : 100;
     auto t1 = high_resolution_clock::now();
+    size_t start = clock();
     GILS_RVND(Imax, Iils, info);
+    double cpu_time = (double)(clock() - start) / CLOCKS_PER_SEC ;
     auto t2 = high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 
     double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
+    //std::cout << "TIME: " << res << std::endl;
+    std::cout << "TIME: " << cpu_time << std::endl;
 
     std::cout << "Tamanho RND " << rnd.size() << std::endl;
 
