@@ -1,5 +1,7 @@
 .*.sw*
 
+*/solve
+fortran/*.mod
 rust/target/*
 rust/target/
 python/__pycache__/
