@@ -1,1 +1,1 @@
-pub const SIZE : usize = 318;
+pub const SIZE : usize = 99;

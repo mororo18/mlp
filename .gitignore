@@ -4,7 +4,7 @@
 fortran/*.mod
 rust/target/*
 rust/target/
-*.lock
+rust/Cargo.lock
 python/__pycache__/
 *.mem
 *.class
