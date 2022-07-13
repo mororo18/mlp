@@ -1,2 +1,3 @@
 #! /usr/bin/bash
-julia main.jl
+julia --check-bounds=no --math-mode=fast main.jl
+#--check-bounds=no 

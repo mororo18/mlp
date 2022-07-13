@@ -50,7 +50,7 @@ function get_instance_info()
         end
 
         if name == true
-            println(line)
+            #println(line)
             inst = line
             name = false
             continue
