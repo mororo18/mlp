@@ -1,2 +1,7 @@
 (RESOLVIDO) 29/03 - BUG (ver valor da solução para a instancia lin328)
     Solução -> tamanho da string q armazena cada linha da distancia era insuficiente
+
+
+Fortran -> Column major
+Vim -> regex para swap de indices
+    %s/(\([^),]*\),\([^),]*\),\([^),]*\))/(\3,\2,\1)/gc

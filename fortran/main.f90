@@ -79,20 +79,20 @@ subroutine subseq_load(sol, info)
     do i = 1, info%dimen+1
         k = 1 - i - merge(0, 1, i /= 1)
 
-        sol%seq(i, i, info%T) = 0.0
-        sol%seq(i, i, info%C) = 0.0
-        sol%seq(i, i, info%W) = merge(1.0, 0.0, i /= 1)
+        sol%seq(info%T, i, i) = 0.0
+        sol%seq(info%C, i, i) = 0.0
+        sol%seq(info%W, i, i) = merge(1.0, 0.0, i /= 1)
         do j = i+1, info%dimen+1
             j_prev = j-1
 
-            sol%seq(i,j,info%T) = info%cost(sol%s(j_prev), sol%s(j)) + sol%seq(i,j_prev,info%T)
-            sol%seq(i,j,info%C) = sol%seq(i,j,info%T) + sol%seq(i,j_prev,info%C)
-            sol%seq(i,j,info%W) = j+k
+            sol%seq(info%T, j, i) = info%cost(sol%s(j_prev), sol%s(j)) + sol%seq(info%T, j_prev,i)
+            sol%seq(info%C,j,i) = sol%seq(info%T, j, i) + sol%seq(info%C,j_prev,i)
+            sol%seq(info%W,j,i) = j+k
 
         end do
     end do
 
-    sol%cost = sol%seq(1, info%dimen+1, info%C)
+    sol%cost = sol%seq(info%C, info%dimen+1, 1)
 
 end subroutine
 
@@ -308,12 +308,12 @@ subroutine search_swap(solut, info, ret)
         i_prev = i-1
         i_next = i+1
 
-        cost_concat_1 =                 solut%seq(1, i_prev, info%T) + info%cost(solut%s(i_prev), solut%s(i_next))
-        cost_concat_2 = cost_concat_1 + solut%seq(i, i_next, info%T) + info%cost(solut%s(i), solut%s(i_next+1))
+        cost_concat_1 =                 solut%seq( info%T, i_prev,1) + info%cost(solut%s(i_prev), solut%s(i_next))
+        cost_concat_2 = cost_concat_1 + solut%seq( info%T, i_next,i) + info%cost(solut%s(i), solut%s(i_next+1))
 
-        cost_new = solut%seq(1, i_prev, info%C)                                                    + &
-                solut%seq(i, i_next, info%W)               * (cost_concat_1) + info%cost(solut%s(i_next), solut%s(i))  + &
-                solut%seq(i_next+1, info%dimen+1, info%W)   * (cost_concat_2) + solut%seq(i_next+1, info%dimen+1, info%C) 
+        cost_new = solut%seq( info%C, i_prev,1)                                                    + &
+                solut%seq( info%W, i_next,i)               * (cost_concat_1) + info%cost(solut%s(i_next), solut%s(i))  + &
+                solut%seq( info%W, info%dimen+1,i_next+1)   * (cost_concat_2) + solut%seq( info%C, info%dimen+1,i_next+1) 
 
         if (cost_new < cost_best) then
             cost_best = cost_new - EPSILON(1.0)
@@ -327,17 +327,17 @@ subroutine search_swap(solut, info, ret)
             j_next = j+1
 
 
-            cost_concat_1 =                 solut%seq(1, i_prev, info%T)       + info%cost(solut%s(i_prev), solut%s(j))
+            cost_concat_1 =                 solut%seq( info%T, i_prev,1)       + info%cost(solut%s(i_prev), solut%s(j))
             cost_concat_2 = cost_concat_1                           + info%cost(solut%s(j), solut%s(i_next))
-            cost_concat_3 = cost_concat_2 + solut%seq(i_next, j_prev, info%T)  + info%cost(solut%s(j_prev), solut%s(i))
+            cost_concat_3 = cost_concat_2 + solut%seq( info%T, j_prev,i_next)  + info%cost(solut%s(j_prev), solut%s(i))
             cost_concat_4 = cost_concat_3                           + info%cost(solut%s(i), solut%s(j_next))
 
 
-            cost_new = solut%seq(1, i_prev, info%C)                                                 + &     ! 1st subseq
+            cost_new = solut%seq( info%C, i_prev,1)                                                 + &     ! 1st subseq
                     cost_concat_1 + &                                                           ! concat 2nd subseq (single node)
-                    solut%seq(i_next, j_prev, info%W)      * cost_concat_2 + solut%seq(i_next, j_prev, info%C) + &    ! concat 3rd subseq
+                    solut%seq( info%W, j_prev,i_next)      * cost_concat_2 + solut%seq( info%C, j_prev,i_next) + &    ! concat 3rd subseq
                     cost_concat_3 + &                                                           ! concat 4th subseq (single node)
-                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_4 + solut%seq(j_next, info%dimen+1, info%C)   ! concat 5th subseq
+                    solut%seq( info%W, info%dimen+1,j_next) * cost_concat_4 + solut%seq( info%C, info%dimen+1,j_next)   ! concat 5th subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0);
@@ -390,19 +390,19 @@ subroutine search_two_opt(solut, info, ret)
 
     do i=2, info%dimen-1
         i_prev = i-1
-        rev_seq_cost = solut%seq(i, i+1, info%T)
+        rev_seq_cost = solut%seq( info%T, i+1,i)
 
         do j=i+2, info%dimen
             j_next = j+1
 
-            rev_seq_cost = rev_seq_cost + info%cost(solut%s(j-1), solut%s(j)) * (solut%seq(i, j, info%W)-1.0)
+            rev_seq_cost = rev_seq_cost + info%cost(solut%s(j-1), solut%s(j)) * ( solut%seq(info%W, j,i)-1.0)
 
-            cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(j), solut%s(i_prev))
-            cost_concat_2 = cost_concat_1 + solut%seq(i, j, info%T)        + info%cost(solut%s(j_next), solut%s(i))
+            cost_concat_1 =                 solut%seq( info%T, i_prev,1)   + info%cost(solut%s(j), solut%s(i_prev))
+            cost_concat_2 = cost_concat_1 + solut%seq( info%T, j,i)        + info%cost(solut%s(j_next), solut%s(i))
 
-            cost_new = solut%seq(1, i_prev, info%C)                                                        + & !   1st subseq
-                    solut%seq(i, j, info%W)                * cost_concat_1 + rev_seq_cost                  + & ! concat 2nd subseq (reversed seq)
-                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_2 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 3rd subseq
+            cost_new = solut%seq( info%C, i_prev,1)                                                        + & !   1st subseq
+                    solut%seq( info%W, j,i)                * cost_concat_1 + rev_seq_cost                  + & ! concat 2nd subseq (reversed seq)
+                    solut%seq( info%W, info%dimen+1,j_next) * cost_concat_2 + solut%seq( info%C, info%dimen+1,j_next)       ! concat 3rd subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0)
@@ -468,15 +468,15 @@ subroutine search_reinsertion(solut, info, opt, ret)
         do k=1, i_prev-1
             k_next = k+1
 
-            cost_new =  solut%seq(1, info%dimen+1, info%C)
-            cost_concat_1 =                 solut%seq(1, k, info%T)            + info%cost(solut%s(k), solut%s(i))
-            cost_concat_2 = cost_concat_1 + solut%seq(i, j, info%T)            + info%cost(solut%s(j), solut%s(k_next))
-            cost_concat_3 = cost_concat_2 + solut%seq(k_next, i_prev, info%T)  + info%cost(solut%s(i_prev), solut%s(j_next))
+            cost_new =  solut%seq( info%C, info%dimen+1,1)
+            cost_concat_1 =                 solut%seq( info%T, k,1)            + info%cost(solut%s(k), solut%s(i))
+            cost_concat_2 = cost_concat_1 + solut%seq( info%T, j,i)            + info%cost(solut%s(j), solut%s(k_next))
+            cost_concat_3 = cost_concat_2 + solut%seq( info%T, i_prev,k_next)  + info%cost(solut%s(i_prev), solut%s(j_next))
 
-            cost_new = solut%seq(1, k, info%C)                                                             + & !       1st subseq
-                    solut%seq(i, j, info%W)                * cost_concat_1 + solut%seq(i, j, info%C)                  + & ! concat 2nd subseq (reinserted seq)
-                    solut%seq(k_next, i_prev, info%W)      * cost_concat_2 + solut%seq(k_next, i_prev, info%C)        + & ! concat 3rd subseq
-                    solut%seq(j_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 4th subseq
+            cost_new = solut%seq( info%C, k,1)                                                             + & !       1st subseq
+                    solut%seq( info%W, j,i)                * cost_concat_1 + solut%seq( info%C, j,i)                  + & ! concat 2nd subseq (reinserted seq)
+                    solut%seq( info%W, i_prev,k_next)      * cost_concat_2 + solut%seq( info%C, i_prev,k_next)        + & ! concat 3rd subseq
+                    solut%seq( info%W, info%dimen+1,j_next) * cost_concat_3 + solut%seq( info%C, info%dimen+1,j_next)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0)
@@ -494,14 +494,14 @@ subroutine search_reinsertion(solut, info, opt, ret)
         do k=i+opt, info%dimen
             k_next = k+1
 
-            cost_concat_1 =                 solut%seq(1, i_prev, info%T)   + info%cost(solut%s(i_prev), solut%s(j_next))
-            cost_concat_2 = cost_concat_1 + solut%seq(j_next, k, info%T)   + info%cost(solut%s(k), solut%s(i))
-            cost_concat_3 = cost_concat_2 + solut%seq(i, j, info%T)        + info%cost(solut%s(j), solut%s(k_next))
+            cost_concat_1 =                 solut%seq( info%T, i_prev,1)   + info%cost(solut%s(i_prev), solut%s(j_next))
+            cost_concat_2 = cost_concat_1 + solut%seq( info%T, k,j_next)   + info%cost(solut%s(k), solut%s(i))
+            cost_concat_3 = cost_concat_2 + solut%seq( info%T, j,i)        + info%cost(solut%s(j), solut%s(k_next))
 
-            cost_new = solut%seq(1, i_prev, info%C)                                                        + & !       1st subseq
-                    solut%seq(j_next, k, info%W)           * cost_concat_1 + solut%seq(j_next, k, info%C)             + & ! concat 2nd subseq
-                    solut%seq(i, j, info%W)                * cost_concat_2 + solut%seq(i, j, info%C)                  + & ! concat 3rd subseq (reinserted seq)
-                    solut%seq(k_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(k_next, info%dimen+1, info%C)       ! concat 4th subseq
+            cost_new = solut%seq( info%C, i_prev,1)                                                        + & !       1st subseq
+                    solut%seq( info%W, k,j_next)           * cost_concat_1 + solut%seq( info%C, k,j_next)             + & ! concat 2nd subseq
+                    solut%seq( info%W, j,i)                * cost_concat_2 + solut%seq( info%C, j,i)                  + & ! concat 3rd subseq (reinserted seq)
+                    solut%seq( info%W, info%dimen+1,k_next) * cost_concat_3 + solut%seq( info%C, info%dimen+1,k_next)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
                 cost_best = cost_new - EPSILON(1.0)
@@ -721,7 +721,7 @@ subroutine solut_init(solut, info)
     type(tInfo) :: info
 
     allocate(solut%s(info%dimen+1))
-    allocate(solut%seq(info%dimen+1, info%dimen+1, 3))
+    allocate(solut%seq(3, info%dimen+1, info%dimen+1))
 
 end subroutine
 

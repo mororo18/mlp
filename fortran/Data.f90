@@ -8,7 +8,7 @@ contains
       integer, allocatable :: rnd (:)
 
       integer :: io
-      character(len=2500) ::line
+      character(len=5500) ::line
       integer :: dimen
       integer :: i
       integer :: j
