@@ -59,18 +59,12 @@ where T: Copy, {
 }
 
 pub trait Access {
-    #[inline]
     fn set_C(&mut self, i : usize, j : usize, value : f64);
-    #[inline]
     fn set_T(&mut self, i : usize, j : usize, value : f64);
-    #[inline]
     fn set_W(&mut self, i : usize, j : usize, value : f64);
 
-    #[inline]
     fn get_C(&self, i : usize, j : usize) -> f64;
-    #[inline]
     fn get_T(&self, i : usize, j : usize) -> f64;
-    #[inline]
     fn get_W(&self, i : usize, j : usize) -> f64;
 
     //fn get_C_mut(&mut self, i : usize, j : usize) -> &mut f64;

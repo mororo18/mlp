@@ -463,6 +463,7 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>())
 }
 
+#[allow(non_snake_case)]
 fn main() {
     let mut dimension : usize = 0;
     let mut c = tCostData::New();
