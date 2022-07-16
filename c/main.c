@@ -415,10 +415,10 @@ void RVND(tSolution * solut, tInfo * info) {
     int neighbd;
     char improve_flag;
 
-    printf("RVND\n");
+    //printf("RVND\n");
     while (nl_size > 0) {
         //k++;
-        printf("\t%.0lf\n", solut->cost);
+        //printf("\t%.0lf\n", solut->cost);
         index = rand() % nl_size;
         index = info->rnd[info->rnd_index++];
         neighbd = neighbd_list[index];
@@ -430,31 +430,31 @@ void RVND(tSolution * solut, tInfo * info) {
             case REINSERTION:
                 //before();
                 improve_flag = search_reinsertion(solut, info, REINSERTION);
-                printf("REINSERTION");
+                //printf("REINSERTION");
                 break;				
             case OR_OPT_2:
                 //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_2);
                 //after();
-                printf("OR_OPT2\t");
+                //printf("OR_OPT2\t");
                 break;				
             case OR_OPT_3:
                 //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_3);
                 //after(OR_OPT3);
-                printf("OR_OPT3\t");
+                //printf("OR_OPT3\t");
                 break;				
             case SWAP:
                 //before();
                 improve_flag = search_swap(solut, info);
                 //after(SWAP);
-                printf("SWAP\t");
+                //printf("SWAP\t");
                 break;
             case TWO_OPT:
                 //before();
                 improve_flag = search_two_opt(solut, info);
                 //after(TWO_OPT);
-                printf("TWO_OPT\t");
+                //printf("TWO_OPT\t");
                 break;				
         }
 
@@ -581,7 +581,7 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         while (iterILS < Iils) {
             //k++;
             RVND(&solut_crnt, info);
-            printf("%.2lf\n", solut_crnt.cost);
+            //printf("%.2lf\n", solut_crnt.cost);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
                 Solution_cpy(&solut_crnt, &solut_partial, info);
                 //solut_partial = solut_crnt;
