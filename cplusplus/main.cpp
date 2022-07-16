@@ -25,7 +25,7 @@
 
 #define MATRIX
 
-using std::chrono::high_resolution_clock;
+using std::chrono::steady_clock;
 
 typedef unsigned uint;
 
@@ -798,16 +798,16 @@ int main(int argc, char **argv){
     srand(clock());
 
     Iils = info.dimen < 100 ? info.dimen : 100;
-    auto t1 = high_resolution_clock::now();
+    auto t1 = steady_clock::now();
     size_t start = clock();
     GILS_RVND(Imax, Iils, info);
     double cpu_time = (double)(clock() - start) / CLOCKS_PER_SEC ;
-    auto t2 = high_resolution_clock::now();
+    auto t2 = steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 
     double res = (double)duration / 10e2;
-    //std::cout << "TIME: " << res << std::endl;
-    std::cout << "TIME: " << cpu_time << std::endl;
+    std::cout << "TIME: " << res << std::endl;
+    std::cout << "time clock(): " << cpu_time << std::endl;
 
     std::cout << "Tamanho RND " << rnd.size() << std::endl;
 
