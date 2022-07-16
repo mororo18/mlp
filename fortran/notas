@@ -5,3 +5,5 @@
 Fortran -> Column major
 Vim -> regex para swap de indices
     %s/(\([^),]*\),\([^),]*\),\([^),]*\))/(\3,\2,\1)/gc
+Vim -> regex 3d-array -> 2d-array (struct)
+    %s/(\s\+info%\([^),]*\),\([^),]*\),\([^),]*\))/(\2,\3)%\1/gc
