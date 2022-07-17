@@ -18,7 +18,7 @@
 #define DBL_SZ      8
 #define INT_SZ      4
 
-#define MATRIX
+#define FLAT
 
 typedef unsigned uint;
 
@@ -41,35 +41,76 @@ typedef tSeq * tSeq_;
 typedef tSeq_ * tSeq__;
 
 typedef struct tSolution {
+#ifdef MATRIX
     tSeq__ seq;
+#elif defined(FLAT)
+    tSeq_ seq;
+#endif
     //double *** seq;
     double cost;
     int * s;
+    int s_size;
     //int s_size;
 } tSolution;
 
-inline void set_C(tSeq__ seq, int i, int j, double value) {
-    seq[i][j].C = value;
+#ifdef FLAT
+inline
+int to_1D(const int i, const int j, const int size) {
+    return i * size + j;
+}
+#endif
+
+inline
+void seq_set_C(tSolution * solut, int i, int j, double value) {
+#ifdef MATRIX
+    solut->seq[i][j].C = value;
+#elif defined(FLAT)
+    solut->seq[to_1D(i, j, solut->s_size)].C = value;
+#endif
 }
 
-inline void set_T(tSeq__ seq, int i, int j, double value) {
-    seq[i][j].T = value;
+inline
+void seq_set_T(tSolution * solut, int i, int j, double value) {
+#ifdef MATRIX
+    solut->seq[i][j].T = value;
+#elif defined(FLAT)
+    solut->seq[to_1D(i, j, solut->s_size)].T = value;
+#endif
 }
 
-inline void set_W(tSeq__ seq, int i, int j, double value) {
-    seq[i][j].W = value;
+inline
+void seq_set_W(tSolution * solut, int i, int j, double value) {
+#ifdef MATRIX
+    solut->seq[i][j].W = value;
+#elif defined(FLAT)
+    solut->seq[to_1D(i, j, solut->s_size)].W = value;
+#endif
 }
 
-inline double get_C(tSeq__ seq, int i, int j) {
-    return seq[i][j].C;
+inline
+double seq_get_C(const tSolution * solut, int i, int j) {
+#ifdef MATRIX
+    return solut->seq[i][j].C;
+#elif defined(FLAT)
+    return solut->seq[to_1D(i, j, solut->s_size)].C;
+#endif
 }
 
-inline double get_T(tSeq__ seq, int i, int j) {
-    return seq[i][j].T;
+inline 
+double seq_get_T(const tSolution * solut, int i, int j) {
+#ifdef MATRIX
+    return solut->seq[i][j].T;
+#elif defined(FLAT)
+    return solut->seq[to_1D(i, j, solut->s_size)].T;
+#endif
 }
-
-inline double get_W(tSeq__ seq, int i, int j) {
-    return seq[i][j].W;
+inline 
+double seq_get_W(const tSolution * solut, int i, int j) {
+#ifdef MATRIX
+    return solut->seq[i][j].W;
+#elif defined(FLAT)
+    return solut->seq[to_1D(i, j, solut->s_size)].W;
+#endif
 }
 
 tSolution Solution_init(tInfo info) {
@@ -85,15 +126,17 @@ tSolution Solution_init(tInfo info) {
   //    }
   //}
 
+#ifdef MATRIX
     solut.seq = (tSeq__) calloc(info.dimen+1, sizeof(tSeq_));
     for (int i = 0; i < info.dimen+1; i++) {
         solut.seq[i] = (tSeq_) calloc(info.dimen+1, sizeof(tSeq));
-      //for (int j = 0; j < info.dimen+1; j++) {
-      //    solut.seq[i][j] = (double *) calloc(3, sizeof(double));
-      //}
     }
+#elif defined(FLAT)
+    solut.seq = (tSeq_) calloc((info.dimen+1)*(info.dimen+1), sizeof(tSeq));
+#endif
 
     solut.cost = DBL_MAX;
+    solut.s_size = info.dimen + 1;
 
     return solut;
 }
@@ -212,27 +255,27 @@ void subseq_load(tSolution * solut, const tInfo * info){
         k = 1 - i - (!i);
         t = i == from;
 
-        set_T(solut->seq, i, i, 0.0);
-        set_C(solut->seq, i, i, 0.0);
-        set_W(solut->seq, i, i, (double)!(i == 0));
+        seq_set_T(solut, i, i, 0.0);
+        seq_set_C(solut, i, i, 0.0);
+        seq_set_W(solut, i, i, (double)!(i == 0));
 
         for (j = i+1; j < info->dimen+1; j++) {
             j_prev = j-1;
             
-            double T = info->cost[solut->s[j_prev]][solut->s[j]] + get_T(solut->seq, i, j_prev);
-            set_T(solut->seq, i, j, T);
+            double T = info->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
+            seq_set_T(solut, i, j, T);
 
-            double C = get_T(solut->seq, i, j) + get_C(solut->seq, i, j_prev);
-            set_C(solut->seq, i, j, C);
+            double C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
+            seq_set_C(solut, i, j, C);
 
             double W = j + k;
-            set_W(solut->seq, i, j, W);
+            seq_set_W(solut, i, j, W);
 
         }
         from += t;
     }
 
-    solut->cost = get_C(solut->seq, 0, info->dimen);
+    solut->cost = seq_get_C(solut,  0,  info->dimen);
 }
 
 void subseq_load_b(tSolution * solut, const tInfo * info, int index){
@@ -243,28 +286,28 @@ void subseq_load_b(tSolution * solut, const tInfo * info, int index){
         k = 1 - i - (!i);
         t = i == from;
 
-        set_T(solut->seq, i, i, 0.0);
-        set_C(solut->seq, i, i, 0.0);
-        set_W(solut->seq, i, i, (double)!(i == 0));
+        seq_set_T(solut, i, i, 0.0);
+        seq_set_C(solut, i, i, 0.0);
+        seq_set_W(solut, i, i, (double)!(i == 0));
 
         for (j = i+1; j < info->dimen+1; j++) {
             j_prev = j-1;
             
-            double T = info->cost[solut->s[j_prev]][solut->s[j]] + get_T(solut->seq, i, j_prev);
-            set_T(solut->seq, i, j, T);
+            double T = info->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
+            seq_set_T(solut, i, j, T);
 
-            double C = get_T(solut->seq, i, j) + get_C(solut->seq, i, j_prev);
-            set_C(solut->seq, i, j, C);
+            double C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
+            seq_set_C(solut, i, j, C);
 
             double W = j + k;
-            set_W(solut->seq, i, j, W);
+            seq_set_W(solut, i, j, W);
 
 
         }
         from += t;
     }
 
-    solut->cost = get_C(solut->seq, 0, info->dimen);
+    solut->cost = seq_get_C(solut,  0,  info->dimen);
 }
 
 char search_swap(tSolution * solut, const tInfo * info) {
@@ -280,12 +323,12 @@ char search_swap(tSolution * solut, const tInfo * info) {
         i_next = i + 1;
 
         //consecutive nodes
-        cost_concat_1 =                 get_T(solut->seq, 0, i_prev) + info->cost[solut->s[i_prev]][solut->s[i_next]];
-        cost_concat_2 = cost_concat_1 + get_T(solut->seq, i, i_next)  + info->cost[solut->s[i]][solut->s[i_next+1]];
+        cost_concat_1 =                 seq_get_T(solut,  0,  i_prev) + info->cost[solut->s[i_prev]][solut->s[i_next]];
+        cost_concat_2 = cost_concat_1 + seq_get_T(solut,  i,  i_next)  + info->cost[solut->s[i]][solut->s[i_next+1]];
 
-        cost_new = get_C(solut->seq, 0, i_prev)                                                    +           //       1st subseq
-        get_W(solut->seq, i, i_next)               * (cost_concat_1) + info->cost[solut->s[i_next]][solut->s[i]]  +           // concat 2nd subseq
-        get_W(solut->seq, i_next+1, info->dimen)   * (cost_concat_2) + get_C(solut->seq, i_next+1, info->dimen);   // concat 3rd subseq
+        cost_new = seq_get_C(solut,  0,  i_prev)                                                    +           //       1st subseq
+        seq_get_W(solut,  i,  i_next)               * (cost_concat_1) + info->cost[solut->s[i_next]][solut->s[i]]  +           // concat 2nd subseq
+        seq_get_W(solut,  i_next+1,  info->dimen)   * (cost_concat_2) + seq_get_C(solut,  i_next+1,  info->dimen);   // concat 3rd subseq
 
         if (cost_new < cost_best) {
             cost_best = cost_new - DBL_EPSILON;
@@ -297,16 +340,16 @@ char search_swap(tSolution * solut, const tInfo * info) {
             j_next = j + 1;
             j_prev = j - 1;
 
-            cost_concat_1 =                 get_T(solut->seq, 0, i_prev)       + info->cost[solut->s[i_prev]][solut->s[j]];
+            cost_concat_1 =                 seq_get_T(solut,  0,  i_prev)       + info->cost[solut->s[i_prev]][solut->s[j]];
             cost_concat_2 = cost_concat_1                           + info->cost[solut->s[j]][solut->s[i_next]];
-            cost_concat_3 = cost_concat_2 + get_T(solut->seq, i_next, j_prev)  + info->cost[solut->s[j_prev]][solut->s[i]];
+            cost_concat_3 = cost_concat_2 + seq_get_T(solut,  i_next,  j_prev)  + info->cost[solut->s[j_prev]][solut->s[i]];
             cost_concat_4 = cost_concat_3                           + info->cost[solut->s[i]][solut->s[j_next]];
 
-            cost_new = get_C(solut->seq, 0, i_prev)                                                 +      // 1st subseq
+            cost_new = seq_get_C(solut,  0,  i_prev)                                                 +      // 1st subseq
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
-            get_W(solut->seq, i_next, j_prev)      * cost_concat_2 + get_C(solut->seq, i_next, j_prev) +      // concat 3rd subseq
+            seq_get_W(solut,  i_next,  j_prev)      * cost_concat_2 + seq_get_C(solut,  i_next,  j_prev) +      // concat 3rd subseq
             cost_concat_3 +                                                             // concat 4th subseq (single node)
-            get_W(solut->seq, j_next, info->dimen) * cost_concat_4 + get_C(solut->seq, j_next, info->dimen);   // concat 5th subseq
+            seq_get_W(solut,  j_next,  info->dimen) * cost_concat_4 + seq_get_C(solut,  j_next,  info->dimen);   // concat 5th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -337,19 +380,19 @@ char search_two_opt(tSolution * solut, const tInfo * info) {
     for (i = 1; i < info->dimen-1; ++i) {
         i_prev = i - 1;
 
-        rev_seq_cost = get_T(solut->seq, i, i+1);
+        rev_seq_cost = seq_get_T(solut,  i,  i+1);
         for (j = i + 2; j < info->dimen; ++j) {
             j_next = j + 1;
 
 
-          rev_seq_cost += info->cost[solut->s[j-1]][solut->s[j]] * (get_W(solut->seq, i, j)-1.0);
+          rev_seq_cost += info->cost[solut->s[j-1]][solut->s[j]] * (seq_get_W(solut,  i,  j)-1.0);
 
-          cost_concat_1 =                 get_T(solut->seq, 0, i_prev)   + info->cost[solut->s[j]][solut->s[i_prev]];
-          cost_concat_2 = cost_concat_1 + get_T(solut->seq, i, j)        + info->cost[solut->s[j_next]][solut->s[i]];
+          cost_concat_1 =                 seq_get_T(solut,  0,  i_prev)   + info->cost[solut->s[j]][solut->s[i_prev]];
+          cost_concat_2 = cost_concat_1 + seq_get_T(solut,  i,  j)        + info->cost[solut->s[j_next]][solut->s[i]];
 
-          cost_new = get_C(solut->seq, 0, i_prev)                                                        +   //  1st subseq
-              get_W(solut->seq, i, j)                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
-              get_W(solut->seq, j_next, info->dimen) * cost_concat_2 + get_C(solut->seq, j_next, info->dimen);      // concat 3rd subseq
+          cost_new = seq_get_C(solut,  0,  i_prev)                                                        +   //  1st subseq
+              seq_get_W(solut,  i,  j)                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
+              seq_get_W(solut,  j_next,  info->dimen) * cost_concat_2 + seq_get_C(solut,  j_next,  info->dimen);      // concat 3rd subseq
 
             
             if (cost_new < cost_best) {
@@ -385,14 +428,14 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
         for(k = 0; k < i_prev; ++k){
             k_next = k+1;
 
-          cost_concat_1 =                 get_T(solut->seq, 0, k)            + info->cost[solut->s[k]][solut->s[i]];
-          cost_concat_2 = cost_concat_1 + get_T(solut->seq, i, j)            + info->cost[solut->s[j]][solut->s[k_next]];
-          cost_concat_3 = cost_concat_2 + get_T(solut->seq, k_next, i_prev)  + info->cost[solut->s[i_prev]][solut->s[j_next]];
+          cost_concat_1 =                 seq_get_T(solut,  0,  k)            + info->cost[solut->s[k]][solut->s[i]];
+          cost_concat_2 = cost_concat_1 + seq_get_T(solut,  i,  j)            + info->cost[solut->s[j]][solut->s[k_next]];
+          cost_concat_3 = cost_concat_2 + seq_get_T(solut,  k_next,  i_prev)  + info->cost[solut->s[i_prev]][solut->s[j_next]];
 
-          cost_new = get_C(solut->seq, 0, k)                                                                   +   //       1st subseq
-              get_W(solut->seq, i, j)               * cost_concat_1 + get_C(solut->seq, i, j)                  +   //  concat 2nd subseq (reinserted seq)
-              get_W(solut->seq, k_next, i_prev)     * cost_concat_2 + get_C(solut->seq, k_next, i_prev)        +   //  concat 3rd subseq
-              get_W(solut->seq, j_next, info->dimen) * cost_concat_3 + get_C(solut->seq, j_next, info->dimen);       // concat 4th subseq
+          cost_new = seq_get_C(solut,  0,  k)                                                                   +   //       1st subseq
+              seq_get_W(solut,  i,  j)               * cost_concat_1 + seq_get_C(solut,  i,  j)                  +   //  concat 2nd subseq (reinserted seq)
+              seq_get_W(solut,  k_next,  i_prev)     * cost_concat_2 + seq_get_C(solut,  k_next,  i_prev)        +   //  concat 3rd subseq
+              seq_get_W(solut,  j_next,  info->dimen) * cost_concat_3 + seq_get_C(solut,  j_next,  info->dimen);       // concat 4th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -405,14 +448,14 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
         for (k = i + opt; k < info->dimen; ++k) {
             k_next = k + 1;
 
-          cost_concat_1 =                 get_T(solut->seq, 0, i_prev)  + info->cost[solut->s[i_prev]][solut->s[j_next]];
-          cost_concat_2 = cost_concat_1 + get_T(solut->seq, j_next, k)  + info->cost[solut->s[k]][solut->s[i]];
-          cost_concat_3 = cost_concat_2 + get_T(solut->seq, i, j)       + info->cost[solut->s[j]][solut->s[k_next]];
+          cost_concat_1 =                 seq_get_T(solut,  0,  i_prev)  + info->cost[solut->s[i_prev]][solut->s[j_next]];
+          cost_concat_2 = cost_concat_1 + seq_get_T(solut,  j_next,  k)  + info->cost[solut->s[k]][solut->s[i]];
+          cost_concat_3 = cost_concat_2 + seq_get_T(solut,  i,  j)       + info->cost[solut->s[j]][solut->s[k_next]];
 
-          cost_new = get_C(solut->seq, 0, i_prev)                                                                  +   //       1st subseq
-                  get_W(solut->seq, j_next, k)          * cost_concat_1 + get_C(solut->seq, j_next, k)             +   // concat 2nd subseq
-                  get_W(solut->seq, i, j)               * cost_concat_2 + get_C(solut->seq, i, j)                  +   // concat 3rd subseq (reinserted seq)
-                  get_W(solut->seq, k_next, info->dimen) * cost_concat_3 + get_C(solut->seq, k_next, info->dimen);       // concat 4th subseq
+          cost_new = seq_get_C(solut,  0,  i_prev)                                                                  +   //       1st subseq
+                  seq_get_W(solut,  j_next,  k)          * cost_concat_1 + seq_get_C(solut,  j_next,  k)             +   // concat 2nd subseq
+                  seq_get_W(solut,  i,  j)               * cost_concat_2 + seq_get_C(solut,  i,  j)                  +   // concat 3rd subseq (reinserted seq)
+                  seq_get_W(solut,  k_next,  info->dimen) * cost_concat_3 + seq_get_C(solut,  k_next,  info->dimen);       // concat 4th subseq
           
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
