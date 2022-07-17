@@ -574,9 +574,9 @@ subroutine RVND(sol, info, it)
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
 
-        if (index_ > nl_size) then
-            call exit(0)
-        endif
+       !if (index_ > nl_size) then
+       !    call exit(0)
+       !endif
 
         neighbd = neighbd_list(index_)
         
