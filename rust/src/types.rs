@@ -9,7 +9,12 @@ pub struct tSeqInfo {
    pub  W : f64,
 }
 
+#[cfg(feature="flat")]
+//pub type tSeqData = Vec<tSeqInfo>;
+pub type tSeqData = Box<[tSeqInfo; (sz::SIZE+1)*(sz::SIZE+1)]>;
+#[cfg(not(feature="flat"))]
 pub type tSeqData = Box<[[tSeqInfo; sz::SIZE+1]; sz::SIZE+1]>;
+
 pub type tCostData = Box<[[f64; sz::SIZE]; sz::SIZE]>;
 
 

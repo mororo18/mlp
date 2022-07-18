@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-cargo run
+cargo run --features flat

@@ -1,5 +1,5 @@
 [package]
-name = "main_"
+name = "main"
 version = "0.1.0"
 edition = "2021"
 build = "build.rs"
@@ -24,5 +24,7 @@ panic = "abort"
 
 [dependencies]
 rand = "0.8.0"
-#ndarray = "0.15.4"
 cpu-time = "1.0.0"
+
+[features]
+flat = []

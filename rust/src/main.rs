@@ -17,14 +17,6 @@ use cpu_time::ProcessTime;
 
 
 
-#[inline(always)]
-unsafe
-fn to_1D(x : usize, y : usize, size : usize) -> usize {
-
-    return x * (size+1) + y;
-    //return x + (size+1) * (y + (size+1) * z);
-}
-
 fn subseq_load(solut : &mut tSolution, info : & tInfo) {
     for i in 0..info.dimen + 1 {
         let k : i32 = 1 - (i as i32) - if i == 0 {1} else {0};
