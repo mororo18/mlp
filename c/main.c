@@ -18,7 +18,7 @@
 #define DBL_SZ      8
 #define INT_SZ      4
 
-#define FLAT
+#define MATRIX
 
 typedef unsigned uint;
 
@@ -50,6 +50,8 @@ typedef struct tSolution {
     double cost;
     int * s;
     int s_size;
+    size_t size;
+    float MBsize;
     //int s_size;
 } tSolution;
 
@@ -115,6 +117,7 @@ double seq_get_W(const tSolution * solut, int i, int j) {
 
 tSolution Solution_init(tInfo info) {
     tSolution solut;
+    solut.size = sizeof(tSolution);
     solut.s = (int*) calloc(info.dimen+1, sizeof(int));
     //solut.s_size = info.dimen+1;
 
@@ -126,17 +129,25 @@ tSolution Solution_init(tInfo info) {
   //    }
   //}
 
+    solut.s_size = info.dimen + 1;
+
 #ifdef MATRIX
     solut.seq = (tSeq__) calloc(info.dimen+1, sizeof(tSeq_));
     for (int i = 0; i < info.dimen+1; i++) {
         solut.seq[i] = (tSeq_) calloc(info.dimen+1, sizeof(tSeq));
     }
+
+    solut.size += solut.s_size * sizeof(tSeq_);
+    solut.size += solut.s_size * solut.s_size * sizeof(tSeq);
 #elif defined(FLAT)
     solut.seq = (tSeq_) calloc((info.dimen+1)*(info.dimen+1), sizeof(tSeq));
+
+    solut.size += solut.s_size * solut.s_size * sizeof(tSeq);
 #endif
 
+    solut.MBsize = solut.size / (1024.0 * 1024);
+
     solut.cost = DBL_MAX;
-    solut.s_size = info.dimen + 1;
 
     return solut;
 }
@@ -545,10 +556,10 @@ void RVND(tSolution * solut, tInfo * info) {
                 break;				
         }
 
-        if (feasible(solut->s, info->dimen+1)) {
-            printf("qebrad\n");
-            exit(0);
-        }
+      //if (feasible(solut->s, info->dimen+1)) {
+      //    printf("qebrad\n");
+      //    exit(0);
+      //}
         //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
             neighbd_list[0] = SWAP;
@@ -644,6 +655,16 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
     tSolution solut_crnt = Solution_init(*info);
     tSolution solut_best = Solution_init(*info);
 
+#ifdef MATRIX
+    printf("MATRIX\n");
+#elif defined(FLAT)
+    printf("FLAT\n");
+#endif
+    printf("struct tSolution's size: %zu bytes\n", solut_crnt.size);
+    printf("struct tSolution's size: %.4f MB\n", solut_crnt.MBsize);
+
+    //exit(0);
+
     for(int i = 0; i < Imax; ++i){
         /**/ int aux = (unsigned)rand() % TABLE_SZ;
         aux = info->rnd[info->rnd_index++];
@@ -728,12 +749,12 @@ int main(int argc, char **argv){
     tSolution solut = Solution_init(info);
 
     //exit(0);
-    for (int i = 0; i < info.dimen; i++) {
-        for (int j = 0; j < info.dimen; j++) {
-            printf("%.0lf ",info.cost[i][j]);
-        }
-        puts("");
-    }
+  //for (int i = 0; i < info.dimen; i++) {
+  //    for (int j = 0; j < info.dimen; j++) {
+  //        printf("%.0lf ",info.cost[i][j]);
+  //    }
+  //    puts("");
+  //}
 
 
     srand(clock());
