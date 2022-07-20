@@ -1,1 +1,7 @@
 28/03 - https://cerfacs.fr/coop/fortran-vs-python
+
+Acesso de memória (performance):
+ -> List
+    array
+    Dict
+    numpy.array
