@@ -78,7 +78,7 @@ fn subseq_load(s : & Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, c : & Vec<Vec<f6
 
 fn sort(arr : &mut Vec<usize>, r : usize, c : & Vec<Vec<f64>>) {
     for i in 0..arr.len() {
-        for j in 0..(arr.len()-1) {
+        for j in 0..(arr.len()-1-i) {
             if c[r][arr[j]] > c[r][arr[j+1]] {
                 let tmp = arr[j];
                 arr[j] = arr[j+1];
