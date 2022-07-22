@@ -8,11 +8,13 @@ import (
     "strings"
 )
 
-func loadData() {
+func loadData() (int, [][]float64, []int) {
     var dimension int
     var line string
     var value float64
     var cost [][]float64
+    var rnd []int
+    var rnd_size int
 
     fmt.Println("Hello, World!")
 
@@ -26,9 +28,13 @@ func loadData() {
 
     scanner := bufio.NewScanner(f)
 
+    if err :=  scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+
     scanner.Scan(); line = scanner.Text()
     fmt.Sscanf(line, "%d ", &dimension)
-    fmt.Println(dimension)
+    //fmt.Println(dimension)
 
     cost = make([][]float64, dimension)
 
@@ -58,21 +64,31 @@ func loadData() {
             cost[i][j] = value;
             cost[j][i] = value;
         }
-        fmt.Println( cost[i])
+        //fmt.Println( cost[i])
     }
 
-    /*
     scanner.Scan(); line = scanner.Text()
-    fmt.Println(line)
+    //fmt.Println(line)
+    scanner.Scan(); line = scanner.Text()
+    //fmt.Println(line)
+    scanner.Scan(); line = scanner.Text()
+    fmt.Sscanf(line, "%d", &rnd_size)
+    //fmt.Println(rnd_size)
 
+    rnd = make([]int, rnd_size)
+
+    for i:=0; i<rnd_size; i++ {
+        scanner.Scan(); line = scanner.Text()
+        fmt.Sscanf(line, "%d", &rnd[i])
+    }
+
+    return dimension, cost, rnd
+
+    /*
     fmt.Sscanf(line, "%v ", &value)
     fmt.Println(value)
     for scanner.Scan() {
         fmt.Println(scanner.Text())
     }
     */
-
-    if err :=  scanner.Err(); err != nil {
-        log.Fatal(err)
-    }
 }
