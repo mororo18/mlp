@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "math/rand"
+    "math"
     "os"
 )
 
@@ -55,6 +56,45 @@ func swap(s []int, i int, j int) {
     s[j] = tmp
 }
 
+func reverse(s []int, i int, j int) {
+    m := int((i+j) / 2)
+
+    for first, last := i, j; first <= m; first,last = first+1, last-1  {
+        swap(s, first, last)
+    }
+}
+
+func shift(s []int, from int, to int, sz int) {
+    if (from < to) {
+        for i, j := from+sz-1, to+sz-1; i >= from; i,j = i-1, j-1 {
+            s[j] = s[i]
+        }
+    } else {
+        for i, j := from, to; i < from+sz; i, j = i+1, j+1 {
+            s[j] = s[i]
+        }
+    }
+}
+
+func cpy(from []int, to []int, sz int) {
+    for i := 0; i < sz; i++ {
+        to[i] = from[i];
+    }
+}
+
+func reinsert(s []int, i int, j int, pos int) {
+    seq := s[i:j+1]
+    if pos < i {
+        sz := i-pos
+        shift(s, pos, j+1-sz, sz)
+        cpy(seq, s[pos:], j-i+1)
+    } else {
+        sz := pos-j-1
+        shift(s, j+1, i, sz)
+        cpy(seq, s[i+sz:], j-i+1)
+    }
+}
+
 func sort(arr []int, r int) {
     for i := 0; i < len(arr); i++ {
         for j := 0; j < len(arr)-i-1; j++ {
@@ -77,24 +117,39 @@ func construct(alpha float64, rnd * tRnd) []int {
     var r = 0
     for len(cL) > 0 {
         sort(cL, r)
-        fmt.Println(r)
 
         var rang =  int(float64(len(cL)) * alpha + 1.0)
         var index = rand.Intn(rang)
-        //r_index = rnd.index; rnd.index++
-        //index = rnd.rnd[r_index]
+        r_index := rnd.index; rnd.index++
+        index = rnd.rnd[r_index]
         var c = cL[index]
         r = c
-        fmt.Println(cL)
+        //fmt.Println(cL)
         cL = remove(cL, index)
-        fmt.Println(index, cL)
+        //fmt.Println(index, cL)
         s = append(s, c)
     }
 
     s = append(s, 0)
-    fmt.Println(s)
 
     return s
+}
+
+func fea(s []int) bool {
+    check := make([]bool, dimension)
+    for i, v := range s {
+        _ = i
+        check[v] = true
+    }
+
+    for i, v := range check {
+        _ = i
+        if !v {
+            return false
+        }
+    }
+
+    return true
 }
 
 func search_swap(s []int, seq [][]tSeqInfo) bool {
@@ -104,7 +159,7 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
     var I int
     var J int
 
-    for i := 1; i < dimension-1; ++i {
+    for i := 1; i < dimension-1; i++ {
         i_prev = i - 1
         i_next = i + 1
 
@@ -114,15 +169,15 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
 
         cost_new = seq[0][i_prev].C                                                    +           //       1st subseq
         seq[i][i_next].W               * (cost_concat_1) + cost[s[i_next]][s[i]]  +           // concat 2nd subseq
-        seq[i_next+1][dimen].W   * (cost_concat_2) + seq[i_next+1][dimen].C   // concat 3rd subseq
+        seq[i_next+1][dimension].W   * (cost_concat_2) + seq[i_next+1][dimension].C   // concat 3rd subseq
 
         if cost_new < cost_best {
-            cost_best = cost_new - math.MinFloat64
+            cost_best = cost_new - math.SmallestNonzeroFloat64
             I = i
             J = i_next
         }
 
-        for j := i_next+1; j < dimen; ++j {
+        for j := i_next+1; j < dimension; j++ {
             j_next = j + 1
             j_prev = j - 1
 
@@ -135,17 +190,17 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
             seq[i_next][j_prev].W      * cost_concat_2 + seq[i_next][j_prev].C +      // concat 3rd subseq
             cost_concat_3 +                                                             // concat 4th subseq (single node)
-            seq[j_next][dimen].W * cost_concat_4 + seq[j_next][dimen].C   // concat 5th subseq
+            seq[j_next][dimension].W * cost_concat_4 + seq[j_next][dimension].C   // concat 5th subseq
 
             if cost_new < cost_best {
-                cost_best = cost_new - math.MinFloat64
+                cost_best = cost_new - math.SmallestNonzeroFloat64
                 I = i
                 J = j
             }
         }
     }
 
-    if cost_best < seq[0][dimen].C -math.MinFloat64 {
+    if cost_best < seq[0][dimension].C -math.SmallestNonzeroFloat64 {
         swap(s, I, J);
         subseq_load(s, seq);
         //subseq_load_b(s, seq, I);
@@ -159,15 +214,15 @@ func search_two_opt(s []int, seq [][]tSeqInfo) bool {
     var cost_new, cost_concat_1, cost_concat_2 float64
     var cost_best = math.MaxFloat64 
     var rev_seq_cost float64
-    var i, j, i_prev, j_next int
+    var i_prev, j_next int
     var I int
     var J int
 
-    for i := 1; i < dimen-1; ++i {
+    for i := 1; i < dimension-1; i++ {
         i_prev = i - 1
 
         rev_seq_cost = seq[i][i+1].T
-        for j := i + 2; j < dimen; ++j {
+        for j := i + 2; j < dimension; j++ {
             j_next = j + 1
 
 
@@ -178,17 +233,17 @@ func search_two_opt(s []int, seq [][]tSeqInfo) bool {
 
             cost_new = seq[0][i_prev].C                                                        +   //  1st subseq
             seq[i][j].W                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
-            seq[j_next][dimen].W * cost_concat_2 + seq[j_next][dimen].C      // concat 3rd subseq
+            seq[j_next][dimension].W * cost_concat_2 + seq[j_next][dimension].C      // concat 3rd subseq
 
             if (cost_new < cost_best) {
-                cost_best = cost_new - math.MinFloat64
+                cost_best = cost_new - math.SmallestNonzeroFloat64
                 I = i
                 J = j
             }
         }
     }
 
-    if cost_best < seq[0][dimen].C - math.MinFloat64 {
+    if cost_best < seq[0][dimension].C - math.SmallestNonzeroFloat64 {
         reverse(s, I, J)
         subseq_load(s, seq)
         return true
@@ -200,50 +255,51 @@ func search_two_opt(s []int, seq [][]tSeqInfo) bool {
 func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
     var cost_new, cost_concat_1, cost_concat_2, cost_concat_3 float64
     var cost_best = math.MaxFloat64
-    var i, j, k, k_next, i_prev, j_next int
+    var k_next, i_prev, j_next int
     var I int
     var J int
     var POS int
 
-    for i, j := 1, opt +i-1; i < dimen-opt+1; ++i, ++j {
+    for i:= 1; i < dimension-opt+1; i = i+1 {
+        j := opt+i-1
         j_next = j + 1
         i_prev = i - 1
 
         //k -> edges 
-        for k := 0; k < i_prev; ++k {
+        for k := 0; k < i_prev; k++ {
             k_next = k+1
 
-          cost_concat_1 =                 seq[0][k].T            + cost[s[k]][s[i]]
-          cost_concat_2 = cost_concat_1 + seq[i][j].T            + cost[s[j]][s[k_next]]
-          cost_concat_3 = cost_concat_2 + seq[k_next][i_prev].T  + cost[s[i_prev]][s[j_next]]
+            cost_concat_1 =                 seq[0][k].T            + cost[s[k]][s[i]]
+            cost_concat_2 = cost_concat_1 + seq[i][j].T            + cost[s[j]][s[k_next]]
+            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev].T  + cost[s[i_prev]][s[j_next]]
 
-          cost_new = seq[0][k].C                                                                   +   //       1st subseq
-              seq[i][j].W               * cost_concat_1 + seq[i][j].C                  +   //  concat 2nd subseq (reinserted seq)
-              seq[k_next][i_prev].W     * cost_concat_2 + seq[k_next][i_prev].C        +   //  concat 3rd subseq
-              seq[j_next][dimen].W * cost_concat_3 + seq[j_next][dimen].C       // concat 4th subseq
+            cost_new = seq[0][k].C                                                                   +   //       1st subseq
+            seq[i][j].W               * cost_concat_1 + seq[i][j].C                  +   //  concat 2nd subseq (reinserted seq)
+            seq[k_next][i_prev].W     * cost_concat_2 + seq[k_next][i_prev].C        +   //  concat 3rd subseq
+            seq[j_next][dimension].W * cost_concat_3 + seq[j_next][dimension].C       // concat 4th subseq
 
             if cost_new < cost_best {
-                cost_best = cost_new - math.MinFloat64
+                cost_best = cost_new - math.SmallestNonzeroFloat64
                 I = i
                 J = j
                 POS = k
             }
         }
 
-        for k := i + opt; k < dimen; ++k {
+        for k := i + opt; k < dimension; k++ {
             k_next = k + 1
 
-          cost_concat_1 =                 seq[0][i_prev].T  + cost[s[i_prev]][s[j_next]]
-          cost_concat_2 = cost_concat_1 + seq[j_next][k].T  + cost[s[k]][s[i]]
-          cost_concat_3 = cost_concat_2 + seq[i][j].T       + cost[s[j]][s[k_next]]
+            cost_concat_1 =                 seq[0][i_prev].T  + cost[s[i_prev]][s[j_next]]
+            cost_concat_2 = cost_concat_1 + seq[j_next][k].T  + cost[s[k]][s[i]]
+            cost_concat_3 = cost_concat_2 + seq[i][j].T       + cost[s[j]][s[k_next]]
 
-          cost_new = seq[0][i_prev].C                                                                  +   //       1st subseq
-                  seq[j_next][k].W          * cost_concat_1 + seq[j_next][k].C             +   // concat 2nd subseq
-                  seq[i][j].W               * cost_concat_2 + seq[i][j].C                  +   // concat 3rd subseq (reinserted seq)
-                  seq[k_next][dimen].W * cost_concat_3 + seq[k_next][dimen].C       // concat 4th subseq
+            cost_new = seq[0][i_prev].C                                                                  +   //       1st subseq
+            seq[j_next][k].W          * cost_concat_1 + seq[j_next][k].C             +   // concat 2nd subseq
+            seq[i][j].W               * cost_concat_2 + seq[i][j].C                  +   // concat 3rd subseq (reinserted seq)
+            seq[k_next][dimension].W * cost_concat_3 + seq[k_next][dimension].C       // concat 4th subseq
 
             if cost_new < cost_best {
-                cost_best = cost_new - math.MinFloat64;
+                cost_best = cost_new - math.SmallestNonzeroFloat64;
                 I = i
                 J = j
                 POS = k
@@ -251,9 +307,12 @@ func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
         }
     }
 
-    if cost_best < seq[0][dimen].C - math.MinFloat64 {
-        reinsert(s, I, J, POS+1);
-        subseq_load(s, seq);
+    if cost_best < seq[0][dimension].C - math.SmallestNonzeroFloat64 {
+        fmt.Println(cost_best, seq[0][dimension].C)
+        fmt.Println(s, I, J, POS+1)
+        reinsert(s, I, J, POS+1)
+        fmt.Println(s, I, J, POS+1)
+        subseq_load(s, seq)
         //subseq_load_b(s, seq, I < POS+1 ? I : POS+1);
         return true;
     }
@@ -264,14 +323,16 @@ func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
 func RVND(s []int , seq [][]tSeqInfo, rnd *tRnd) {
     var neighbd_list []int
     _ = neighbd_list
-    neighbd_list = []int{SWAP, REINSERTION, OR_OPT_2, OR_OPT_3, TWO_OPT}
+    neighbd_list = []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
 
     for len(neighbd_list) > 0 {
         r_index := rnd.index; rnd.index++
 
-        improve := false
 
-        switch neighbd := neighbd_list[rnd.rnd[r_index]]; neighbd {
+        improve := false
+        index := rnd.rnd[r_index]
+
+        switch neighbd := neighbd_list[index]; neighbd {
         case SWAP:
             improve = search_swap(s, seq)
         case REINSERTION:
@@ -284,14 +345,83 @@ func RVND(s []int , seq [][]tSeqInfo, rnd *tRnd) {
             improve = search_two_opt(s, seq)
         }
 
+        if !fea(s) {
+            fmt.Println("qebrad")
+            os.Exit(0)
+        }
+        fmt.Println(index, seq[0][dimension].C)
+
         if improve {
-            neighbd_list = []int{SWAP, REINSERTION, OR_OPT_2, OR_OPT_3, TWO_OPT}
+            neighbd_list = []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
 
         } else {
-            neighbd_list = remove(neighbd_list, neighbd)
+            neighbd_list = remove(neighbd_list, index)
         }
 
     }
+}
+
+func perturb(s_crnt []int, s_partial []int, rnd *tRnd) {
+    s := s_partial
+
+    var A_start = 1
+    var A_end = 1
+    var B_start = 1
+    var B_end = 1
+
+    var size_max = (dimension+1)/10
+    size_max = ternary(size_max >= 2, size_max, 2)
+    var size_min = 2
+    //std::cout << "perturbing\n";
+    //print_s(s);
+    for (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
+        /**/
+        max := (dimension+1) -2 -size_max
+        A_start = rand.Intn(max + 1)
+        A_end = A_start + rand.Intn(size_max - size_min + 1) + size_min
+
+        B_start = rand.Intn(max + 1)
+        B_end = B_start + rand.Intn(size_max - size_min + 1) + size_min
+        /**/
+
+
+
+        //std::cout << "paa\n";
+
+        //cout << info.rnd[info.rnd_index] << endl;
+        r_index := rnd.index; rnd.index++
+        A_start = rnd.rnd[r_index]
+        //cout << info.rnd[info.rnd_index] << endl;
+        r_index = rnd.index; rnd.index++
+        A_end = A_start + rnd.rnd[r_index]
+        //std::cout << "A start  " << A_start << std::endl;
+        //std::cout << "A end  " << A_end << std::endl;
+
+        //cout << info.rnd[info.rnd_index] << endl;
+        r_index = rnd.index; rnd.index++
+        B_start = rnd.rnd[r_index]
+        //cout << info.rnd[info.rnd_index] << endl;
+        r_index = rnd.index; rnd.index++
+        B_end = B_start + rnd.rnd[r_index]
+        //std::cout << "B start  " << B_start << std::endl;
+        //std::cout << "B end  " << B_end << std::endl;
+    }
+    
+    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
+
+    if A_start < B_start {
+        reinsert(s, B_start, B_end-1, A_end)
+        reinsert(s, A_start, A_end-1, B_end)
+    } else {
+        reinsert(s, A_start, A_end-1, B_end)
+        reinsert(s, B_start, B_end-1, A_end)
+    }
+
+    //print_s(s);
+    //subseq_load(solut, info);
+
+    s_crnt = s
+    //memcpy(s_crnt, s, sizeof(int)*(dimen+1));
 }
 
 //func GILS_RVND(Imax int, Iils int, R []float64) {
@@ -321,21 +451,38 @@ func GILS_RVND(rnd tRnd) {
         var alpha = R[rand.Intn(len(R))]
         var r_index = rnd.index; rnd.index++
         var index = rnd.rnd[r_index]
+        fmt.Printf("[+] Search %d\n", i+1)
+        fmt.Printf("\t[+] Constructing..\n");	
 
         alpha = R[index]
         s_crnt = construct(alpha, &rnd)
 
         cost_crnt = subseq_load(s_crnt, seq)
-        fmt.Println(cost_crnt)
+        fmt.Println(s_crnt, cost_crnt)
         s_partial = s_crnt
         cost_partial = cost_crnt
 
         var iterILS = 0
         for iterILS < Iils {
+            RVND(s_crnt, seq, &rnd)
+            cost_crnt = seq[0][dimension].C
 
+            if cost_crnt < cost_partial {
+                cost_partial = cost_crnt
+                s_partial = s_crnt
+            }
+
+            perturb(s_crnt, s_partial, &rnd)
             iterILS++
         }
+
+        if cost_partial < cost_best {
+            cost_best = cost_partial
+            s_best = s_partial
+        }
     }
+
+    fmt.Println(cost_best)
 }
 
 func main() {
@@ -349,4 +496,5 @@ func main() {
     fmt.Println(cost)
 
     GILS_RVND(rnd)
+    os.Exit(0)
 }
