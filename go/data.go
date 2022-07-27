@@ -16,8 +16,6 @@ func loadData() (int, [][]float64, []int) {
     var rnd []int
     var rnd_size int
 
-    fmt.Println("Hello, World!")
-
     f, err := os.Open("../distance_matrix")
 
     if err != nil {

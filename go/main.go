@@ -5,6 +5,7 @@ import (
     "math/rand"
     "math"
     "os"
+    "time"
 )
 
 type tSeqInfo struct {
@@ -83,7 +84,8 @@ func cpy(from []int, to []int, sz int) {
 }
 
 func reinsert(s []int, i int, j int, pos int) {
-    seq := s[i:j+1]
+    seq  := make([]int , j-i+1)
+    copy(seq, s[i:j+1])
     if pos < i {
         sz := i-pos
         shift(s, pos, j+1-sz, sz)
@@ -105,7 +107,7 @@ func sort(arr []int, r int) {
     }
 }
 
-func construct(alpha float64, rnd * tRnd) []int {
+func construct(alpha float64, s_crnt []int, rnd * tRnd) {
     s := make([]int, 0)
     s = append(s, 0)
 
@@ -132,7 +134,7 @@ func construct(alpha float64, rnd * tRnd) []int {
 
     s = append(s, 0)
 
-    return s
+    copy(s_crnt, s)
 }
 
 func fea(s []int) bool {
@@ -308,10 +310,10 @@ func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
     }
 
     if cost_best < seq[0][dimension].C - math.SmallestNonzeroFloat64 {
-        fmt.Println(cost_best, seq[0][dimension].C)
-        fmt.Println(s, I, J, POS+1)
+      //fmt.Println(cost_best, seq[0][dimension].C)
+      //fmt.Println(s, I, J, POS+1)
         reinsert(s, I, J, POS+1)
-        fmt.Println(s, I, J, POS+1)
+      //fmt.Println(s, I, J, POS+1)
         subseq_load(s, seq)
         //subseq_load_b(s, seq, I < POS+1 ? I : POS+1);
         return true;
@@ -349,20 +351,22 @@ func RVND(s []int , seq [][]tSeqInfo, rnd *tRnd) {
             fmt.Println("qebrad")
             os.Exit(0)
         }
-        fmt.Println(index, seq[0][dimension].C)
+        //fmt.Println(index, seq[0][dimension].C)
 
         if improve {
             neighbd_list = []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
-
         } else {
             neighbd_list = remove(neighbd_list, index)
         }
 
     }
+    
 }
 
 func perturb(s_crnt []int, s_partial []int, rnd *tRnd) {
-    s := s_partial
+    s := make([]int, len(s_partial))
+
+    copy(s, s_partial)
 
     var A_start = 1
     var A_end = 1
@@ -420,7 +424,7 @@ func perturb(s_crnt []int, s_partial []int, rnd *tRnd) {
     //print_s(s);
     //subseq_load(solut, info);
 
-    s_crnt = s
+    copy(s_crnt, s)
     //memcpy(s_crnt, s, sizeof(int)*(dimen+1));
 }
 
@@ -431,11 +435,11 @@ func GILS_RVND(rnd tRnd) {
     _ = Iils
     R := []float64{0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25}
 
-    var s_best []int
-    var s_crnt []int
-    var s_partial []int
+    s_best := make([]int, dimension+1)
+    s_crnt := make([]int, dimension+1)
+    s_partial := make([]int, dimension+1)
 
-    var cost_best float64
+    var cost_best float64 = math.MaxFloat64
     var cost_crnt float64
     var cost_partial float64
 
@@ -451,15 +455,15 @@ func GILS_RVND(rnd tRnd) {
         var alpha = R[rand.Intn(len(R))]
         var r_index = rnd.index; rnd.index++
         var index = rnd.rnd[r_index]
+        alpha = R[index]
         fmt.Printf("[+] Search %d\n", i+1)
         fmt.Printf("\t[+] Constructing..\n");	
 
-        alpha = R[index]
-        s_crnt = construct(alpha, &rnd)
+        construct(alpha, s_crnt, &rnd)
 
         cost_crnt = subseq_load(s_crnt, seq)
-        fmt.Println(s_crnt, cost_crnt)
-        s_partial = s_crnt
+        //fmt.Println(s_crnt, cost_crnt)
+        copy(s_partial, s_crnt)
         cost_partial = cost_crnt
 
         var iterILS = 0
@@ -469,20 +473,26 @@ func GILS_RVND(rnd tRnd) {
 
             if cost_crnt < cost_partial {
                 cost_partial = cost_crnt
-                s_partial = s_crnt
+                copy(s_partial, s_crnt)
+                iterILS = 0
             }
 
             perturb(s_crnt, s_partial, &rnd)
+            subseq_load(s_crnt, seq)
             iterILS++
         }
 
         if cost_partial < cost_best {
+            copy(s_best, s_partial)
             cost_best = cost_partial
-            s_best = s_partial
         }
+
+        fmt.Println("Current best cost: ", cost_best)
+        fmt.Println(s_best)
     }
 
-    fmt.Println(cost_best)
+    fmt.Println("COST: ", cost_best)
+    fmt.Println("SOLUCAO: ", s_best)
 }
 
 func main() {
@@ -492,9 +502,10 @@ func main() {
     _ = cost
     _ = rnd
 
-    fmt.Println(dimension)
-    fmt.Println(cost)
 
+    start := time.Now()
     GILS_RVND(rnd)
-    os.Exit(0)
+    elapsed := time.Since(start).Seconds()
+
+    fmt.Println("TIME: ", elapsed)
 }
