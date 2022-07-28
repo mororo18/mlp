@@ -152,6 +152,25 @@ tSolution Solution_init(tInfo info) {
     return solut;
 }
 
+void Solution_free(tSolution * solut) {
+    free(solut->s);
+
+#ifdef MATRIX
+    for (int i = 0; i < solut->s_size; i++) {
+        free(solut->seq[i]);
+    }
+#endif
+    free(solut->seq);
+}
+
+void tInfo_free(tInfo * info) {
+    for (int i = 0; i < info->dimen; i++) {
+        free(info->cost[i]);
+    }
+    free(info->cost);
+    free(info->rnd);
+}
+
 void Solution_cpy(tSolution * src, tSolution * tgt, const tInfo * info) {
 
     memcpy(tgt->s, src->s, sizeof(int)*(info->dimen+1));
@@ -727,6 +746,10 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
     }
     //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", solut_best.cost);
+
+    Solution_free(&solut_best);
+    Solution_free(&solut_crnt);
+    Solution_free(&solut_partial);
 }
 
 int main(int argc, char **argv){
@@ -746,8 +769,6 @@ int main(int argc, char **argv){
     //printf("%d\n", rnd[10]);
     info.rnd_index = 0;
 
-    tSolution solut = Solution_init(info);
-
     //exit(0);
   //for (int i = 0; i < info.dimen; i++) {
   //    for (int j = 0; j < info.dimen; j++) {
@@ -766,6 +787,7 @@ int main(int argc, char **argv){
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
     printf("TIME: %.6lf\n", res);
 
+    tInfo_free(&info);
     /*
     flag = true;
 
