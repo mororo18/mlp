@@ -1,1 +1,7 @@
 https://sendilkumarn.com/blog/9-tips-to-increase-your-java-performance/
+https://blog.bramp.net/tags/unsafe/
+https://www.baeldung.com/java-unsafe
+http://www.docjar.com/html/api/sun/misc/Unsafe.java.html
+http://mishadoff.com/blog/java-magic-part-4-sun-dot-misc-dot-unsafe/
+javac Test.java -XDignore.symbol.file
+https://gist.github.com/raphw/7935844
