@@ -1,7 +1,4 @@
 
-#define TRUE 1
-#define FALSE 0
-
 double ** matrix_allocate(size_t sz) {
     double ** ptr = (double **) calloc(sz, sizeof(double*));
 
@@ -32,7 +29,7 @@ int loadData(double *** matrix, int ** rnd) {
         *matrix = matrix_allocate((size_t) dimension);
         //cout << "dimension " << dimension << endl;
 
-        char flag = FALSE;
+        _Bool flag = false;
         for (int i = 0; i < dimension-1; i++) {
             //cout << line << "\n";
             //int j = i + 1;
