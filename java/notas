@@ -13,3 +13,6 @@ https://sendilkumarn.com/blog/9-tips-to-increase-your-java-performance/
         Possiveis explicações:
             https://groups.google.com/g/mechanical-sympathy/c/k0qd7dLHFQE
             https://bugs.openjdk.org/browse/JDK-8074124
+
+
+Ver inlining: https://www.baeldung.com/jvm-method-inlining

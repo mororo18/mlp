@@ -1,3 +1,3 @@
 #! /usr/bin/bash
 rm *.class
-javac -O  main.java -Xlint:unchecked 
+javac -O  main.java -Xlint:unchecked
