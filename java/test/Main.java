@@ -85,7 +85,7 @@ class Main {
 
 
         System.out.print("Teste com acesso ");
-        if (linear) System.out.println("SEQUENCIAL");
+        if (linear) System.out.print("SEQUENCIAL");
         else System.out.print("ALEATORIO");
         System.out.print(" em array 3D (");
         System.out.print(size);
