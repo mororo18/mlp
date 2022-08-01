@@ -1,9 +1,7 @@
-Teste com acesso LINEAR
- em Matriz (5000 x 5000)
+Teste com acesso SEQUENCIAL em Matriz (5000 x 5000)
 Nested 2D	0.012421244
 Flat 2D		0.033309451
-Teste com acesso LINEAR
- em array 3D (5000 x 5000 x 3)
+Teste com acesso SEQUENCIAL em array 3D (5000 x 5000 x 3)
 Nested 3D	0.039142083
 Flat 3D		0.095102928
 Part. Nested 3D	0.010104175

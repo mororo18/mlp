@@ -3,7 +3,7 @@ import java.util.Random;
 
 class Main {
     private int line_size;
-    private static boolean linear = false;
+    private static boolean linear = true;
 
     private static final double D = 1e9;
 
@@ -29,7 +29,7 @@ class Main {
 
 
         System.out.print("Teste com acesso ");
-        if (linear) System.out.println("LINEAR");
+        if (linear) System.out.print("SEQUENCIAL");
         else System.out.print("ALEATORIO");
         System.out.print(" em Matriz (");
         System.out.print(size);
@@ -85,7 +85,7 @@ class Main {
 
 
         System.out.print("Teste com acesso ");
-        if (linear) System.out.println("LINEAR");
+        if (linear) System.out.println("SEQUENCIAL");
         else System.out.print("ALEATORIO");
         System.out.print(" em array 3D (");
         System.out.print(size);
