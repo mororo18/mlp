@@ -1,6 +1,7 @@
 .*.sw*
+.swp
 
-*/solve
+solve
 fortran/*.mod
 rust/target/*
 rust/target/
@@ -12,3 +13,4 @@ python/__pycache__/
 *.pyc
 *.prof
 *.o
+*.d
