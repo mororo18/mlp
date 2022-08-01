@@ -1,4 +1,6 @@
+#include "data.h"
 
+static
 double ** matrix_allocate(size_t sz) {
     double ** ptr = (double **) calloc(sz, sizeof(double*));
 

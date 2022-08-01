@@ -3,7 +3,8 @@ BIN_NAME = solve
 
 MODE = MATRIX
 
-COPT = -O3 -std=c99 -D$(MODE) $(Wno) -g
+COPT = -O3 -std=c99 -D$(MODE) $(Wno) $(W) -g
+W = -Winline
 Wno = -Wno-unused-result 
 LOPT = -lm
 
@@ -35,7 +36,7 @@ flat: $(BIN_NAME)
 
 clean:
 	@echo "\033[31mcleaning obj directory \033[0m"
-	rm $(OBJDIR)/* $(BIN_NAME)
+	@rm $(OBJDIR)/* $(BIN_NAME)
 
 rebuild: clean $(BIN_NAME)
 

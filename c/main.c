@@ -5,8 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "Data.h"
-#include "types.c"
+#include "data.h"
+#include "types.h"
 
 #define REINSERTION 1
 #define OR_OPT_2 	2
@@ -358,7 +358,7 @@ void RVND(tSolution * solut, tInfo * info) {
 
     int neighbd_list[] = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     int nl_size = 5;
-    uint index;
+    int index;
     int neighbd;
     _Bool improve_flag;
 
@@ -535,9 +535,9 @@ int main(int argc, char **argv){
     int Iils;
 
     tInfo info = {0};
-    info.T = 0;
-    info.W = 1;
-    info.C = 2;
+  //info.T = 0;
+  //info.W = 1;
+  //info.C = 2;
 
     int * rnd;
 
