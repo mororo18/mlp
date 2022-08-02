@@ -62,8 +62,8 @@ class GILS_RVND {
         solut.setCost(solut.getSeq(0, info.getDimen(), info.C));
     }
 
-    private ArrayList<Integer> construction(double alpha, tInfo info){
-        ArrayList<Integer> s = new ArrayList<Integer>();
+    private tArray construction(double alpha, tInfo info){
+        tArray s = new ArrayList<Integer>();
         s.add(0);
 
         ArrayList<Integer> cList = new ArrayList<Integer>();
@@ -95,29 +95,6 @@ class GILS_RVND {
         //System.out.println(s);
         //System.exit(1);
         return s;
-    }
-
-    private void swap(ArrayList<Integer> s, int i, int j){
-        Collections.swap(s, i, j);
-        //System.out.println(s);
-    }
-
-    private void reverse(ArrayList<Integer> s, int i, int j){
-        Collections.reverse(s.subList(i,j+1));
-        //System.out.println(s);
-    }
-
-    private void reinsert(ArrayList<Integer> s, int i, int j, int pos){
-        if(i > pos){
-            int sz = j-i+1;
-            s.addAll(pos, s.subList(i, j+1));
-            s.subList(i+sz, j+1+sz).clear();
-        }else{
-            s.addAll(pos, s.subList(i, j+1));
-            s.subList(i, j+1).clear();
-        }
-
-        //System.out.println(s);
     }
 
     private boolean search_swap(tSolution solut, tInfo info){
@@ -181,7 +158,7 @@ class GILS_RVND {
         }
 
         if(cost_best < solut.getCost()){
-            swap(solut.getSolut(), I, J);
+            solut.getSolut().swap(I, J);
             subseq_load(solut, info);
             //improv_flag = true;
             return true;
@@ -229,7 +206,7 @@ class GILS_RVND {
         }
 
         if(cost_best < solut.getCost() - info.EPSILON){
-            reverse(solut.getSolut(), I, J);
+            solut.getSolut().reverse(I, J);
             subseq_load(solut, info);
             //improv_flag = true;
             return true;
@@ -305,7 +282,7 @@ class GILS_RVND {
         }
 
         if(cost_best < solut.getCost()){
-            reinsert(solut.getSolut(), I, J, POS+1);
+            solut.getSolut().reinsert(I, J, POS+1);
             subseq_load(solut, info);
             return true;
             //improv_flag = true;
@@ -315,13 +292,7 @@ class GILS_RVND {
     } 
 
     private void RVND(tSolution solut, tInfo info){
-        ArrayList<Integer> neighbd_list = new ArrayList<Integer>() {{
-            add(info.SWAP);
-            add(info.TWO_OPT);
-            add(info.REINSERTION);
-            add(info.OR_OPT2);
-            add(info.OR_OPT3);
-        }};
+        tArray neighbd_list = new tArray(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_2});
 
         while(!neighbd_list.isEmpty()){
             
@@ -365,21 +336,14 @@ class GILS_RVND {
             */
             
             if(improve){
-                neighbd_list.clear();
-                neighbd_list = new ArrayList<Integer>() {{
-                    add(info.SWAP);
-                    add(info.TWO_OPT);
-                    add(info.REINSERTION);
-                    add(info.OR_OPT2);
-                    add(info.OR_OPT3);
-                }};
+                neighbd_list.assign(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_2});
             }else
                 neighbd_list.remove(i_rand);
         }
     }
 
-    private ArrayList<Integer> perturb(ArrayList<Integer> sl, tInfo info){
-        ArrayList<Integer> sl_cpy = new ArrayList<>(sl); 
+    private tArray perturb(tArray sl, tInfo info){
+        tArray sl_cpy = new tArray(sl.getArrayCopy()); 
 
         int A_start = 1, A_end = 1;
         int B_start = 1, B_end = 1;
@@ -406,11 +370,11 @@ class GILS_RVND {
         }
 
         if(A_start < B_start){
-            reinsert(sl_cpy, B_start, B_end-1, A_end);
-            reinsert(sl_cpy, A_start, A_end-1, B_end);
+            sl_cpy.reinsert(B_start, B_end-1, A_end);
+            sl_cpy.reinsert(A_start, A_end-1, B_end);
         }else{
-            reinsert(sl_cpy, A_start, A_end-1, B_end);
-            reinsert(sl_cpy, B_start, B_end-1, A_end);
+            sl_cpy.reinsert(A_start, A_end-1, B_end);
+            sl_cpy.reinsert(B_start, B_end-1, A_end);
         }
 
         return sl_cpy;
