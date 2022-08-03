@@ -1,8 +1,8 @@
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 class tSolution {
     public static final boolean TEST = true;
-    private ArrayList<Integer> s;
+    private tArray s;
 
     private static double [][][] seq3d;
     private static double [][] seq2d;
@@ -19,7 +19,7 @@ else
         cost = c;
     }
 
-    void storeSolut(ArrayList<Integer> sN) {s = sN;}
+    void storeSolut(tArray sN) {s = sN;}
 
     public static double getSeq(int i, int j, int k) {
 if (TEST)   
@@ -38,6 +38,6 @@ else
     double getCost() {return cost;}
     void setCost(double value) {cost = value;}
 
-    ArrayList<Integer> getSolut() {return s;}
-    ArrayList<Integer> getSolutCpy() {return new ArrayList<>(s);}
+    tArray getSolut() {return s;}
+    tArray getSolutCpy() {return s.getArrayCopy();}
 }

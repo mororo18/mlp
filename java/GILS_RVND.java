@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
 import java.lang.Math;
@@ -63,10 +63,12 @@ class GILS_RVND {
     }
 
     private tArray construction(double alpha, tInfo info){
-        tArray s = new ArrayList<Integer>();
+        tArray s = new tArray();
+        s.reserve(info.getDimen()+1);
         s.add(0);
 
-        ArrayList<Integer> cList = new ArrayList<Integer>();
+        tArray cList = new tArray();
+        cList.reserve(info.getDimen()-1);
         int dimension = info.getDimen();
         for(int i = 1; i < dimension; i++){
             cList.add(i);
@@ -74,7 +76,7 @@ class GILS_RVND {
 
         int r = 0;
         while(!cList.isEmpty()){
-            cList.sort((Integer i, Integer j) -> Double.compare (info.getCost(i, s.get(s.size()-1)), info.getCost(j, s.get(s.size()-1))));
+            cList.sort((int i, int j) -> Double.compare (info.getCost(i, s.get(s.size()-1)), info.getCost(j, s.get(s.size()-1))));
             //erro ao usar variavel 'r' na lambda expression. 'r' n eh final(const)
             //cList.sort((Integer i, Integer j) -> Double.compare (c[i][r], c[j][r]));
 
@@ -86,12 +88,14 @@ class GILS_RVND {
             c = cList.get(index);
 
             s.add(c);
-            cList.remove(Integer.valueOf(c));
+            cList.remove(index);
             r = c;
+            //cList.print();
             //System.out.println(cList);
         }
 
         s.add(0);
+        //s.print();
         //System.out.println(s);
         //System.exit(1);
         return s;
@@ -292,7 +296,7 @@ class GILS_RVND {
     } 
 
     private void RVND(tSolution solut, tInfo info){
-        tArray neighbd_list = new tArray(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_2});
+        tArray neighbd_list = new tArray(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3});
 
         while(!neighbd_list.isEmpty()){
             
@@ -336,14 +340,14 @@ class GILS_RVND {
             */
             
             if(improve){
-                neighbd_list.assign(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_2});
+                neighbd_list.assign(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3});
             }else
                 neighbd_list.remove(i_rand);
         }
     }
 
     private tArray perturb(tArray sl, tInfo info){
-        tArray sl_cpy = new tArray(sl.getArrayCopy()); 
+        tArray sl_cpy = sl.getArrayCopy(); 
 
         int A_start = 1, A_end = 1;
         int B_start = 1, B_end = 1;
@@ -437,7 +441,7 @@ class GILS_RVND {
         System.out.print("COST: ");
         System.out.println(solut_best.getCost());
         System.out.print("SOLUTION: ");
-        System.out.println(solut_best.getSolut());
+        solut_best.getSolut().printPretty();
         /*
         System.out.print("Construction: ");
         System.out.println(t_construction/10e8);

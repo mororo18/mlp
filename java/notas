@@ -16,3 +16,8 @@ https://sendilkumarn.com/blog/9-tips-to-increase-your-java-performance/
 
 
 Ver inlining: https://www.baeldung.com/jvm-method-inlining
+
+03/08 - Melhora aparente na performance após a implementação da classe tArray, substituindo ArrayList
+    Principais motivos:
+        - Evitar bounds checking
+        - método ArrayList.add() muito custoso;
