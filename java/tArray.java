@@ -108,7 +108,15 @@ class tArray {
         shift(index+1, index, sizeCrnt-index-1);
         sizeCrnt--;
     }
+
+    public void fill() {
+        this.sizeCrnt = this.size;
+    }
     
+    public int set(int i, int element) {
+        return arr[i] = element;
+    }
+
     public int get(int i) {
         return arr[i];
     }

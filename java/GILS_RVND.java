@@ -340,7 +340,12 @@ class GILS_RVND {
             */
             
             if(improve){
-                neighbd_list.assign(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3});
+                neighbd_list.fill(); //assign(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3});
+                neighbd_list.set(0, info.SWAP);
+                neighbd_list.set(1, info.TWO_OPT);
+                neighbd_list.set(2, info.REINSERTION);
+                neighbd_list.set(3, info.OR_OPT2);
+                neighbd_list.set(4, info.OR_OPT3);
             }else
                 neighbd_list.remove(i_rand);
         }

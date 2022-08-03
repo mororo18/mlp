@@ -2,12 +2,12 @@ class tInfo {
     private int     []  rnd;
     private int     rnd_index;
 
-    final double EPSILON = 1e-16;
+    static final double EPSILON = 1e-16;
     private int     dimension;
     private double  [][] c;
 
-    static final int C = 0;
-    static final int T = 1;
+    static final int T = 0;
+    static final int C = 1;
     static final int W = 2;
 
     public static  int SWAP       = 0;

@@ -4,8 +4,8 @@ class tSolution {
     public static final boolean TEST = true;
     private tArray s;
 
-    private static double [][][] seq3d;
-    private static double [][] seq2d;
+    private double [][][] seq3d;
+    private double [][] seq2d;
 
     private double cost;
     private static int Z = 3;
@@ -21,14 +21,14 @@ else
 
     void storeSolut(tArray sN) {s = sN;}
 
-    public static double getSeq(int i, int j, int k) {
+    public double getSeq(int i, int j, int k) {
 if (TEST)   
         return seq2d[i][j*Z + k];
 else        
         return seq3d[i][j][k];
     }
 
-    public static void setSeq(int i, int j, int k, double value) {
+    public void setSeq(int i, int j, int k, double value) {
 if (TEST)   
         seq2d[i][j*Z + k] = value; 
 else        
