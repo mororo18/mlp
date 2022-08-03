@@ -7,6 +7,11 @@ rust/target/*
 rust/target/
 rust/Cargo.lock
 python/__pycache__/
+csharp/bin
+csharp/ref
+*.pdb
+*.dll
+*.json
 *.mem
 *.class
 *.pyo
