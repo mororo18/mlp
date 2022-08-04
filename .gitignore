@@ -7,8 +7,6 @@ rust/target/*
 rust/target/
 rust/Cargo.lock
 python/__pycache__/
-csharp/bin
-csharp/ref
 *.pdb
 *.dll
 *.json
@@ -19,3 +17,7 @@ csharp/ref
 *.prof
 *.o
 *.d
+
+# dotnet 
+csharp/bin/
+csharp/obj/
