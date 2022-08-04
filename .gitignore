@@ -1,4 +1,5 @@
 .*.sw*
+.swp
 
 rust/main_/target/*
 python/__pycache__/
@@ -9,3 +10,6 @@ python/__pycache__/
 *.prof
 *.o
 *.mod
+
+csharp/obj/
+csharp/bin/
