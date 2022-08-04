@@ -4,7 +4,6 @@ using System.Diagnostics;
 namespace MLP {
     class main {
         static void Main(){
-            Console.WriteLine("Hello World!");
             GILS_RVND tsp = new GILS_RVND();
 
             long s = Stopwatch.GetTimestamp();
