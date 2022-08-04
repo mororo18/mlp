@@ -1,3 +1,3 @@
-#! /bin/bash
-./main.exe
+#! /usr/bin/bash
+./solve
 #rm *.exe

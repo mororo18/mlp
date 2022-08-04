@@ -1,6 +1,6 @@
-#! /bin/bash
+#! /usr/bin/bash
 # using mono
-mcs -optimize+ main.cs Data.cs GILS_RVND.cs  
+mcs -optimize+ -out:solve *.cs 
 
 # using dotnet
-#dotnet build --output ./dotnet_output
+dotnet build
