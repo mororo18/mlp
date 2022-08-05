@@ -8,14 +8,23 @@ import concurrent.futures
 import psutil as pU
 import time
 
-def ds_open(lang_name):
-    ds_name = 'data/' + lang_name + ".csv"
+data_dir = "../data_mlp"
 
-    if os.path.isfile(ds_name):
-        df = pd.read_csv(ds_name)
+def get_branch():
+    out = subprocess.check_output(['git', 'branch']).decode('utf-8').split('\n')
+    for b in out:
+        if b.find('*') != -1:
+            branch = b.replace('*', '').replace(' ', '')
+            return branch
+
+def ds_open(lang_name):
+    ds_path = os.path.join(data_dir, lang_name + ".csv")
+
+    if os.path.isfile(ds_path):
+        df = pd.read_csv(ds_path)
     else:
-        os.system('cp data/template.csv data/' + lang_name + '.csv')
-        df = pd.read_csv(ds_name)
+        os.system('cp data/template.csv ' + ds_path)
+        df = pd.read_csv(ds_path)
 
     return df
 
@@ -125,7 +134,7 @@ def main():
     args = parser.parse_args()
 
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp",
-            "fortran", "node", "lua", "luajit", "rust"]
+            "fortran", "node", "lua", "luajit", "rust", "octave", "c"]
 
     for i in args.lang:
         if i not in sources:
@@ -150,11 +159,13 @@ def main():
             "pypy": "python",
             "julia": "julia",
             "cpp" : "cplusplus",
+            "c" : "c",
             "fortran" : "fortran",
             "node" : "javascript",
             "lua" : "lua",
             "luajit" : "lua",
-            "rust" : "rust"
+            "rust" : "rust",
+            "octave" : "octave"
             }
 
     """
@@ -163,9 +174,17 @@ def main():
             "csharp" : "cli",
             }
     """
+
+    if not os.path.isdir(data_dir):
+        os.mkdir(data_dir)
     
+    os.chdir("mlp-instances/loader")
+    os.system("make")
+    os.chdir("../../")
     for inst in instances:
+        os.chdir("mlp-instances/")
         os.system("./load " + inst)
+        os.chdir("../")
 
         for lang in sources:
             ds = ds_open(lang_dir[lang])
@@ -181,13 +200,13 @@ def main():
             for i in range(n):
 
                 info = get_info(lang)
-                info.update({"source" : lang, "instance" : inst})
+                info.update({"source" : lang, "instance" : inst, "branch" : get_branch()})
 
                 ds = ds.append(pd.DataFrame(info), ignore_index=True)
 
                 print(ds)
 
-            ds.to_csv('../data/' +  lang_dir[lang] + '.csv', index=False)
+            ds.to_csv(os.path.join('..', data_dir,  lang_dir[lang] + '.csv'), index=False)
 
             os.chdir("..")
 
