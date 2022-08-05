@@ -178,8 +178,13 @@ def main():
     if not os.path.isdir(data_dir):
         os.mkdir(data_dir)
     
+    os.chdir("mlp-instances/loader")
+    os.system("make")
+    os.chdir("../../")
     for inst in instances:
+        os.chdir("mlp-instances/")
         os.system("./load " + inst)
+        os.chdir("../")
 
         for lang in sources:
             ds = ds_open(lang_dir[lang])
