@@ -1,0 +1,3 @@
+[submodule "mlp-instances"]
+	path = mlp-instances
+	url = https://github.com/mororo18/mlp-instances.git
