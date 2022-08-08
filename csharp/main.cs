@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace MLP {
     class main {
         static void Main(){
+            //Thread.Sleep(1000 * 10);
             GILS_RVND tsp = new GILS_RVND();
 
             long s = Stopwatch.GetTimestamp();
