@@ -76,6 +76,21 @@ namespace MLP {
         }
         */
 
+        private void sort(List<int> arr, Func<int, int, bool> comp) {
+
+            for (int i = 0; i < arr.Count; i++) {
+                for (int j = 0; j < arr.Count-i-1; j++) {
+                    if (comp(arr[j], arr[j+1])) {
+                        int tmp = arr[j];
+                        arr[j] = arr[j+1];
+                        arr[j+1] = tmp;
+                    }
+                }
+            }
+        }
+
+        
+
         private List<int> construction(double alpha, tInfo info){
             var s = new List<int> {0};
 
@@ -89,6 +104,8 @@ namespace MLP {
                 // bug ae (geralmente apos muitas comparacoes)
                 //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
                 cList = cList.OrderBy(i => info.GetCost(r,i)).ToList();
+                sort(cList, (i, j) =>
+                        info.GetCost(r, i) > info.GetCost(r, j));
                 //sort(cList, r);
                 //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
                 int range = (int)(((double)cList.Count) * alpha) +1;
