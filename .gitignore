@@ -21,3 +21,4 @@ python/__pycache__/
 # dotnet 
 csharp/bin/
 csharp/obj/
+csharp/.vs/
