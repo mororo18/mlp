@@ -24,13 +24,13 @@ class tArray {
         this.sizeCrnt   = arr.length;
         this.size       = arr.length;
 
-        this.arrBuffer  = new int[3];
+        this.arrBuffer  = new int[this.size];
         this.sizeBuffer = 0;
     }
 
     tArray(int size) {
         this.arr        = new int[size];
-        this.arrBuffer  = new int[3];
+        this.arrBuffer  = new int[size];
         this.sizeCrnt   = size;
         this.sizeBuffer = 0;
         this.size       = arr.length;
@@ -50,10 +50,10 @@ class tArray {
         }
     }
     public void reserve(int sz) {
-        this.arr = new int[sz];
-        this.arrBuffer = new int[3];
-        this.size = sz;
-        this.sizeCrnt = 0;
+        this.arr        = new int[sz];
+        this.arrBuffer  = new int[sz];
+        this.size       = sz;
+        this.sizeCrnt   = 0;
         this.sizeBuffer = 0;
     }
 
@@ -111,10 +111,12 @@ class tArray {
             System.arraycopy(this.arrBuffer, 0, arr, i+sz, this.sizeBuffer);
         }
         
+        /*
         if (feasibility() != true) {
-            System.out.println("infisibu");
+            System.out.println(String.format("infisibu %d %d", i, j));
+            printPretty();
             System.exit(0);
-        }
+        }*/
     }
 
     public void remove(int index) {
@@ -135,12 +137,18 @@ class tArray {
     }
 
     public boolean feasibility() {
-        boolean [] check = new boolean[this.sizeCrnt];
-        for (int i = 0; i < sizeCrnt; i++) {
+        boolean [] check = new boolean[this.sizeCrnt-1];
+
+        for (int i = 0; i < check.length; i++) {
+            check[i] = false;
+        }
+
+        for (int i = 0; i < this.arr.length; i++) {
             check[this.arr[i]] = true;
         }
 
-        for (int i = 0; i < sizeCrnt; i++) {
+        for (int i = 0; i < check.length; i++) {
+            //System.out.println(String.format("%d %b", i, check[i]));
             if (!check[i]) return false;
         }
          return true;
