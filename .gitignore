@@ -22,3 +22,5 @@ python/__pycache__/
 csharp/bin/
 csharp/obj/
 csharp/.vs/
+csharp/test/bin/
+csharp/test/obj/
