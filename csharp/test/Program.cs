@@ -5,7 +5,7 @@ using System;
 namespace Test {
     class test {
         const int Z = 3;
-        const int dimension = 2000;
+        const int dimension = 700;
 
         static int to_1D(int i, int j, int k) {
             return Z* (i*dimension +j) + k;
@@ -38,6 +38,7 @@ namespace Test {
             //          -> Notar idexacao invertida;
             //
             //
+            Console.Write(String.Format("Tamanho {0}\n", dimension));
             Console.Write("Teste com acesso ");
 #if RAND
             Console.Write("ALEATORIO");
