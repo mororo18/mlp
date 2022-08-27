@@ -3,7 +3,7 @@ BIN_NAME = solve
 
 MODE = MATRIX
 
-COPT = -O3 -std=c99 -D$(MODE) $(Wno) $(W) -g
+COPT = -Ofast -std=c99 -D$(MODE) $(Wno) $(W) -g
 W = -Winline
 Wno = -Wno-unused-result 
 LOPT = -lm
