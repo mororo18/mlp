@@ -17,8 +17,8 @@
 #define DBL_SZ      8
 #define INT_SZ      4
 
-double R_table(int i){
-    static const double table[] = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
+Real R_table(int i){
+    static const Real table[] = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                                     0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
     return table[i];
 }
@@ -43,7 +43,7 @@ void sort(int * arr, int arr_size, int r, tInfo * info) {
     }
 }
 
-void construct(int * ret, const double alpha, tInfo * info){
+void construct(int * ret, const Real alpha, tInfo * info){
 
     int s[info->dimen+1];
 
@@ -117,18 +117,18 @@ void subseq_load(tSolution * solut, const tInfo * info){
 
         seq_set_T(solut, i, i, 0.0);
         seq_set_C(solut, i, i, 0.0);
-        seq_set_W(solut, i, i, (double)!(i == 0));
+        seq_set_W(solut, i, i, (Real)!(i == 0));
 
         for (j = i+1; j < info->dimen+1; j++) {
             j_prev = j-1;
             
-            double T = info->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
+            Real T = info->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
             seq_set_T(solut, i, j, T);
 
-            double C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
+            Real C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
             seq_set_C(solut, i, j, C);
 
-            double W = j + k;
+            Real W = j + k;
             seq_set_W(solut, i, j, W);
 
         }
@@ -148,18 +148,18 @@ void subseq_load_b(tSolution * solut, const tInfo * info, int index){
 
         seq_set_T(solut, i, i, 0.0);
         seq_set_C(solut, i, i, 0.0);
-        seq_set_W(solut, i, i, (double)!(i == 0));
+        seq_set_W(solut, i, i, (Real)!(i == 0));
 
         for (j = i+1; j < info->dimen+1; j++) {
             j_prev = j-1;
             
-            double T = info->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
+            Real T = info->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
             seq_set_T(solut, i, j, T);
 
-            double C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
+            Real C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
             seq_set_C(solut, i, j, C);
 
-            double W = j + k;
+            Real W = j + k;
             seq_set_W(solut, i, j, W);
 
 
@@ -171,9 +171,9 @@ void subseq_load_b(tSolution * solut, const tInfo * info, int index){
 }
 
 _Bool search_swap(tSolution * solut, const tInfo * info) {
-    double cost_new, 
+    Real cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
-    double cost_best = DBL_MAX;
+    Real cost_best = DBL_MAX;
     int i, j, j_prev, j_next, i_prev, i_next;
     int I;
     int J;
@@ -229,10 +229,10 @@ _Bool search_swap(tSolution * solut, const tInfo * info) {
 }
 
 _Bool search_two_opt(tSolution * solut, const tInfo * info) {
-    double cost_new, 
+    Real cost_new, 
         cost_concat_1, cost_concat_2;
-    double cost_best = DBL_MAX;// cost_l1, cost_l2;
-    double rev_seq_cost;
+    Real cost_best = DBL_MAX;// cost_l1, cost_l2;
+    Real rev_seq_cost;
     int i, j, i_prev, j_next;
     int I;
     int J;
@@ -273,8 +273,8 @@ _Bool search_two_opt(tSolution * solut, const tInfo * info) {
 }
 
 _Bool search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
-    double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-    double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+    Real cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
+    Real cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     int i, j, k, k_next, i_prev, j_next;
     int I;
     int J;
@@ -479,7 +479,7 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         /**/ int aux = (unsigned)rand() % TABLE_SZ;
         aux = info->rnd[info->rnd_index++];
 
-        double alpha = R_table(aux);
+        Real alpha = R_table(aux);
 
         printf("[+] Search %d\n", i+1);
         printf("\t[+] Constructing..\n");	

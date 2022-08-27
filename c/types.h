@@ -5,15 +5,18 @@
 #include <float.h>
 #include <stdlib.h>
 
+typedef double Real;
+
+
 typedef struct tInfo {
-    double ** cost;
+    Real ** cost;
     int dimen;
     int * rnd;
     int rnd_index;
 } tInfo;
 
 typedef struct tSeqInfo {
-    double T, C, W;
+    Real T, C, W;
 } tSeqInfo;
 
 typedef tSeqInfo tSeq;
@@ -26,8 +29,8 @@ typedef struct tSolution {
 #elif defined(FLAT)
     tSeq_ seq;
 #endif
-    //double *** seq;
-    double cost;
+    //Real *** seq;
+    Real cost;
     int * s;
     int s_size;
     size_t size;
@@ -41,14 +44,14 @@ static int to_1D(const int i, const int j, const int size);
 
 /*==========================SET==========================*/
 
-static void seq_set_C(tSolution * solut, int i, int j, double value);
-static void seq_set_T(tSolution * solut, int i, int j, double value);
-static void seq_set_W(tSolution * solut, int i, int j, double value);
+static void seq_set_C(tSolution * solut, int i, int j, Real value);
+static void seq_set_T(tSolution * solut, int i, int j, Real value);
+static void seq_set_W(tSolution * solut, int i, int j, Real value);
 
 /*==========================GET==========================*/
-static double seq_get_C(const tSolution * solut, int i, int j);
-static double seq_get_T(const tSolution * solut, int i, int j);
-static double seq_get_W(const tSolution * solut, int i, int j);
+static Real seq_get_C(const tSolution * solut, int i, int j);
+static Real seq_get_T(const tSolution * solut, int i, int j);
+static Real seq_get_W(const tSolution * solut, int i, int j);
 tSolution Solution_init(tInfo info);
 void      Solution_cpy(tSolution * src, tSolution * tgt, const tInfo * info);
 void      Solution_free(tSolution * solut);
@@ -66,7 +69,7 @@ int to_1D(const int i, const int j, const int size) {
 
 
 inline
-void seq_set_C(tSolution * solut, int i, int j, double value) {
+void seq_set_C(tSolution * solut, int i, int j, Real value) {
 #ifdef MATRIX
     solut->seq[i][j].C = value;
 #elif defined(FLAT)
@@ -75,7 +78,7 @@ void seq_set_C(tSolution * solut, int i, int j, double value) {
 }
 
 inline
-void seq_set_T(tSolution * solut, int i, int j, double value) {
+void seq_set_T(tSolution * solut, int i, int j, Real value) {
 #ifdef MATRIX
     solut->seq[i][j].T = value;
 #elif defined(FLAT)
@@ -84,7 +87,7 @@ void seq_set_T(tSolution * solut, int i, int j, double value) {
 }
 
 inline
-void seq_set_W(tSolution * solut, int i, int j, double value) {
+void seq_set_W(tSolution * solut, int i, int j, Real value) {
 #ifdef MATRIX
     solut->seq[i][j].W = value;
 #elif defined(FLAT)
@@ -94,7 +97,7 @@ void seq_set_W(tSolution * solut, int i, int j, double value) {
 
 
 inline
-double seq_get_C(const tSolution * solut, int i, int j) {
+Real seq_get_C(const tSolution * solut, int i, int j) {
 #ifdef MATRIX
     return solut->seq[i][j].C;
 #elif defined(FLAT)
@@ -103,7 +106,7 @@ double seq_get_C(const tSolution * solut, int i, int j) {
 }
 
 inline
-double seq_get_T(const tSolution * solut, int i, int j) {
+Real seq_get_T(const tSolution * solut, int i, int j) {
 #ifdef MATRIX
     return solut->seq[i][j].T;
 #elif defined(FLAT)
@@ -112,7 +115,7 @@ double seq_get_T(const tSolution * solut, int i, int j) {
 }
 
 inline 
-double seq_get_W(const tSolution * solut, int i, int j) {
+Real seq_get_W(const tSolution * solut, int i, int j) {
 #ifdef MATRIX
     return solut->seq[i][j].W;
 #elif defined(FLAT)

@@ -1,20 +1,20 @@
 #include "data.h"
 
 static
-double ** matrix_allocate(size_t sz) {
-    double ** ptr = (double **) calloc(sz, sizeof(double*));
+Real ** matrix_allocate(size_t sz) {
+    Real ** ptr = (Real **) calloc(sz, sizeof(Real*));
 
     if (ptr == NULL) printf("qebro\n");
     for ( int i = 0; i < sz; i++ ) {
         //ptr[i] = new double [sz];
-        ptr[i] = (double *) calloc(sz, sizeof(double));
+        ptr[i] = (Real *) calloc(sz, sizeof(Real));
         if (ptr[i] == NULL) printf("qebro\n");
     }
 
     return ptr;
 }
 
-int loadData(double *** matrix, int ** rnd) {
+int loadData(Real *** matrix, int ** rnd) {
     int dimension;
     FILE * file;
 
@@ -32,12 +32,16 @@ int loadData(double *** matrix, int ** rnd) {
         //cout << "dimension " << dimension << endl;
 
         _Bool flag = false;
+        char * read_fmt;
+        if      (sizeof(Real) == sizeof(float))  read_fmt = "%f";
+        else if (sizeof(Real) == sizeof(double)) read_fmt = "%lf";
         for (int i = 0; i < dimension-1; i++) {
             //cout << line << "\n";
             //int j = i + 1;
             for (int j = i+1; j < dimension; j++) {
-                double value;
-                fscanf(file, "%lf", &value);
+                Real value;
+                fscanf(file, read_fmt, &value);
+                    
                 (*matrix)[i][j] = value;
                 (*matrix)[j][i] = value;
                 //printf("%.2lf ", value);

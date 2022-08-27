@@ -4,7 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "types.h"
 
-int loadData(double *** matrix, int ** rnd);
+int loadData(Real *** matrix, int ** rnd);
 
 #endif
