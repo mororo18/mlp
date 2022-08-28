@@ -1,43 +1,11 @@
-module data_types
-    implicit none
+#include "preproc.h"
 
-    type tInfo
-        integer :: dimen
-        real, allocatable :: cost (:,:)
-        integer :: T = 1
-        integer :: C = 2
-        integer :: W = 3
-        
-        integer :: REINSERTION  = 1
-        integer :: OR_OPT_2     = 2
-        integer :: OR_OPT_3     = 3 
-        integer :: SWAP         = 4
-        integer :: TWO_OPT      = 5
-
-        real :: fmax = 3.4028235E+38
-        
-        integer :: reinsert_call = 0
-
-        integer, allocatable :: rnd(:)
-        integer :: rnd_index = 1
-    end type
-
-    type tSeqInfo
-        real :: T, C, W
-    end type
-
-    type tSolution
-        integer, allocatable :: s (:)
-        !real, allocatable :: seq (:,:,:)
-        type(tSeqInfo), allocatable :: seq (:,:)
-        real :: cost
-    end type
-
-end module
+#define ASSERT(X,Y) call assert(X, Y, __FILE__, __LINE__)
 
 subroutine print_matrix(c)
+    use types
     implicit none
-    real, allocatable :: c(:,:)
+    real(typeReal), allocatable :: c(:,:)
 
     integer, allocatable :: nxm(:)
     integer :: dimen
@@ -58,12 +26,12 @@ subroutine print_matrix(c)
 end subroutine
 
 subroutine print_info(info)
-    use data_types
+    use types
     type(tInfo) :: info
 
     interface
         subroutine print_matrix(c)
-            real, allocatable :: c(:,:)
+            real(typeReal), allocatable :: c(:,:)
         end subroutine
     end interface
 
@@ -73,7 +41,7 @@ subroutine print_info(info)
 end subroutine
 
 subroutine subseq_load(sol, info)
-    use data_types
+    use types
     type(tSolution) :: sol
     type(tInfo) :: info
     integer :: i
@@ -92,7 +60,7 @@ subroutine subseq_load(sol, info)
 
             sol%seq( j, i)%T = info%cost(sol%s(j_prev), sol%s(j)) + sol%seq( j_prev,i)%T
             sol%seq(j,i)%C = sol%seq( j, i)%T + sol%seq(j_prev,i)%C
-            sol%seq(j,i)%W = j+k
+            sol%seq(j,i)%W = real(j+k, typeReal)
 
         end do
     end do
@@ -102,7 +70,7 @@ subroutine subseq_load(sol, info)
 end subroutine
 
 subroutine sort(cL, lmt, r, info)
-    use data_types
+    use types
     implicit none
 
     type(tInfo) :: info
@@ -148,10 +116,10 @@ subroutine arr_shift(arr, src, tgt, sz)
 end subroutine
 
 function construction(alpha, info) result(ret)
-    use data_types
+    use types
     implicit none
 
-    real :: alpha
+    real(typeReal) :: alpha
     type(tInfo) :: info
     integer, dimension(info%dimen+1) :: ret 
 
@@ -164,7 +132,7 @@ function construction(alpha, info) result(ret)
     integer :: r
     integer :: rng
     integer :: index_
-    real :: RND
+    real(typeReal) :: RND
     integer :: cnt
 
 
@@ -278,8 +246,33 @@ subroutine reinsert(s, i, j, pos)
 
 end subroutine
 
+subroutine is_feasible(solut, ret)
+    use types
+    implicit none
+    type(tSolution) :: solut
+    logical, intent(out) :: ret
+    integer :: i
+    integer :: n
+    logical, dimension(solut%s_size-1) :: check
+    n = solut%s_size-1
+    check = (/ (.false.,i=1,n) /)
+
+    do i=1, n
+        check(solut%s(i)) = .true.
+    end do
+
+    ret = .true.
+    do i=1, n
+        if (check(i) .eqv. .false.) then
+            ret = .false.
+        endif
+    end do
+
+end subroutine
+
 subroutine search_swap(solut, info, ret) 
-    use data_types
+    use types
+    use assertion
     implicit none
     type(tSolution) :: solut
     type(tInfo) :: info
@@ -295,12 +288,12 @@ subroutine search_swap(solut, info, ret)
     integer :: I_best
     integer :: J_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
+    real(typeReal) :: cost_best 
+    real(typeReal) :: cost_new
+    real(typeReal) :: cost_concat_1
+    real(typeReal) :: cost_concat_2 
+    real(typeReal) :: cost_concat_3 
+    real(typeReal) :: cost_concat_4
 
     cost_best = info%fmax
     cost_new = 0.0
@@ -358,6 +351,7 @@ subroutine search_swap(solut, info, ret)
         call swap(solut%s, I_best, J_best)
         call subseq_load(solut, info)
         !print *, "swap", cost_best, solut%cost
+        ASSERT(cost_best, solut%cost)
         ret = .true.
     else
         ret = .false.
@@ -366,7 +360,8 @@ subroutine search_swap(solut, info, ret)
 end subroutine
 
 subroutine search_two_opt(solut, info, ret) 
-    use data_types
+    use types
+    use assertion
     implicit none
     type(tSolution) :: solut
     type(tInfo) :: info
@@ -380,13 +375,13 @@ subroutine search_two_opt(solut, info, ret)
     integer :: I_best
     integer :: J_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
-    real :: rev_seq_cost
+    real(typeReal) :: cost_best 
+    real(typeReal) :: cost_new
+    real(typeReal) :: cost_concat_1
+    real(typeReal) :: cost_concat_2 
+    real(typeReal) :: cost_concat_3 
+    real(typeReal) :: cost_concat_4
+    real(typeReal) :: rev_seq_cost
 
     cost_best = info%fmax
     cost_new = 0.0
@@ -424,6 +419,7 @@ subroutine search_two_opt(solut, info, ret)
         call subseq_load(solut, info)
         !print *,  "reverse", cost_best, solut%cost
         !print *, I_best, J_best
+        ASSERT(cost_best, solut%cost)
         ret = .true.
     else
         ret = .false.
@@ -432,7 +428,8 @@ subroutine search_two_opt(solut, info, ret)
 end subroutine
 
 subroutine search_reinsertion(solut, info, opt, ret) 
-    use data_types
+    use types
+    use assertion
     implicit none
     type(tSolution) :: solut
     type(tInfo) :: info
@@ -450,12 +447,12 @@ subroutine search_reinsertion(solut, info, opt, ret)
     integer :: J_best
     integer :: POS_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
+    real(typeReal) :: cost_best 
+    real(typeReal) :: cost_new
+    real(typeReal) :: cost_concat_1
+    real(typeReal) :: cost_concat_2 
+    real(typeReal) :: cost_concat_3 
+    real(typeReal) :: cost_concat_4
 
     info%reinsert_call = info%reinsert_call + 1
 
@@ -520,8 +517,8 @@ subroutine search_reinsertion(solut, info, opt, ret)
     if (cost_best < solut%cost) then
         call reinsert(solut%s, I_best, J_best, POS_best+1)
         call subseq_load(solut, info)
-        !print *, "reinsertion", cost_best, solut%cost
-        !print *, "reinsertion", I_best, J_best, POS_best
+
+        ASSERT(cost_best, solut%cost)
         ret = .true.
     else
         ret = .false.
@@ -531,14 +528,15 @@ subroutine search_reinsertion(solut, info, opt, ret)
 end subroutine
 
 subroutine RVND(sol, info, it)
-    use data_types
+    use types
+    use assertion
     implicit none
 
     type(tSolution) :: sol
     type(tInfo) :: info
     integer, intent(out) :: it
 
-    real :: rnd
+    real(typeReal) :: rnd
 
     integer, dimension(5) :: neighbd_list
     integer :: nl_size
@@ -548,6 +546,7 @@ subroutine RVND(sol, info, it)
     integer :: i
     integer :: total
     logical :: improve_flag
+    logical :: fsb
     logical :: yes
 
     integer, dimension(5) :: improv
@@ -574,19 +573,10 @@ subroutine RVND(sol, info, it)
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
 
-       !if (index_ > nl_size) then
-       !    call exit(0)
-       !endif
+        ASSERT(index_ > nl_size, .false.)
 
         neighbd = neighbd_list(index_)
         
-        !print *, neighbd
-       !do i=1, nl_size
-       !    write(*, '(I1, a)', advance='no') neighbd_list(i), ' '
-       !end do
-       !print *, ''
-
-        !print *, neighbd
         improve_flag = .false.
         if (neighbd == info%REINSERTION) then
             call search_reinsertion(sol, info, info%REINSERTION, improve_flag)
@@ -600,8 +590,12 @@ subroutine RVND(sol, info, it)
             call search_two_opt(sol, info, improve_flag)
         endif
 
+        ! feasibility check
+        fsb = .true.
+        call is_feasible(sol, fsb)
+        ASSERT(fsb, .true.)
+
         if (improve_flag .eqv. .true.) then
-            !neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
             neighbd_list(1) = info%SWAP
             neighbd_list(2) = info%TWO_OPT
             neighbd_list(3) = info%REINSERTION
@@ -634,15 +628,16 @@ subroutine RVND(sol, info, it)
 end subroutine
 
 subroutine notnull_rnd(rnd)
+    use types
     implicit none
-    real, intent(out) :: RND
+    real(typeReal), intent(out) :: RND
 
     call random_number(RND)
     RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
 end subroutine
 
 subroutine perturb(solut_crnt, solut_part, info)! result(ret)
-    use data_types
+    use types
 
     implicit none
     type(tSolution) :: solut_crnt
@@ -657,7 +652,7 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
     integer :: size_max
     integer :: size_min
     integer :: max_
-    real :: rnd
+    real(typeReal) :: rnd
 
     A_start = 1
     A_end = 1
@@ -719,7 +714,7 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
 end subroutine
 
 subroutine solut_init(solut, info)
-    use data_types
+    use types
     implicit none
 
     type(tSolution), intent(out) :: solut
@@ -727,19 +722,20 @@ subroutine solut_init(solut, info)
 
     allocate(solut%s(info%dimen+1))
     allocate(solut%seq(info%dimen+1, info%dimen+1))
+    solut%s_size = info%dimen+1
     !allocate(solut%seq(3, info%dimen+1, info%dimen+1))
 
 end subroutine
 
 function GILS_RVND(Imax, Iils, R, info) result(ret)
-    use data_types
+    use types
 
     implicit none
 
     !! parameters
     integer :: Imax
     integer :: Iils
-    real, dimension(26) :: R
+    real(typeReal), dimension(26) :: R
     type(tInfo) :: info
     type(tSolution) :: ret
 
@@ -752,8 +748,8 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     integer :: i
     integer :: index_
     integer :: R_size = 26
-    real :: alpha
-    real :: rnd
+    real(typeReal) :: alpha
+    real(typeReal) :: rnd
     integer :: iterILS
 
     integer :: it
@@ -761,15 +757,15 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
     interface
         function construction(alpha, info) result (ret)
-            use data_types
+            use types
             implicit none
-            real :: alpha
+            real(typeReal) :: alpha
             type(tInfo) :: info
             integer, dimension(info%dimen+1) :: ret 
         end function
         
        !function perturb(solut, info) result(ret)
-       !    use data_types
+       !    use types
        !    implicit none
        !    type(tSolution) :: solut
        !    type(tInfo) :: info
@@ -796,6 +792,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         alpha = R(index_)
         print *, "[+] Local Search ", i
         sol_crnt%s = construction(alpha, info)
+
         call subseq_load(sol_crnt, info)
         sol_partial = sol_crnt
         print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
@@ -811,9 +808,9 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
             if (sol_crnt%cost < sol_partial%cost - EPSILON(1.0)) then
                 sol_partial%s(:) = sol_crnt%s(:)
-                sol_partial%cost = sol_crnt%cost - EPSILON(1.0)
+                sol_partial%cost = sol_crnt%cost 
                 iterILS = 0
-                !print *, sol_partial%cost
+                print *, sol_partial%cost
             endif
 
             call perturb(sol_crnt, sol_partial, info)
@@ -845,8 +842,9 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 end function
 
 program main
-    use rData
-    use data_types
+    use data
+    use types
+    use assertion
 
     implicit none
 
@@ -854,36 +852,38 @@ program main
     integer, allocatable :: rnd (:)
     type(tInfo) :: info
     type(tSolution) :: sol
-    real, dimension(26) :: r
+    real(typeReal), dimension(26) :: r
     integer :: Iils
     integer :: Imax
     integer :: i
+    real(typeReal) :: opa
+!   opa = 10.0
 
     INTEGER :: begin, end_, rate
 
     interface
         function construction(alpha, info) result (ret)
-            use data_types
+            use types
             implicit none
-            real :: alpha
+            real(typeReal) :: alpha
             type(tInfo) :: info
             integer, dimension(info%dimen+1) :: ret 
         end function
         function GILS_RVND(Imax, Iils, R, info) result(ret)
-            use data_types
+            use types
 
             implicit none
 
             !! parameters
             integer :: Imax
             integer :: Iils
-            real, dimension(26) :: R
+            real(typeReal), dimension(26) :: R
             type(tInfo) :: info
             type(tSolution) :: ret
         end function
         subroutine print_matrix(c)
             implicit none
-            real, allocatable :: c(:,:)
+            real(typeReal), allocatable :: c(:,:)
 
             integer, allocatable :: nxm(:)
             integer :: dimen
@@ -902,7 +902,11 @@ program main
     dimensions = shape(info%cost(:,:))
     info%dimen = dimensions(1)
 
-    !call print_info(info)
+    call print_matrix(info%cost)
+    !print *
+
+
+    !call exit(0)
 
 
     R = (/ (i/100.0 + 0.000000001, i=1, 26) /)
@@ -915,6 +919,7 @@ program main
     print *, "COST: ", sol%cost
 
     print *, "TIME: ", real(end_ - begin) / real(rate)
-
-    print *, "reinsert Calls ", info%reinsert_call
+#if OPa
+    print *, "reinsert Calls OPA", info%reinsert_call
+#endif
 end program

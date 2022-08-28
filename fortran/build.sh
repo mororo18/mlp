@@ -1,4 +1,7 @@
 #! /usr/bin/bash
 COMP=gfortran
-$COMP -c Data.f90
-$COMP -Ofast main.f90 Data.o -o solve -g
+rm *.o
+$COMP -cpp -c data.f90
+$COMP -cpp -c types.f90
+$COMP -cpp -c assert.f90
+$COMP -cpp -DOPa  main.f90 data.o types.o assert.f90 -o solve -g
