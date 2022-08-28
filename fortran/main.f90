@@ -1,7 +1,5 @@
 #include "preproc.h"
 
-#define ASSERT(X,Y) call assert(X, Y, __FILE__, __LINE__)
-
 subroutine print_matrix(c)
     use types
     implicit none
