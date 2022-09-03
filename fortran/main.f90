@@ -134,6 +134,7 @@ function construction(alpha, info) result(ret)
     integer :: cnt
 
 
+    call srand(0)
     cnt = 0
 
     cL_size = info%dimen-1
@@ -153,15 +154,19 @@ function construction(alpha, info) result(ret)
         !!print *, info%cost(r, cL(1)-1)
         !print *, cL
         !call exit(0)
-       !rng = ceiling(cL_size * alpha)
+        rng = ceiling(cL_size * alpha)
         !!!
-        call random_number(RND)
+        RND  = rand()
+        !call random_number(RND)
         RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
         index_ = ceiling(rng * RND)
+        index_ = merge(1, index_, index_ < 1 )
         !!!
 
+#ifndef RANDOM
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
+#endif
 
         cN = cL(index_)
 
@@ -293,6 +298,8 @@ subroutine search_swap(solut, info, ret)
     real(typeReal) :: cost_concat_3 
     real(typeReal) :: cost_concat_4
 
+    logical :: fsb
+
     cost_best = info%fmax
     cost_new = 0.0
     cost_concat_1 = 0.0
@@ -349,7 +356,20 @@ subroutine search_swap(solut, info, ret)
         call swap(solut%s, I_best, J_best)
         call subseq_load(solut, info)
         !print *, "swap", cost_best, solut%cost
+#ifndef UNSAFE
+        fsb = .true.
+        call is_feasible(solut, fsb)
+
+        if (ABS(cost_best - solut%cost) .gt. EPSILON(1.0)) then
+            print *, "preso", __LINE__
+            do
+            enddo
+        endif
+
+
+        ASSERT(fsb, .true.)
         ASSERT(cost_best, solut%cost)
+#endif
         ret = .true.
     else
         ret = .false.
@@ -380,6 +400,8 @@ subroutine search_two_opt(solut, info, ret)
     real(typeReal) :: cost_concat_3 
     real(typeReal) :: cost_concat_4
     real(typeReal) :: rev_seq_cost
+
+    logical :: fsb
 
     cost_best = info%fmax
     cost_new = 0.0
@@ -417,7 +439,19 @@ subroutine search_two_opt(solut, info, ret)
         call subseq_load(solut, info)
         !print *,  "reverse", cost_best, solut%cost
         !print *, I_best, J_best
+#ifndef UNSAFE
+        fsb = .true.
+        call is_feasible(solut, fsb)
+
+        if (ABS(cost_best - solut%cost) .gt. EPSILON(1.0)) then
+            print *, "preso", __LINE__
+            do
+            enddo
+        endif
+
+        ASSERT(fsb, .true.)
         ASSERT(cost_best, solut%cost)
+#endif
         ret = .true.
     else
         ret = .false.
@@ -452,6 +486,8 @@ subroutine search_reinsertion(solut, info, opt, ret)
     real(typeReal) :: cost_concat_3 
     real(typeReal) :: cost_concat_4
 
+    logical :: fsb
+
     info%reinsert_call = info%reinsert_call + 1
 
     cost_best = info%fmax
@@ -468,7 +504,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
         do k=1, i_prev-1
             k_next = k+1
 
-            cost_new =  solut%seq( info%dimen+1,1)%C
+            !cost_new =  solut%seq( info%dimen+1,1)%C
             cost_concat_1 =                 solut%seq( k,1)%T            + info%cost(solut%s(k), solut%s(i))
             cost_concat_2 = cost_concat_1 + solut%seq( j,i)%T            + info%cost(solut%s(j), solut%s(k_next))
             cost_concat_3 = cost_concat_2 + solut%seq( i_prev,k_next)%T  + info%cost(solut%s(i_prev), solut%s(j_next))
@@ -516,7 +552,20 @@ subroutine search_reinsertion(solut, info, opt, ret)
         call reinsert(solut%s, I_best, J_best, POS_best+1)
         call subseq_load(solut, info)
 
+#ifndef UNSAFE
+        fsb = .true.
+        call is_feasible(solut, fsb)
+
+        if (ABS(cost_best - solut%cost) .gt. EPSILON(1.0)) then
+            print *, "preso", __LINE__
+            do
+            enddo
+            print *, "saiu" 
+        endif
+
+        ASSERT(fsb, .true.)
         ASSERT(cost_best, solut%cost)
+#endif
         ret = .true.
     else
         ret = .false.
@@ -563,13 +612,16 @@ subroutine RVND(sol, info, it)
     total = 0
     do while (nl_size > 0)
         !!!
-        call random_number(rnd)
+        rnd =  rand()
+        !call random_number(rnd)
         rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
         index_ = ceiling(rnd*nl_size)
         !!!
 
+#ifndef RANDOM
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
+#endif
 
         ASSERT(index_ > nl_size, .false.)
 
@@ -630,7 +682,9 @@ subroutine notnull_rnd(rnd)
     implicit none
     real(typeReal), intent(out) :: RND
 
-    call random_number(RND)
+    RND =  rand()
+    !call random_number(RND)
+
     RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
 end subroutine
 
@@ -678,6 +732,7 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
        !!!
 
 
+#ifndef RANDOM
        A_start = info%rnd(info%rnd_index) + 1
        info%rnd_index = info%rnd_index + 1
        A_end = A_start + info%rnd(info%rnd_index) 
@@ -689,6 +744,7 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
        B_end = B_start + info%rnd(info%rnd_index) 
        !!print *, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
+#endif
 
     end do
 
@@ -727,6 +783,7 @@ end subroutine
 
 function GILS_RVND(Imax, Iils, R, info) result(ret)
     use types
+    use assertion
 
     implicit none
 
@@ -749,6 +806,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     real(typeReal) :: alpha
     real(typeReal) :: rnd
     integer :: iterILS
+    logical :: fsb
 
     integer :: it
     integer :: Tit
@@ -779,17 +837,27 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     Tit = 0
     do i=1, Imax
         !!!
-        call random_number(rnd)
+        rnd  = rand()
+        !call random_number(rnd)
         rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
         index_ = ceiling(rnd*R_size)
         !!!
 
+#ifndef RANDOM
+        print *, "Not Random"
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
+#endif
 
         alpha = R(index_)
         print *, "[+] Local Search ", i
         sol_crnt%s = construction(alpha, info)
+
+        ! feasibility check
+        fsb = .true.
+        call is_feasible(sol_crnt, fsb)
+        ASSERT(fsb, .true.)
+
 
         call subseq_load(sol_crnt, info)
         sol_partial = sol_crnt
@@ -907,7 +975,9 @@ program main
     !call exit(0)
 
 
-    R = (/ (i/100.0 + 0.000000001, i=1, 26) /)
+    R = (/ 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09,  0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, &
+    0.20, 0.21, 0.22, 0.23, 0.24, 0.25 /)
+    print *, R
     Iils = min(100, info%dimen)
     Imax = 10
     !call solut_init(sol, info)
@@ -917,7 +987,4 @@ program main
     print *, "COST: ", sol%cost
 
     print *, "TIME: ", real(end_ - begin) / real(rate)
-#if OPa
-    print *, "reinsert Calls OPA", info%reinsert_call
-#endif
 end program
