@@ -6,7 +6,7 @@ contains
 
     subroutine load_matrix(c, rnd)
       use types
-      real(typeReal), allocatable :: c (:,:)
+      real(typeReal), allocatable, intent(out):: c (:,:)
       integer, allocatable :: rnd (:)
 
       integer :: io
@@ -20,19 +20,21 @@ contains
       integer :: rnd_value
 
       open(newunit=io, file="../distance_matrix", status="old", action="read") 
-      read(io, "(I3)") dimen
+      read(io, "(I5)") dimen
 
       allocate(c(dimen, dimen))
 
       do i = 1, dimen
       !! "(A)" -> Read w=len(variable) characters as a string.
+          c(i,i) = real(0.0, typeReal)
           read(io, "(A)") line
           do j = i + 1, dimen
               blnk = index(line, ' ')
-              read(line(:blnk), '(I6)') value_ 
-              c(i, j) = value_
-              c(j, i) = value_
+              read(line(:blnk), '(I8)') value_ 
+              c(i, j) = real(value_, typeReal)
+              c(j, i) = real(value_, typeReal)
               line(:) = line(blnk+1:)
+
           end do
       end do
 
@@ -47,8 +49,6 @@ contains
       do i = 1, rnd_count
           read(io, '(I6)') rnd(i)
       end do
-
-      !print *, rnd(1)
 
       close(io)
 

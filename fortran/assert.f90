@@ -21,7 +21,7 @@ module assertion
       character(len=*) :: filename
       character(len=128) :: buff
 
-      if (ABS(a-b) .gt. EPSILON(1.0)) then
+      if (ABS(a-b) .gt. EPSILON(real(1.0, 8))) then
           call error(filename, line)
       endif
 
@@ -34,7 +34,7 @@ module assertion
       character(len=*) :: filename
       character(len=128) :: buff
 
-      if (ABS(a-b) .gt. EPSILON(1.0)) then
+      if (ABS(a-b) .gt. EPSILON(real(1.0, 4))) then
           call error(filename, line)
       endif
 

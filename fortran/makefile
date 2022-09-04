@@ -1,9 +1,9 @@
 COMP = gfortran
 BIN_NAME = solve
 
-MACRO = -DRANDOM
-PREPROC = -cpp
-COPT = -cpp -Ofast $(MACRO) $(W) -g -pg -fbounds-check
+PREPROC = -cpp 
+#PREPROC += -DDOUBLE
+COPT =  $(W) -g -Ofast
 W = -Winline
 
 OBJDIR = obj
@@ -20,11 +20,11 @@ $(BIN_NAME): $(OBJS)
 
 $(OBJDIR)/%.o: %.f90
 	@echo  "\033[31m \nCompiling $<: \033[0m"
-	$(COMP) $(PREPROC) -c $< -o $@ $(COPT) -I$(MODDIR) -J$(MODDIR)
+	$(COMP) $(PREPROC) $(COPT) -c $< -o $@ -I$(MODDIR) -J$(MODDIR)
 	
 	
 	@echo  "\033[32m \ncreating $< dependency file: \033[0m"
-	$(COMP) $(PREPROC) -I$(MODDIR) -MM $< > $(basename $@).d
+	$(COMP) $(PREPROC) $(COPT) -I$(MODDIR) -MM $< > $(basename $@).d
 	@mv -f $(basename $@).d $(basename $@).d.tmp
 	@sed -e 's|.*:|$(basename $@).o:|' < $(basename $@).d.tmp > $(basename $@).d
 	@rm -f $(basename $@).d.tmp
@@ -33,12 +33,13 @@ $(OBJDIR)/%.o: %.f90
 $(OBJDIR)/main.o: $(filter-out $(OBJDIR)/main.o,$(OBJS))
 $(OBJDIR)/data.o: $(OBJDIR)/types.o
 
-unsafe: MACRO += -DUNSAFE
-unsafe: $(BIN_NAME)
+debug: PREPROC += -DDEBUG 
+debug: COPT += -fbounds-check
+debug: $(BIN_NAME)
 
 clean:
 	@echo "\033[31mcleaning obj directory \033[0m"
-	@rm -f $(OBJDIR)/* $(BIN_NAME)
+	@rm -f $(OBJDIR)/* $(BIN_NAME) $(MODDIR)/* *.o *.mod
 
 rebuild: clean $(BIN_NAME)
 
