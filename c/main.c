@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "data.h"
 #include "types.h"
 
@@ -43,13 +44,33 @@ void sort(int * arr, int arr_size, int r, tInfo * info) {
     }
 }
 
+#ifndef NDEBUG
+_Bool feasible(int * s, int sz) {
+    assert(sz > 0);
+    int * count = calloc(sz, sizeof(int)); 
+
+    for (int i = 0; i < sz; i++) { 
+        assert(s[i] >= 0 && s[i] < sz);
+    }
+
+    for (int i = 0; i < sz; i++) 
+        count[s[i]] += 1;
+
+    for (int i = 0; i < sz; i++)
+        if (count[i] != 1) {
+            free(count);
+            return false;
+        }
+
+    free(count);
+    return true;
+}
+#endif
+
 void construct(int * ret, const Real alpha, tInfo * info){
 
-    int s[info->dimen+1];
-
-    memset(s, 0, (info->dimen+1)*sizeof(int));
-
-    int cL[info->dimen-1];
+    int * s = calloc(info->dimen+1, sizeof(int));
+    int * cL = calloc(info->dimen-1, sizeof(int));
     int cL_size = info->dimen-1;
     
     for (int i = 1; i < info->dimen; ++i) {
@@ -66,7 +87,9 @@ void construct(int * ret, const Real alpha, tInfo * info){
         /**/
 
         //std::cout << info.rnd[info.rnd_index]<< std::endl;
+#ifndef RANDOM
         index = info->rnd[info->rnd_index++];
+#endif
         int c = cL[index];
         s[j] = c;
         //print_s(cL);
@@ -76,6 +99,8 @@ void construct(int * ret, const Real alpha, tInfo * info){
     }
 
     memcpy(ret, s, sizeof(int)*(info->dimen+1));
+    free(s);
+    free(cL);
 }	
 
 void swap(int * vec, int i, int j){
@@ -222,6 +247,9 @@ _Bool search_swap(tSolution * solut, const tInfo * info) {
     if (cost_best < solut->cost - DBL_EPSILON) {
         swap(solut->s, I, J);
         subseq_load_b(solut, info, I);
+
+        assert(abs(cost_best-solut->cost) < FLT_EPSILON);
+        assert(feasible(solut->s, info->dimen));
         return true;
     }
 
@@ -266,13 +294,15 @@ _Bool search_two_opt(tSolution * solut, const tInfo * info) {
     if (cost_best < solut->cost - DBL_EPSILON) {
         reverse(solut->s, I, J);
         subseq_load(solut, info);
+        assert(abs(cost_best-solut->cost) < FLT_EPSILON);
+        assert(feasible(solut->s, info->dimen));
         return true;
     }
 
     return false;
 }
 
-_Bool search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
+_Bool search_reinsertion(tSolution * solut, const tInfo * info, int opt) {
     Real cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     Real cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     int i, j, k, k_next, i_prev, j_next;
@@ -329,30 +359,15 @@ _Bool search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
     if (cost_best < solut->cost - DBL_EPSILON) {
         reinsert(solut->s, I, J, POS+1);
         subseq_load_b(solut, info, I < POS+1 ? I : POS+1);
-        if (cost_best == 21575.0) {
-            puts("pa");
-        }
+
+        assert(abs(cost_best-solut->cost) < FLT_EPSILON);
+        assert(feasible(solut->s, info->dimen));
         return true;
     }
 
     return false;
 }
 
-
-_Bool feasible(int * s, int sz) {
-    int count[sz]; 
-
-    memset(count, 0, sizeof(int)*sz);
-
-    for (int i = 0; i < sz; i++)
-        count[s[i]] += 1;
-
-    for (int i = 0; i < sz; i++)
-        if (count[i] != 1) 
-            return false;
-
-    return true;
-}
 
 void RVND(tSolution * solut, tInfo * info) {
 
@@ -367,9 +382,13 @@ void RVND(tSolution * solut, tInfo * info) {
         //k++;
         //printf("\t%.0lf\n", solut->cost);
         index = rand() % nl_size;
+#ifndef RANDOM
         index = info->rnd[info->rnd_index++];
+#endif
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
+        //
+        assert(index < nl_size);
 
         improve_flag = false;
 
@@ -391,6 +410,7 @@ void RVND(tSolution * solut, tInfo * info) {
                 break;				
         }
 
+        assert(feasible(solut->s, info->dimen));
       //if (feasible(solut->s, info->dimen+1)) {
       //    printf("qebrad\n");
       //    exit(0);
@@ -439,11 +459,13 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tInfo * info) {
         B_start = rand() % max + 1;
         B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
 
+#ifndef RANDOM
         A_start = info->rnd[info->rnd_index++];
         A_end = A_start + info->rnd[info->rnd_index++];
 
         B_start = info->rnd[info->rnd_index++];
         B_end = B_start + info->rnd[info->rnd_index++];
+#endif
     }
     
     if (A_start < B_start) {
@@ -477,7 +499,9 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
 
     for(int i = 0; i < Imax; ++i){
         /**/ int aux = (unsigned)rand() % TABLE_SZ;
+#ifndef RANDOM
         aux = info->rnd[info->rnd_index++];
+#endif
 
         Real alpha = R_table(aux);
 
@@ -486,6 +510,7 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
 
 
         construct(solut_crnt.s, alpha, info);
+        assert(feasible(solut_crnt.s, info->dimen));
         print_s(solut_crnt.s, info->dimen+1);
         subseq_load(&solut_crnt, info);
 
@@ -503,6 +528,8 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
 
             perturb(&solut_crnt, &solut_partial, info);
             subseq_load(&solut_crnt, info);
+
+            assert(feasible(solut_crnt.s, info->dimen));
             //exit(0);
             //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;

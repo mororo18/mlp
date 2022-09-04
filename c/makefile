@@ -1,9 +1,9 @@
 CC = gcc
 BIN_NAME = solve
 
-MODE = MATRIX
+MACRO = -DMATRIX -DNDEBUG
 
-COPT = -Ofast -std=c99 -D$(MODE) $(Wno) $(W) -g
+COPT = -std=c99 $(MACRO) $(Wno) $(W) -g -Ofast
 W = -Winline
 Wno = -Wno-unused-result 
 LOPT = -lm
@@ -12,7 +12,6 @@ OBJDIR = obj
 
 SRCS = $(wildcard *.c)
 OBJS = $(patsubst %.c, $(OBJDIR)/%.o, $(SRCS))
-
 
 
 $(BIN_NAME): $(OBJS)
@@ -31,8 +30,14 @@ $(OBJDIR)/%.o: %.c
 	@sed -e 's|.*:|$(basename $@).o:|' < $(basename $@).d.tmp > $(basename $@).d
 	@rm -f $(basename $@).d.tmp
 
-flat: MODE = FLAT
+debug: MACRO = -DMATRIX 
+debug: $(BIN_NAME)
+
+flat: MACRO = -DFLAT -DNDEBUG 
 flat: $(BIN_NAME)
+
+rand: MACRO = -DMATRIX -DRANDOM 
+rand: $(BIN_NAME)
 
 clean:
 	@echo "\033[31mcleaning obj directory \033[0m"
