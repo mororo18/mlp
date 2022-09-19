@@ -1,0 +1,1 @@
+Definições (static) de funções inline precisam estar no header file (.h) para que o "inlinement" possa acontecer fora do source file (.c). O static serve para que a função seja visível apenas no escopo do arquivo em que foi incluída. Caso isso não seja feito, as funções serão definidas em múltiplos object files (.o), causando conflito durante a *link*agem  

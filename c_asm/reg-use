@@ -1,0 +1,37 @@
+rax
+rbx
+rcx
+rdx
+rdi
+rsi
+rbp
+rsp
+r8 -> addr
+r9 -> addr
+r10
+r11 -> addr
+r12 -> addr
+r13 -> addr
+r14
+r15
+xmm4
+xmm5
+xmm6
+xmm7
+
+
+
+rbx -> i
+rcx -> j
+
+rdx -> i_prev
+r10 -> j_next
+
+r14 -> i_bound
+r15 -> j_bound
+
+xmm0 -> cost_new
+xmm1 -> cost_concat_1
+xmm2 -> cost_concat_2
+xmm3 -> rev_seq_cost
+xmm7 -> cost_best
