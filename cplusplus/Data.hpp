@@ -1,7 +1,11 @@
+#ifndef DATA_HPP
+#define DATA_HPP
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+#include "readData.h"
 
 using namespace std;
 
@@ -66,3 +70,5 @@ int loadData(double *** matrix, vector<int> & rnd) {
     file.close();
     return dimension;
 }
+
+#endif
