@@ -9,6 +9,7 @@
 
 using namespace std;
 
+static
 double ** matrix_allocate(size_t sz) {
     double ** ptr = new double*[sz];
 
@@ -18,6 +19,7 @@ double ** matrix_allocate(size_t sz) {
     return ptr;
 }
 
+static
 int loadData(double *** matrix, vector<int> & rnd) {
     int dimension;
     fstream file;
@@ -70,5 +72,29 @@ int loadData(double *** matrix, vector<int> & rnd) {
     file.close();
     return dimension;
 }
+
+class Data {
+    private:
+        int dimen;
+        double ** cost;
+        std::vector<int> rnd;
+
+    public:
+        void load() {
+            dimen = loadData(&cost, rnd);
+        }
+
+        std::vector<int> getRndVec() {
+            return rnd;
+        }
+
+        int getDimen() {
+            return dimen;
+        }
+
+        double ** getCostPtr() {
+            return cost;
+        }
+};
 
 #endif

@@ -7,21 +7,17 @@ using std::chrono::steady_clock;
 
 int main(int argc, char **argv){
 
+    Data data;
+    data.load();
+
     tInfo info;
-
-
-    std::vector<int> rnd;
-    double ** cost;
-    int dimen = loadData(&cost, rnd);
-    info.setDimen(dimen);
-    info.setCostPtr(cost);
-    info.setRnd(rnd);
+    info.setDimen(data.getDimen());
+    info.setCostPtr(data.getCostPtr());
+    info.setRnd(data.getRndVec());
 
     MLP mlp(info);
 
     mlp.solve();
-
-
 
     return 0;
 }

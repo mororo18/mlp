@@ -79,17 +79,34 @@ void MLP::subseq_load(tSolution & solut, tInfo & info, int index = 0) {
         solut.setC(i, i, 0.0);
         solut.setW(i, i, (double) !(i == 0));
 
+        int s_j;
+        int s_j_prev;
+        double some_T = 0.0;
+        double some_C = 0.0;
+
+        //if (i+1 < info.getDimen()+1) 
+            s_j_prev = solut.getPos(i);
+
         for (j = i+1; j < info.getDimen()+1; j++) {
             j_prev = j-1;
 
-            double T = info.getCost(solut.getPos(j_prev), solut.getPos(j)) + solut.getT(i, j_prev);
+            s_j = solut.getPos(j);
+
+            //double T = info.getCost(solut.getPos(j_prev), solut.getPos(j)) + solut.getT(i, j_prev);
+            double T = info.getCost(s_j_prev, s_j) + some_T;
+
             solut.setT(i, j, T);
 
-            double C = solut.getT(i, j) + solut.getC(i, j_prev);
+            double C = T + some_C;
+            //double C = solut.getT(i, j) + solut.getC(i, j_prev);
             solut.setC(i, j, C);
 
             double W = j + k;
             solut.setW(i, j, W);
+
+            s_j_prev = s_j;
+            some_T = T;
+            some_C = C;
 
         }
         from += t;
