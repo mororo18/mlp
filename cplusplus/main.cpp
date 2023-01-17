@@ -10,17 +10,16 @@ int main(int argc, char **argv){
     int Imax = 10;
     int Iils;
 
-    tInfo info = {};
-    info.T = 0;
-    info.W = 1;
-    info.C = 2;
-
-
     std::vector<int> rnd;
+    double ** cost;
+    int dimen;
 
-    info.dimen = loadData(&info.cost, rnd);
-    info.rnd = rnd;
-    info.rnd_index = 0;
+    dimen = loadData(&cost, rnd);
+
+    tInfo info;
+    info.setDimen(dimen);
+    info.setCostPtr(cost);
+    info.setRnd(rnd);
 
     MLP mlp(info);
 

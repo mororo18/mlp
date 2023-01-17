@@ -6,11 +6,11 @@ MLP::MLP(tInfo & info) {
 }
 
 void MLP::solve() {
-    tSolution solut = Solution_init(info);
+    tSolution solut(info);
 
     int Imax = 10;
     int Iils;
-    Iils = info.dimen < 100 ? info.dimen : 100;
+    Iils = info.getDimen() < 100 ? info.getDimen() : 100;
 
     size_t start = clock();
     GILS_RVND(Imax, Iils, info);
@@ -38,9 +38,9 @@ void print_s(std::vector<int> s) {
 std::vector<int> MLP::construct(const double alpha, tInfo & info){
 
     std::vector<int> s = {0};
-    s.reserve(info.dimen+1);
-    std::vector<int> cL(info.dimen-1);
-    for(int i = 1; i < info.dimen; ++i){
+    s.reserve(info.getDimen()+1);
+    std::vector<int> cL(info.getDimen()-1);
+    for(int i = 1; i < info.getDimen(); ++i){
         cL[i-1] = i;
     }
 
@@ -48,7 +48,7 @@ std::vector<int> MLP::construct(const double alpha, tInfo & info){
     while (!cL.empty()) {
         std::stable_sort(cL.begin(), cL.end(), 
             [r, &info] (const int i, const int j) {
-                return info.cost[i][r] < info.cost[j][r];
+                return info.getCost(i, r) < info.getCost(j, r);
             });
 
         /**/
@@ -57,7 +57,7 @@ std::vector<int> MLP::construct(const double alpha, tInfo & info){
         /**/
 
         //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = info.rnd[info.rnd_index++];
+        index = info.getRndCrnt();
         int c = cL[index];
         s.push_back(c);
         //print_s(cL);
@@ -70,33 +70,38 @@ std::vector<int> MLP::construct(const double alpha, tInfo & info){
     return s;
 }	
 
-void MLP::subseq_load(tSolution & solut, const tInfo & info, int index = 0){
+void MLP::subseq_load(tSolution & solut, tInfo & info, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
-    for (i = 0; i < info.dimen+1; i++) {
+    for (i = 0; i < info.getDimen()+1; i++) {
         k = 1 - i - (!i);
         t = i == from;
 
-        solut.seq[i][i][info.T] = 0.0;
-        solut.seq[i][i][info.C] = 0.0;
-        solut.seq[i][i][info.W] = (double) !(i == 0);
+        solut.setT(i, i, 0.0);
+        solut.setC(i, i, 0.0);
+        solut.setW(i, i,(double) !(i == 0));
 
-        for (j = i+1; j < info.dimen+1; j++) {
+        for (j = i+1; j < info.getDimen()+1; j++) {
             j_prev = j-1;
             
-            solut.seq[i][j][info.T] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T];
-            solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C];
-            solut.seq[i][j][info.W] = j + k;
+            double T = info.getCost(solut.getPos(j_prev), solut.getPos(j)) + solut.getT(i, j_prev);
+            solut.setT(i, j, T); 
+
+            double C = solut.getT(i, j) + solut.getC(i, j_prev);
+            solut.setC(i, j, C);
+
+            double W = j + k;
+            solut.setW(i, j, W);
 
         }
         from += t;
     }
 
-    solut.cost = solut.seq[0][info.dimen][info.C];
+    solut.setCost(solut.getC(0, info.getDimen()));
 }
 
-bool MLP::search_swap(tSolution & solut, const tInfo & info) {
+bool MLP::search_swap(tSolution & solut, tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -104,17 +109,19 @@ bool MLP::search_swap(tSolution & solut, const tInfo & info) {
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
 
-    for (i = 1; i < info.dimen-1; ++i) {
+    for (i = 1; i < info.getDimen()-1; ++i) {
         i_prev = i - 1;
         i_next = i + 1;
 
+	
         //consecutive nodes
-        cost_concat_1 =                 solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[i_next]];
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T]  + info.cost[solut.s[i]][solut.s[i_next+1]];
+        cost_concat_1 =                 solut.getT(0, i_prev) + info.getCost(solut.getPos(i_prev), solut.getPos(i_next));
+        cost_concat_2 = cost_concat_1 + solut.getT(i, i_next)  + info.getCost(solut.getPos(i), solut.getPos(i_next+1));
 
-        cost_new = solut.seq[0][i_prev][info.C]                                                    +           //       1st subseq
-        solut.seq[i][i_next][info.W]               * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
-        solut.seq[i_next+1][info.dimen][info.W]   * (cost_concat_2) + solut.seq[i_next+1][info.dimen][info.C];   // concat 3rd subseq
+        cost_new = solut.getC(0, i_prev)                                                    +           //       1st subseq
+        solut.getW(i, i_next)               * (cost_concat_1) + info.getCost(solut.getPos(i_next), solut.getPos(i))  +           // concat 2nd subseq
+        solut.getW(i_next+1, info.getDimen())   * (cost_concat_2) + solut.getC(i_next+1, info.getDimen());   // concat 3rd subseq
+
 
         if (cost_new < cost_best) {
             cost_best = cost_new - DBL_EPSILON;
@@ -122,20 +129,21 @@ bool MLP::search_swap(tSolution & solut, const tInfo & info) {
             J = i_next;
         }
 
-        for (j = i_next+1; j < info.dimen; ++j) {
+        for (j = i_next+1; j < info.getDimen(); ++j) {
             j_next = j + 1;
             j_prev = j - 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][info.T]       + info.cost[solut.s[i_prev]][solut.s[j]];
-            cost_concat_2 = cost_concat_1                           + info.cost[solut.s[j]][solut.s[i_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T]  + info.cost[solut.s[j_prev]][solut.s[i]];
-            cost_concat_4 = cost_concat_3                           + info.cost[solut.s[i]][solut.s[j_next]];
+            cost_concat_1 =                 solut.getT(0, i_prev)       + info.getCost(solut.getPos(i_prev), solut.getPos(j));
+            cost_concat_2 = cost_concat_1                           + info.getCost(solut.getPos(j), solut.getPos(i_next));
+            cost_concat_3 = cost_concat_2 + solut.getT(i_next, j_prev)  + info.getCost(solut.getPos(j_prev), solut.getPos(i));
+            cost_concat_4 = cost_concat_3                           + info.getCost(solut.getPos(i), solut.getPos(j_next));
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                 +      // 1st subseq
+            cost_new = solut.getC(0, i_prev)                                                 +      // 1st subseq
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
-            solut.seq[i_next][j_prev][info.W]      * cost_concat_2 + solut.seq[i_next][j_prev][info.C] +      // concat 3rd subseq
+            solut.getW(i_next, j_prev)      * cost_concat_2 + solut.getC(i_next, j_prev) +      // concat 3rd subseq
             cost_concat_3 +                                                             // concat 4th subseq (single node)
-            solut.seq[j_next][info.dimen][info.W] * cost_concat_4 + solut.seq[j_next][info.dimen][info.C];   // concat 5th subseq
+            solut.getW(j_next, info.getDimen()) * cost_concat_4 + solut.getC(j_next, info.getDimen());   // concat 5th subseq
+
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -145,16 +153,17 @@ bool MLP::search_swap(tSolution & solut, const tInfo & info) {
         }
     }
 
-    if (cost_best < solut.cost - DBL_EPSILON) {
-        swap(solut.s, I, J);
+    if (cost_best < solut.getCost() - DBL_EPSILON) {
+        solut.swap(I, J);
         subseq_load(solut, info, I);
+
         return true;
     }
 
     return false;
 }
 
-bool MLP::search_two_opt(tSolution & solut, const tInfo & info) {
+bool MLP::search_two_opt(tSolution & solut, tInfo & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -163,24 +172,26 @@ bool MLP::search_two_opt(tSolution & solut, const tInfo & info) {
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
 
-    for (i = 1; i < info.dimen-1; ++i) {
+    for (i = 1; i < info.getDimen()-1; ++i) {
         i_prev = i - 1;
 
-        rev_seq_cost = solut.seq[i][i+1][info.T];
-        for (j = i + 2; j < info.dimen; ++j) {
+        rev_seq_cost = solut.getT(i, i+1);
+        for (j = i + 2; j < info.getDimen(); ++j) {
             j_next = j + 1;
 
 
-          rev_seq_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1.0);
 
-          cost_concat_1 =                 solut.seq[0][i_prev][info.T]   + info.cost[solut.s[j]][solut.s[i_prev]];
-          cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]        + info.cost[solut.s[j_next]][solut.s[i]];
+          rev_seq_cost += info.getCost(solut.getPos(j-1), solut.getPos(j)) * (solut.getW(i, j)-1.0);
 
-          cost_new = solut.seq[0][i_prev][info.C]                                                        +   //  1st subseq
-              solut.seq[i][j][info.W]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
-              solut.seq[j_next][info.dimen][info.W] * cost_concat_2 + solut.seq[j_next][info.dimen][info.C];      // concat 3rd subseq
 
-            
+          cost_concat_1 =                 solut.getT(0, i_prev)   + info.getCost(solut.getPos(j), solut.getPos(i_prev));
+          cost_concat_2 = cost_concat_1 + solut.getT(i, j)        + info.getCost(solut.getPos(j_next), solut.getPos(i));
+
+          cost_new = solut.getC(0, i_prev)                                                        +   //  1st subseq
+              solut.getW(i, j)                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
+              solut.getW(j_next, info.getDimen()) * cost_concat_2 + solut.getC(j_next, info.getDimen());      // concat 3rd subseq
+
+   
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
                 I = i;
@@ -189,16 +200,26 @@ bool MLP::search_two_opt(tSolution & solut, const tInfo & info) {
         }
     }
 
-    if (cost_best < solut.cost - DBL_EPSILON) {
-        reverse(solut.s, I, J);
+    if (cost_best < solut.getCost() - DBL_EPSILON) {
+        solut.reverse(I, J);
         subseq_load(solut, info);
+
+        solut.validate();
+
+        if (solut.getCost() != cost_best) {
+            std::cout << "deu merda 2\n";
+
+            std::cout << "Cost best = " << cost_best << "\nCost calc = " << solut.getCost() << "\n";
+
+        }
+
         return true;
     }
 
     return false;
 }
 
-bool MLP::search_reinsertion(tSolution & solut, const tInfo & info, const int opt) {
+bool MLP::search_reinsertion(tSolution & solut, tInfo & info, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -206,7 +227,7 @@ bool MLP::search_reinsertion(tSolution & solut, const tInfo & info, const int op
     alignas(INT_SZ) int J;
     alignas(INT_SZ) int POS;
 
-    for (i = 1, j = opt +i-1; i < info.dimen-opt+1; ++i, ++j) {
+    for (i = 1, j = opt +i-1; i < info.getDimen()-opt+1; ++i, ++j) {
         j_next = j + 1;
         i_prev = i - 1;
 
@@ -214,14 +235,16 @@ bool MLP::search_reinsertion(tSolution & solut, const tInfo & info, const int op
         for(k = 0; k < i_prev; ++k){
             k_next = k+1;
 
-          cost_concat_1 =                 solut.seq[0][k][info.T]            + info.cost[solut.s[k]][solut.s[i]];
-          cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.cost[solut.s[j]][solut.s[k_next]];
-          cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
 
-          cost_new = solut.seq[0][k][info.C]                                                                   +   //       1st subseq
-              solut.seq[i][j][info.W]               * cost_concat_1 + solut.seq[i][j][info.C]                  +   //  concat 2nd subseq (reinserted seq)
-              solut.seq[k_next][i_prev][info.W]     * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   //  concat 3rd subseq
-              solut.seq[j_next][info.dimen][info.W] * cost_concat_3 + solut.seq[j_next][info.dimen][info.C];       // concat 4th subseq
+          cost_concat_1 =                 solut.getT(0, k)            + info.getCost(solut.getPos(k), solut.getPos(i));
+          cost_concat_2 = cost_concat_1 + solut.getT(i, j)            + info.getCost(solut.getPos(j), solut.getPos(k_next));
+          cost_concat_3 = cost_concat_2 + solut.getT(k_next, i_prev)  + info.getCost(solut.getPos(i_prev), solut.getPos(j_next));
+
+          cost_new = solut.getC(0, k)                                                                   +   //       1st subseq
+              solut.getW(i, j)               * cost_concat_1 + solut.getC(i, j)                  +   //  concat 2nd subseq (reinserted seq)
+              solut.getW(k_next, i_prev)     * cost_concat_2 + solut.getC(k_next, i_prev)        +   //  concat 3rd subseq
+              solut.getW(j_next, info.getDimen()) * cost_concat_3 + solut.getC(j_next, info.getDimen());       // concat 4th subseq
+
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -231,17 +254,17 @@ bool MLP::search_reinsertion(tSolution & solut, const tInfo & info, const int op
             }
         }
 
-        for (k = i + opt; k < info.dimen; ++k) {
+        for (k = i + opt; k < info.getDimen(); ++k) {
             k_next = k + 1;
 
-          cost_concat_1 =                 solut.seq[0][i_prev][info.T]  + info.cost[solut.s[i_prev]][solut.s[j_next]];
-          cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]  + info.cost[solut.s[k]][solut.s[i]];
-          cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]       + info.cost[solut.s[j]][solut.s[k_next]];
+          cost_concat_1 =                 solut.getT(0, i_prev)  + info.getCost(solut.getPos(i_prev), solut.getPos(j_next));
+          cost_concat_2 = cost_concat_1 + solut.getT(j_next, k)  + info.getCost(solut.getPos(k), solut.getPos(i));
+          cost_concat_3 = cost_concat_2 + solut.getT(i, j)       + info.getCost(solut.getPos(j), solut.getPos(k_next));
 
-          cost_new = solut.seq[0][i_prev][info.C]                                                                  +   //       1st subseq
-                  solut.seq[j_next][k][info.W]          * cost_concat_1 + solut.seq[j_next][k][info.C]             +   // concat 2nd subseq
-                  solut.seq[i][j][info.W]               * cost_concat_2 + solut.seq[i][j][info.C]                  +   // concat 3rd subseq (reinserted seq)
-                  solut.seq[k_next][info.dimen][info.W] * cost_concat_3 + solut.seq[k_next][info.dimen][info.C];       // concat 4th subseq
+          cost_new = solut.getC(0, i_prev)                                                                  +   //       1st subseq
+                  solut.getW(j_next, k)          * cost_concat_1 + solut.getC(j_next, k)             +   // concat 2nd subseq
+                  solut.getW(i, j)               * cost_concat_2 + solut.getC(i, j)                  +   // concat 3rd subseq (reinserted seq)
+                  solut.getW(k_next, info.getDimen()) * cost_concat_3 + solut.getC(k_next, info.getDimen());       // concat 4th subseq
           
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -252,9 +275,16 @@ bool MLP::search_reinsertion(tSolution & solut, const tInfo & info, const int op
         }
     }
 
-    if (cost_best < solut.cost - DBL_EPSILON) {
-        reinsert(solut.s, I, J, POS+1);
+    if (cost_best < solut.getCost() - DBL_EPSILON) {
+        solut.reinsert(I, J, POS+1);
         subseq_load(solut, info, I < POS+1 ? I : POS+1);
+
+        solut.validate();
+
+        if (solut.getCost() != cost_best) {
+            std::cout << "deu merda\n";
+        }
+
         return true;
     }
 
@@ -265,7 +295,7 @@ bool MLP::search_reinsertion(tSolution & solut, const tInfo & info, const int op
 void MLP::RVND(tSolution & solut, tInfo & info) {
 
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
-    alignas(INT_SZ) uint index;
+    alignas(INT_SZ) int index;
     alignas(INT_SZ) int neighbd;
     //int k = 0;
     bool improve_flag;
@@ -276,7 +306,7 @@ void MLP::RVND(tSolution & solut, tInfo & info) {
 
         index = rand() % neighbd_list.size();
         //cout << info.rnd[info.rnd_index] << endl;
-        index = info.rnd[info.rnd_index++];
+        index = info.getRndCrnt();
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
 
@@ -311,6 +341,7 @@ void MLP::RVND(tSolution & solut, tInfo & info) {
         }
         //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
+
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
             //std::cout << index << "  " << neighbd_list.size() << std::endl;
@@ -330,20 +361,20 @@ void MLP::RVND(tSolution & solut, tInfo & info) {
 }
 
 std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
-    auto s = solut->s;
+    auto s = solut->getSolutVec();
     int A_start = 1;
     int A_end = 1;
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = std::floor((info.dimen+1)/10);
+    int size_max = std::floor((info.getDimen()+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
     int size_min = 2;
     //std::cout << "perturbing\n";
     //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
         /**/
-        int max = (info.dimen+1) -2 -size_max;
+        int max = (info.getDimen()+1) -2 -size_max;
         A_start = rand() % max + 1;
         A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
@@ -356,19 +387,30 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
         //std::cout << "paa\n";
 
         //cout << info.rnd[info.rnd_index] << endl;
-        A_start = info.rnd[info.rnd_index++];
+        A_start = info.getRndCrnt();
         //cout << info.rnd[info.rnd_index] << endl;
-        A_end = A_start + info.rnd[info.rnd_index++];
+        A_end = A_start + info.getRndCrnt();
         //std::cout << "A start  " << A_start << std::endl;
         //std::cout << "A end  " << A_end << std::endl;
 
         //cout << info.rnd[info.rnd_index] << endl;
-        B_start = info.rnd[info.rnd_index++];
+        B_start = info.getRndCrnt();
         //cout << info.rnd[info.rnd_index] << endl;
-        B_end = B_start + info.rnd[info.rnd_index++];
+        B_end = B_start + info.getRndCrnt();
         //std::cout << "B start  " << B_start << std::endl;
         //std::cout << "B end  " << B_end << std::endl;
     }
+
+    auto reinsert = [](std::vector<int> &vec, int i, int j, int pos){
+        std::vector<int> seq (vec.begin() + i, vec.begin() +j+1);
+        if(pos < i){
+            vec.erase(vec.begin() + i, vec.begin() + j+1);
+            vec.insert(vec.begin() + pos, seq.begin(), seq.end());
+        }else{
+            vec.insert(vec.begin() + pos, seq.begin(), seq.end());
+            vec.erase(vec.begin() + i, vec.begin() + j+1);
+        }
+    };
     
     //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
 
@@ -389,13 +431,13 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
 
 void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
 
-    tSolution solut_partial = Solution_init(info);
-    tSolution solut_crnt = Solution_init(info);
-    tSolution solut_best = Solution_init(info);
+    tSolution solut_partial(info);
+    tSolution solut_crnt(info);
+    tSolution solut_best(info);
 
     for(int i = 0; i < Imax; ++i){
         /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = info.rnd[info.rnd_index++];
+        aux = info.getRndCrnt();
 
         double alpha = R_table(aux);
 
@@ -403,27 +445,35 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
         printf("\t[+] Constructing..\n");	
 
 
-        solut_crnt.s = construct(alpha, info);
-        //print_s(solut_crnt.s);
+
+        solut_crnt.setSolutVec(
+                construct(alpha, info)
+                );
+
         subseq_load(solut_crnt, info);
 
         //solut_partial = solut_crnt;
-        Solution_cpy(solut_crnt, solut_partial, info);
+        solut_partial.copy(solut_crnt);
         printf("\t[+] Looking for the best Neighbor..\n");
-        printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
+        printf("\t    Construction Cost: %.3lf\n", solut_partial.getCost());	
+
+        std::cout << "Solucao inicial ";
+        solut_partial.print();
 
         int iterILS = 0;
         //int k = 0;
         while (iterILS < Iils) {
             //k++;
             RVND(solut_crnt, info);
-            if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
-                Solution_cpy(solut_crnt, solut_partial, info);
+            if(solut_crnt.getCost() < solut_partial.getCost() - DBL_EPSILON){
+                solut_partial.copy(solut_crnt);
                 //solut_partial = solut_crnt;
                 iterILS = 0;
+
             }
 
-            solut_crnt.s = perturb(&solut_partial, info);
+            auto s = perturb(&solut_partial, info);
+            solut_crnt.setSolutVec(s);
             subseq_load(solut_crnt, info);
             //exit(0);
             //std::cout << "ITER  " << iterILS << std::endl;
@@ -432,27 +482,27 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
 
         //subseq_load(solut_partial, info);
 
-        if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
-            Solution_cpy(solut_partial, solut_best, info);
+        if (solut_partial.getCost() < solut_best.getCost() - DBL_EPSILON) {
+            solut_best.copy(solut_partial);
             //solut_best = solut_partial;
         }
 
         //after(7);
 
         //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
-        std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
+        std::cout << "\tCurrent best cost: "<< solut_best.getCost() << std::endl;
         //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
         //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
         //std::cout << k << "  Iteracoes " << std::endl;
 
         std::cout << "SOLUCAO: ";
-        for(int i = 0; i < solut_best.s.size(); i++){
-            std::cout << solut_best.s[i] << " ";
+        for(int i = 0; i < solut_best.getSolutVec().size(); i++){
+            std::cout << solut_best.getPos(i) << " ";
         }
         std::cout << std::endl;
 
     }
     //std::cout << "Dimension: " << dimension << std::endl;
-    printf("COST: %.2lf\n", solut_best.cost);
+    printf("COST: %.2lf\n", solut_best.getCost());
 }
 
