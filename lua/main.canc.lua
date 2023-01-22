@@ -24,11 +24,20 @@ function matrix_print(info)
 
 end
 
-function seq_print(solut)
+function seq_print(solut, info)
+    --[[
     for i=1,#solut.seq do
         for j=1,#solut.seq do
             for s=1,3 do
-                io.write(solut.seq[i][j][s] , " ") --= {0, 0, 0}
+            end
+        end
+    end
+    ]]--
+
+    for i=1,info.dimension+1 do
+        for j=i,info.dimension+1 do
+            for k=1,3 do
+                io.write(solut.seq[to_1D(i, j, k, info.dimension+1)] , " ") --= {0, 0, 0}
             end
             io.write("| ")
         end
@@ -56,32 +65,36 @@ function solut_clone(solut)
     return cpy
 end
 
+#define("to_1D(x, y, z, d)", "(3*((d)*(x-1) + (y-1)) + z)")
+
 function subseq_fill(seq, info)
     for i=1,info.dimension+1 do
-        seq[i] = {}
-        for j=1,info.dimension+1 do
-            seq[i][j] = {0, 0, 0}
+        for j=i,info.dimension+1 do
+            for k=1,3 do
+                seq[to_1D(i, j, k, info.dimension+1)] = 0.0
+            end
         end
     end
 end
 
 function subseq_load(solut, info)
-    for i=1,info.dimension+1 do
+    local dimen = info.dimension
+    for i=1,dimen+1 do
         local k = 1 - i - (i ~= 1 and 0 or 1)
 
-        solut.seq[i][i][info.T] = 0.0
-        solut.seq[i][i][info.C] = 0.0
-        solut.seq[i][i][info.W] = (i ~= 1 and 1 or 0)
-        for j=i+1,info.dimension+1 do
+        solut.seq[to_1D(i, i, info.T, dimen+1)] = 0.0
+        solut.seq[to_1D(i, i, info.C, dimen+1)] = 0.0
+        solut.seq[to_1D(i, i, info.W, dimen+1)] = (i ~= 1 and 1 or 0)
+        for j=i+1,dimen+1 do
             local j_prev = j-1
 
-            solut.seq[i][j][info.T] = info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T]
-            solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C]
-            solut.seq[i][j][info.W] = j + k
+            solut.seq[to_1D(i, j, info.T, dimen+1)] = info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[to_1D(i, j_prev, info.T, dimen+1)]
+            solut.seq[to_1D(i, j, info.C, dimen+1)] = solut.seq[to_1D(i, j, info.T, dimen+1)] + solut.seq[to_1D(i, j_prev, info.C, dimen+1)]
+            solut.seq[to_1D(i, j, info.W, dimen+1)] = j + k
         end
     end
 
-    solut.cost = solut.seq[1][info.dimension+1][info.C] - info.EPSILON
+    solut.cost = solut.seq[to_1D(1, dimen+1, info.C, dimen+1)] - info.EPSILON
     --print(solut.cost)
 end
 
@@ -164,6 +177,7 @@ function search_swap(solut, info)
     local cost_best = math.huge
     local I = -1
     local J = -1
+    local dimen = info.dimension
 
     local cost_concat_1 = 0.0
     local cost_concat_2 = 0.0
@@ -171,16 +185,16 @@ function search_swap(solut, info)
     local cost_concat_4 = 0.0
     local cost_new = 0.0
 
-    for i = 2, info.dimension-1 do
+    for i = 2, dimen-1 do
         local i_prev = i - 1
         local i_next = i + 1
 
-        cost_concat_1 =                 solut.seq[1][i_prev][ info.T] + info.c[solut.s[i_prev]][solut.s[i_next]]
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T] + info.c[solut.s[i]][solut.s[i_next+1]]
+        cost_concat_1 =                 solut.seq[to_1D(1, i_prev,  info.T, dimen+1)] + info.c[solut.s[i_prev]][solut.s[i_next]]
+        cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, i_next, info.T, dimen+1)] + info.c[solut.s[i]][solut.s[i_next+1]]
 
-        cost_new = solut.seq[1][i_prev][info.C]                                                    +           --       1st subseq
-        solut.seq[i][i_next][info.W]               * (cost_concat_1) + info.c[solut.s[i_next]][solut.s[i]]  +           -- concat 2nd subseq
-        solut.seq[i_next+1][info.dimension+1][info.W]   * (cost_concat_2) + solut.seq[i_next+1][info.dimension+1][info.C]   -- concat 3rd subseq
+        cost_new = solut.seq[to_1D(1, i_prev, info.C, dimen+1)]                                                    +           --       1st subseq
+        solut.seq[to_1D(i, i_next, info.W, dimen+1)]               * (cost_concat_1) + info.c[solut.s[i_next]][solut.s[i]]  +           -- concat 2nd subseq
+        solut.seq[to_1D(i_next+1, dimen+1, info.W, dimen+1)]   * (cost_concat_2) + solut.seq[to_1D(i_next+1, dimen+1, info.C, dimen+1)]   -- concat 3rd subseq
 
         if cost_new < cost_best then
             cost_best = cost_new - info.EPSILON
@@ -188,22 +202,22 @@ function search_swap(solut, info)
             J = i_next
         end
 
-        for j = i_next+1,info.dimension do
+        for j = i_next+1,dimen do
             local j_prev = j-1
             local j_next = j+1
 
 
-            cost_concat_1 =                 solut.seq[1][i_prev][info.T]       + info.c[solut.s[i_prev]][solut.s[j]]
+            cost_concat_1 =                 solut.seq[to_1D(1, i_prev, info.T, dimen+1)]       + info.c[solut.s[i_prev]][solut.s[j]]
             cost_concat_2 = cost_concat_1                           + info.c[solut.s[j]][solut.s[i_next]]
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T]  + info.c[solut.s[j_prev]][solut.s[i]]
+            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i_next, j_prev, info.T, dimen+1)]  + info.c[solut.s[j_prev]][solut.s[i]]
             cost_concat_4 = cost_concat_3                           + info.c[solut.s[i]][solut.s[j_next]]
 
 
-            cost_new = solut.seq[1][i_prev][info.C]                                                 +      -- 1st subseq
+            cost_new = solut.seq[to_1D(1, i_prev, info.C, dimen+1)]                                                 +      -- 1st subseq
             cost_concat_1 +                                                             -- concat 2nd subseq (single node)
-            solut.seq[i_next][j_prev][info.W]      * cost_concat_2 + solut.seq[i_next][j_prev][info.C] +      -- concat 3rd subseq
+            solut.seq[to_1D(i_next, j_prev, info.W, dimen+1)]      * cost_concat_2 + solut.seq[to_1D(i_next, j_prev, info.C, dimen+1)] +      -- concat 3rd subseq
             cost_concat_3 +                                                             -- concat 4th subseq (single node)
-            solut.seq[j_next][info.dimension+1][info.W] * cost_concat_4 + solut.seq[j_next][info.dimension+1][info.C]   -- concat 5th subseq
+            solut.seq[to_1D(j_next, dimen+1, info.W, dimen+1)] * cost_concat_4 + solut.seq[to_1D(j_next, dimen+1, info.C, dimen+1)]   -- concat 5th subseq
 
             if(cost_new < cost_best) then
                 cost_best = cost_new - info.EPSILON;
@@ -214,7 +228,7 @@ function search_swap(solut, info)
         end
     end
 
-    if cost_best < solut.seq[1][info.dimension+1][info.C] - info.EPSILON then
+    if cost_best < solut.seq[to_1D(1, dimen+1, info.C, dimen+1)] - info.EPSILON then
         --print("swap")
         --print(cost_best)
         swap(solut.s, I, J)
@@ -230,25 +244,26 @@ function search_two_opt(solut, info)
     local cost_best = math.huge
     local I = -1
     local J = -1
+    local dimen = info.dimension
 
     local cost_concat_1 = 0.0
     local cost_concat_2 = 0.0
     local cost_new = 0.0
 
-    for i = 2,info.dimension-1 do
+    for i = 2,dimen-1 do
         local i_prev = i - 1
-        local rev_seq_cost = solut.seq[i][i+1][info.T]
-        for j = i+2,info.dimension do
+        local rev_seq_cost = solut.seq[to_1D(i, i+1, info.T, dimen+1)]
+        for j = i+2,dimen do
             local j_next = j+1
 
-            rev_seq_cost = rev_seq_cost + info.c[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1.0)
+            rev_seq_cost = rev_seq_cost + info.c[solut.s[j-1]][solut.s[j]] * (solut.seq[to_1D(i, j, info.W, dimen+1)]-1.0)
 
-            cost_concat_1 =                 solut.seq[1][i_prev][info.T]   + info.c[solut.s[j]][solut.s[i_prev]]
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]        + info.c[solut.s[j_next]][solut.s[i]]
+            cost_concat_1 =                 solut.seq[to_1D(1, i_prev, info.T, dimen+1)]   + info.c[solut.s[j]][solut.s[i_prev]]
+            cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, j, info.T, dimen+1)]        + info.c[solut.s[j_next]][solut.s[i]]
 
-            cost_new = solut.seq[1][i_prev][info.C]                                                        +   --   1st subseq
-                    solut.seq[i][j][info.W]                * cost_concat_1 + rev_seq_cost                  +   -- concat 2nd subseq (reversed seq)
-                    solut.seq[j_next][info.dimension+1][info.W] * cost_concat_2 + solut.seq[j_next][info.dimension+1][info.C]       -- concat 3rd subseq
+            cost_new = solut.seq[to_1D(1, i_prev, info.C, dimen+1)]                                                        +   --   1st subseq
+                    solut.seq[to_1D(i, j, info.W, dimen+1)]                * cost_concat_1 + rev_seq_cost                  +   -- concat 2nd subseq (reversed seq)
+                    solut.seq[to_1D(j_next, dimen+1, info.W, dimen+1)] * cost_concat_2 + solut.seq[to_1D(j_next,dimen+1, info.C, dimen+1)]       -- concat 3rd subseq
 
             if cost_new < cost_best then
                 cost_best = cost_new -info.EPSILON
@@ -258,7 +273,7 @@ function search_two_opt(solut, info)
         end
     end
 
-    if cost_best < solut.seq[1][info.dimension+1][info.C] - info.EPSILON then
+    if cost_best < solut.seq[to_1D(1, dimen+1, info.C, dimen+1)] - info.EPSILON then
         reverse(solut.s, I, J)
         subseq_load(solut, info)
         return true
@@ -272,13 +287,14 @@ function search_reinsertion(solut, info, opt)
     local I = -1
     local J = -1
     local POS = -1
+    local dimen = info.dimension
 
     local cost_concat_1 = 0.0
     local cost_concat_2 = 0.0
     local cost_concat_3 = 0.0
     local cost_new = 0.0
 
-    for i = 2, info.dimension-opt+1 do
+    for i = 2, dimen-opt+1 do
         local j = opt+i-1
         local i_prev = i-1
         local j_next = j+1
@@ -286,14 +302,14 @@ function search_reinsertion(solut, info, opt)
         for k = 1, i_prev-1 do
             local k_next = k+1
 
-            cost_concat_1 =                 solut.seq[1][k][info.T]            + info.c[solut.s[k]][solut.s[i]];
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T]            + info.c[solut.s[j]][solut.s[k_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][info.T]  + info.c[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_1 =                 solut.seq[to_1D(1, k, info.T, dimen+1)]            + info.c[solut.s[k]][solut.s[i]];
+            cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, j, info.T, dimen+1)]            + info.c[solut.s[j]][solut.s[k_next]];
+            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(k_next, i_prev, info.T, dimen+1)]  + info.c[solut.s[i_prev]][solut.s[j_next]];
 
-            cost_new = solut.seq[1][k][info.C]                                                             +   --       1st subseq
-            solut.seq[i][j][info.W]                * cost_concat_1 + solut.seq[i][j][info.C]                  +   -- concat 2nd subseq (reinserted seq)
-            solut.seq[k_next][i_prev][info.W]      * cost_concat_2 + solut.seq[k_next][i_prev][info.C]        +   -- concat 3rd subseq
-            solut.seq[j_next][info.dimension+1][info.W] * cost_concat_3 + solut.seq[j_next][info.dimension+1][info.C];       -- concat 4th subseq
+            cost_new = solut.seq[to_1D(1, k, info.C, dimen+1)]                                                             +   --       1st subseq
+            solut.seq[to_1D(i, j, info.W, dimen+1)]                * cost_concat_1 + solut.seq[to_1D(i, j, info.C, dimen+1)]                  +   -- concat 2nd subseq (reinserted seq)
+            solut.seq[to_1D(k_next, i_prev, info.W, dimen+1)]      * cost_concat_2 + solut.seq[to_1D(k_next, i_prev, info.C, dimen+1)]        +   -- concat 3rd subseq
+            solut.seq[to_1D(j_next, dimen+1, info.W, dimen+1)] * cost_concat_3 + solut.seq[to_1D(j_next, dimen+1, info.C, dimen+1)];       -- concat 4th subseq
 
             if cost_new < cost_best then
                 cost_best = cost_new - info.EPSILON
@@ -304,17 +320,17 @@ function search_reinsertion(solut, info, opt)
             end
         end
 
-        for k = i+opt,info.dimension do
+        for k = i+opt,dimen do
             local k_next = k+1
 
-            cost_concat_1 =                 solut.seq[1][i_prev][info.T]   + info.c[solut.s[i_prev]][solut.s[j_next]];
-            cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][info.T]   + info.c[solut.s[k]][solut.s[i]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i][j][info.T]        + info.c[solut.s[j]][solut.s[k_next]];
+            cost_concat_1 =                 solut.seq[to_1D(1, i_prev, info.T, dimen+1)]   + info.c[solut.s[i_prev]][solut.s[j_next]];
+            cost_concat_2 = cost_concat_1 + solut.seq[to_1D(j_next, k, info.T, dimen+1)]   + info.c[solut.s[k]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i, j, info.T, dimen+1)]        + info.c[solut.s[j]][solut.s[k_next]];
 
-            cost_new = solut.seq[1][i_prev][info.C]                                                        +   --       1st subseq
-                    solut.seq[j_next][k][info.W]           * cost_concat_1 + solut.seq[j_next][k][info.C]             +   -- concat 2nd subseq
-                    solut.seq[i][j][info.W]                * cost_concat_2 + solut.seq[i][j][info.C]                  +   -- concat 3rd subseq (reinserted seq)
-                    solut.seq[k_next][info.dimension+1][info.W] * cost_concat_3 + solut.seq[k_next][info.dimension+1][info.C];       -- concat 4th subseq
+            cost_new = solut.seq[to_1D(1, i_prev, info.C, dimen+1)]                                                        +   --       1st subseq
+                    solut.seq[to_1D(j_next, k, info.W, dimen+1)]           * cost_concat_1 + solut.seq[to_1D(j_next, k, info.C, dimen+1)]             +   -- concat 2nd subseq
+                    solut.seq[to_1D(i, j, info.W, dimen+1)]                * cost_concat_2 + solut.seq[to_1D(i, j, info.C, dimen+1)]                  +   -- concat 3rd subseq (reinserted seq)
+                    solut.seq[to_1D(k_next, dimen+1, info.W, dimen+1)] * cost_concat_3 + solut.seq[to_1D(k_next, dimen+1, info.C, dimen+1)];       -- concat 4th subseq
 
             if cost_new < cost_best then
                 cost_best = cost_new - info.EPSILON
@@ -475,6 +491,11 @@ function GILS_RVND(Imax, Iils, R, info)
         subseq_load(solut_crnt, info)
         s_print(solut_crnt)
         print("\tConstruction cost  ", solut_crnt.cost)
+
+      --print(solut_crnt.seq[to_1D(1, info.dimension+1, info.C, info.dimension+1)])
+
+      --seq_print(solut_crnt, info)
+      --os.exit()
         solut_partial = solut_clone(solut_crnt)
 
         --print(solut_partial.seq[1][info.dimension+1][info.C])
