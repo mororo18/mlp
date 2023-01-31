@@ -236,11 +236,14 @@ function search_swap(solut, info)
         local i_prev = i - 1
         local i_next = i + 1
 
-        cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)] + c[s[i_prev]][s[i_next]]
-        cost_concat_2 = cost_concat_1 + seq[to_1D(i, i_next, T, s_size)] + c[s[i]][     s[i_next+1]]
+        local s_i = s[i]
+        local s_i_next = s[i_next]
+
+        cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)] + c[s[i_prev]][s_i_next]
+        cost_concat_2 = cost_concat_1 + seq[to_1D(i, i_next, T, s_size)] + c[s_i][     s[i_next+1]]
 
         cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                    +           --       1st subseq
-        seq[to_1D(i, i_next, W, s_size)]               * (cost_concat_1) + c[s[i_next]][s[i]]  +           -- concat 2nd subseq
+        seq[to_1D(i, i_next, W, s_size)]               * (cost_concat_1) + c[s_i_next][s_i]  +           -- concat 2nd subseq
         seq[to_1D(i_next+1, s_size, W, s_size)]   * (cost_concat_2) + seq[to_1D(i_next+1, s_size, C, s_size)]   -- concat 3rd subseq
 
         if cost_new < cost_best then
@@ -252,12 +255,13 @@ function search_swap(solut, info)
         for j = i_next+1,dimen do
             local j_prev = j-1
             local j_next = j+1
+            local s_j = s[j]
 
 
-            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]       + c[s[i_prev]][s[j]]
-            cost_concat_2 = cost_concat_1                     + c[s[j]][s[i_next]]
-            cost_concat_3 = cost_concat_2 + seq[to_1D(i_next, j_prev, T, s_size)]  + c[s[j_prev]][s[i]]
-            cost_concat_4 = cost_concat_3                           + c[s[i]][s[j_next]]
+            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]       + c[s[i_prev]][s_j]
+            cost_concat_2 = cost_concat_1                     + c[s_j][s_i_next]
+            cost_concat_3 = cost_concat_2 + seq[to_1D(i_next, j_prev, T, s_size)]  + c[s[j_prev]][s_i]
+            cost_concat_4 = cost_concat_3                           + c[s_i][s[j_next]]
 
 
             cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                 +      -- 1st subseq
@@ -312,12 +316,16 @@ function search_two_opt(solut, info)
     for i = 2,dimen-1 do
         local i_prev = i - 1
         local rev_seq_cost = seq[to_1D(i, i+1, T, s_size)]
+
+        local s_j_prev = s[i+1]
+
         for j = i+2,dimen do
             local j_next = j+1
+            local s_j = s[j]
 
-            rev_seq_cost = rev_seq_cost + c[s[j-1]][s[j]] * (seq[to_1D(i, j, W, s_size)]-1.0)
+            rev_seq_cost = rev_seq_cost + c[s_j_prev][s_j] * (seq[to_1D(i, j, W, s_size)]-1.0)
 
-            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]   + c[s[j]][     s[i_prev]]
+            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]   + c[s_j][     s[i_prev]]
             cost_concat_2 = cost_concat_1 + seq[to_1D(i, j, T, s_size)]        + c[s[j_next]][s[i]]
 
             cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                        +   --   1st subseq
@@ -329,6 +337,8 @@ function search_two_opt(solut, info)
                 I = i
                 J = j
             end
+
+            s_j_prev = s_j
         end
     end
 
@@ -369,12 +379,18 @@ function search_reinsertion(solut, info, opt)
         local i_prev = i-1
         local j_next = j+1
 
+        local s_i = s[i]
+        local s_j = s[j]
+
+        local s_i_prev = s[i_prev]
+        local s_j_next = s[j_next]
+
         for k = 1, i_prev-1 do
             local k_next = k+1
 
-            cost_concat_1 =                 seq[to_1D(1, k, T, s_size)]            + c[s[k]][s[i]];
-            cost_concat_2 = cost_concat_1 + seq[to_1D(i, j, T, s_size)]            + c[s[j]][s[k_next]];
-            cost_concat_3 = cost_concat_2 + seq[to_1D(k_next, i_prev, T, s_size)]  + c[s[i_prev]][s[j_next]];
+            cost_concat_1 =                 seq[to_1D(1, k, T, s_size)]            + c[s[k]][s_i];
+            cost_concat_2 = cost_concat_1 + seq[to_1D(i, j, T, s_size)]            + c[s_j][s[k_next]];
+            cost_concat_3 = cost_concat_2 + seq[to_1D(k_next, i_prev, T, s_size)]  + c[s_i_prev][s_j_next];
 
             cost_new = seq[to_1D(1, k, C, s_size)]                                                             +   --       1st subseq
             seq[to_1D(i, j, W, s_size)]                * cost_concat_1 + seq[to_1D(i, j, C, s_size)]                  +   -- concat 2nd subseq (reinserted seq)
@@ -393,9 +409,9 @@ function search_reinsertion(solut, info, opt)
         for k = i+opt,dimen do
             local k_next = k+1
 
-            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]   + c[s[i_prev]][s[j_next]];
-            cost_concat_2 = cost_concat_1 + seq[to_1D(j_next, k, T, s_size)]   + c[s[k]][     s[i]];
-            cost_concat_3 = cost_concat_2 + seq[to_1D(i, j, T, s_size)]        + c[s[j]][     s[k_next]];
+            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]   + c[s_i_prev][s_j_next];
+            cost_concat_2 = cost_concat_1 + seq[to_1D(j_next, k, T, s_size)]   + c[s[k]][     s_i];
+            cost_concat_3 = cost_concat_2 + seq[to_1D(i, j, T, s_size)]        + c[s_j][     s[k_next]];
 
             cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                        +   --       1st subseq
                     seq[to_1D(j_next, k, W, s_size)]           * cost_concat_1 + seq[to_1D(j_next, k, C, s_size)]             +   -- concat 2nd subseq
