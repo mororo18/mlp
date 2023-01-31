@@ -3,6 +3,7 @@ n = 100
 a_table = {}
 b_table = {}
 c_table = {}
+d_table = {}
 
 index = {}
 
@@ -29,6 +30,15 @@ for i = 1,n do
         for k = 1,3 do
             c_table[to_1D_func(i, j, k, n)] = k
         end
+    end
+end
+
+for i = 1,n do
+    d_table[i] = {}
+    for j = 1,n do
+        d_table[i][3 * (j-1) + 1] = 0.0 
+        d_table[i][3 * (j-1) + 2] = 0.0 
+        d_table[i][3 * (j-1) + 3] = 0.0 
     end
 end
 
@@ -74,3 +84,15 @@ print("Tabela C",- start + os.clock())
 
 
 print(c_table[to_1D(1, 2, 3, n)])
+
+start = os.clock()
+for i = 1,n do
+    for j = 1,n do
+        local x = d_table[index[i]][3 * (index[j]-1) + 1]
+        local y = d_table[index[i]][3 * (index[j]-1) + 2]
+        local z = d_table[index[i]][3 * (index[j]-1) + 3]
+    end
+end
+
+print("Tabela D",- start + os.clock())
+

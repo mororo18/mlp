@@ -111,12 +111,15 @@ function subseq_load(solut, info)
 
             local s_j = s[j]
 
+            -- set T
             local cost_T= c[s_j_prev][s_j] + some_T
             seq[to_1D(i, j, T, s_size)] = cost_T
 
+            -- set C
             local cost_C = cost_T + some_C
             seq[to_1D(i, j, C, s_size)]  = cost_C
 
+            -- set W
             seq[to_1D(i, j, W, s_size)] = j + k
 
 
