@@ -41,6 +41,7 @@ namespace MLP {
         }
 
         private void subseq_load(tSolution solut, tInfo info){
+            var solutSolut = solut.GetSolut();  
             for(int i = 0; i < info.GetDimen()+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -51,7 +52,7 @@ namespace MLP {
                 for(int j = i+1; j < info.GetDimen()+1; j++){
                     int j_prev = j-1;
 
-                    solut.SetSeq(i,  j,  tInfo.T, info.GetCost(solut.GetSolut()[j_prev], solut.GetSolut()[j]) + solut.GetSeq(i, j_prev, tInfo.T));
+                    solut.SetSeq(i,  j,  tInfo.T, info.GetCost(solutSolut[j_prev], solutSolut[j]) + solut.GetSeq(i, j_prev, tInfo.T));
                     solut.SetSeq(i, j, tInfo.C, solut.GetSeq(i, j, tInfo.T) + solut.GetSeq(i, j_prev, tInfo.C));
                     solut.SetSeq(i, j, tInfo.W, j + k);
 
@@ -138,10 +139,10 @@ namespace MLP {
 
         private void reinsert(List<int> s, int i, int j, int pos){
             int sz = j-i+1;
-            if(i < pos){
+            if (i < pos) {
                 s.InsertRange(pos, s.GetRange(i, sz));
                 s.RemoveRange(i, sz);
-            }else{
+            } else {
                 s.InsertRange(pos, s.GetRange(i, sz));
                 s.RemoveRange(i+sz, sz);
             }
@@ -149,23 +150,26 @@ namespace MLP {
         }
 
         private bool search_swap(tSolution solut, tInfo info){
-            double cost_best = Double.MaxValue;
+            double cost_best = 9999999.9;
             double cost_new;
             double cost_concat_1, cost_concat_2,
                    cost_concat_3, cost_concat_4;
             int I = -1;
             int J = -1;
 
-            for(int i = 1; i < info.GetDimen()-1; i++){
+            var solutSolut = solut.GetSolut();
+            var dimen = info.GetDimen();
+
+            for(int i = 1; i < dimen-1; i++){
                 int i_prev = i - 1;
                 int i_next = i + 1;
 
-                cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solut.GetSolut()[i_prev],  solut.GetSolut()[i_next]);
-                cost_concat_2 = cost_concat_1 + solut.GetSeq(i, i_next, tInfo.T) + info.GetCost(solut.GetSolut()[i],  solut.GetSolut()[i_next+1]);
+                cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solut.GetPos(i_prev),  solut.GetPos(i_next));
+                cost_concat_2 = cost_concat_1 + solut.GetSeq(i, i_next, tInfo.T) + info.GetCost(solutSolut[i], solutSolut[i_next+1]);
 
                 cost_new = solut.GetSeq(0, i_prev, tInfo.C)
-                        + solut.GetSeq(i, i_next, tInfo.W)             * (cost_concat_1) + info.GetCost(solut.GetSolut()[i_next], solut.GetSolut()[i])
-                        + solut.GetSeq(i_next+1, info.GetDimen(), tInfo.W)   * (cost_concat_2) + solut.GetSeq(i_next+1, info.GetDimen(), tInfo.C);
+                        + solut.GetSeq(i, i_next, tInfo.W)             * (cost_concat_1) + info.GetCost(solutSolut[i_next], solutSolut[i])
+                        + solut.GetSeq(i_next+1, dimen, tInfo.W)   * (cost_concat_2) + solut.GetSeq(i_next+1, dimen, tInfo.C);
 
                 if(cost_new < cost_best){
                     cost_best = cost_new - tInfo.EPSILON;
@@ -173,20 +177,20 @@ namespace MLP {
                     J = i_next;
                 }
 
-                for(int j = i_next+1; j < info.GetDimen(); j++){
+                for(int j = i_next+1; j < dimen; j++){
                     int j_next = j+1;
                     int j_prev = j-1;
 
-                    cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solut.GetSolut()[i_prev], solut.GetSolut()[j]);
-                    cost_concat_2 = cost_concat_1 + info.GetCost(solut.GetSolut()[j], solut.GetSolut()[i_next]);
-                    cost_concat_3 = cost_concat_2 + solut.GetSeq(i_next, j_prev, tInfo.T) + info.GetCost(solut.GetSolut()[j_prev], solut.GetSolut()[i]);
-                    cost_concat_4 = cost_concat_3 + info.GetCost(solut.GetSolut()[i], solut.GetSolut()[j_next]);
+                    cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solutSolut[i_prev], solutSolut[j]);
+                    cost_concat_2 = cost_concat_1 + info.GetCost(solutSolut[j], solutSolut[i_next]);
+                    cost_concat_3 = cost_concat_2 + solut.GetSeq(i_next, j_prev, tInfo.T) + info.GetCost(solutSolut[j_prev], solutSolut[i]);
+                    cost_concat_4 = cost_concat_3 + info.GetCost(solutSolut[i], solutSolut[j_next]);
 
                     cost_new = solut.GetSeq(0, i_prev, tInfo.C)
                             + cost_concat_1
                             + solut.GetSeq(i_next, j_prev, tInfo.W) * cost_concat_2 + solut.GetSeq(i_next, j_prev, tInfo.C)
                             + cost_concat_3
-                            + solut.GetSeq(j_next, info.GetDimen(), tInfo.W) * cost_concat_4 + solut.GetSeq(j_next, info.GetDimen(), tInfo.C);
+                            + solut.GetSeq(j_next, dimen, tInfo.W) * cost_concat_4 + solut.GetSeq(j_next, dimen, tInfo.C);
                     
                     if(cost_new < cost_best){
                         cost_best = cost_new - tInfo.EPSILON;
@@ -197,7 +201,7 @@ namespace MLP {
             }
 
             if(cost_best < solut.GetCost() - tInfo.EPSILON){
-                swap(solut.GetSolut(), I, J);
+                swap(solutSolut, I, J);
                 subseq_load(solut, info);
                 return true;
             }
@@ -212,24 +216,27 @@ namespace MLP {
                    cost_concat_2;
             int I = -1;
             int J = -1;
+            var solutSolut = solut.GetSolut();
 
-            for(int i = 1; i < info.GetDimen()-1; i++){
+            var dimen = info.GetDimen();
+
+            for (int i = 1; i < dimen-1; i++){
                 int i_prev = i-1;
 
                 double rev_seq_cost = solut.GetSeq(i, i+1, tInfo.T);
 
-                for(int j = i+2; j < info.GetDimen(); j++){
+                for(int j = i+2; j < dimen; j++){
                     int j_next = j+1;
                     //int j_prev = j-1;
 
-                    rev_seq_cost += info.GetCost(solut.GetSolut()[j-1], solut.GetSolut()[j]) * (solut.GetSeq(i,  j, tInfo.W)-1.0);
+                    rev_seq_cost += info.GetCost(solutSolut[j-1], solutSolut[j]) * (solut.GetSeq(i,  j, tInfo.W)-1.0);
 
-                    cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solut.GetSolut()[j], solut.GetSolut()[i_prev]);
-                    cost_concat_2 = cost_concat_1 + solut.GetSeq(i, j,  tInfo.T) + info.GetCost(solut.GetSolut()[j_next],  solut.GetSolut()[i]);
+                    cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solutSolut[j], solutSolut[i_prev]);
+                    cost_concat_2 = cost_concat_1 + solut.GetSeq(i, j,  tInfo.T) + info.GetCost(solutSolut[j_next], solutSolut[i]);
 
                     cost_new = solut.GetSeq(0, i_prev,  tInfo.C)
                             + solut.GetSeq(i, j, tInfo.W)              * cost_concat_1 + rev_seq_cost
-                            + solut.GetSeq(j_next, info.GetDimen(), tInfo.W) * cost_concat_2 + solut.GetSeq(j_next, info.GetDimen(), tInfo.C);
+                            + solut.GetSeq(j_next, dimen, tInfo.W) * cost_concat_2 + solut.GetSeq(j_next, dimen, tInfo.C);
 
                     if(cost_new < cost_best){
                         cost_best = cost_new - tInfo.EPSILON;
@@ -242,7 +249,7 @@ namespace MLP {
             }
 
             if(cost_best < solut.GetCost() - tInfo.EPSILON){
-                reverse(solut.GetSolut(), I, J);
+                reverse(solutSolut, I, J);
                 subseq_load(solut, info);
                 return true;
             }
@@ -251,15 +258,18 @@ namespace MLP {
         }
 
         private bool search_reinsertion(tSolution solut, tInfo info, int opt){
-            double cost_best = Double.MaxValue;
+            double cost_best = 99999999.9;
             double cost_new;
             double cost_concat_1, cost_concat_2,
                    cost_concat_3;
             int I = -1;
             int J = -1;
             int POS = -1;
+            var solutSolut = solut.GetSolut();
 
-            for(int i = 1; i < info.GetDimen() - opt + 1; i++){
+            var dimen = info.GetDimen();
+
+            for (int i = 1; i < dimen - opt + 1; i++){
                 int j = opt + i - 1;
                 int i_prev = i - 1;
                 int j_next = j + 1;
@@ -267,14 +277,14 @@ namespace MLP {
                 for(int k = 0; k < i_prev; k++){
                     int k_next = k+1;
 
-                    cost_concat_1 = solut.GetSeq(0, k, tInfo.T) + info.GetCost(solut.GetSolut()[k], solut.GetSolut()[i]);
-                    cost_concat_2 = cost_concat_1 + solut.GetSeq(i, j, tInfo.T) + info.GetCost(solut.GetSolut()[j], solut.GetSolut()[k_next]);
-                    cost_concat_3 = cost_concat_2 + solut.GetSeq(k_next, i_prev, tInfo.T) + info.GetCost(solut.GetSolut()[i_prev], solut.GetSolut()[j_next]);
+                    cost_concat_1 = solut.GetSeq(0, k, tInfo.T) + info.GetCost(solutSolut[k], solutSolut[i]);
+                    cost_concat_2 = cost_concat_1 + solut.GetSeq(i, j, tInfo.T) + info.GetCost(solutSolut[j], solutSolut[k_next]);
+                    cost_concat_3 = cost_concat_2 + solut.GetSeq(k_next, i_prev, tInfo.T) + info.GetCost(solutSolut[i_prev], solutSolut[j_next]);
 
                     cost_new = solut.GetSeq(0, k, tInfo.C)
                             + solut.GetSeq(i, j, tInfo.W)              * cost_concat_1 + solut.GetSeq(i, j, tInfo.C)
                             + solut.GetSeq(k_next, i_prev, tInfo.W)    * cost_concat_2 + solut.GetSeq(k_next, i_prev, tInfo.C)
-                            + solut.GetSeq(j_next, info.GetDimen(), tInfo.W) * cost_concat_3 + solut.GetSeq(j_next, info.GetDimen(), tInfo.C);
+                            + solut.GetSeq(j_next, dimen, tInfo.W) * cost_concat_3 + solut.GetSeq(j_next, dimen, tInfo.C);
 
                     if(cost_new < cost_best){
                         cost_best = cost_new - tInfo.EPSILON;
@@ -284,17 +294,17 @@ namespace MLP {
                     }
                 }
 
-                for(int k = i+opt; k < info.GetDimen(); k++){
+                for(int k = i+opt; k < dimen; k++){
                     int k_next = k+1;
 
-                    cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solut.GetSolut()[i_prev], solut.GetSolut()[j_next]);
-                    cost_concat_2 = cost_concat_1 + solut.GetSeq(j_next, k, tInfo.T) + info.GetCost(solut.GetSolut()[k], solut.GetSolut()[i]);
-                    cost_concat_3 = cost_concat_2 + solut.GetSeq(i, j, tInfo.T) + info.GetCost(solut.GetSolut()[j], solut.GetSolut()[k_next]);
+                    cost_concat_1 = solut.GetSeq(0, i_prev, tInfo.T) + info.GetCost(solutSolut[i_prev], solutSolut[j_next]);
+                    cost_concat_2 = cost_concat_1 + solut.GetSeq(j_next, k, tInfo.T) + info.GetCost(solutSolut[k], solutSolut[i]);
+                    cost_concat_3 = cost_concat_2 + solut.GetSeq(i, j, tInfo.T) + info.GetCost(solutSolut[j], solutSolut[k_next]);
 
                     cost_new = solut.GetSeq(0, i_prev, tInfo.C)
                             + solut.GetSeq(j_next, k, tInfo.W)         * cost_concat_1 + solut.GetSeq(j_next, k, tInfo.C)
                             + solut.GetSeq(i, j, tInfo.W)              * cost_concat_2 + solut.GetSeq(i, j, tInfo.C)
-                            + solut.GetSeq(k_next, info.GetDimen(), tInfo.W) * cost_concat_3 + solut.GetSeq(k_next, info.GetDimen(), tInfo.C);
+                            + solut.GetSeq(k_next, dimen, tInfo.W) * cost_concat_3 + solut.GetSeq(k_next, dimen, tInfo.C);
 
                     if(cost_new < cost_best){
                         cost_best = cost_new - tInfo.EPSILON;
@@ -308,7 +318,7 @@ namespace MLP {
             if(cost_best < solut.GetCost() - tInfo.EPSILON){
                 //Console.WriteLine("Reinsertion");
                 //Console.WriteLine(cost_best);
-                reinsert(solut.GetSolut(), I, J, POS+1);
+                reinsert(solutSolut, I, J, POS+1);
                 subseq_load(solut, info);
                 //Console.WriteLine(seq[0, dimension, C]);
                 return true;
