@@ -72,3 +72,6 @@
         lin318      64.70s
         pr299       51.71s
 
+
+REGEX - metodo getCost():
+%s/info.cost\[\(solut.s\[[_a-z]*\]\)\]\[\(solut.s\[[_a-z]*\]\)\]/info.getCost(\1, \2)/gc
