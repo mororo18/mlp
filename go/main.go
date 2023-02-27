@@ -30,7 +30,7 @@ type tSolution struct {
 
 const (
     SWAP          = 0
-    REINSERTION    = 1
+    REINSERTION   = 1
     OR_OPT_2      = 2
     OR_OPT_3      = 3
     TWO_OPT       = 4
@@ -106,6 +106,62 @@ func read_data() (int, [][]float64, []int) {
 
     return dimen, cost, rnd
 
+}
+
+func feasible_(s []int, info tInfo) bool {
+    is := make([]bool, info.dimen)
+
+    for i:=0; i < info.dimen; i++ {
+        is[i] = false
+    }
+
+    for i:=0; i < info.dimen; i++ {
+        is[s[i]] = true
+    }
+
+    for i:=0; i < info.dimen; i++ {
+        if is[i] == false {
+            return false
+        }
+    }
+
+    //fmt.Println(s)
+
+    return true
+}
+
+func feasible(solut * tSolution, info tInfo) bool {
+    is := make([]bool, info.dimen)
+
+    for i:=0; i < info.dimen; i++ {
+        is[i] = false
+    }
+
+    for i:=0; i < info.dimen; i++ {
+        is[solut.s[i]] = true
+    }
+
+    for i:=0; i < info.dimen; i++ {
+        if is[i] == false {
+            return false
+        }
+    }
+
+    fmt.Println(solut.s)
+
+    return true
+}
+
+func calc_cost(solut * tSolution, info tInfo) float64 {
+    total := 0.0 
+    n := info.dimen
+
+    for i := 0; i < info.dimen; i++ {
+        total += info.c[solut.s[i]][solut.s[i+1]] * float64(n)
+        n--
+    }
+
+    return total
 }
 
 func remove (arr []int, i int) []int {
@@ -193,7 +249,8 @@ func subseq_load(solut *tSolution, info tInfo) {
         for j := i+1; j < info.dimen+1; j++ {
             j_prev := j-1
             
-            T := info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev].T
+            T := info.c[solut.s[j_prev]][solut.s[j]] +
+            solut.seq[i][j_prev].T
             solut.seq[i][j].T = T
 
             C := solut.seq[i][j].T + solut.seq[i][j_prev].C
@@ -261,6 +318,8 @@ func search_swap(solut *tSolution, info tInfo) bool {
                     solut.seq[j_next][info.dimen].W * cost_concat_4 + solut.seq[j_next][info.dimen].C 
 
 
+
+
             if cost_new < cost_best {
                 cost_best = cost_new
                 I = i
@@ -269,11 +328,22 @@ func search_swap(solut *tSolution, info tInfo) bool {
         }
     }
 
-
     if cost_best < solut.seq[0][info.dimen].C {
         //println!("swap \n{}", cost_best);
         swap(solut, I, J)
+
+        fmt.Println("swap")
+        if (feasible(solut, info) == false) {
+            fmt.Println("qebro swap\n")
+        }
+
         subseq_load(solut, info)
+
+        fmt.Println(calc_cost(solut, info), cost_best)
+        if (calc_cost(solut, info) != cost_best) {
+            fmt.Println("qebro swap\n")
+        }
+
         //subseq_load(s, info);
         //println!("{}", seq[0][info.dimension][C]);
         return true
@@ -332,7 +402,19 @@ func search_two_opt(solut  *tSolution, info tInfo) bool {
 
     if cost_best < solut.cost {
         reverse(solut, I, J)
+
+        fmt.Println("two_opt")
+        if (feasible(solut, info) == false) {
+            fmt.Println("qebro two_opt\n")
+        }
+
         subseq_load(solut, info)
+
+        if (calc_cost(solut, info) != cost_best) {
+            fmt.Println("qebro two_opt\n")
+        }
+
+
         return true
     } else {
         return false
@@ -340,18 +422,44 @@ func search_two_opt(solut  *tSolution, info tInfo) bool {
 }
 
 func reinsert(solut * tSolution, i int, j int, pos int) {
-    sub := make([]int, j-i+1)
+    sz := j-i+1
+    sub := make([]int, sz)
+
+    /*
+    remove_seq := func(arr []int, a int, b int) []int {
+        return append(arr[:a], arr[b+1:]...)
+    }
+    */
+     //s_cpy := make([]int, len(solut.s))
+
     copy(sub, solut.s[i:j+1])
+    //copy(s_cpy, solut.s)
+
     if pos < i {
+        fmt.Println("Antes", solut.s)
+        copy(solut.s[pos:i], solut.s[pos+sz:j+1])
+        copy(solut.s[pos:pos+sz], sub)
+        //solut.s = remove_seq(solut.s, i, j)
+        //sub = append(solut.s[:pos], sub...)
+        //solut.s = append(sub, solut.s[pos:]...)
 
     } else {
+        fmt.Println("Depois", solut.s)
+        copy(solut.s[i:i+pos-j], solut.s[j+1:pos])
+        copy(solut.s[pos-(j-i+1): pos], sub)
+        //sub = append((*solut).s[:pos], sub...)
+        //fmt.Println("sub=",sub, "solut.s", solut.s)
+        //sub = append(sub, solut.s[pos+1:]...)
+        //fmt.Println("sub=",sub)
+        //solut.s = remove_seq(solut.s, i, j)
+        //fmt.Println("solut.s=",solut.s)
     }
 
 }
 
 
 func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
-    cost_best := f64::MAX
+    cost_best := math.MaxFloat64
     var cost_new float64
 
     var cost_concat_1 float64
@@ -367,7 +475,7 @@ func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
         i_prev := i-1
         j_next := j+1
 
-        for k := 0 k < i_prev; k++ {
+        for k := 0; k < i_prev; k++ {
             k_next := k+1
 
             cost_concat_1 = solut.seq[0][k].T + info.c[solut.s[k]][solut.s[i]]
@@ -411,6 +519,16 @@ func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
 
     if cost_best < solut.cost {
         reinsert(solut, I, J, POS+1)
+
+        fmt.Println("reinsert\n", solut.s)
+        if (feasible(solut, info) == false) {
+            fmt.Println("qebro reinsert\n")
+        }
+
+        if (calc_cost(solut, info) != cost_best) {
+            fmt.Println("qebro reinsert\n")
+        }
+
         subseq_load(solut, info)
         return true
     } else {
@@ -418,12 +536,14 @@ func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
     }
 }
 
-func RVND(info tInfo) {
-    n_list_b := []int{SWAP, REINSERTION, OR_OPT_2, OR_OPT_3, TWO_OPT}
+func RVND(solut * tSolution, info * tInfo) {
+    n_list_b := []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
     n_list := make([]int, 5)
 
     copy(n_list, n_list_b)
     improve := false
+
+    fmt.Println(solut.s)
 
     for len(n_list) > 0 {
         index := rand.Intn(len(n_list))
@@ -432,13 +552,19 @@ func RVND(info tInfo) {
 
         switch n_list[index] {
         case REINSERTION:
-        case SWAP:
+            improve = search_reinsertion(solut, *info, REINSERTION)
         case OR_OPT_2:
+            improve = search_reinsertion(solut, *info, OR_OPT_2)
         case OR_OPT_3:
+            improve = search_reinsertion(solut, *info, OR_OPT_3)
         case TWO_OPT:
+            improve = search_two_opt(solut, *info)
+        case SWAP:
+            improve = search_swap(solut, *info)
         }
 
         if improve == true {
+            n_list = make([]int, 5)
             copy(n_list, n_list_b)
 
         } else {
@@ -447,31 +573,127 @@ func RVND(info tInfo) {
     }
 }
 
-func GILS_RVND(Imax int, Iils int , R []float64, info tInfo) {
+func perturb(sl []int, info * tInfo) []int {
+    fmt.Println("Perturbacion")
+    s := make([]int, info.dimen+1)
+    copy(s, sl)
+
+    A_start := 1
+    A_end   := 1
+    B_start := 1
+    B_end   := 1
+
+    size_max := 3
+    if int(float64(len(s) / 10.0)) >= 2 {
+        size_max = int(float64(len(s) / 10.0))
+    }
+
+    size_min := 2
+
+
+    for (A_start <= B_start &&  B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
+        A_start = rand.Intn(len(s) - 2 - size_max) + 1
+        A_end = A_start + rand.Intn(size_max - size_min) + size_min
+
+        B_start = rand.Intn(len(s) - 2 - size_max) + 1
+        B_end = B_start + rand.Intn(size_max - size_min) + size_min
+
+        A_start = info.rnd[info.rnd_index]
+        info.rnd_index++
+        A_end = A_start + info.rnd[info.rnd_index]
+        info.rnd_index++
+
+        B_start = info.rnd[info.rnd_index]
+        info.rnd_index++
+        B_end = B_start + info.rnd[info.rnd_index]
+        info.rnd_index++
+
+    }
+
+    reinsert_s := func (s_ * []int, i int, j int, pos int) {
+        sz := j-i+1
+        sub := make([]int, j-i+1)
+
+        copy(sub, (*s_)[i:j+1])
+        fmt.Println("sub", sub)
+
+        if pos < i {
+            fmt.Println("Antes ", s_)
+            copy((*s_)[pos:i], (*s_)[pos+sz:j+1])
+            fmt.Println(s_)
+            copy((*s_)[pos:pos+sz], sub)
+            fmt.Println(s_)
+            //solut.s = remove_seq(solut.s, i, j)
+            //sub = append(solut.s[:pos], sub...)
+            //solut.s = append(sub, solut.s[pos:]...)
+
+        } else {
+            fmt.Println("Depois", s_)
+            copy((*s_)[i:i+pos-j], (*s_)[j+1:pos])
+            copy((*s_)[pos-(j-i+1): pos], sub)
+        }
+
+        if feasible_(*s_, *info) == false {
+            fmt.Println("Perturb qebrad")
+            os.Exit(0)
+        }
+
+
+    }
+
+
+
+    if A_start < B_start {
+        reinsert_s(&s, B_start, B_end-1, A_end);
+        fmt.Println("Reinsercao 1", s)
+        reinsert_s(&s, A_start, A_end-1, B_end);
+        fmt.Println("Reinsercao 2", s)
+    } else {
+        reinsert_s(&s, A_start, A_end-1, B_end);
+        fmt.Println("Reinsercao 1", s)
+        reinsert_s(&s, B_start, B_end-1, A_end);
+        fmt.Println("Reinsercao 2", s)
+    }
+
+    fmt.Println("PERTURBACOA Resultado = ", s)
+
+    return s;
+}
+
+func GILS_RVND(Imax int, Iils int , R [26]float64, info tInfo) {
 
 	solut_crnt := NewSolution(info)
 	solut_partial := NewSolution(info)
 	solut_best := NewSolution(info)
 
     for i := 0; i < Imax; i++ {
+
+        fmt.Printf("[+] Local Search %d\n", i)
+
         index := rand.Intn(len(R))
         index = info.rnd[info.rnd_index]
         info.rnd_index++
 
         solut_crnt.s = construction(R[index], &info)
         subseq_load(&solut_crnt, info)
+        fmt.Printf("\t[+] Constructing Inital Solution.. %.2f\n", solut_crnt.cost)
 
         solut_partial.s = solut_crnt.s
         solut_partial.cost = solut_crnt.cost
 
+        fmt.Println("\t[+] Looking for the best Neighbor..")
         iterILS := 0
         for iterILS < Iils {
-            //RVND
+            RVND(&solut_crnt, &info)
             if solut_crnt.cost < solut_partial.cost {
                 solut_partial.s = solut_crnt.s
                 solut_partial.cost = solut_crnt.cost
+                iterILS = 0
             }
 
+
+            solut_crnt.s = perturb(solut_partial.s, &info)
+            subseq_load(&solut_crnt, info)
             // perturbación
             iterILS++
         }
@@ -493,19 +715,17 @@ func main() {
 
     info.dimen, info.c, info.rnd = read_data()
 
-	solut := NewSolution(info)
+	//solut := NewSolution(info)
 
     R := [...]float64{0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
-    index := info.rnd[info.rnd_index]
-    info.rnd_index++
+    Imax := 10
+    Iils := 100
+    if info.dimen < 100 {
+        Iils = info.dimen
+    }
 
-	solut.s = construction(R[index], &info)
-    fmt.Println(solut.s)
-
-    subseq_load(&solut, info)
-
-
-    fmt.Println(solut.cost)
+    GILS_RVND(Imax, Iils, R, info)
+    //GILS_RVND()
 
 }
