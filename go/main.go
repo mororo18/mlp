@@ -16,7 +16,7 @@ type tSubseq struct {
 }
 
 type tInfo struct {
-    cost [][]float64
+    c [][]float64
     dimen int
     rnd []int
     rnd_index int
@@ -27,6 +27,14 @@ type tSolution struct {
     seq [][]tSubseq
     cost float64
 }
+
+const (
+    SWAP          = 0
+    REINSERTION    = 1
+    OR_OPT_2      = 2
+    OR_OPT_3      = 3
+    TWO_OPT       = 4
+)
 
 func read_data() (int, [][]float64, []int) {
     var (
@@ -100,11 +108,16 @@ func read_data() (int, [][]float64, []int) {
 
 }
 
+func remove (arr []int, i int) []int {
+    arr[i] =  arr[len(arr)-1]
+    return arr[:len(arr)-1]
+}
+
 func sort(arr *[]int, r int, info tInfo) {
 
 	for i := 0; i < len(*arr); i++ {
         for j := 0; j < len(*arr)-i-1; j++ {
-            if info.cost[r][(*arr)[j]] > info.cost[r][(*arr)[j+1]] {
+            if info.c[r][(*arr)[j]] > info.c[r][(*arr)[j+1]] {
                 tmp := (*arr)[j]
                 (*arr)[j] = (*arr)[j+1]
                 (*arr)[j+1] = tmp
@@ -120,11 +133,6 @@ func construction(alpha float64, info *tInfo) []int {
     cL := make([]int, info.dimen-1)
     for i := 0; i < info.dimen-1; i++ {
         cL[i] = i+1
-    }
-
-    remove := func(arr []int, i int) []int {
-        arr[i] =  arr[len(arr)-1]
-        return arr[:len(arr)-1]
     }
 
 	r := 0
@@ -185,10 +193,10 @@ func subseq_load(solut *tSolution, info tInfo) {
         for j := i+1; j < info.dimen+1; j++ {
             j_prev := j-1
             
-            T := info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev].T
+            T := info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev].T
             solut.seq[i][j].T = T
 
-            C := solut.seq[i][j].T + solut.seq[i][j_prev].C;
+            C := solut.seq[i][j].T + solut.seq[i][j_prev].C
             solut.seq[i][j].C = C
 
             W := float64(j + k)
@@ -197,18 +205,257 @@ func subseq_load(solut *tSolution, info tInfo) {
         }
     }
 
-    solut.cost = solut.seq[0][info.dimen].C;
+    solut.cost = solut.seq[0][info.dimen].C
 
 }
 
-func GILS_RVND(Imax int, Iils int , R []float64) {
+func swap(solut *tSolution, i int, j int) {
+    tmp := solut.s[i]
+    solut.s[i] = solut.s[j]
+    solut.s[j] = tmp
+}
+
+func search_swap(solut *tSolution, info tInfo) bool {
+    
+    var cost_concat_1  float64
+    var cost_concat_2  float64
+    var cost_concat_3  float64
+    var cost_concat_4  float64
+
+    var cost_best float64 = math.MaxFloat64
+    var cost_new  float64
+    I := 0
+    J := 0
+
+    for i :=  1; i < info.dimen-1; i++ {
+        i_prev := i - 1
+        i_next := i + 1
+
+
+        cost_concat_1 =   solut.seq[0][ i_prev].T + info.c[solut.s[i_prev]][solut.s[i_next]]
+        cost_concat_2 = cost_concat_1 + solut.seq[i][ i_next].T + info.c[solut.s[i]][solut.s[i_next+1]]
+
+        cost_new = solut.seq[0][ i_prev].C +
+            solut.seq[i][ i_next].W     * cost_concat_1 + info.c[solut.s[i_next]][solut.s[i]] +
+            solut.seq[i_next+1][ info.dimen].W * cost_concat_2 + solut.seq[i_next+1][info.dimen ].C
+
+        if cost_new < cost_best {
+            cost_best = cost_new
+            I = i
+            J = i_next
+        }
+
+        for j :=  i_next+1; j < info.dimen; j++ {
+            j_next := j+1
+            j_prev := j-1
+
+            cost_concat_1 = solut.seq[0][i_prev].T + info.c[solut.s[i_prev]][solut.s[j]]
+            cost_concat_2 = cost_concat_1 + info.c[solut.s[j]][solut.s[i_next]]
+            cost_concat_3 = cost_concat_2 + solut.seq[i_next][ j_prev].T + info.c[solut.s[j_prev]][solut.s[i]]
+            cost_concat_4 = cost_concat_3  + info.c[solut.s[i]][solut.s[j_next]]
+
+            cost_new = solut.seq[0][ i_prev].C +
+                    cost_concat_1 +
+                    solut.seq[i_next][j_prev].W * cost_concat_2 + solut.seq[i_next][ j_prev].C +
+                    cost_concat_3 +
+                    solut.seq[j_next][info.dimen].W * cost_concat_4 + solut.seq[j_next][info.dimen].C 
+
+
+            if cost_new < cost_best {
+                cost_best = cost_new
+                I = i
+                J = j
+            }
+        }
+    }
+
+
+    if cost_best < solut.seq[0][info.dimen].C {
+        //println!("swap \n{}", cost_best);
+        swap(solut, I, J)
+        subseq_load(solut, info)
+        //subseq_load(s, info);
+        //println!("{}", seq[0][info.dimension][C]);
+        return true
+    } else {
+        return false
+    }
+}
+
+func reverse(solut * tSolution, i int, j int) {
+    f := i
+    l := j
+
+    m := int((i+j) /2)
+
+    for f < m {
+        swap(solut, f, l)
+        f++
+        l--
+    }
+}
+
+func search_two_opt(solut  *tSolution, info tInfo) bool {
+    var cost_new  float64
+    cost_best := math.MaxFloat64
+
+    var cost_concat_1 float64
+    var cost_concat_2 float64
+
+    I := 0
+    J := 0
+
+    for i := 1; i < info.dimen-1; i++ {
+        i_prev := i - 1;
+        rev_seq_cost := solut.seq[i][i+1].T
+
+        for j := i+2; j < info.dimen; j++ {
+            j_next := j + 1
+
+            rev_seq_cost += info.c[solut.s[j-1]][solut.s[j]] * (solut.seq[i][ j].W-1.0)
+
+            cost_concat_1 =  solut.seq[0][ i_prev].T + info.c[solut.s[j]][solut.s[i_prev]]
+            cost_concat_2 = cost_concat_1 + solut.seq[i][ j].T + info.c[solut.s[j_next]][solut.s[i]]
+
+            cost_new = solut.seq[0][i_prev].C +
+                    solut.seq[i][j].W      * cost_concat_1 + rev_seq_cost +
+                    solut.seq[j_next][ info.dimen].W * cost_concat_2 + solut.seq[j_next][ info.dimen].C;
+
+            if cost_new < cost_best {
+                cost_best = cost_new
+                I = i
+                J = j
+            }
+        }
+    }
+
+
+    if cost_best < solut.cost {
+        reverse(solut, I, J)
+        subseq_load(solut, info)
+        return true
+    } else {
+        return false
+    }
+}
+
+func reinsert(solut * tSolution, i int, j int, pos int) {
+    sub := make([]int, j-i+1)
+    copy(sub, solut.s[i:j+1])
+    if pos < i {
+
+    } else {
+    }
+
+}
+
+
+func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
+    cost_best := f64::MAX
+    var cost_new float64
+
+    var cost_concat_1 float64
+    var cost_concat_2 float64
+    var cost_concat_3 float64
+
+    I := 0;
+    J := 0;
+    POS := 0;
+
+    for i := 1; i < info.dimen-opt+1; i++ {
+        j := opt+i-1
+        i_prev := i-1
+        j_next := j+1
+
+        for k := 0 k < i_prev; k++ {
+            k_next := k+1
+
+            cost_concat_1 = solut.seq[0][k].T + info.c[solut.s[k]][solut.s[i]]
+            cost_concat_2 = cost_concat_1 + solut.seq[i][j].T + info.c[solut.s[j]][solut.s[k_next]]
+            cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev].T + info.c[solut.s[i_prev]][solut.s[j_next]];
+
+              cost_new = solut.seq[0][k].C +                                                            /*        1st subseq */
+                solut.seq[i][j].W              * cost_concat_1 + solut.seq[i][j].C  +                 /* concat 2nd subseq (reinserted seq) */
+                solut.seq[k_next][i_prev].W   * cost_concat_2 + solut.seq[k_next][ i_prev].C  +       /* concat 3rd subseq */
+                solut.seq[j_next][ info.dimen].W * cost_concat_3 + solut.seq[j_next][ info.dimen].C    /* concat 4th subseq */
+
+            if cost_new < cost_best {
+                cost_best = cost_new
+                I = i
+                J = j
+                POS = k
+            }
+        }
+
+        for k := i+opt; k < info.dimen; k++ {
+            k_next := k+1
+
+            cost_concat_1 = solut.seq[0][ i_prev].T + info.c[solut.s[i_prev]][solut.s[j_next]]
+            cost_concat_2 = cost_concat_1 + solut.seq[j_next][ k].T + info.c[solut.s[k]][solut.s[i]]
+            cost_concat_3 = cost_concat_2 + solut.seq[i][ j].T + info.c[solut.s[j]][solut.s[k_next]]
+
+            cost_new = solut.seq[0][ i_prev].C  +                                                       /*      1st subseq */
+                solut.seq[j_next][k].W         * cost_concat_1 + solut.seq[j_next][ k].C  +           /* concat 2nd subseq */
+                solut.seq[i][ j].W              * cost_concat_2 + solut.seq[i][ j].C   +              /* concat 3rd subseq (reinserted seq) */
+                solut.seq[k_next][ info.dimen].W * cost_concat_3 + solut.seq[k_next][ info.dimen].C    /* concat 4th subseq */
+
+            if cost_new < cost_best {
+                cost_best = cost_new
+                I = i
+                J = j
+                POS = k
+            }
+        }
+    }
+
+
+    if cost_best < solut.cost {
+        reinsert(solut, I, J, POS+1)
+        subseq_load(solut, info)
+        return true
+    } else {
+        return false
+    }
+}
+
+func RVND(info tInfo) {
+    n_list_b := []int{SWAP, REINSERTION, OR_OPT_2, OR_OPT_3, TWO_OPT}
+    n_list := make([]int, 5)
+
+    copy(n_list, n_list_b)
+    improve := false
+
+    for len(n_list) > 0 {
+        index := rand.Intn(len(n_list))
+        index = info.rnd[info.rnd_index]
+        info.rnd_index++
+
+        switch n_list[index] {
+        case REINSERTION:
+        case SWAP:
+        case OR_OPT_2:
+        case OR_OPT_3:
+        case TWO_OPT:
+        }
+
+        if improve == true {
+            copy(n_list, n_list_b)
+
+        } else {
+            n_list = remove(n_list, index)
+        }
+    }
+}
+
+func GILS_RVND(Imax int, Iils int , R []float64, info tInfo) {
 
 	solut_crnt := NewSolution(info)
 	solut_partial := NewSolution(info)
 	solut_best := NewSolution(info)
 
     for i := 0; i < Imax; i++ {
-        index := info.rnd[info.rnd_index]
+        index := rand.Intn(len(R))
+        index = info.rnd[info.rnd_index]
         info.rnd_index++
 
         solut_crnt.s = construction(R[index], &info)
@@ -244,7 +491,7 @@ func main() {
         rnd_index: 0,
     }
 
-    info.dimen, info.cost, info.rnd = read_data()
+    info.dimen, info.c, info.rnd = read_data()
 
 	solut := NewSolution(info)
 
