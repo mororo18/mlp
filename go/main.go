@@ -1,6 +1,8 @@
 package main
 
 import (
+    _ "runtime/pprof"
+    "time"
     //"bufio"
     "fmt"
     "log"
@@ -130,6 +132,7 @@ func feasible_(s []int, info tInfo) bool {
     return true
 }
 
+/*
 func feasible(solut * tSolution, info tInfo) bool {
     is := make([]bool, info.dimen)
 
@@ -163,6 +166,7 @@ func calc_cost(solut * tSolution, info tInfo) float64 {
 
     return total
 }
+*/
 
 func remove (arr []int, i int) []int {
     return append(arr[:i], arr[i+1:]...)
@@ -248,15 +252,12 @@ func subseq_load(solut *tSolution, info tInfo) {
         for j := i+1; j < info.dimen+1; j++ {
             j_prev := j-1
             
-            T := info.c[solut.s[j_prev]][solut.s[j]] +
-            solut.seq[i][j_prev].T
-            solut.seq[i][j].T = T
+            solut.seq[i][j].T = info.c[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev].T
 
-            C := solut.seq[i][j].T + solut.seq[i][j_prev].C
-            solut.seq[i][j].C = C
+            solut.seq[i][j].C = solut.seq[i][j].T + solut.seq[i][j_prev].C
 
-            W := float64(j + k)
-            solut.seq[i][j].W = W
+            solut.seq[i][j].W = float64(j + k)
+            //= W
 
         }
     }
@@ -331,18 +332,20 @@ func search_swap(solut *tSolution, info tInfo) bool {
         //println!("swap \n{}", cost_best);
         swap(solut, I, J)
 
+        subseq_load(solut, info)
+
+        /*
         if (feasible(solut, info) == false) {
             fmt.Println("qebro swap\n")
             os.Exit(0)
         }
-
-        subseq_load(solut, info)
 
         //fmt.Println(calc_cost(solut, info), cost_best)
         if (calc_cost(solut, info) != cost_best) {
             fmt.Println("qebro swap\n")
             os.Exit(0)
         }
+        */
 
         //fmt.Println("swap", solut.cost)
         //subseq_load(s, info);
@@ -407,13 +410,14 @@ func search_two_opt(solut  *tSolution, info tInfo) bool {
         reverse(solut, I, J)
 
         //antes := solut.cost
+        subseq_load(solut, info)
 
+
+        /*
         if (feasible(solut, info) == false) {
             fmt.Println("qebro two_opt")
             os.Exit(0)
         }
-
-        subseq_load(solut, info)
 
         if (calc_cost(solut, info) != cost_best) {
             //fmt.Println(solut.s, "qebro two_opt")
@@ -421,6 +425,7 @@ func search_two_opt(solut  *tSolution, info tInfo) bool {
             fmt.Println("Cost Best ", cost_best)
             os.Exit(0)
         }
+        */
 
 
         //fmt.Println("two_opt", solut.cost)
@@ -530,6 +535,7 @@ func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
     if cost_best < solut.cost {
         reinsert(solut, I, J, POS+1)
 
+        /*
         if (feasible(solut, info) == false) {
             //fmt.Println("qebro reinsert\n")
             os.Exit(0)
@@ -539,6 +545,7 @@ func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
             fmt.Println("qebro reinsert\n", solut.s)
             os.Exit(0)
         }
+        */
 
         subseq_load(solut, info)
         //fmt.Println("reinsert", solut.cost)
@@ -748,7 +755,21 @@ func main() {
         Iils = info.dimen
     }
 
+//  f, err := os.Create("privateJourneyFindAll.prof")
+//  if err != nil {
+//      log.Fatal(err)
+//  }
+//  pprof.StartCPUProfile(f)
+//  defer pprof.StopCPUProfile()
+
+    start := time.Now()
+
     GILS_RVND(Imax, Iils, R, info)
+
+    //elapsed := 
+    t := time.Now()
+    elapsed := t.Sub(start)
+    fmt.Println("TIME:", elapsed.Seconds())
     //GILS_RVND()
 
 }
