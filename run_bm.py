@@ -8,7 +8,7 @@ import concurrent.futures
 import psutil as pU
 import time
 
-data_dir = "../data_mlp"
+data_dir = "../sbc_mlp"
 
 def get_branch():
     out = subprocess.check_output(['git', 'branch']).decode('utf-8').split('\n')
@@ -130,11 +130,11 @@ def main():
     parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required= not ('--instances-list' in sys.argv or '-I' in sys.argv ))
     parser.add_argument('-I' ,'--instances-list', help='Path to the file with a list of the paths of the instances.', required=not ('-i' in sys.argv or '--instance' in sys.argv))
     parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
-    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
+    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript, matlab')    
     args = parser.parse_args()
 
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp",
-            "fortran", "node", "lua", "luajit", "rust", "octave", "c"]
+            "fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab"]
 
     for i in args.lang:
         if i not in sources:
@@ -165,7 +165,8 @@ def main():
             "lua" : "lua",
             "luajit" : "lua",
             "rust" : "rust",
-            "octave" : "octave"
+            "octave" : "octave",
+            "matlab" : "octave"
             }
 
     """

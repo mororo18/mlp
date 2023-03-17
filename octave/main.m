@@ -1,23 +1,25 @@
 1;
+mainn()
 
 function print_s(s)
-    sz = columns(s);
+    sz = size(s);
+    sz = sz(2);
 
     for i = 1:sz
-        printf('%d ', s(i))
+        fprintf('%d ', s(i))
     end
-    printf('\n')
+    fprintf('\n')
 end
 
 function ret = subseq_load (sol, info)
     tern1 = [1, 0];
     tern2 = [0, 1];
     for i = 1:info.dimen+1
-        k = 1 - i - tern1((i != 1) + 1);
+        k = 1 - i - tern1((i ~= 1) + 1);
 
         sol.seq(i, i, info.T) = 0.0;
         sol.seq(i, i, info.C) = 0.0;
-        sol.seq(i, i, info.W) = tern2((i != 1) + 1);
+        sol.seq(i, i, info.W) = tern2((i ~= 1) + 1);
         for j = i+1:info.dimen+1
             j_prev = j-1;
 
@@ -33,10 +35,12 @@ function ret = subseq_load (sol, info)
 end
 
 function ret = sort_by(arr, r, info)
-    sz = columns(arr);
-
+    sz = size(arr);
+    sz = sz(2);
+    
     for i = 1:sz
         for j = 1:sz-i
+            %fprintf("eita");
             if (info.cost(r, arr(j)) > info.cost(r, arr(j+1)))
                 tmp = arr(j);
                 arr(j) = arr(j+1);
@@ -44,7 +48,7 @@ function ret = sort_by(arr, r, info)
             end
         end
     end
-
+    %fprintf("eita2");
     ret = arr;
 end
 
@@ -55,12 +59,14 @@ function [ret, index_new] = construction(alpha, info)
     end
 
     r = 1;
-    while (columns(cL) > 0) 
+    sz_cL = size(cL);
+    sz_cL = sz_cL(2);
+    while (sz_cL > 0) 
         cL = sort_by(cL, r, info);
 
-        rng = ceil(columns(cL) * alpha);
+        rng = ceil(sz_cL * alpha);
         RND = rand(1);
-        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        %RND = [RND, RND+0.0000000001](RND < 0.0000000001 + 1);
         index = ceil(rng * RND);
         
         index = info.rnd(info.rnd_index) + 1;
@@ -70,11 +76,17 @@ function [ret, index_new] = construction(alpha, info)
         cN = cL(index);
 
         cL(index) = [];
-        s(columns(s)+1) = cN;
+        sz_s = size(s);
+        sz_s = sz_s(2);
+        s(sz_s+1) = cN;
         r = cN;
-    end
+        s;
 
-    s(columns(s)+1) = 1;
+        sz_cL = sz_cL - 1;
+    end
+    sz_s = size(s);
+    sz_s = sz_s(2);
+    s(sz_s+1) = 1;
     ret = s;
     index_new = info.rnd_index;
 end
@@ -93,6 +105,7 @@ function ret = reverse(s, i, j)
 end
 
 function ret = reinsert(s, i, j, pos)
+
     if (i < pos)
         tmp = s(i:j);
         inter = s(j+1:pos-1);
@@ -292,10 +305,11 @@ end
 function [s, cost, index_new] = RVND(solut, info)
 
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
-    while (columns(neighbd_list) > 0)
+    sz_nb = 5;
+    while (isempty(neighbd_list) == false)
         RND = rand(1);
-        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(RND*columns(neighbd_list));
+        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        index = ceil(RND*sz_nb);
         %info.rnd(info.rnd_index);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
@@ -327,11 +341,14 @@ function [s, cost, index_new] = RVND(solut, info)
     s = solut.s;
     cost = solut.cost;
     index_new = info.rnd_index;
+
+    sz_nb = size(neighbd_list);
+    sz_nb = sz_nb(2);
 end
 
 function ret = notnull_rnd()
     RND = rand(1);
-    RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+    %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
     ret = RND;
 end
 
@@ -342,7 +359,10 @@ function [ret, index_new] = perturb(solut, info)
     B_end = 1;
 
     size_max = ceil((info.dimen+1) / 10);
-    size_max = [2, size_max]((size_max >= 2) + 1);
+    if (size_max < 2)
+        size_max = 2;
+    end
+    %size_max = [2, size_max]((size_max >= 2) + 1);
     size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
@@ -400,22 +420,23 @@ function ret = GILS_RVND(Imax, Iils, R, info)
 
     for i = 1:Imax
         RND = rand(1);
-        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(columns(R) * RND);
+        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        %index = ceil(columns(R) * RND);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
         alpha = R(index);
 
-        printf("[+] Search %d\n", i)
-        printf("\t[+] Constructing..\n");
+        fprintf("[+] Search %d\n\n", i);
+        fprintf("\t[+] Constructing..\n");
         %"ITER ", i
 
         [solut_crnt.s, info.rnd_index] = construction(alpha, info);
+        %sout_crnt.s
         solut_crnt = subseq_load(solut_crnt, info);
 
         solut_partial = solut_crnt;
-        printf("\t[+] Looking for the best Neighbor..\n")
-        printf("\t    Construction Cost: %.2f\n", solut_partial.cost)
+        fprintf("\t[+] Looking for the best Neighbor..\n")
+        fprintf("\t    Construction Cost: %.2f\n", solut_partial.cost)
 
         iterILS = 0;
         while (iterILS < Iils)
@@ -429,27 +450,29 @@ function ret = GILS_RVND(Imax, Iils, R, info)
 
             [solut_crnt.s, info.rnd_index] = perturb(solut_partial, info);
             solut_crnt = subseq_load(solut_crnt, info);
-            iterILS++;
+            iterILS = iterILS + 1;
         end
 
         if (solut_partial.cost < solut_best.cost)
             solut_best = solut_partial;
         end
 
-        printf("\tCurrent best cost: %.2f\n", solut_best.cost)
-        printf('SOLUCAO: ')
+        fprintf("\tCurrent best cost: %.2f\n", solut_best.cost)
+        fprintf('SOLUCAO: ')
         print_s(solut_best.s)
         %typeinfo(solut_crnt.s)
     end
 
-    printf('COST: %.2f\n', solut_best.cost)
+    fprintf('COST: %.2f\n', solut_best.cost)
 
     ret = solut_best;
 end
 
-function main
+
+
+function mainn
     [info.dimen, info.cost, info.rnd] = Data();
-    info;
+    info.cost;
     info.fmax = Inf(1);
     info.T = 1;
     info.C = 2;
@@ -476,14 +499,19 @@ function main
    %s = reinsert(s, 6, 11, 2);
 
     Imax = 10;
-    Iils = [100, info.dimen]((info.dimen < 100) +1);
+    Iils = info.dimen;
+    if (info.dimen > 100)
+        Iils = 100;
+    end
+
+    %Iils = [100, info.dimen]((info.dimen < 100) +1);
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
     t0 = clock ();
     s = GILS_RVND(Imax, Iils, R, info);
     elapsed_time = etime (clock (), t0);
-    printf('TIME: %.2f\n', elapsed_time)
+    fprintf('TIME: %.2f\n', elapsed_time)
     s.s;
-end
 
-%val = jit_enable(1)
-main();
+    exit;
+
+end
