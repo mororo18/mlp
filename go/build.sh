@@ -1,1 +1,1 @@
-go run -gcflags=-B main.go
+go build -gcflags=-B main.go

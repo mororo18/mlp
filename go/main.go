@@ -198,7 +198,7 @@ func construction(alpha float64, info *tInfo) []int {
     for len(cL) > 0 {
 		sort(&cL, r, *info)
 
-		rg := int(math.Ceil(float64(len(cL)) * alpha))
+		rg := int(math.Ceil(float64(len(cL)) * alpha)) + 1
 
 		index := rand.Intn(rg)
         index = info.rnd[info.rnd_index];
