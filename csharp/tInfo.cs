@@ -1,5 +1,5 @@
 
-using System.Runtime.CompilerServices;
+//using System.Runtime.CompilerServices;
 
 namespace MLP {
     class tInfo {
@@ -37,16 +37,14 @@ namespace MLP {
                     c[to_1D(i,j)]  = cost[i][j];
                     c[to_1D(j,i)]  = cost[i][j];
                 }
-                
             }
         }
 
         public int GetDimen() {return dimension;}
         public double GetCost(int i, int j) {
-
             //var f = ref c[0];
-            double ret = Unsafe.Add(ref c[0], to_1D(i, j));
-            return ret;
+            //double ret = Unsafe.Add(ref c[0], to_1D(i, j));
+            return c[to_1D(i,j)];
         }
         //public double GetCost(int i, int j) {return c[i][j];}
         public int GetRndCrnt() {return rnd[rnd_index++];}

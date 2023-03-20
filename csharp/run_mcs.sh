@@ -1,3 +1,3 @@
 #! /usr/bin/bash
-./solve
+./solve_mcs
 #rm *.exe

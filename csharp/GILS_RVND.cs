@@ -126,6 +126,7 @@ namespace MLP {
         }
 
         private void swap(List<int> s, int i, int j){
+            //Console.WriteLine(string.Format("Swap: ({0}, {1}).", i, j));
             int tmp = s[i];
             s[i] = s[j];
             s[j] = tmp;
@@ -150,7 +151,7 @@ namespace MLP {
         }
 
         private bool search_swap(tSolution solut, tInfo info){
-            double cost_best = 9999999.9;
+            double cost_best = Double.MaxValue;
             double cost_new;
             double cost_concat_1, cost_concat_2,
                    cost_concat_3, cost_concat_4;
@@ -201,6 +202,9 @@ namespace MLP {
             }
 
             if(cost_best < solut.GetCost() - tInfo.EPSILON){
+              //if (I == -1 && J == -1) {
+              //    Console.WriteLine(string.Format("Swap: ({0}, {1}, {2}).", cost_best, solut.GetCost(), -cost_best+solut.GetCost()));
+              //}
                 swap(solutSolut, I, J);
                 subseq_load(solut, info);
                 return true;
@@ -258,7 +262,7 @@ namespace MLP {
         }
 
         private bool search_reinsertion(tSolution solut, tInfo info, int opt){
-            double cost_best = 99999999.9;
+            double cost_best = Double.MaxValue;
             double cost_new;
             double cost_concat_1, cost_concat_2,
                    cost_concat_3;
