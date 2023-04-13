@@ -24,3 +24,9 @@ csharp/obj/
 csharp/.vs/
 csharp/test/bin/
 csharp/test/obj/
+
+# c
+c/solve
+
+rust/main
+go/main
