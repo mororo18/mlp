@@ -130,11 +130,11 @@ def main():
     parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required= not ('--instances-list' in sys.argv or '-I' in sys.argv ))
     parser.add_argument('-I' ,'--instances-list', help='Path to the file with a list of the paths of the instances.', required=not ('-i' in sys.argv or '--instance' in sys.argv))
     parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
-    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript, matlab')    
+    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')    
     args = parser.parse_args()
 
-    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp",
-            "fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab"]
+    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cpp-OOP",
+            "fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab", "golang"]
 
     for i in args.lang:
         if i not in sources:
@@ -159,14 +159,16 @@ def main():
             "pypy": "python",
             "julia": "julia",
             "cpp" : "cplusplus",
+            "cpp-OOP" : "cppOOP",
             "c" : "c",
             "fortran" : "fortran",
             "node" : "javascript",
             "lua" : "lua",
             "luajit" : "lua",
             "rust" : "rust",
-            "octave" : "octave",
-            "matlab" : "octave"
+            #"octave" : "octave",
+            "matlab" : "octave",
+            "golang" : "go"
             }
 
     """
