@@ -1,26 +1,28 @@
 1;
+mainn()
 
-global dimen = 0;
+global dimen;
 global cost;
-global fmax = Inf(1);
+global fmax;
 
-global T = 1;
-global C = 2;
-global W = 3;
+global T;
+global C;
+global W;
 
-global REINSERTION = 1;
-global OR_OPT_2 = 2;
-global OR_OPT_3 = 3;
-global SWAP = 4;
-global TWO_OPT = 5;
+global REINSERTION;
+global OR_OPT_2;
+global OR_OPT_3;
+global SWAP;
+global TWO_OPT;
     
 function print_s(s)
-    sz = columns(s);
+    sz = size(s);
+    sz = sz(2);
 
     for i = 1:sz
-        printf('%d ', s(i))
+        fprintf('%d ', s(i))
     end
-    printf('\n')
+    fprintf('\n')
 end
 
 function ret = subseq_load (s)
@@ -34,14 +36,14 @@ global W;
 
     seq = zeros(dimen+1, dimen+1, 3);
     for i = 1:dimen+1
-        k = 1 - i - tern1((i != 1) + 1);
+        k = 1 - i - tern1((i ~= 1)  + 1);
 
         seq(i, i, T) = 0.0;
         seq(i, i, C) = 0.0;
-        seq(i, i, W) = tern2((i != 1) + 1);
+        seq(i, i, W) = tern2((i ~= 1)  + 1);
         for j = i+1:dimen+1
             j_prev = j-1;
-
+            s;
             seq(i, j, T) = cost(s(j_prev), s(j)) + seq(i, j_prev, T);
             seq(i, j, C) = seq(i, j, T) + seq(i, j_prev, C);
             seq(i, j, W) = j+k;
@@ -54,7 +56,8 @@ end
 
 function ret = sort_by(arr, r)
     global cost
-    sz = columns(arr);
+    sz = size(arr);
+    sz = sz(2);
 
     for i = 1:sz
         for j = 1:sz-i
@@ -77,12 +80,14 @@ function [ret, index_new] = construction(alpha, rnd)
     end
 
     r = 1;
-    while (columns(cL) > 0) 
+    sz_cL = size(cL);
+    sz_cL = sz_cL(2);
+    while (sz_cL > 0) 
         cL = sort_by(cL, r );
 
-        rng = ceil(columns(cL) * alpha);
+        rng = ceil(sz_cL * alpha);
         RND = rand(1);
-        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(rng * RND);
         
         index = rnd.rnd(rnd.rnd_index) + 1;
@@ -92,11 +97,16 @@ function [ret, index_new] = construction(alpha, rnd)
         cN = cL(index);
 
         cL(index) = [];
-        s(columns(s)+1) = cN;
+        sz_s = size(s);
+        sz_s = sz_s(2);
+        s(sz_s+1) = cN;
         r = cN;
+        sz_cL = sz_cL - 1;
     end
 
-    s(columns(s)+1) = 1;
+    sz_s = size(s);
+    sz_s = sz_s(2);
+    s(sz_s+1) = 1;
     ret = s;
     index_new = rnd.rnd_index;
 end
@@ -206,7 +216,7 @@ function [solut_new, seq_new, ret] = search_swap(s, seq)
 
 end
 
-function [solut_new, seq_new ret] = search_two_opt(s, seq)
+function [solut_new, seq_new, ret] = search_two_opt(s, seq)
     global fmax;
     global dimen;
     global cost;
@@ -350,10 +360,10 @@ function [s, cost, index_new] = RVND(solut, seq, rnd)
     global dimen;
 
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
-    while (columns(neighbd_list) > 0)
+    while (isempty(neighbd_list) == false)
         RND = rand(1);
-        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(RND*columns(neighbd_list));
+        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        %index = ceil(RND*columns(neighbd_list));
         %info.rnd(info.rnd_index);
         index = rnd.rnd(rnd.rnd_index) + 1;
         rnd.rnd_index = rnd.rnd_index + 1;
@@ -389,7 +399,7 @@ end
 
 function ret = notnull_rnd()
     RND = rand(1);
-    RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+    %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
     ret = RND;
 end
 
@@ -401,7 +411,7 @@ function [ret, index_new] = perturb(s, rnd)
     B_end = 1;
 
     size_max = ceil((dimen+1) / 10);
-    size_max = [2, size_max]((size_max >= 2) + 1);
+    %size_max = [2, size_max]((size_max >= 2) + 1);
     size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
@@ -467,14 +477,14 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
 
     for i = 1:Imax
         RND = rand(1);
-        RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(columns(R) * RND);
+        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
+        %index = ceil(columns(R) * RND);
         index = rnd.rnd(rnd.rnd_index) + 1;
         rnd.rnd_index = rnd.rnd_index + 1;
         alpha = R(index);
 
-        printf("[+] Search %d\n", i)
-        printf("\t[+] Constructing..\n");
+        fprintf("[+] Search %d\n", i)
+        fprintf("\t[+] Constructing..\n");
         %"ITER ", i
 
         [solut_crnt, rnd.rnd_index] = construction(alpha, rnd);
@@ -484,8 +494,8 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
         cost_partial = cost_crnt;
 
         solut_partial = solut_crnt;
-        printf("\t[+] Looking for the best Neighbor..\n")
-        printf("\t    Construction Cost: %.2f\n", cost_partial)
+        fprintf("\t[+] Looking for the best Neighbor..\n")
+        fprintf("\t    Construction Cost: %.2f\n", cost_partial)
 
         iterILS = 0;
         while (iterILS < Iils)
@@ -499,7 +509,7 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
 
             [solut_crnt, rnd.rnd_index] = perturb(solut_partial, rnd);
             seq = subseq_load(solut_crnt);
-            iterILS++;
+            iterILS = iterILS + 1;
         end
 
         if (cost_partial < cost_best)
@@ -507,21 +517,44 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
             cost_best = cost_partial;
         end
 
-        printf("\tCurrent best cost: %.2f\n", cost_best)
-        printf('SOLUCAO: ')
+        fprintf("\tCurrent best cost: %.2f\n", cost_best)
+        fprintf('SOLUCAO: ')
         print_s(solut_best)
     end
 
-    printf('COST: %.2f\n', cost_best)
+    fprintf('COST: %.2f\n', cost_best)
 
     ret = solut_best;
 end
 
-function main
+function mainn
     global dimen
     global cost
+    global fmax;
+    global T
+    global C
+    global W
+    global REINSERTION;
+    global OR_OPT_2;
+    global OR_OPT_3;
+    global SWAP;
+    global TWO_OPT;
+
+    REINSERTION = 1;
+    OR_OPT_2 = 2;
+    OR_OPT_3 = 3;
+    SWAP = 4;
+    TWO_OPT = 5;
+    
+    
+
+    fmax = Inf(1);
     [dimen, cost, rnd.rnd] = Data();
     rnd.rnd_index = 1;
+    T = 1;
+    C = 2;
+    W = 3;
+
 
    %for i = 1:info.dimen
    %    sol.s(i) = i;
@@ -538,13 +571,14 @@ function main
    %s = reinsert(s, 6, 11, 2);
 
     Imax = 10;
-    Iils = [100, dimen]((dimen < 100) +1);
+
+    Iils = dimen;
+    if (dimen > 100)
+        Iils = 100;
+    end
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
     t0 = clock ();
     s = GILS_RVND(Imax, Iils, R, rnd);
     elapsed_time = etime (clock (), t0);
-    printf('TIME: %.2f\n', elapsed_time)
+    fprintf('TIME: %.2f\n', elapsed_time)
 end
-
-%val = jit_enable(1)
-main();
