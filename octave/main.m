@@ -2,8 +2,7 @@
 mainn()
 
 function print_s(s)
-    sz = size(s);
-    sz = sz(2);
+    sz = length(s);
 
     for i = 1:sz
         fprintf('%d ', s(i))
@@ -62,12 +61,10 @@ function [ret, index_new] = construction(alpha, info)
     end
 
     r = 1;
-    sz_cL = size(cL);
-    sz_cL = sz_cL(2);
-    while (sz_cL > 0) 
+    while (~isempty(cL)) 
         cL = sort_by(cL, r, info);
 
-        rng = ceil(sz_cL * alpha);
+        rng = ceil(length(cL)* alpha);
         RND = rand(1);
         %RND = [RND, RND+0.0000000001](RND < 0.0000000001 + 1);
         index = ceil(rng * RND);
@@ -79,17 +76,13 @@ function [ret, index_new] = construction(alpha, info)
         cN = cL(index);
 
         cL(index) = [];
-        sz_s = size(s);
-        sz_s = sz_s(2);
-        s(sz_s+1) = cN;
+        s(length(s)+1) = cN;
         r = cN;
         %s;
 
-        sz_cL = sz_cL - 1;
+        %sz_cL = sz_cL - 1;
     end
-    sz_s = size(s);
-    sz_s = sz_s(2);
-    s(sz_s+1) = 1;
+    s(length(s)+1) = 1;
     ret = s;
     index_new = info.rnd_index;
 end
@@ -345,8 +338,8 @@ function [s, cost, index_new] = RVND(solut, info)
     cost = solut.cost;
     index_new = info.rnd_index;
 
-    sz_nb = size(neighbd_list);
-    sz_nb = sz_nb(2);
+    %sz_nb = size(neighbd_list);
+    sz_nb = length(neighbd_list);
 end
 
 function ret = notnull_rnd()
