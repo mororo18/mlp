@@ -207,7 +207,7 @@ def main():
                 info = get_info(lang)
                 info.update({"source" : lang, "instance" : inst, "branch" : get_branch()})
 
-                ds = ds.append(pd.DataFrame(info), ignore_index=True)
+                ds = pd.concat([ds, pd.DataFrame(info)], ignore_index=True)
 
                 print(ds)
 
