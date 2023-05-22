@@ -2,7 +2,7 @@ COMP = gfortran
 BIN_NAME = solve
 
 PREPROC = -cpp 
-#PREPROC += -DDOUBLE
+PREPROC += -DDOUBLE
 COPT =  $(W) -g -Ofast
 W = -Winline
 

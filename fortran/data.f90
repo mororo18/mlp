@@ -10,7 +10,7 @@ contains
       integer, allocatable :: rnd (:)
 
       integer :: io
-      character(len=5500) ::line
+      character(len=20000) ::line
       integer :: dimen
       integer :: i
       integer :: j
@@ -20,7 +20,7 @@ contains
       integer :: rnd_value
 
       open(newunit=io, file="../distance_matrix", status="old", action="read") 
-      read(io, "(I5)") dimen
+      read(io, "(I10)") dimen
 
       allocate(c(dimen, dimen))
 
@@ -30,7 +30,7 @@ contains
           read(io, "(A)") line
           do j = i + 1, dimen
               blnk = index(line, ' ')
-              read(line(:blnk), '(I8)') value_ 
+              read(line(:blnk), '(I15)') value_ 
               c(i, j) = real(value_, typeReal)
               c(j, i) = real(value_, typeReal)
               line(:) = line(blnk+1:)
@@ -40,14 +40,14 @@ contains
 
       read(io, *)
       read(io, *)
-      read(io, '(I8)') rnd_count
+      read(io, '(I10)') rnd_count
 
       allocate(rnd(rnd_count))
 
       print *, "qntd rnd  ", rnd_count
 
       do i = 1, rnd_count
-          read(io, '(I6)') rnd(i)
+          read(io, '(I10)') rnd(i)
       end do
 
       close(io)
