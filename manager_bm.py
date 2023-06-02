@@ -1,16 +1,17 @@
 import os
 import time
 
-bm_dir = '../mlp_test'
-inst_list_file = 'inst-list'
+bm_dir = '../mlp_tudao'
+inst_list_file = 'mailist'
 inst_list = []
 
 min_test = 5
 
 #sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cpp-OOP",
-        #"fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab", "golang"]
-sources = ["julia", "cpp",
-        "fortran","c"]
+        #"fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
+#sources = ["java", "dotnet", "pypy", "julia", "cpp", "cpp-OOP",
+        #"fortran", "node", "luajit", "rust", "c", "golang"]
+sources = ["fortran"]
 
 lang_dir = {
         "dotnet": "csharp",
@@ -52,20 +53,21 @@ def count(source, lang, inst, path):
 
     return c
 
-for s in sources:
-    for inst in inst_list:
+for i in range(min_test):
+    for s in sources:
+        for inst in inst_list:
 
-        crnt_time = time.localtime()
-        hour = crnt_time.tm_hour
+            crnt_time = time.localtime()
+            hour = crnt_time.tm_hour
+            day = crnt_time.tm_wday
 
-        while hour >= 9 and hour < 21:
-            time.sleep(5)
-            hour = time.localtime().tm_hour
+            #while (hour >= 9 and hour < 21):# and day < 5:
+                #time.sleep(5)
+                #hour = time.localtime().tm_hour
 
-        if count(s, lang_dir[s], inst, bm_dir) < min_test:
-            os.system(f'python3.8 run_bm.py -i {inst} --lang {s}')
-        else:
-            continue
+            if count(s, lang_dir[s], inst, bm_dir) < min_test:
+                os.system(f'python3.8 run_bm.py -i {inst} --lang {s}')
 
-        
+
+
 
