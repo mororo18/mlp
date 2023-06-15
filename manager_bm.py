@@ -1,17 +1,16 @@
 import os
 import time
 
-bm_dir = '../mlp_tudao'
-inst_list_file = 'mailist'
+bm_dir = '../mlp_tudao_mid'
+inst_list_file = 'mailist-cp'
 inst_list = []
 
-min_test = 5
+min_test = 1
 
 #sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cpp-OOP",
         #"fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
-#sources = ["java", "dotnet", "pypy", "julia", "cpp", "cpp-OOP",
-        #"fortran", "node", "luajit", "rust", "c", "golang"]
-sources = ["fortran"]
+sources = ["java", "dotnet", "pypy", "julia", "cpp", "cpp-OOP",
+        "fortran", "node", "luajit", "rust", "c", "golang"]
 
 lang_dir = {
         "dotnet": "csharp",

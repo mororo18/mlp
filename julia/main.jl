@@ -1,6 +1,5 @@
 #! /opt/julia-1.4.2/bin/julia
 using Printf
-using BenchmarkTools
 include("Data.jl")
 
 mutable struct tInfo

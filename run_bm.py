@@ -8,7 +8,7 @@ import concurrent.futures
 import psutil as pU
 import time
 
-data_dir = "../data_mlp"
+data_dir = "../mlp_tudao_mid"
 
 def get_branch():
     out = subprocess.check_output(['git', 'branch']).decode('utf-8').split('\n')
@@ -133,8 +133,8 @@ def main():
     parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
     args = parser.parse_args()
 
-    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp",
-            "fortran", "node", "lua", "luajit", "rust", "octave", "c"]
+    sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cpp-OOP",
+            "fortran", "node", "lua", "luajit", "rust", "matlab", "c"]
 
     for i in args.lang:
         if i not in sources:
@@ -165,7 +165,7 @@ def main():
             "lua" : "lua",
             "luajit" : "lua",
             "rust" : "rust",
-            "octave" : "octave"
+            "matlab" : "octave"
             }
 
     """
