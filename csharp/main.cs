@@ -18,7 +18,7 @@ namespace MLP {
             TimeSpan ts = (end - start);
             Console.WriteLine("TIME: "+ ts.TotalMilliseconds/10e2);
 
-            Console.WriteLine("Elapsed Time is {0} ticks", (e - s)/10e6);
+            //Console.WriteLine("Elapsed Time is {0} ticks", (e - s)/10e6);
         }
     }
 }
