@@ -581,4 +581,5 @@ function mainn
     s = GILS_RVND(Imax, Iils, R, rnd);
     elapsed_time = etime (clock (), t0);
     fprintf('TIME: %.2f\n', elapsed_time)
+    exit
 end
