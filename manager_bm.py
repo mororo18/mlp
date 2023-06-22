@@ -1,7 +1,7 @@
 import os
 import time
 
-bm_dir = '../mlp_tudao_mid'
+bm_dir = '../mlp_tudao_naive'
 inst_list_file = 'mailist-cp'
 inst_list = []
 
