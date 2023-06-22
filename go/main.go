@@ -2,6 +2,7 @@ package main
 
 import (
     //"bufio"
+    "time"
     "fmt"
     "log"
     "math"
@@ -766,7 +767,13 @@ func main() {
         Iils = info.dimen
     }
 
+    start := time.Now()
+
     GILS_RVND(Imax, Iils, R, info)
+
+    t := time.Now()
+    elapsed := t.Sub(start)
+    fmt.Println("TIME:", elapsed.Seconds())
     //GILS_RVND()
 
 }
