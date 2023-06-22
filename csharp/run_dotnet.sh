@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-dotnet run
+./bin/Debug/net6.0/csharp
