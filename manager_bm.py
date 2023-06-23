@@ -2,7 +2,7 @@ import os
 import time
 
 bm_dir = '../mlp_tudao'
-inst_list_file = 'mailist'
+inst_list_file = 'mailist-agrvai'
 inst_list = []
 
 min_test = 5
