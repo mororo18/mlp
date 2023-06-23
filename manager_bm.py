@@ -9,8 +9,8 @@ min_test = 1
 
 #sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cpp-OOP",
         #"fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
-sources = ["java", "dotnet", "pypy", "julia", "cpp", "cppOOP",
-        "fortran", "node", "luajit", "rust", "c", "golang"]
+sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cppOOP",
+        "fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
 
 lang_dir = {
         "dotnet": "csharp",
