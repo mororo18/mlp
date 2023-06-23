@@ -6,13 +6,11 @@ edition = "2018"
 
 [profile.dev]
 
-opt-level = 3
 codegen-units = 1
 debug = 1
 
 [profile.release]
 
-opt-level = 3
 codegen-units = 1
 debug = 1
 
