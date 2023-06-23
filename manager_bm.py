@@ -7,11 +7,11 @@ inst_list = []
 
 min_test = 5
 
-#sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cpp-OOP",
-        #"fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
-#sources = ["java", "dotnet", "pypy", "julia", "cpp", "cpp-OOP",
-        #"fortran", "node", "luajit", "rust", "c", "golang"]
-sources = ["fortran"]
+sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cpp-OOP",
+         "fortran", "node", "luajit", "rust", "c", "golang"]
+#sources = ["fortran"]
+#sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cpp-OOP",
+         #"fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
 
 lang_dir = {
         "dotnet": "csharp",
