@@ -497,4 +497,5 @@ function mainn
     elapsed_time = etime (clock (), t0);
     fprintf('TIME: %.4f\n', elapsed_time)
     s.s;
+    exit
 end
