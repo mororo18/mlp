@@ -47,7 +47,7 @@ def count(source, lang, inst, path):
         return c
     with open(f_name) as f:
         for line in f:
-            if line.find(source) > 0 and line.find(inst) > 0:
+            if line.find(source) >= 0 and line.find(inst) >= 0:
                 c += 1
 
     return c
