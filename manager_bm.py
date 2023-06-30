@@ -2,16 +2,14 @@ import os
 import time
 
 bm_dir = '../mlp_tudao'
-inst_list_file = 'mailist-agrvai'
+inst_list_file = 'mailist-agrvai' 
 inst_list = []
+min_test = 1
 
-min_test = 5
-
-sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cpp-OOP",
-         "fortran", "node", "luajit", "rust", "c", "golang"]
-#sources = ["fortran"]
 #sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cpp-OOP",
-         #"fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
+         #"fortran", "node", "luajit", "rust", "c", "golang"]
+sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cpp-OOP",
+         "fortran", "node", "lua", "luajit", "rust", "c", "matlab", "golang"]
 
 lang_dir = {
         "dotnet": "csharp",
@@ -48,7 +46,7 @@ def count(source, lang, inst, path):
         return c
     with open(f_name) as f:
         for line in f:
-            if line.find(source) > 0 and line.find(inst) > 0:
+            if line.find(source) >= 0 and line.find(inst) >= 0:
                 c += 1
 
     return c
