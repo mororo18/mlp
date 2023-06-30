@@ -508,6 +508,6 @@ function mainn
     fprintf('TIME: %.2f\n', elapsed_time)
     s.s;
 
-    %exit;
+    exit;
 
 end
