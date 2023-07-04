@@ -8,7 +8,7 @@ import concurrent.futures
 import psutil as pU
 import time
 
-data_dir = "../sbc_mlp"
+data_dir = "../mlp_tudao"
 
 def get_branch():
     out = subprocess.check_output(['git', 'branch']).decode('utf-8').split('\n')
