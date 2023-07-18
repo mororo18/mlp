@@ -52,6 +52,24 @@ def count(source, lang, inst, path):
 
     return c
 
+parser = argparse.ArgumentParser(description='Rodador Tudao')
+parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')
+parser.add_argument('--min' ,  default=1, type=int, help='Quantidade minima de rodadas de cada linguagem')
+parser.add_argument('--out' , help='Output dir')
+
+args = parser.parse_args()
+
+min_test = args.min
+bm_dir = args.out
+
+for i in args.lang:
+    if i not in sources and i != 'all':
+        print("{} is not suported".format(i))
+        exit(0)
+
+if args.lang[0] != 'all':
+    sources = args.lang[:]
+
 for i in range(min_test):
     for s in sources:
         for inst in inst_list:
