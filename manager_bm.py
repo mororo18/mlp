@@ -1,5 +1,6 @@
 import os
 import time
+import argparse
 
 bm_dir = '../mlp_tudao_mid'
 inst_list_file = 'mailist-agrvai'
@@ -35,10 +36,6 @@ lang_dir = {
 if os.path.isdir(bm_dir) == False:
     os.mkdir(bm_dir)
 
-with open(inst_list_file) as f:
-    for line in f:
-        inst_list.append(line.replace('\n', ''))
-
 def count(source, lang, inst, path):
 
     f_name = os.path.join(bm_dir, lang+'.csv')
@@ -54,13 +51,20 @@ def count(source, lang, inst, path):
 
 parser = argparse.ArgumentParser(description='Rodador Tudao')
 parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')
-parser.add_argument('--min' ,  default=1, type=int, help='Quantidade minima de rodadas de cada linguagem')
-parser.add_argument('--out' , help='Output dir')
+parser.add_argument('--min' ,  default=min_test, type=int, help='Quantidade minima de rodadas de cada linguagem')
+parser.add_argument('--out' ,  default=bm_dir,	help='Output dir')
+parser.add_argument('--instPath',  default=inst_list_file,help='Caminho da instancia')
 
 args = parser.parse_args()
 
 min_test = args.min
 bm_dir = args.out
+inst_list_file = args.instPath
+
+with open(inst_list_file) as f:
+    for line in f:
+        inst_list.append(line.replace('\n', ''))
+
 
 for i in args.lang:
     if i not in sources and i != 'all':
