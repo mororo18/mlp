@@ -83,8 +83,8 @@ for i in range(min_test):
             day = crnt_time.tm_wday
             _min = crnt_time.tm_min
 
-            while (_min < 3 or _min > 5):# and day < 5:
-            #while (hour >= 9 and hour < 21):# and day < 5:
+            #while (_min < 3 or _min > 5):# and day < 5:
+            while (hour >= 9 and hour < 21):# and day < 5:
                 time.sleep(5)
                 hour = time.localtime().tm_hour
                 day = crnt_time.tm_wday

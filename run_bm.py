@@ -8,7 +8,7 @@ import concurrent.futures
 import psutil as pU
 import time
 
-data_dir = "../virtu_test"
+data_dir = "../mlp_testao"
 ###data_dir = "../mlp_tudao"
 
 def get_branch():
@@ -132,6 +132,7 @@ def main():
     parser.add_argument('-I' ,'--instances-list', help='Path to the file with a list of the paths of the instances.', required=not ('-i' in sys.argv or '--instance' in sys.argv))
     parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
     parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')    
+    parser.add_argument('--out' ,  default=data_dir,  help='Output dir')
     args = parser.parse_args()
 
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cppOOP",
