@@ -8,7 +8,8 @@ import concurrent.futures
 import psutil as pU
 import time
 
-data_dir = "../mlp_tudao_naive"
+data_dir = "../mlp_testao"
+###data_dir = "../mlp_tudao"
 
 def get_branch():
     out = subprocess.check_output(['git', 'branch']).decode('utf-8').split('\n')
@@ -130,11 +131,12 @@ def main():
     parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required= not ('--instances-list' in sys.argv or '-I' in sys.argv ))
     parser.add_argument('-I' ,'--instances-list', help='Path to the file with a list of the paths of the instances.', required=not ('-i' in sys.argv or '--instance' in sys.argv))
     parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
-    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, g++, lua, javascript')    
+    parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')    
+    parser.add_argument('--out' ,  default=data_dir,  help='Output dir')
     args = parser.parse_args()
 
-    sources = ["java", "dotnet", "python3", "pypy", "julia", "cpp", "cppOOP",
-            "fortran", "node", "lua", "luajit", "rust", "matlab", "c", "golang"]
+    sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cppOOP",
+            "fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab", "golang"]
 
     for i in args.lang:
         if i not in sources:
@@ -166,6 +168,7 @@ def main():
             "lua" : "lua",
             "luajit" : "lua",
             "rust" : "rust",
+            #"octave" : "octave",
             "matlab" : "octave",
             "golang" : "go"
             }
@@ -200,6 +203,8 @@ def main():
                 os.system("./build.sh")
 
             for i in range(n):
+                if lang == 'rust':
+                    os.system("./build.sh")
 
                 info = get_info(lang)
                 info.update({"source" : lang, "instance" : inst, "branch" : get_branch()})
