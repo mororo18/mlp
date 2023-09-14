@@ -4,7 +4,7 @@ module rData
 contains 
 
     subroutine load_matrix(c, rnd, dimen_ret)
-      real, allocatable :: c (:,:)
+      real(8), allocatable :: c (:,:)
       integer, allocatable :: rnd (:)
       integer, intent(out) :: dimen_ret
 

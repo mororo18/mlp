@@ -8,7 +8,7 @@ module data_types
 
     type tInfo
         integer :: dimen
-        real, allocatable :: cost (:,:)
+        real(8), allocatable :: cost (:,:)
         integer :: T = 1
         integer :: C = 2
         integer :: W = 3
@@ -19,7 +19,7 @@ module data_types
         integer :: SWAP         = 4
         integer :: TWO_OPT      = 5
 
-        real :: fmax = 3.4028235E+38
+        real(8) :: fmax = 3.4028235E+38
         
         integer :: reinsert_call = 0
 
@@ -29,15 +29,15 @@ module data_types
 
     type tSolution
         integer, allocatable :: s (:)
-        real, allocatable :: seq (:,:,:)
-        real :: cost
+        real(8), allocatable :: seq (:,:,:)
+        real(8) :: cost
     end type
 
 end module
 
 subroutine print_matrix(c)
     implicit none
-    real, allocatable :: c(:,:)
+    real(8), allocatable :: c(:,:)
 
     integer, allocatable :: nxm(:)
     integer :: dimen
@@ -63,7 +63,7 @@ subroutine print_info(info)
 
     interface
         subroutine print_matrix(c)
-            real, allocatable :: c(:,:)
+            real(8), allocatable :: c(:,:)
         end subroutine
     end interface
 
@@ -76,13 +76,13 @@ subroutine subseq_load(s, seq, dimen, cost)
     use data_types
     integer :: dimen
     integer, dimension(dimen+1) :: s
-    real, dimension(dimen+1, dimen+1, 3) :: seq
-    real, dimension(dimen, dimen) :: cost
+    real(8), dimension(dimen+1, dimen+1, 3) :: seq
+    real(8), dimension(dimen, dimen) :: cost
 
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real :: fmax = 3.4028235E+38
+    real(8) :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -112,7 +112,7 @@ subroutine sort(cL, lmt, r, dimen, cost)
     implicit none
 
     integer :: dimen
-    real, dimension(dimen, dimen) :: cost(:,:)
+    real(8), dimension(dimen, dimen) :: cost(:,:)
     integer, dimension(dimen-1), intent(out) :: cL
     integer :: lmt
     integer :: r
@@ -158,9 +158,9 @@ function construction(alpha, dimen, cost, rnd) result(ret)
     use data_types
     implicit none
 
-    real :: alpha
+    real(8) :: alpha
     integer :: dimen
-    real, dimension(dimen, dimen) :: cost
+    real(8), dimension(dimen, dimen) :: cost
     type(tRnd) :: rnd
 
     integer, dimension(dimen+1) :: ret 
@@ -174,7 +174,7 @@ function construction(alpha, dimen, cost, rnd) result(ret)
     integer :: r
     integer :: rng
     integer :: index_
-    real :: RND_v
+    real(8) :: RND_v
     integer :: cnt
 
     interface
@@ -184,7 +184,7 @@ function construction(alpha, dimen, cost, rnd) result(ret)
             implicit none
 
             integer :: dimen
-            real, dimension(dimen, dimen) :: cost(:,:)
+            real(8), dimension(dimen, dimen) :: cost(:,:)
             integer, dimension(dimen-1), intent(out) :: cL
             integer :: lmt
             integer :: r
@@ -302,15 +302,15 @@ subroutine search_swap(s, seq, dimen, cost, ret)
 
     integer :: dimen
     integer, dimension(dimen+1) :: s
-    real, dimension(dimen+1, dimen+1, 3) :: seq
-    real, dimension(dimen, dimen) :: cost
+    real(8), dimension(dimen+1, dimen+1, 3) :: seq
+    real(8), dimension(dimen, dimen) :: cost
 
     logical, intent(out) :: ret
 
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real :: fmax = 3.4028235E+38
+    real(8) :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -322,20 +322,20 @@ subroutine search_swap(s, seq, dimen, cost, ret)
     integer :: I_best
     integer :: J_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
+    real(8) :: cost_best 
+    real(8) :: cost_new
+    real(8) :: cost_concat_1
+    real(8) :: cost_concat_2 
+    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_4
 
     interface
         subroutine subseq_load(s, seq, dimen, cost)
             use data_types
             integer :: dimen
             integer, dimension(dimen+1) :: s
-            real, dimension(dimen+1, dimen+1, 3) :: seq
-            real, dimension(dimen, dimen) :: cost
+            real(8), dimension(dimen+1, dimen+1, 3) :: seq
+            real(8), dimension(dimen, dimen) :: cost
         end subroutine
     end interface
 
@@ -408,14 +408,14 @@ subroutine search_two_opt(s, seq, dimen, cost, ret)
 
     integer :: dimen
     integer, dimension(dimen+1) :: s 
-    real, dimension(dimen+1, dimen+1, 3) :: seq
-    real, dimension(dimen, dimen) :: cost 
+    real(8), dimension(dimen+1, dimen+1, 3) :: seq
+    real(8), dimension(dimen, dimen) :: cost 
     logical, intent(out) :: ret
 
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real :: fmax = 3.4028235E+38
+    real(8) :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -425,21 +425,21 @@ subroutine search_two_opt(s, seq, dimen, cost, ret)
     integer :: I_best
     integer :: J_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
-    real :: rev_seq_cost
+    real(8) :: cost_best 
+    real(8) :: cost_new
+    real(8) :: cost_concat_1
+    real(8) :: cost_concat_2 
+    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_4
+    real(8) :: rev_seq_cost
 
     interface
         subroutine subseq_load(s, seq, dimen, cost)
             use data_types
             integer :: dimen
             integer, dimension(dimen+1) :: s
-            real, dimension(dimen+1, dimen+1, 3) :: seq
-            real, dimension(dimen, dimen) :: cost
+            real(8), dimension(dimen+1, dimen+1, 3) :: seq
+            real(8), dimension(dimen, dimen) :: cost
         end subroutine
     end interface
 
@@ -492,15 +492,15 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
 
     integer :: dimen
     integer, dimension(dimen+1) :: s
-    real, dimension(dimen+1, dimen+1, 3) :: seq
-    real, dimension(dimen, dimen) :: cost
+    real(8), dimension(dimen+1, dimen+1, 3) :: seq
+    real(8), dimension(dimen, dimen) :: cost
     integer :: opt
     logical, intent(out) :: ret
 
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real :: fmax = 3.4028235E+38
+    real(8) :: fmax = 3.4028235E+38
 
     integer :: i
     integer :: j
@@ -513,20 +513,20 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
     integer :: J_best
     integer :: POS_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
+    real(8) :: cost_best 
+    real(8) :: cost_new
+    real(8) :: cost_concat_1
+    real(8) :: cost_concat_2 
+    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_4
 
     interface
         subroutine subseq_load(s, seq, dimen, cost)
             use data_types
             integer :: dimen
             integer, dimension(dimen+1) :: s
-            real, dimension(dimen+1, dimen+1, 3) :: seq
-            real, dimension(dimen, dimen) :: cost
+            real(8), dimension(dimen+1, dimen+1, 3) :: seq
+            real(8), dimension(dimen, dimen) :: cost
         end subroutine
 
     end interface
@@ -611,11 +611,11 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
 
     integer :: dimen
     integer, dimension(dimen+1) :: sol
-    real, dimension(dimen+1, dimen+1, 3) :: seq
-    real, dimension(dimen, dimen) :: cost
+    real(8), dimension(dimen+1, dimen+1, 3) :: seq
+    real(8), dimension(dimen, dimen) :: cost
     type(tRnd) :: rnd
 
-    real :: RND_v
+    real(8) :: RND_v
 
 
     integer, dimension(5) :: neighbd_list
@@ -643,8 +643,8 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
 
             integer :: dimen
             integer, dimension(dimen+1) :: s
-            real, dimension(dimen+1, dimen+1, 3) :: seq
-            real, dimension(dimen, dimen) :: cost
+            real(8), dimension(dimen+1, dimen+1, 3) :: seq
+            real(8), dimension(dimen, dimen) :: cost
             integer :: opt
             logical, intent(out) :: ret
         end subroutine 
@@ -654,8 +654,8 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
 
             integer :: dimen
             integer, dimension(dimen+1) :: s
-            real, dimension(dimen+1, dimen+1, 3) :: seq
-            real, dimension(dimen, dimen) :: cost
+            real(8), dimension(dimen+1, dimen+1, 3) :: seq
+            real(8), dimension(dimen, dimen) :: cost
 
             logical, intent(out) :: ret
         end subroutine
@@ -665,8 +665,8 @@ subroutine RVND(sol, seq, dimen, cost, rnd)
 
             integer :: dimen
             integer, dimension(dimen+1) :: s
-            real, dimension(dimen+1, dimen+1, 3) :: seq
-            real, dimension(dimen, dimen) :: cost
+            real(8), dimension(dimen+1, dimen+1, 3) :: seq
+            real(8), dimension(dimen, dimen) :: cost
 
             logical, intent(out) :: ret
 
@@ -758,7 +758,7 @@ end subroutine
 
 subroutine notnull_rnd(rnd)
     implicit none
-    real, intent(out) :: RND
+    real(8), intent(out) :: RND
 
     call random_number(RND)
     RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
@@ -780,7 +780,7 @@ function perturb(sl, dimen, rnd) result(ret)
     integer :: size_max
     integer :: size_min
     integer :: max_
-    real :: RND_v
+    real(8) :: RND_v
 
     A_start = 1
     A_end = 1
@@ -862,9 +862,9 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
     !! parameters
     integer :: Imax
     integer :: Iils
-    real, dimension(26) :: R
+    real(8), dimension(26) :: R
     integer :: dimen
-    real, allocatable :: cost (:,:)
+    real(8), allocatable :: cost (:,:)
     type(tRnd) :: rnd
 
     integer, allocatable, intent(out) :: ret(:)
@@ -874,32 +874,32 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
     integer, dimension(dimen+1) :: sol_partial
     integer, dimension(dimen+1) :: sol_crnt
 
-    real, dimension(dimen+1, dimen+1, 3) :: seq
+    real(8), dimension(dimen+1, dimen+1, 3) :: seq
 
-    real :: cost_best
-    real :: cost_partial
-    real :: cost_crnt
+    real(8) :: cost_best
+    real(8) :: cost_partial
+    real(8) :: cost_crnt
 
     !! aux variables
     integer :: i
     integer :: index_
     integer :: R_size = 26
-    real :: alpha
-    real :: RND_v
+    real(8) :: alpha
+    real(8) :: RND_v
     integer :: iterILS
 
     integer :: C = 2
 
-    real :: fmax = 3.4028235E+38
+    real(8) :: fmax = 3.4028235E+38
 
     interface
         function construction(alpha, dimen, cost, rnd) result(ret)
             use data_types
             implicit none
-            real :: alpha
+            real(8) :: alpha
             type(tRnd) :: rnd
             integer :: dimen
-            real, dimension(dimen, dimen) :: cost 
+            real(8), dimension(dimen, dimen) :: cost 
             integer, dimension(dimen+1) :: ret 
         end function
         function perturb(sl, dimen, rnd) result(ret)
@@ -1008,13 +1008,13 @@ program main
     type(tInfo) :: info
     !!type(tSolution) :: sol
     type(tRnd) :: rnd
-    real, dimension(26) :: r
+    real(8), dimension(26) :: r
     integer :: Iils
     integer :: Imax
     integer :: i
 
     integer :: dimen
-    real, allocatable :: cost (:,:)
+    real(8), allocatable :: cost (:,:)
     integer, allocatable :: sol(:)
 
     INTEGER :: begin, end_, rate
@@ -1023,10 +1023,10 @@ program main
         function construction(alpha, dimen, cost, rnd) result(ret)
             use data_types
             implicit none
-            real :: alpha
+            real(8) :: alpha
             type(tRnd) :: rnd
             integer :: dimen
-            real, dimension(dimen, dimen) :: cost 
+            real(8), dimension(dimen, dimen) :: cost 
             integer, dimension(dimen+1) :: ret 
         end function
         subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
@@ -1037,15 +1037,15 @@ program main
             !! parameters
             integer :: Imax
             integer :: Iils
-            real, dimension(26) :: R
+            real(8), dimension(26) :: R
             integer :: dimen
-            real, allocatable :: cost (:,:)
+            real(8), allocatable :: cost (:,:)
             type(tRnd) :: rnd
             integer, allocatable, intent(out) :: ret(:)
         end subroutine
         subroutine print_matrix(c)
             implicit none
-            real, allocatable :: c(:,:)
+            real(8), allocatable :: c(:,:)
 
             integer, allocatable :: nxm(:)
             integer :: dimen
