@@ -19,7 +19,7 @@ module data_types
         integer :: SWAP         = 4
         integer :: TWO_OPT      = 5
 
-        real(8) :: fmax = 3.4028235E+38
+        real(8) :: fmax = 1073E12
         
         integer :: reinsert_call = 0
 
@@ -82,7 +82,7 @@ subroutine subseq_load(s, seq, dimen, cost)
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real(8) :: fmax = 3.4028235E+38
+    real(8) :: fmax = 1073E12
 
     integer :: i
     integer :: j
@@ -310,7 +310,7 @@ subroutine search_swap(s, seq, dimen, cost, ret)
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real(8) :: fmax = 3.4028235E+38
+    real(8) :: fmax = 1073E12
 
     integer :: i
     integer :: j
@@ -358,7 +358,7 @@ subroutine search_swap(s, seq, dimen, cost, ret)
                 seq(i_next+1, dimen+1, W)   * (cost_concat_2) + seq(i_next+1, dimen+1, C) 
 
         if (cost_new < cost_best) then
-            cost_best = cost_new - EPSILON(1.0)
+            cost_best = cost_new 
             I_best = i
             J_best = i_next
         endif
@@ -382,7 +382,7 @@ subroutine search_swap(s, seq, dimen, cost, ret)
                     seq(j_next, dimen+1, W) * cost_concat_4 + seq(j_next, dimen+1, C)   ! concat 5th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0);
+                cost_best = cost_new 
                 I_best = i;
                 J_best = j;
             endif
@@ -415,7 +415,7 @@ subroutine search_two_opt(s, seq, dimen, cost, ret)
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real(8) :: fmax = 3.4028235E+38
+    real(8) :: fmax = 1073E12
 
     integer :: i
     integer :: j
@@ -465,7 +465,7 @@ subroutine search_two_opt(s, seq, dimen, cost, ret)
                     seq(j_next, dimen+1, W) * cost_concat_2 + seq(j_next, dimen+1, C)       ! concat 3rd subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0)
+                cost_best = cost_new 
                 I_best = i
                 J_best = j
             endif
@@ -500,7 +500,7 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
     integer :: T = 1
     integer :: C = 2
     integer :: W = 3
-    real(8) :: fmax = 3.4028235E+38
+    real(8) :: fmax = 1073E12
 
     integer :: i
     integer :: j
@@ -558,7 +558,7 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
                     seq(j_next, dimen+1, W) * cost_concat_3 + seq(j_next, dimen+1, C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0)
+                cost_best = cost_new 
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -583,7 +583,7 @@ subroutine search_reinsertion(s, seq, dimen, cost, opt, ret)
                     seq(k_next, dimen+1, W) * cost_concat_3 + seq(k_next, dimen+1, C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0)
+                cost_best = cost_new 
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -890,7 +890,7 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
 
     integer :: C = 2
 
-    real(8) :: fmax = 3.4028235E+38
+    real(8) :: fmax = 1073E12
 
     interface
         function construction(alpha, dimen, cost, rnd) result(ret)
@@ -964,7 +964,7 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
             if (cost_crnt < cost_partial - EPSILON(1.0)) then
                 !print *, "PARTIAL antes", sol_partial
                 sol_partial = sol_crnt
-                cost_partial = cost_crnt - EPSILON(1.0)
+                cost_partial = cost_crnt 
                 !print *, "PARTIAL dps", sol_partial
                 iterILS = 0
                 !print *, sol_partial%cost
