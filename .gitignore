@@ -10,6 +10,7 @@ python/__pycache__/
 *.prof
 *.o
 *.mod
+solve
 
 csharp/obj/
 csharp/bin/
