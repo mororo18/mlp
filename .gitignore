@@ -13,3 +13,18 @@ python/__pycache__/
 
 csharp/obj/
 csharp/bin/
+
+argparse
+fortran/main
+fortran/obj/
+fortran/solve
+go/.nfs00000000030609dc00000980
+go/main
+listinha
+lua/profiler.log
+os
+rust/main
+rust/target/
+subprocess
+tempfile
+
