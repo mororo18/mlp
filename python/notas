@@ -5,3 +5,10 @@ Acesso de memória (performance):
     array
     Dict
     numpy.array
+
+
+seq[i][j].C pior q seq[i][j][C]
+
+
+seq[i][j][info.C]  ===  seq[i][j][tInfo.C] (ruindade equivalente)
+    seq[i][j][C] --> melhor desempenho
