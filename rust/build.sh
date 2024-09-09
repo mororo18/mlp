@@ -1,3 +1,3 @@
 #! /usr/bin/bash
-cargo build
-cp target/debug/main .
+cargo build --release
+cp target/debug/main solve
