@@ -1,11 +1,9 @@
-.*.sw*
-.swp
+# vim
+/**/.*.sw*
 
 solve
 fortran/*.mod
-rust/target/*
-rust/target/
-rust/Cargo.lock
+
 python/__pycache__/
 *.pdb
 *.dll
@@ -30,3 +28,11 @@ c/solve
 
 rust/main
 go/main
+
+# rust
+rust/debug/
+rust/target/
+rust/Cargo.lock
+rust/**/*.rs.bk
+rust/*.pdb
+rust/solve
