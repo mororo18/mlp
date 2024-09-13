@@ -1,22 +1,12 @@
-pub mod sz;
-
 use std::process::exit;
 use std::fs;
-use std::vec;
 use std::fs::File;
 use std::io::prelude::*;
 
-fn print_type_of<T>(_: &T) {
-        println!("{}", std::any::type_name::<T>())
-}
 
-//pub const SIZE : usize = 319;
+use crate::subseq::CostMatrix;
 
-pub fn load(dimension : &mut usize, c : &mut [[f64; sz::SIZE]; sz::SIZE], rnd : &mut Vec<usize>) {
-//pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize>) {
-
-    let filename = "../distance_matrix";
-    //println!("In file {}", filename);
+pub fn load(filename: &str) -> (usize, CostMatrix, Vec<usize>) {
 
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
@@ -28,16 +18,12 @@ pub fn load(dimension : &mut usize, c : &mut [[f64; sz::SIZE]; sz::SIZE], rnd : 
         lines.push(l.to_string());
     }
 
-    *dimension = lines[line_i].parse::<usize>().unwrap();
-    //for k in 0..*dimension {c.push(vec![0.0; *dimension]);}
+    let dimension = lines[line_i].parse::<usize>().unwrap();
     line_i += 1;
 
-    //print_type_of(&lines[line_i].parse::<usize>().unwrap());
-    //println!("{}", lines[line_i]);
+    let c = CostMatrix::new(dimension);
 
-    //exit(0);
-    //let mut l_i = -1;
-    for l_i in 0..*dimension {
+    for l_i in 0..dimension {
         let mut iter = lines[line_i].split_ascii_whitespace();
         line_i += 1;
         let mut n = iter.next();
@@ -45,7 +31,7 @@ pub fn load(dimension : &mut usize, c : &mut [[f64; sz::SIZE]; sz::SIZE], rnd : 
         let mut i = l_i;
         let mut j = l_i + 1;
 
-        while j < *dimension {
+        while j < dimension {
             c[i][j] = n.unwrap().to_string().parse::<f64>().unwrap();
             c[j][i] = c[i][j];
             n = iter.next();
@@ -57,15 +43,14 @@ pub fn load(dimension : &mut usize, c : &mut [[f64; sz::SIZE]; sz::SIZE], rnd : 
     }
 
     line_i += 2;
-    //println!("{}", lines[line_i]);
     let rnd_size = lines[line_i].parse::<usize>().unwrap();
     line_i += 1;
 
+    let rnd: Vec<usize> = vec![];
     for i in 0..rnd_size {
         rnd.push(lines[line_i].parse::<usize>().unwrap());
         line_i += 1;
     }
 
-    //println!("{:?}", rnd);
-
+    (dimension, c, rnd)
 }

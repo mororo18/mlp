@@ -1,11 +1,6 @@
-mod data;
-mod types;
-mod traits;
+mod gils_rvnd;
 
-use types::{tSeqInfo, tInfo, tSolution, tSeqData, tCostData};
-use traits::{Access, Test, Kba, Q};
-
-use data::sz;
+use subseq::*;
 
 use std::time::Instant;
 use std::process::exit;
@@ -457,14 +452,9 @@ fn print_type_of<T>(_: &T) {
 
 #[allow(non_snake_case)]
 fn main() {
-    let mut dimension : usize = 0;
-    let mut c = tCostData::New();
-    //let mut c : [[f64; 500]; 500] = [[0.0; 500]; 500];
-    //let mut c : Vec<Vec<f64>> = vec![vec![];0];
+    let filename = "../distance_matrix";
 
-    let mut rnd : Vec<usize> = vec![];
-
-    data::load(&mut dimension, &mut c, &mut rnd);
+    let (dimension, c, rnd) = data::load(filename);
 
     let mut info = tInfo {
         dimen : dimension,
