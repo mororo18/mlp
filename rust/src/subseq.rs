@@ -1,10 +1,13 @@
 use std::ops::{Index, IndexMut};
 
-pub const SWAP        : usize = 0;
-pub const REINSERTION : usize = 1;
-pub const OR_OPT_2    : usize = 2;
-pub const OR_OPT_3    : usize = 3;
-pub const TWO_OPT     : usize = 4;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Operator {
+    Swap = 0,
+    Reinsertion = 1,
+    OrOpt2 = 2,
+    OrOpt3 = 3,
+    TwoOpt = 4,
+}
 
 #[derive(Debug, Copy, Clone)]
 pub struct SubseqInfo {
@@ -24,7 +27,7 @@ pub
 struct SubseqMatrix {
     row_size: usize,
 #[cfg(feature="flat")]
-    mem: Vec<SubseqInfo>,
+    data: Vec<SubseqInfo>,
 #[cfg(not(feature="flat"))]
     data:  Vec<Vec<SubseqInfo>>,
 }
@@ -35,7 +38,7 @@ impl SubseqMatrix {
         Self { 
             row_size: n+1,
 #[cfg(feature="flat")]
-            mem: vec![SubseqInfo::zeored(); (n+1) * (n+1)],
+            data: vec![SubseqInfo::zeored(); (n+1) * (n+1)],
 #[cfg(not(feature="flat"))]
             data: vec![ vec![ SubseqInfo::zeored(); n+1]; n+1],
         }
@@ -156,7 +159,7 @@ impl Index<usize> for Solution {
     type Output = usize;
 
     fn index(&self, index: usize) -> &Self::Output {
-        &self.s[index]
+        unsafe { self.s.get_unchecked(index) }
     }
 }
 
