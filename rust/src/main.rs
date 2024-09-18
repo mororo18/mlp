@@ -310,20 +310,19 @@ fn rvnd(solut: &mut Solution, info: &mut Info) {
         Operator::OrOpt3,
     ];
 
-    let mut improv_flag = false;
 
     let mut rng = rand::thread_rng();
     while neighbd_list.is_empty() == false {
-        let mut index : usize = rng.gen::<usize>() % neighbd_list.len();
+        let _ = rng.gen::<usize>() % neighbd_list.len();
 
-        index = info.rnd[info.rnd_index];
+        let index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
 
         //println!("{} {}", info.rnd_index, index);
 
         let neighbd = neighbd_list[index];
 
-        improv_flag = match neighbd {
+        let improv_flag = match neighbd {
             Operator::Swap          => search_swap(solut, info),
             Operator::TwoOpt        => search_two_opt(solut, info),
             Operator::Reinsertion   => search_reinsertion(solut, Operator::Reinsertion as usize, info),
@@ -333,13 +332,14 @@ fn rvnd(solut: &mut Solution, info: &mut Info) {
 
 
         if improv_flag {
-            neighbd_list = vec![
+            neighbd_list.resize(5, Operator::Swap);
+            neighbd_list.copy_from_slice(&[
                 Operator::Swap,
                 Operator::TwoOpt,
                 Operator::Reinsertion,
                 Operator::OrOpt2,
                 Operator::OrOpt3,
-            ];
+            ]);
 
         } else {
             neighbd_list.remove(index);
@@ -351,10 +351,10 @@ fn rvnd(solut: &mut Solution, info: &mut Info) {
 fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
     let mut rng = rand::thread_rng();
     let mut s = sl.clone();
-    let mut A_start : usize = 1;
-    let mut A_end : usize = 1;
-    let mut B_start : usize = 1;
-    let mut B_end : usize = 1;
+    let mut a_start : usize = 1;
+    let mut a_end : usize = 1;
+    let mut b_start : usize = 1;
+    let mut b_end : usize = 1;
 
     let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {(s.len() as f64 / 10.0) as usize} else {2};
     let size_min = 2;
@@ -365,37 +365,38 @@ fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
         range = 0..1;
     }
 
-    while (A_start <= B_start &&  B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
-        A_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        A_end = A_start + rng.gen_range(range.clone());
+    #[allow(unused_assignments)]
+    while (a_start <= b_start &&  b_start <= a_end) || (b_start <= a_start && a_start <= b_end) {
+        a_start = rng.gen_range(1.. s.len() - 1 - size_max);
+        a_end = a_start + rng.gen_range(range.clone());
 
-        B_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        B_end = B_start + rng.gen_range(range.clone());
+        b_start = rng.gen_range(1.. s.len() - 1 - size_max);
+        b_end = b_start + rng.gen_range(range.clone());
 
-        A_start = info.rnd[info.rnd_index];
+        a_start = info.rnd[info.rnd_index];
         info.rnd_index += 1;
-        A_end = A_start + info.rnd[info.rnd_index];
+        a_end = a_start + info.rnd[info.rnd_index];
         info.rnd_index += 1;
 
-        B_start = info.rnd[info.rnd_index];
+        b_start = info.rnd[info.rnd_index];
         info.rnd_index += 1;
-        B_end = B_start + info.rnd[info.rnd_index];
+        b_end = b_start + info.rnd[info.rnd_index];
         info.rnd_index += 1;
 
     }
 
-    if A_start < B_start {
-        reinsert(&mut s, B_start, B_end-1, A_end);
-        reinsert(&mut s, A_start, A_end-1, B_end);
+    if a_start < b_start {
+        reinsert(&mut s, b_start, b_end-1, a_end);
+        reinsert(&mut s, a_start, a_end-1, b_end);
     } else {
-        reinsert(&mut s, A_start, A_end-1, B_end);
-        reinsert(&mut s, B_start, B_end-1, A_end);
+        reinsert(&mut s, a_start, a_end-1, b_end);
+        reinsert(&mut s, b_start, b_end-1, a_end);
     }
 
     return s;
 }
 
-fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info: &mut Info) {
+fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
 
     let mut solut_best = Solution {
         seq : SubseqMatrix::new(info.dimen),
@@ -417,12 +418,12 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info: &mut Info) {
 
 
     let mut rng = rand::thread_rng();
-    for _i in 0..Imax {
-        let mut alpha : f64 = R[rng.gen::<usize>() % 26];
+    for _i in 0..imax {
+        let mut alpha : f64 = r[rng.gen::<usize>() % 26];
 
         let r_value = info.rnd[info.rnd_index];
         info.rnd_index += 1;
-        alpha = R[r_value];
+        alpha = r[r_value];
 
         println!("[+] Local Search {}", _i);
         solut_crnt.s = construction(alpha, info);
@@ -435,7 +436,7 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info: &mut Info) {
 
         println!("\t[+] Looking for the best Neighbor..");
         let mut iter_ils : usize = 0;
-        while iter_ils < Iils {
+        while iter_ils < iils {
             rvnd(&mut solut_crnt, info);
             if solut_crnt.cost < solut_partial.cost {
                 solut_partial.s = solut_crnt.s.clone();
@@ -475,15 +476,15 @@ fn main() {
         rnd_index : 0,
     };
 
-    let Imax = 10;
-    let Iils = if dimension < 100 {dimension} else {100};
+    let imax = 10;
+    let iils = if dimension < 100 {dimension} else {100};
 
-    let R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
+    let r = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
             0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25];
 
     let start = ProcessTime::try_now().expect("Getting process time failed");
 
-    GILS_RVND(Imax, Iils, R, &mut info);
+    gils_rvnd(imax, iils, r, &mut info);
 
     let cpu_time: Duration = start.try_elapsed().expect("Getting process time failed");
     println!("TIME: {:?}", cpu_time.as_secs_f64());

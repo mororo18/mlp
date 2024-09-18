@@ -17,6 +17,7 @@ pub struct SubseqInfo {
 }
 
 impl SubseqInfo {
+    #[inline]
     fn zeored () -> Self {
         Self { t: 0.0, c: 0.0, w: 0.0 }
     }
@@ -25,6 +26,7 @@ impl SubseqInfo {
 #[derive(Debug, Clone)]
 pub
 struct SubseqMatrix {
+#[cfg(feature="flat")]
     row_size: usize,
 #[cfg(feature="flat")]
     data: Vec<SubseqInfo>,
@@ -36,6 +38,7 @@ impl SubseqMatrix {
     pub
     fn new (n: usize) -> Self {
         Self { 
+#[cfg(feature="flat")]
             row_size: n+1,
 #[cfg(feature="flat")]
             data: vec![SubseqInfo::zeored(); (n+1) * (n+1)],
@@ -47,7 +50,7 @@ impl SubseqMatrix {
 
 impl Index<(usize, usize)> for SubseqMatrix {
     type Output = SubseqInfo;
-
+    #[inline]
     fn index(&self,  index: (usize, usize)) -> &Self::Output {
         let (row, col) = index;
         unsafe {
@@ -65,6 +68,7 @@ impl Index<(usize, usize)> for SubseqMatrix {
 }
 
 impl IndexMut<(usize, usize)> for SubseqMatrix {
+    #[inline]
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         let (row, col) = index;
         unsafe {
@@ -84,6 +88,7 @@ impl IndexMut<(usize, usize)> for SubseqMatrix {
 
 #[derive(Debug, Clone)]
 pub struct CostMatrix {
+#[cfg(feature="flat")]
     row_size: usize,
 #[cfg(feature="flat")]
     data:     Vec<f64>,
@@ -95,6 +100,7 @@ impl CostMatrix {
     pub
     fn new(n: usize) -> CostMatrix {
         Self {
+#[cfg(feature="flat")]
             row_size: n,
 #[cfg(feature="flat")]
             data: vec![0.0; n*n],
@@ -107,6 +113,7 @@ impl CostMatrix {
 impl Index<(usize, usize)> for CostMatrix {
     type Output = f64;
 
+    #[inline]
     fn index (& self,  index: (usize, usize)) -> &Self::Output {
         let (row, col) = index;
         unsafe {
@@ -124,6 +131,7 @@ impl Index<(usize, usize)> for CostMatrix {
 }
 
 impl IndexMut<(usize, usize)> for CostMatrix {
+    #[inline]
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         let (row, col) = index;
         unsafe {
@@ -158,6 +166,7 @@ pub struct Solution {
 impl Index<usize> for Solution {
     type Output = usize;
 
+    #[inline]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { self.s.get_unchecked(index) }
     }
