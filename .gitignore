@@ -36,3 +36,5 @@ rust/Cargo.lock
 rust/**/*.rs.bk
 rust/*.pdb
 rust/solve
+
+load
