@@ -12,7 +12,6 @@ fn subseq_load(solut: &mut Solution, info: &Info) {
     for i in 0..=info.dimen {
         let k: i32 = 1 - (i as i32) - if i == 0 { 1 } else { 0 };
 
-        // Inicialização da subsequência para (i, i)
         solut.seq[(i, i)].t = 0.0;
         solut.seq[(i, i)].c = 0.0;
         solut.seq[(i, i)].w = if i != 0 { 1.0 } else { 0.0 };
@@ -40,15 +39,29 @@ fn subseq_load(solut: &mut Solution, info: &Info) {
 
 
 fn sort(arr: &mut Vec<usize>, r: usize, info: &Info) {
-    for _ in 0..arr.len() {
-        for j in 0..(arr.len() - 1) {
-            if info.c[(r, arr[j])] > info.c[(r, arr[j + 1])] {
-                arr.swap(j, j + 1);
-            }
-        }
+    quicksort(arr, 0, arr.len() as isize - 1, info, r);
+}
+
+fn quicksort(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: usize) {
+    if left < right {
+        let pivot = partition(arr, left, right, info, r);
+        quicksort(arr, left, pivot - 1, info, r);
+        quicksort(arr, pivot + 1, right, info, r);
     }
 }
 
+fn partition(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: usize) -> isize {
+    let pivot = arr[right as usize];
+    let mut i = left - 1;
+    for j in left..right {
+        if info.c[(r, arr[j as usize])] < info.c[(r, pivot)] {
+            i += 1;
+            arr.swap(i as usize, j as usize);
+        }
+    }
+    arr.swap((i + 1) as usize, right as usize);
+    i + 1
+}
 
 fn construction(alpha : f64, info : &mut Info) -> Vec<usize> {
     let mut s = vec![0; 1];
@@ -58,15 +71,13 @@ fn construction(alpha : f64, info : &mut Info) -> Vec<usize> {
         c_list.push(i);
     }
 
-    let mut rng = rand::thread_rng();
     let mut r : usize = 0;
-    while c_list.is_empty() == false {
+    while !c_list.is_empty() {
         sort(&mut c_list, r, & info);
 
-        let range = (c_list.len() as f64 * alpha + 1.0) as usize;
-        let _ = rng.gen::<usize>() % range;
         let index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
+
         let c = c_list[index];
         r = c;
         c_list.remove(index);

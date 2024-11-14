@@ -10,11 +10,11 @@ class tInfo {
     static final int C = 1;
     static final int W = 2;
 
-    public static  int SWAP       = 0;
-    static  int REINSERTION= 1;
-    static  int OR_OPT2    = 2;
-    static  int OR_OPT3    = 3;
-    static  int TWO_OPT    = 4;
+    public static final int SWAP        = 0;
+    public static final int REINSERTION = 1;
+    public static final int OR_OPT2     = 2;
+    public static final int OR_OPT3     = 3;
+    public static final int TWO_OPT     = 4;
 
     tInfo( int dimen, double [][] cost, int [] rnd_arr) {
         rnd = rnd_arr;

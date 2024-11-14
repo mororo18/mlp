@@ -18,6 +18,8 @@ namespace MLP {
             Data data = new Data();
             data.loadData();
 
+            Console.WriteLine(string.Format("dimesion: {0}.", data.getDimension()));
+
             int dimension = data.getDimension();
             double [][] c = new double [dimension][];
             for(int i = 0; i < dimension; i++){
@@ -52,7 +54,7 @@ namespace MLP {
                 for(int j = i+1; j < info.GetDimen()+1; j++){
                     int j_prev = j-1;
 
-                    solut.SetSeq(i,  j,  tInfo.T, info.GetCost(solutSolut[j_prev], solutSolut[j]) + solut.GetSeq(i, j_prev, tInfo.T));
+                    solut.SetSeq(i, j, tInfo.T, info.GetCost(solutSolut[j_prev], solutSolut[j]) + solut.GetSeq(i, j_prev, tInfo.T));
                     solut.SetSeq(i, j, tInfo.C, solut.GetSeq(i, j, tInfo.T) + solut.GetSeq(i, j_prev, tInfo.C));
                     solut.SetSeq(i, j, tInfo.W, j + k);
 
@@ -77,17 +79,37 @@ namespace MLP {
         }
         */
 
-        private void sort(List<int> arr, Func<int, int, bool> comp) {
+        private void sort(List<int> arr, int r, tInfo info)
+        {
+            Quicksort(arr, 0, arr.Count - 1, r, info);
+        }
 
-            for (int i = 0; i < arr.Count; i++) {
-                for (int j = 0; j < arr.Count-i-1; j++) {
-                    if (comp(arr[j], arr[j+1])) {
-                        int tmp = arr[j];
-                        arr[j] = arr[j+1];
-                        arr[j+1] = tmp;
-                    }
+        private void Quicksort(List<int> arr, int left, int right, int r, tInfo info)
+        {
+            if (left < right)
+            {
+                int pivot = Partition(arr, left, right, r, info);
+                Quicksort(arr, left, pivot - 1, r, info);
+                Quicksort(arr, pivot + 1, right, r, info);
+            }
+        }
+
+        private int Partition(List<int> arr, int left, int right, int r, tInfo info)
+        {
+            int pivotIndex = right;
+            double pivotValue = info.GetCost(r, arr[pivotIndex]);
+            int i = left - 1;
+
+            for (int j = left; j < right; j++)
+            {
+                if (info.GetCost(r, arr[j]) < pivotValue)
+                {
+                    i++;
+                    (arr[i], arr[j]) = (arr[j], arr[i]); // Troca os elementos usando tuple swap
                 }
             }
+            (arr[i + 1], arr[right]) = (arr[right], arr[i + 1]); // Troca o pivô
+            return i + 1;
         }
 
         
@@ -102,13 +124,9 @@ namespace MLP {
 
             int r = 0;
             while(cList.Count > 0){
-                // bug ae (geralmente apos muitas comparacoes)
-                //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
-                cList = cList.OrderBy(i => info.GetCost(r,i)).ToList();
-                sort(cList, (i, j) =>
-                        info.GetCost(r, i) > info.GetCost(r, j));
-                //sort(cList, r);
-                //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
+
+                sort(cList, r, info);
+
                 int range = (int)(((double)cList.Count) * alpha) +1;
 
                 int r_value = rand.Next(range);
@@ -442,13 +460,14 @@ namespace MLP {
                 Console.WriteLine("[+] Local Search " + (i+1));
                 Console.WriteLine("\t[+] Constructing Inital Solution..");
 
-                //t_construction -= Stopwatch.GetTimestamp();
                 solut_crnt.StoreSolut(construction(alpha, info));
 
                 subseq_load(solut_crnt, info);
 
                 solut_partial.StoreSolut(solut_crnt.GetSolutCpy());
                 solut_partial.SetCost(solut_crnt.GetCost());
+
+                Console.WriteLine("Construction: " + solut_crnt.GetCost());
 
                 Console.WriteLine("\t[+] Looking for the best Neighbor..");
                 int iterILS = 0;

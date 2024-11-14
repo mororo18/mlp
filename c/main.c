@@ -31,17 +31,33 @@ void print_s(int * s, int sz) {
     printf("\n");
 }
 
-void sort(int * arr, int arr_size, int r, tInfo * info) {
-
-    for (int i = 0; i < arr_size; i++) {
-        for (int j = 0; j < arr_size-i-1; j++) {
-            if (info->cost[r][arr[j]] > info->cost[r][arr[j+1]]) {
-                int tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
+int partition(int *arr, int left, int right, tInfo *info, int r) {
+    int pivot = arr[right];
+    int i = left - 1;
+    for (int j = left; j < right; j++) {
+        if (info->cost[r][arr[j]] < info->cost[r][pivot]) {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
         }
     }
+    int temp = arr[i + 1];
+    arr[i + 1] = arr[right];
+    arr[right] = temp;
+    return i + 1;
+}
+
+void quicksort(int *arr, int left, int right, tInfo *info, int r) {
+    if (left < right) {
+        int pivot = partition(arr, left, right, info, r);
+        quicksort(arr, left, pivot - 1, info, r);
+        quicksort(arr, pivot + 1, right, info, r);
+    }
+}
+
+void sort(int *arr, int len, int r, tInfo *info) {
+    quicksort(arr, 0, len - 1, info, r);
 }
 
 #ifndef NDEBUG

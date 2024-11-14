@@ -1,4 +1,3 @@
-//import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
 import java.lang.Math;
@@ -26,13 +25,9 @@ class GILS_RVND {
             for(int j = i; j < dimension; j++){
                 c[i][j] = data.getDistance(i, j);
                 c[j][i] = data.getDistance(i, j);
-                //System.out.print(Double.toString(c[i][j])+ " ");
             }
-            //System.out.println(i);
         }
-        //System.out.println(Integer.toString(data.getRndSize()));
         int [] rnd = data.getRnd();
-        //rnd_index = 0;
         info = new tInfo(dimension, c, rnd);
 
         Iils = (dimension < 100 ? dimension : 100);
@@ -49,10 +44,12 @@ class GILS_RVND {
             solut.setSeq(i, i, info.C, 0.0);
             solut.setSeq(i, i, info.W, (i != 0 ? 1.0 : 0.0));
 
+            var s = solut.getSolut();
+
             for(int j = i+1; j < dimension+1; j++){
                 int j_prev = j-1;
 
-                solut.setSeq(i, j, info.T, info.getCost(solut.getSolut().get(j_prev), solut.getSolut().get(j)) + solut.getSeq(i, j_prev, info.T));
+                solut.setSeq(i, j, info.T, info.getCost(s.get(j_prev), s.get(j)) + solut.getSeq(i, j_prev, info.T));
                 solut.setSeq(i, j, info.C, solut.getSeq(i, j, info.T) + solut.getSeq(i, j_prev, info.C));
                 solut.setSeq(i, j, info.W, j + k);
 
@@ -76,28 +73,17 @@ class GILS_RVND {
 
         int r = 0;
         while(!cList.isEmpty()){
-            cList.sort((int i, int j) -> Double.compare (info.getCost(i, s.get(s.size()-1)), info.getCost(j, s.get(s.size()-1))));
-            //erro ao usar variavel 'r' na lambda expression. 'r' n eh final(const)
-            //cList.sort((Integer i, Integer j) -> Double.compare (c[i][r], c[j][r]));
+            cList.sort(r, info);
 
-            int range = (int)(((double)cList.size()) * alpha)+1;
-
-            int c = cList.get(rand.nextInt(range));
             int index = info.rndCrnt();
-            //System.out.println(index);
-            c = cList.get(index);
+            int c = cList.get(index);
 
             s.add(c);
             cList.remove(index);
             r = c;
-            //cList.print();
-            //System.out.println(cList);
         }
 
         s.add(0);
-        //s.print();
-        //System.out.println(s);
-        //System.exit(1);
         return s;
     }
 
@@ -164,7 +150,6 @@ class GILS_RVND {
         if(cost_best < solut.getCost()){
             solut.getSolut().swap(I, J);
             subseq_load(solut, info);
-            //improv_flag = true;
             return true;
         }
 
@@ -212,7 +197,6 @@ class GILS_RVND {
         if(cost_best < solut.getCost() - info.EPSILON){
             solut.getSolut().reverse(I, J);
             subseq_load(solut, info);
-            //improv_flag = true;
             return true;
         }
 
@@ -289,58 +273,43 @@ class GILS_RVND {
             solut.getSolut().reinsert(I, J, POS+1);
             subseq_load(solut, info);
             return true;
-            //improv_flag = true;
         }
 
         return false;
     } 
 
     private void RVND(tSolution solut, tInfo info){
-        tArray neighbd_list = new tArray(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3});
+        tArray neighbd_list = new tArray(new int[]{
+		info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3
+	});
 
         while(!neighbd_list.isEmpty()){
             
-            int i_rand = rand.nextInt(neighbd_list.size());
-            i_rand = info.rndCrnt();
+            int i_rand = info.rndCrnt();
             int neighbd = neighbd_list.get(i_rand);
-
             
             boolean improve = false;
 
-            if (neighbd == info.REINSERTION) {
-                    improve = search_reinsertion(solut, info, info.REINSERTION);
-            } else if (neighbd == info.OR_OPT2) {
-                    improve = search_reinsertion(solut, info, info.OR_OPT2);
-            } else if (neighbd == info.OR_OPT3) {
-                    improve = search_reinsertion(solut, info, info.OR_OPT3);
-            } else if (neighbd == info.SWAP) {
-                    improve = search_swap(solut, info);
-            } else if (neighbd == info.TWO_OPT) {
-                    improve = search_two_opt(solut, info);
-            }
-
-            /*
             switch(neighbd){
-                case info.REINSERTION:
+                case tInfo.REINSERTION:
                     improve = search_reinsertion(solut, info, info.REINSERTION);
                     break;
-                case info.OR_OPT2:
+                case tInfo.OR_OPT2:
                     improve = search_reinsertion(solut, info, info.OR_OPT2);
                     break;
-                case info.OR_OPT3:
+                case tInfo.OR_OPT3:
                     improve = search_reinsertion(solut, info, info.OR_OPT3);
                     break;
-                case info.SWAP:
+                case tInfo.SWAP:
                     improve = search_swap(solut, info);
                     break;
-                case info.TWO_OPT:
+                case tInfo.TWO_OPT:
                     improve = search_two_opt(solut, info);
                     break;
             }
-            */
             
             if(improve){
-                neighbd_list.fill(); //assign(new int[]{info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3});
+                neighbd_list.fill();
                 neighbd_list.set(0, info.SWAP);
                 neighbd_list.set(1, info.TWO_OPT);
                 neighbd_list.set(2, info.REINSERTION);

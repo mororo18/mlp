@@ -18,7 +18,7 @@ function subseq_fill(dimension) {
 }
 
 function subseq_load(s, seq, info) {
-    //console.log(info);
+
     for (var i = 0; i < info.dimension+1; i++) {
         var k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -33,29 +33,39 @@ function subseq_load(s, seq, info) {
             seq[to_1D(i, j, info.W, info.dimension)] = j + k;
         }
     }
-    //console.log(seq);
 }
 
 function sort(arr, r, info) {
-    for (var i = 0; i < arr.length; i++) {
-        for (var j = 0; j < arr.length-1; j++) {
-            if (info.c[r][arr[j]] > info.c[r][arr[j+1]]) {
-                let tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
+    quicksort(arr, 0, arr.length - 1, r, info);
+}
+
+function quicksort(arr, left, right, r, info) {
+    if (left < right) {
+        let pivotIndex = partition(arr, left, right, r, info);
+        quicksort(arr, left, pivotIndex - 1, r, info);
+        quicksort(arr, pivotIndex + 1, right, r, info);
+    }
+}
+
+function partition(arr, left, right, r, info) {
+    let pivotValue = arr[right];
+    let i = left - 1;
+    for (let j = left; j < right; j++) {
+        if (info.c[r][arr[j]] < info.c[r][pivotValue]) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
         }
     }
+    [arr[i + 1], arr[right]] = [arr[right], arr[i + 1]]; // Swap pivot
+    return i + 1;
 }
 
 function construction(alpha, info) {
     s = [0];
-    //var cList = [...Array(info.dimension).keys()];
     var cList = Array.from({length: info.dimension-1}, (_, i) => i + 1)
 
     var r = 0;
     while (cList.length > 0) {
-        //cList.sort((i, j) => info.c[i][r] - info.c[j][r]);
         sort(cList, r, info);
 
         var a = Math.random()*(cList.length)*alpha;
@@ -63,13 +73,11 @@ function construction(alpha, info) {
         i = info.rnd[info.rnd_index++];
         var c = cList.splice(i, 1);
         c = c[0];
-        //console.log(i, c);
         s.push(c);
         r = c;
     }
 
     s[info.dimension] = 0;
-     //console.log(s);
 
     return s;
 }
@@ -274,21 +282,10 @@ function search_reinsertion(s, seq, info, opt) {
             }
         }
     }
-    //console.log("cost best
 
     if(cost_best < seq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON){
         reinsert(s, I, J, POS+1);
-        /*
-        console.log("reinsertion", I, POS+1, opt);
-        //console.log(s);
-        console.log(cost_best);
-        */
         subseq_load(s, seq, info);
-        /*
-        console.log(seq[0][info.dimension][info.C]);
-        //console.log(s);
-        console.log();
-        */
 
         return true;
     }
@@ -303,26 +300,16 @@ function RVND(s, subseq, info) {
     const OR_OPT_3    = 3;
     const TWO_OPT     = 4;
 
-    //neighbd_list = [TWO_OPT];//, OR_OPT_2, OR_OPT_3, TWO_OPT];
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
-    /*
-    var s = Array.from({length: info.dimension}, (_, i) => i);
-    s[info.dimension] = 0;
-    console.log(s);
 
-    subseq_load(s, subseq, info);
-    console.log(subseq[0][info.dimension][info.C]);
-    */
     var improve = false;
     var ITER = 0;
 
-    //console.log("opa");
     while (neighbd_list.length > 0) {
         ITER++;
         let i = parseInt(Math.random() * neighbd_list.length);
         i = info.rnd[info.rnd_index++];
         let neighbd = neighbd_list[i];
-        //console.log("Current cost: ", subseq[0][info.dimension][info.C]);
 
         switch (neighbd) {
             case SWAP:
@@ -345,15 +332,10 @@ function RVND(s, subseq, info) {
         if (improve) {
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
         } else {
-            //console.log(neighbd_list);
             neighbd_list.splice(i, 1);
-            //console.log(neighbd_list);
-            //process.exit();
         }
     }
-    //process.exit();
-    //console.log(s, subseq[0][info.dimension][info.C]);
-    //
+
     return ITER;
 
 }
@@ -414,7 +396,6 @@ function GILS_RVND(Iils, Imax, R, info) {
 
         subseq_load(s, subseq, info);
         var rvnd_cost_best = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
-        //var rvnd_cost_best = subseq[0][info.dimension][info.C] - Number.EPSILON;
         console.log("Construction cost", rvnd_cost_best);
         var iterILS = 0;
 
@@ -423,7 +404,7 @@ function GILS_RVND(Iils, Imax, R, info) {
             ITER += RVND(s, subseq, info);
             var rvnd_cost_crnt = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
             if (rvnd_cost_crnt < rvnd_cost_best) {
-                rvnd_cost_best = rvnd_cost_crnt;// -  Number.EPSILON;
+                rvnd_cost_best = rvnd_cost_crnt;
                 sl = [...s];
                 iterILS = 0;
             }
@@ -447,7 +428,6 @@ function GILS_RVND(Iils, Imax, R, info) {
 
     console.log(s_best);
     console.log("COST: ", cost_best);
-    //console.log("\tRVND ITER ", ITER);
 }
 
 function main() {
@@ -463,15 +443,6 @@ function main() {
     const Imax = 10;
     const R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21,0.22, 0.23, 0.24, 0.25];
 
-    /*
-    s = [];
-    for (var i = 0; i < dimension+1; i++) {
-        s[i] = i;
-    }
-    s[dimension] = 0;
-    */
-
-    //var info = Object.freeze({
     var info = {
         c : c,
         rnd : rnd,
@@ -483,8 +454,6 @@ function main() {
     };
 
 
-    //console.log(rnd);
-    //process.exit(0);
 
     var start = new Date();
     GILS_RVND(Iils, Imax, R, info);

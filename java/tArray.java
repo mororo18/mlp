@@ -155,17 +155,33 @@ class tArray {
     }
 
 
-    public void sort(Comparator comp) {
+    public void sort(int r, tInfo info) {
+	quicksort(arr, 0, size() - 1, info, r);
+    }
 
-        for (int i = 0; i < sizeCrnt; i++) {
-            for (int j = 0; j < sizeCrnt-i-1; j++) {
-                if (comp.evaluate(arr[j], arr[j+1]) > 0) {
-                    int tmp = arr[j];
-                    arr[j] = arr[j+1];
-                    arr[j+1] = tmp;
-                }
+    private static void quicksort(int[] arr, int left, int right, tInfo info, int r) {
+        if (left < right) {
+            int pivot = partition(arr, left, right, info, r);
+            quicksort(arr, left, pivot - 1, info, r);
+            quicksort(arr, pivot + 1, right, info, r);
+        }
+    }
+
+    private static int partition(int[] arr, int left, int right, tInfo info, int r) {
+        int pivot = arr[right];
+        int i = left - 1;
+        for (int j = left; j < right; j++) {
+            if (info.getCost(r, arr[j]) < info.getCost(r, pivot)) {
+                i++;
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
             }
         }
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[right];
+        arr[right] = temp;
+        return i + 1;
     }
 
     public void printPretty() {
