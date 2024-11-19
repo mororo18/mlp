@@ -103,6 +103,31 @@ void print_s(std::vector<int> s) {
     std::cout << std::endl;
 }
 
+int partition(std::vector<int>& arr, int left, int right, const tInfo& info, int r) {
+    int pivot = arr[right];
+    int i = left - 1;
+    for (int j = left; j < right; j++) {
+        if (info.cost[r][arr[j]] < info.cost[r][pivot]) {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[right]);
+    return i + 1;
+}
+
+void quicksort(std::vector<int>& arr, int left, int right, const tInfo& info, int r) {
+    if (left < right) {
+        int pivot = partition(arr, left, right, info, r);
+        quicksort(arr, left, pivot - 1, info, r);
+        quicksort(arr, pivot + 1, right, info, r);
+    }
+}
+
+void sort(std::vector<int>& arr, int r, const tInfo& info) {
+    quicksort(arr, 0, arr.size() - 1, info, r);
+}
+
 std::vector<int> construct(const double alpha, tInfo & info){
 
     std::vector<int> s = {0};
@@ -114,10 +139,7 @@ std::vector<int> construct(const double alpha, tInfo & info){
 
     int r = 0;
     while (!cL.empty()) {
-        std::stable_sort(cL.begin(), cL.end(), 
-            [r, &info] (const int i, const int j) {
-                return info.cost[i][r] < info.cost[j][r];
-            });
+        sort(cL, r, info);
 
         /**/
         int range = std::ceil(cL.size() * alpha);

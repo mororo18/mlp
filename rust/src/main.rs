@@ -6,11 +6,8 @@ use std::process::exit;
 use rand::Rng;
 use std::cmp::Ordering;
 
-static SIZE : usize = 319;
-
 #[derive(Debug, Clone)]
-struct tInfo {
-    //c : Box<[[f64; 350]; 350]>,
+struct Info {
     c : Vec<Vec<f64>>,
     dimen : usize,
     T : usize,
@@ -27,13 +24,12 @@ struct tInfo {
 
 #[derive(Debug, Clone)]
 struct tSolution {
-    //seq : Box<[[tSeqInfo; 319]; 319]>,
     seq : Vec<Vec<[f64; 3]>>,
     s : Vec<usize>,
     cost : f64,
 }
 
-fn subseq_load(solut : &mut tSolution, info : & tInfo) {
+fn subseq_load(solut : &mut tSolution, info : & Info) {
     for i in 0..info.dimen + 1 {
         let k : i32 = 1 - (i as i32) - if i == 0 {1} else {0};
 
@@ -54,20 +50,32 @@ fn subseq_load(solut : &mut tSolution, info : & tInfo) {
     solut.cost = solut.seq[0][info.dimen][info.C];
 }
 
+fn sort(arr: &mut Vec<usize>, r: usize, info: &Info) {
+    quicksort(arr, 0, arr.len() as isize - 1, info, r);
+}
 
-fn sort(arr : &mut Vec<usize>, r : usize, info : & tInfo) {
-    for i in 0..arr.len() {
-        for j in 0..(arr.len()-1) {
-            if info.c[r][arr[j]] > info.c[r][arr[j+1]] {
-                let tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
-        }
+fn quicksort(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: usize) {
+    if left < right {
+        let pivot = partition(arr, left, right, info, r);
+        quicksort(arr, left, pivot - 1, info, r);
+        quicksort(arr, pivot + 1, right, info, r);
     }
 }
 
-fn construction(alpha : f64, info : &mut tInfo) -> Vec<usize> {
+fn partition(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: usize) -> isize {
+    let pivot = arr[right as usize];
+    let mut i = left - 1;
+    for j in left..right {
+        if info.c[r][arr[j as usize]] < info.c[r][pivot] {
+            i += 1;
+            arr.swap(i as usize, j as usize);
+        }
+    }
+    arr.swap((i + 1) as usize, right as usize);
+    i + 1
+}
+
+fn construction(alpha : f64, info : &mut Info) -> Vec<usize> {
     let mut s = vec![0; 1];
 
     //let mut c_list = vec![0; info.dimen -1];
@@ -119,7 +127,7 @@ fn reinsert(s : &mut Vec<usize>, i : usize, j : usize, pos : usize){
     }
 }
 
-fn search_swap(solut : &mut tSolution, info : & tInfo) -> bool {
+fn search_swap(solut : &mut tSolution, info : & Info) -> bool {
     let mut cost_concat_1 : f64;
     let mut cost_concat_2 : f64;
     let mut cost_concat_3 : f64;
@@ -180,7 +188,7 @@ fn search_swap(solut : &mut tSolution, info : & tInfo) -> bool {
     }
 }
 
-fn search_two_opt(solut : &mut tSolution, info : & tInfo) -> bool {
+fn search_two_opt(solut : &mut tSolution, info : & Info) -> bool {
     let mut cost_new : f64;
     let mut cost_best : f64 = f64::MAX;
 
@@ -224,7 +232,7 @@ fn search_two_opt(solut : &mut tSolution, info : & tInfo) -> bool {
     }
 }
 
-fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & tInfo) -> bool {
+fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & Info) -> bool {
     let mut cost_best : f64 = f64::MAX;
     let mut cost_new : f64;
 
@@ -292,7 +300,7 @@ fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & tInfo) -> bo
     }
 }
 
-fn RVND(solut : &mut tSolution, info : &mut tInfo) {
+fn RVND(solut : &mut tSolution, info : &mut Info) {
 
     //let mut neighbd_list = vec![REINSERTION, OR_OPT_2, OR_OPT_3];
     let mut neighbd_list = vec![info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
@@ -337,7 +345,7 @@ fn RVND(solut : &mut tSolution, info : &mut tInfo) {
     }
 }
 
-fn perturb(sl : & Vec<usize>, info : &mut tInfo) -> Vec<usize> {
+fn perturb(sl : & Vec<usize>, info : &mut Info) -> Vec<usize> {
     let mut rng = rand::thread_rng();
     let mut s = sl.clone();
     let mut A_start : usize = 1;
@@ -386,7 +394,7 @@ fn perturb(sl : & Vec<usize>, info : &mut tInfo) -> Vec<usize> {
     return s;
 }
 
-fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut tInfo) {
+fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut Info) {
 
     let mut solut_best = tSolution {
         seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
@@ -474,7 +482,7 @@ fn main() {
 
     data::load(&mut dimension, &mut c, &mut rnd);
 
-    let mut info = tInfo {
+    let mut info = Info {
         dimen : dimension,
         c : c.clone(),
         T : 0,

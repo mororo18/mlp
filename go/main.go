@@ -181,17 +181,29 @@ func remove (arr []int, i int) []int {
     return append(arr[:i], arr[i+1:]...)
 }
 
-func sort(arr *[]int, r int, info tInfo) {
+func sort(arr *[]int, r int, info *tInfo) {
+	quicksort(arr, 0, len(*arr)-1, info, r)
+}
 
-	for i := 0; i < len(*arr); i++ {
-        for j := 0; j < len(*arr)-i-1; j++ {
-            if info.c[r][(*arr)[j]] > info.c[r][(*arr)[j+1]] {
-                tmp := (*arr)[j]
-                (*arr)[j] = (*arr)[j+1]
-                (*arr)[j+1] = tmp
-            }
-        }
-    }
+func quicksort(arr *[]int, left, right int, info *tInfo, r int) {
+	if left < right {
+		pivot := partition(arr, left, right, info, r)
+		quicksort(arr, left, pivot-1, info, r)
+		quicksort(arr, pivot+1, right, info, r)
+	}
+}
+
+func partition(arr *[]int, left, right int, info *tInfo, r int) int {
+	pivot := (*arr)[right]
+	i := left - 1
+	for j := left; j < right; j++ {
+		if info.c[r][(*arr)[j]] < info.c[r][pivot] {
+			i++
+			(*arr)[i], (*arr)[j] = (*arr)[j], (*arr)[i]
+		}
+	}
+	(*arr)[i+1], (*arr)[right] = (*arr)[right], (*arr)[i+1]
+	return i + 1
 }
 
 func construction(alpha float64, info *tInfo) []int {
@@ -205,7 +217,7 @@ func construction(alpha float64, info *tInfo) []int {
 
 	r := 0
     for len(cL) > 0 {
-		sort(&cL, r, *info)
+		sort(&cL, r, info)
 
 		rg := int(math.Ceil(float64(len(cL)) * alpha)) + 1
 

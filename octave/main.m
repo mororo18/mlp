@@ -34,21 +34,33 @@ function ret = subseq_load (sol, info)
     ret = sol;
 end
 
-function ret = sort_by(arr, r, info)
+function arr = sort(arr, r, info)
     sz = size(arr);
     sz = sz(2);
+    arr = quicksort(arr, 1, sz, r, info);
+end
 
-    for i = 1:sz
-        for j = 1:sz-i
-            if (info.cost(r, arr(j)) > info.cost(r, arr(j+1)))
-                tmp = arr(j);
-                arr(j) = arr(j+1);
-                arr(j+1) = tmp;
-            end
+function arr = quicksort(arr, left, right, r, info)
+    if left < right
+        [arr, pivotIndex] = partition(arr, left, right, r, info);
+        arr = quicksort(arr, left, pivotIndex - 1, r, info);
+        arr = quicksort(arr, pivotIndex + 1, right, r, info);
+    end
+end
+
+function [arr, pivotIndex] = partition(arr, left, right, r, info)
+    pivotValue = arr(right);
+    i = left - 1;
+    for j = left:right - 1
+        if info.cost(r, arr(j)) < info.cost(r, pivotValue)
+            i = i + 1;
+            % Troca arr(i) e arr(j)
+            [arr(i), arr(j)] = deal(arr(j), arr(i));
         end
     end
-
-    ret = arr;
+    % Troca o pivô
+    [arr(i + 1), arr(right)] = deal(arr(right), arr(i + 1));
+    pivotIndex = i + 1;
 end
 
 function [ret, index_new] = construction(alpha, info)
@@ -61,7 +73,7 @@ function [ret, index_new] = construction(alpha, info)
     size_cL  = size(cL);
     size_cL = size_cL(2);
     while (size_cL > 0) 
-        cL = sort_by(cL, r, info);
+        cL = sort(cL, r, info);
 
         rng = ceil(size_cL * alpha);
         RND = rand(1);

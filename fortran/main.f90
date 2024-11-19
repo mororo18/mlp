@@ -96,30 +96,73 @@ subroutine subseq_load(sol, info)
 
 end subroutine
 
-subroutine sort(cL, lmt, r, info)
+subroutine sort(arr, len, r, info)
     use data_types
-    implicit none
+    implicit none 
 
-    type(tInfo) :: info
-    integer, dimension(info%dimen-1), intent(out) :: cL
-    integer :: lmt
+    integer, intent(inout) :: arr(len)
+    integer :: len
     integer :: r
+    type(tInfo), intent(in) :: info
+    call quicksort(arr, 1, len, info, r)
+end subroutine sort
 
-    integer :: i
-    integer :: j
-    integer :: tmp
 
-    do i=1, lmt
-        do j=1, lmt-i
-            if (info%cost(r, cL(j)) > info%cost(r, cL(j+1))) then
-                tmp = cL(j)
-                cL(j) = cL(j+1)
-                cL(j+1) = tmp
-            end if
-        end do
+function partition(arr, left, right, info, r) result(ret)
+    use data_types
+    implicit none 
+
+    integer, intent(inout) :: arr(*)
+    integer, intent(in) :: left, right, r
+    type(tInfo), intent(in) :: info
+    integer :: pivot, i, j, temp
+    integer :: ret
+
+    pivot = arr(right)
+    i = left - 1
+
+    do j = left, right - 1
+        if (info%cost(r, arr(j)) < info%cost(r, pivot)) then
+            i = i + 1
+            temp = arr(i)
+            arr(i) = arr(j)
+            arr(j) = temp
+        end if
     end do
+    temp = arr(i + 1)
+    arr(i + 1) = arr(right)
+    arr(right) = temp
 
-end subroutine
+    ret = i + 1
+end function partition
+
+recursive subroutine quicksort(arr, left, right, info, r)
+    use data_types
+    implicit none 
+
+    integer, intent(inout) :: arr(*)
+    integer, intent(in) :: left, right, r
+    type(tInfo), intent(in) :: info
+    integer :: pivot
+
+    interface
+        function partition(arr, left, right, info, r) result(ret)
+            use data_types
+            implicit none 
+
+            integer, intent(inout) :: arr(*)
+            integer, intent(in) :: left, right, r
+            type(tInfo), intent(in) :: info
+            integer :: ret
+        end function
+    end interface
+
+    if (left < right) then
+        pivot = partition(arr, left, right, info, r)
+        call quicksort(arr, left, pivot - 1, info, r)
+        call quicksort(arr, pivot + 1, right, info, r)
+    end if
+end subroutine quicksort
 
 subroutine arr_shift(arr, src, tgt, sz)
     implicit none 

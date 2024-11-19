@@ -26,13 +26,9 @@ class GILS_RVND {
             for(int j = i; j < dimension; j++){
                 c[i][j] = data.getDistance(i, j);
                 c[j][i] = data.getDistance(i, j);
-                //System.out.print(Double.toString(c[i][j])+ " ");
             }
-            //System.out.println(i);
         }
-        //System.out.println(Integer.toString(data.getRndSize()));
         int [] rnd = data.getRnd();
-        //rnd_index = 0;
         info = new tInfo(dimension, c, rnd);
 
         Iils = (dimension < 100 ? dimension : 100);
@@ -62,6 +58,35 @@ class GILS_RVND {
         solut.setCost(solut.getSeq(0, info.getDimen(), info.C));
     }
 
+    public void sort(ArrayList<Integer> arr, int r, tInfo info) {
+        quicksort(arr, 0, arr.size() - 1, info, r);
+    }
+
+    private static void quicksort(ArrayList<Integer> arr, int left, int right, tInfo info, int r) {
+        if (left < right) {
+            int pivot = partition(arr, left, right, info, r);
+            quicksort(arr, left, pivot - 1, info, r);
+            quicksort(arr, pivot + 1, right, info, r);
+        }
+    }
+
+    private static int partition(ArrayList<Integer> arr, int left, int right, tInfo info, int r) {
+        int pivot = arr.get(right);
+        int i = left - 1;
+        for (int j = left; j < right; j++) {
+            if (info.getCost(r, arr.get(j)) < info.getCost(r, pivot)) {
+                i++;
+                int temp = arr.get(i);
+                arr.set(i, arr.get(j));
+                arr.set(j, temp);
+            }
+        }
+        int temp = arr.get(i + 1);
+        arr.set(i + 1, arr.get(right));
+        arr.set(right, temp);
+        return i + 1;
+    }
+
     private ArrayList<Integer> construction(double alpha, tInfo info){
         ArrayList<Integer> s = new ArrayList<Integer>();
         s.add(0);
@@ -74,37 +99,29 @@ class GILS_RVND {
 
         int r = 0;
         while(!cList.isEmpty()){
-            cList.sort((Integer i, Integer j) -> Double.compare (info.getCost(i, s.get(s.size()-1)), info.getCost(j, s.get(s.size()-1))));
-            //erro ao usar variavel 'r' na lambda expression. 'r' n eh final(const)
-            //cList.sort((Integer i, Integer j) -> Double.compare (c[i][r], c[j][r]));
+            sort(cList, r, info);
 
             int range = (int)(((double)cList.size()) * alpha)+1;
 
             int c = cList.get(rand.nextInt(range));
             int index = info.rndCrnt();
-            //System.out.println(index);
             c = cList.get(index);
 
             s.add(c);
             cList.remove(Integer.valueOf(c));
             r = c;
-            //System.out.println(cList);
         }
 
         s.add(0);
-        //System.out.println(s);
-        //System.exit(1);
         return s;
     }
 
     private void swap(ArrayList<Integer> s, int i, int j){
         Collections.swap(s, i, j);
-        //System.out.println(s);
     }
 
     private void reverse(ArrayList<Integer> s, int i, int j){
         Collections.reverse(s.subList(i,j+1));
-        //System.out.println(s);
     }
 
     private void reinsert(ArrayList<Integer> s, int i, int j, int pos){
@@ -117,7 +134,6 @@ class GILS_RVND {
             s.subList(i, j+1).clear();
         }
 
-        //System.out.println(s);
     }
 
     private boolean search_swap(tSolution solut, tInfo info){
@@ -183,7 +199,6 @@ class GILS_RVND {
         if(cost_best < solut.getCost()){
             swap(solut.getSolut(), I, J);
             subseq_load(solut, info);
-            //improv_flag = true;
             return true;
         }
 
@@ -231,7 +246,6 @@ class GILS_RVND {
         if(cost_best < solut.getCost() - info.EPSILON){
             reverse(solut.getSolut(), I, J);
             subseq_load(solut, info);
-            //improv_flag = true;
             return true;
         }
 
@@ -308,7 +322,6 @@ class GILS_RVND {
             reinsert(solut.getSolut(), I, J, POS+1);
             subseq_load(solut, info);
             return true;
-            //improv_flag = true;
         }
 
         return false;
@@ -343,26 +356,6 @@ class GILS_RVND {
             } else if (neighbd == info.TWO_OPT) {
                     improve = search_two_opt(solut, info);
             }
-
-            /*
-            switch(neighbd){
-                case info.REINSERTION:
-                    improve = search_reinsertion(solut, info, info.REINSERTION);
-                    break;
-                case info.OR_OPT2:
-                    improve = search_reinsertion(solut, info, info.OR_OPT2);
-                    break;
-                case info.OR_OPT3:
-                    improve = search_reinsertion(solut, info, info.OR_OPT3);
-                    break;
-                case info.SWAP:
-                    improve = search_swap(solut, info);
-                    break;
-                case info.TWO_OPT:
-                    improve = search_two_opt(solut, info);
-                    break;
-            }
-            */
             
             if(improve){
                 neighbd_list.clear();
@@ -426,7 +419,6 @@ class GILS_RVND {
             int index = info.rndCrnt();
 
             alpha = R[index];
-            //System.out.print(index);
 
             System.out.print("[+] Local Search ");
             System.out.println(i+1);
@@ -434,8 +426,6 @@ class GILS_RVND {
 
             solut_crnt.storeSolut(construction(alpha, info));
             subseq_load(solut_crnt, info); 
-
-            //System.out.println(solut_crnt.getCost());
 
             
             solut_partial.storeSolut(solut_crnt.getSolutCpy()); 
@@ -449,8 +439,6 @@ class GILS_RVND {
                 if(solut_crnt.getCost() < solut_partial.getCost()){
                     solut_partial.setCost(solut_crnt.getCost());
                     solut_partial.storeSolut(solut_crnt.getSolutCpy());
-                    //sl.clear();
-                    //sl = new ArrayList<>(s);
                     iterILS = 0;
                 }
 
@@ -458,8 +446,6 @@ class GILS_RVND {
                 subseq_load(solut_crnt, info);
                 iterILS++;
             }
-            //subseq_load(sl, subseq);
-            //double sl_cost = subseq[0][dimension][C] - EPSILON;
             
             if(solut_partial.getCost() < solut_best.getCost()){
                 solut_best.storeSolut(solut_partial.getSolutCpy());
@@ -474,21 +460,5 @@ class GILS_RVND {
         System.out.println(solut_best.getCost());
         System.out.print("SOLUTION: ");
         System.out.println(solut_best.getSolut());
-        /*
-        System.out.print("Construction: ");
-        System.out.println(t_construction/10e8);
-        System.out.print("swap: ");
-        System.out.println(t_swap/10e8);
-        System.out.print("2_opt: ");
-        System.out.println(t_two_opt/10e8);
-        System.out.print("or_opt2: ");
-        System.out.println(t_or_opt2/10e8);
-        System.out.print("or_opt3: ");
-        System.out.println(t_or_opt3/10e8);
-        System.out.print("reinsertion: ");
-        System.out.println(t_reinsertion/10e8);
-        System.out.print("subseq_load: ");
-        System.out.println(t_subseq/10e8);
-        */
     }
 }

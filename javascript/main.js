@@ -33,25 +33,36 @@ function subseq_load(solut, info) {
 }
 
 function sort(arr, r, info) {
-    for (var i = 0; i < arr.length; i++) {
-        for (var j = 0; j < arr.length-1; j++) {
-            if (info.c[r][arr[j]] > info.c[r][arr[j+1]]) {
-                let tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
+    quicksort(arr, 0, arr.length - 1, r, info);
+}
+
+function quicksort(arr, left, right, r, info) {
+    if (left < right) {
+        let pivotIndex = partition(arr, left, right, r, info);
+        quicksort(arr, left, pivotIndex - 1, r, info);
+        quicksort(arr, pivotIndex + 1, right, r, info);
+    }
+}
+
+function partition(arr, left, right, r, info) {
+    let pivotValue = arr[right];
+    let i = left - 1;
+    for (let j = left; j < right; j++) {
+        if (info.c[r][arr[j]] < info.c[r][pivotValue]) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
     }
+    [arr[i + 1], arr[right]] = [arr[right], arr[i + 1]];
+    return i + 1;
 }
 
 function construction(alpha, info) {
     s = [0];
-    //var cList = [...Array(info.dimension).keys()];
     var cList = Array.from({length: info.dimension-1}, (_, i) => i + 1)
 
     var r = 0;
     while (cList.length > 0) {
-        //cList.sort((i, j) => info.c[i][r] - info.c[j][r]);
         sort(cList, r, info);
 
         var a = Math.random()*(cList.length)*alpha;
@@ -59,13 +70,11 @@ function construction(alpha, info) {
         i = info.rnd[info.rnd_index++];
         var c = cList.splice(i, 1);
         c = c[0];
-        //console.log(i, c);
         s.push(c);
         r = c;
     }
 
     s[info.dimension] = 0;
-     //console.log(s);
 
     return s;
 }

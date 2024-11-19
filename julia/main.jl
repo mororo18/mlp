@@ -30,13 +30,13 @@ mutable struct tSolution
     cost::Float64
 end
 
-@inline function subseq_load(solut::tSolution, info::tInfo) # dimension::Int, c::Matrix{Float64})
+@inline function subseq_load(solut::tSolution, info::tInfo)
     for i in 1:info.dimen+1
-        k::Int = 1 - i - (i==1)#convert(Int, i==0)
+        k::Int = 1 - i - (i==1)
 
         solut.seq[i, i, info.T] = 0.0
         solut.seq[i, i, info.C] = 0.0
-        solut.seq[i, i, info.W] = i!=1#convert(Float64, i != 0)
+        solut.seq[i, i, info.W] = i != 1
 
         for j in i+1:info.dimen+1
             j_prev = j-1
@@ -53,16 +53,29 @@ end
     return
 end
 
-function c_sort(arr::Array{Int64,1}, r::Int64, info::tInfo)
-    for i in 1:length(arr)
-        for j in 1:length(arr)-i
-            if info.cost[r, arr[j]] > info.cost[r, arr[j+1]]
-                tmp = arr[j]
-                arr[j] = arr[j+1]
-                arr[j+1] = tmp
-            end
+function sort(arr::Array{Int}, r::Int, info::tInfo)
+    quicksort(arr, 1, length(arr), info, r)
+end
+
+function quicksort(arr::Array{Int}, left::Int, right::Int, info::tInfo, r::Int)
+    if left < right
+        pivot = partition(arr, left, right, info, r)
+        quicksort(arr, left, pivot - 1, info, r)
+        quicksort(arr, pivot + 1, right, info, r)
+    end
+end
+
+function partition(arr::Array{Int}, left::Int, right::Int, info::tInfo, r::Int)
+    pivot = arr[right]
+    i = left - 1
+    for j in left:right-1
+        if info.cost[r, arr[j]] < info.cost[r, pivot]
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
         end
     end
+    arr[i + 1], arr[right] = arr[right], arr[i + 1]
+    return i + 1
 end
 
 function construction(alpha::Float64, info::tInfo)::Array{Int, 1}
@@ -71,8 +84,7 @@ function construction(alpha::Float64, info::tInfo)::Array{Int, 1}
 
     r = 1
     while length(cList) > 0
-        #sort!(cList, by= i -> info.cost[i, r], lt= (i, j) -> i < j)
-        c_sort(cList, r, info)
+        sort(cList, r, info)
 
         i = convert(Int, floor(length(cList)*alpha + 1))
         ###

@@ -56,6 +56,25 @@ def subseq_fill(info : tInfo) -> List[List[List[float]]]:
 
     return arr
 
+def quicksort(arr, left, right, info, r):
+    if left < right:
+        pivot = partition(arr, left, right, info, r)
+        quicksort(arr, left, pivot - 1, info, r)
+        quicksort(arr, pivot + 1, right, info, r)
+
+def partition(arr, left, right, info, r):
+    pivot = arr[right]
+    i = left - 1
+    for j in range(left, right):
+        if info.cost[r][arr[j]] < info.cost[r][pivot]:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[right] = arr[right], arr[i + 1]
+    return i + 1
+
+def sort(arr, r, info):
+    quicksort(arr, 0, len(arr) - 1, info, r)
+
 def construction(alpha : float, info : tInfo) -> List[int]:
     s : List[int] = [0]
     c_list : List[int] = list(range(1, info.dimen))
@@ -65,7 +84,7 @@ def construction(alpha : float, info : tInfo) -> List[int]:
 
         i = int(len(c_list)*alpha) + 1
 
-        c_list = sorted(c_list, key = lambda k : info.cost[k][r], reverse=False)
+        sort(c_list, r, info)
 
         ##
         c = c_list[randint(0, i-1)]

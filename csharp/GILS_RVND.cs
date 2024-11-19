@@ -61,22 +61,34 @@ namespace MLP {
             solut.SetCost(solut.GetSeq(0, info.GetDimen(), tInfo.C));
         }
 
-        /*
-        private void sort(List<int> arr, int r) {
-            for (int i = 0; i < arr.Count; i++) {
-                for (int j = 0; j < arr.Count - i-1; j++) {
-                    //Console.WriteLine(arr[j+1]);
-                    if (c[r][arr[j]] > c[r][arr[j+1]]) {
-                        int tmp = arr[j];
-                        arr[j] = arr[j+1];
-                        arr[j+1] = tmp;
-                    }
-                }
+        private void sort(List<int> arr, int r, tInfo info) {
+            Quicksort(arr, 0, arr.Count - 1, r, info);
+        }
+
+        private void Quicksort(List<int> arr, int left, int right, int r, tInfo info) {
+            if (left < right) {
+                int pivot = Partition(arr, left, right, r, info);
+                Quicksort(arr, left, pivot - 1, r, info);
+                Quicksort(arr, pivot + 1, right, r, info);
             }
         }
-        */
 
-        private List<int> construction(double alpha, tInfo info){
+        private int Partition(List<int> arr, int left, int right, int r, tInfo info) {
+            int pivotIndex = right;
+            double pivotValue = info.GetCost(r, arr[pivotIndex]);
+            int i = left - 1;
+
+            for (int j = left; j < right; j++) {
+                if (info.GetCost(r, arr[j]) < pivotValue) {
+                    i++;
+                    (arr[i], arr[j]) = (arr[j], arr[i]); // Troca os elementos usando tuple swap
+                }
+            }
+            (arr[i + 1], arr[right]) = (arr[right], arr[i + 1]); // Troca o pivô
+            return i + 1;
+        }
+
+        private List<int> construction(double alpha, tInfo info) {
             var s = new List<int> {0};
 
             var cList = new List<int>();
@@ -86,11 +98,8 @@ namespace MLP {
 
             int r = 0;
             while(cList.Count > 0){
-                // bug ae (geralmente apos muitas comparacoes)
-                //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
-                cList = cList.OrderBy(i => info.GetCost(r,i)).ToList();
-                //sort(cList, r);
-                //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
+                sort(cList, r, info);
+
                 int range = (int)(((double)cList.Count) * alpha) +1;
 
                 int r_value = rand.Next(range);
