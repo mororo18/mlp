@@ -107,22 +107,22 @@ def subseq_load(solut : tSolution, info : tInfo) -> NoReturn:
     for i in range(0, info.dimen+1):
         k : int = 1 - i - int(not i)
 
-        solut.seq[i][i][info.T] = 0.0
-        solut.seq[i][i][info.C] = 0.0
-        solut.seq[i][i][info.W] = float(int(not (i == 0)))
+        solut.seq[i][i][tInfo.T] = 0.0
+        solut.seq[i][i][tInfo.C] = 0.0
+        solut.seq[i][i][tInfo.W] = float(int(not (i == 0)))
 
         for j in range(i+1, info.dimen+1):
         #while j < d:
             #print(i, j)
             j_prev : int = j - 1
 
-            solut.seq[i][j][info.T] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][info.T]
-            solut.seq[i][j][info.C] = solut.seq[i][j][info.T] + solut.seq[i][j_prev][info.C]
-            solut.seq[i][j][info.W] = float(j + k)
+            solut.seq[i][j][tInfo.T] = info.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][tInfo.T]
+            solut.seq[i][j][tInfo.C] = solut.seq[i][j][tInfo.T] + solut.seq[i][j_prev][tInfo.C]
+            solut.seq[i][j][tInfo.W] = float(j + k)
 
         #exit(0)
 
-    solut.cost = solut.seq[0][info.dimen][info.C] - info.EPSILON
+    solut.cost = solut.seq[0][info.dimen][tInfo.C] - tInfo.EPSILON
 
 def swap(s : List[int], i : int, j : int) -> NoReturn:
     s[i], s[j] = s[j], s[i]
@@ -155,15 +155,15 @@ def search_swap(solut : tSolution, info : tInfo) -> bool:
         i_prev : int = i - 1
         i_next : int = i + 1
 
-        cost_concat_1 = solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[i_next]]
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][info.T] + info.cost[solut.s[i]][solut.s[i_next+1]]
+        cost_concat_1 = solut.seq[0][i_prev][tInfo.T] + info.cost[solut.s[i_prev]][solut.s[i_next]]
+        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][tInfo.T] + info.cost[solut.s[i]][solut.s[i_next+1]]
 
-        cost_new = solut.seq[0][i_prev][info.C]                                            + \
-                solut.seq[i][i_next][info.W]   * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  + \
-                solut.seq[i_next+1][info.dimen][info.W] * (cost_concat_2) + solut.seq[i_next+1][info.dimen][info.C]
+        cost_new = solut.seq[0][i_prev][tInfo.C]                                            + \
+                solut.seq[i][i_next][tInfo.W]   * (cost_concat_1) + info.cost[solut.s[i_next]][solut.s[i]]  + \
+                solut.seq[i_next+1][info.dimen][tInfo.W] * (cost_concat_2) + solut.seq[i_next+1][info.dimen][tInfo.C]
 
         if cost_new < cost_best:
-            cost_best = cost_new - info.EPSILON
+            cost_best = cost_new - tInfo.EPSILON
             I = i
             J = i_next
             #print(cost_best, I, J)
@@ -172,25 +172,25 @@ def search_swap(solut : tSolution, info : tInfo) -> bool:
             j_next : int = j + 1
             j_prev : int = j - 1
 
-            cost_concat_1 = solut.seq[0][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j]]
+            cost_concat_1 = solut.seq[0][i_prev][tInfo.T] + info.cost[solut.s[i_prev]][solut.s[j]]
             cost_concat_2 = cost_concat_1 + info.cost[solut.s[j]][solut.s[i_next]]
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][info.T] + info.cost[solut.s[j_prev]][solut.s[i]]
+            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][tInfo.T] + info.cost[solut.s[j_prev]][solut.s[i]]
             cost_concat_4 = cost_concat_3 + info.cost[solut.s[i]][solut.s[j_next]]
 
-            cost_new = solut.seq[0][i_prev][info.C]                                                + \
+            cost_new = solut.seq[0][i_prev][tInfo.C]                                                + \
                     cost_concat_1                                                   + \
-                    solut.seq[i_next][j_prev][info.W] * cost_concat_2 + solut.seq[i_next][j_prev][info.C] + \
+                    solut.seq[i_next][j_prev][tInfo.W] * cost_concat_2 + solut.seq[i_next][j_prev][tInfo.C] + \
                     cost_concat_3                                                   + \
-                    solut.seq[j_next][info.dimen][info.W] * cost_concat_4 + solut.seq[j_next][info.dimen][info.C]
+                    solut.seq[j_next][info.dimen][tInfo.W] * cost_concat_4 + solut.seq[j_next][info.dimen][tInfo.C]
 
             if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+                cost_best = cost_new - tInfo.EPSILON
                 I = i
                 J = j
                 #print(cost_best, I, J)
 
     #print(cost_best, solut.cost, I, J)
-    if cost_best < solut.cost - info.EPSILON:
+    if cost_best < solut.cost - tInfo.EPSILON:
         swap(solut.s, I, J)
         subseq_load(solut, info)
         return True
@@ -216,30 +216,30 @@ def search_two_opt(solut : tSolution, info : tInfo) -> bool:
     for i in range(1, info.dimen-1):
         i_prev : int = i - 1
         
-        reverse_cost : float = solut.seq[i][i+1][info.T]
+        reverse_cost : float = solut.seq[i][i+1][tInfo.T]
         for j in range(i+2, info.dimen):
             j_next : int = j + 1
 
-            reverse_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][info.W]-1)
+            reverse_cost += info.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][tInfo.W]-1)
 
-            cost_concat_1 = solut.seq[0][i_prev][info.T] + info.cost[solut.s[j]][solut.s[i_prev]]
-            cost_concat_2 = cost_concat_1 + solut.seq[i][j][info.T] + info.cost[solut.s[j_next]][solut.s[i]]
+            cost_concat_1 = solut.seq[0][i_prev][tInfo.T] + info.cost[solut.s[j]][solut.s[i_prev]]
+            cost_concat_2 = cost_concat_1 + solut.seq[i][j][tInfo.T] + info.cost[solut.s[j_next]][solut.s[i]]
 
-            cost_new = solut.seq[0][i_prev][info.C]                                        + \
-                    solut.seq[i][j][info.W] * cost_concat_1 + reverse_cost             + \
-                    solut.seq[j_next][info.dimen][info.W] * (cost_concat_2) + solut.seq[j_next][info.dimen][info.C]
+            cost_new = solut.seq[0][i_prev][tInfo.C]                                        + \
+                    solut.seq[i][j][tInfo.W] * cost_concat_1 + reverse_cost             + \
+                    solut.seq[j_next][info.dimen][tInfo.W] * (cost_concat_2) + solut.seq[j_next][info.dimen][tInfo.C]
 
             #print(cost, i, "        ", j)
             #print(seq[C][0][i_prev], seq[W][i][j] * cost_concat_1,seq[W][j_next][n] * (cost_concat_2), seq[C][j_next][n] )
             if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+                cost_best = cost_new - tInfo.EPSILON
                 I = i
                 J = j
 
             #if i == 2 and j == 10:
                 #print ("opaa")
 
-    if cost_best < solut.cost - info.EPSILON:
+    if cost_best < solut.cost - tInfo.EPSILON:
         #print(cost_best)
         #print(I, J)
         reverse(solut.s, I, J)
@@ -308,18 +308,18 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
             #k_next : int = k+1
 
 
-            cost_concat_1 =                 seq[0]     [k]     [info.T] + info.cost[solut.s[k]]     [solut.s[i]]
-            cost_concat_2 = cost_concat_1 + seq[i]     [j]     [info.T] + info.cost[solut.s[j]]     [solut.s[k_next]]
-            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
+            cost_concat_1 =                 seq[0]     [k]     [tInfo.T] + info.cost[solut.s[k]]     [solut.s[i]]
+            cost_concat_2 = cost_concat_1 + seq[i]     [j]     [tInfo.T] + info.cost[solut.s[j]]     [solut.s[k_next]]
+            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][tInfo.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
 
 
-            cost_new = seq[0][k][info.C]                                                                     + \
-                    seq[i]     [j]         [info.W]  * cost_concat_1 + seq[i]     [j]         [info.C] + \
-                    seq[k_next][i_prev]    [info.W]  * cost_concat_2 + seq[k_next][i_prev]    [info.C] + \
-                    seq[j_next][info.dimen][info.W]  * cost_concat_3 + seq[j_next][info.dimen][info.C]
+            cost_new = seq[0][k][tInfo.C]                                                                     + \
+                    seq[i]     [j]         [tInfo.W]  * cost_concat_1 + seq[i]     [j]         [tInfo.C] + \
+                    seq[k_next][i_prev]    [tInfo.W]  * cost_concat_2 + seq[k_next][i_prev]    [tInfo.C] + \
+                    seq[j_next][info.dimen][tInfo.W]  * cost_concat_3 + seq[j_next][info.dimen][tInfo.C]
 
             if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+                cost_best = cost_new - tInfo.EPSILON
                 I = i
                 J = j
                 POS = k
@@ -328,23 +328,23 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
         for k in range(i+opt, info.dimen):
             k_next = k+1
 
-            cost_concat_1 =                 seq[0]     [i_prev][info.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
-            cost_concat_2 = cost_concat_1 + seq[j_next][k]     [info.T] + info.cost[solut.s[k]]     [solut.s[i]]
-            cost_concat_3 = cost_concat_2 + seq[i]     [j]     [info.T] + info.cost[solut.s[j]]     [solut.s[k_next]]
+            cost_concat_1 =                 seq[0]     [i_prev][tInfo.T] + info.cost[solut.s[i_prev]][solut.s[j_next]]
+            cost_concat_2 = cost_concat_1 + seq[j_next][k]     [tInfo.T] + info.cost[solut.s[k]]     [solut.s[i]]
+            cost_concat_3 = cost_concat_2 + seq[i]     [j]     [tInfo.T] + info.cost[solut.s[j]]     [solut.s[k_next]]
 
 
-            cost_new = seq[0][i_prev][info.C]                                        + \
-                    seq[j_next][k][info.W]   * cost_concat_1 + seq[j_next][k][info.C] + \
-                    seq[i][j][info.W]        * cost_concat_2 + seq[i][j][info.C]      + \
-                    seq[k_next][info.dimen][info.W]   * cost_concat_3 + seq[k_next][info.dimen][info.C]
+            cost_new = seq[0][i_prev][tInfo.C]                                        + \
+                    seq[j_next][k][tInfo.W]   * cost_concat_1 + seq[j_next][k][tInfo.C] + \
+                    seq[i][j][tInfo.W]        * cost_concat_2 + seq[i][j][tInfo.C]      + \
+                    seq[k_next][info.dimen][tInfo.W]   * cost_concat_3 + seq[k_next][info.dimen][tInfo.C]
 
             if cost_new < cost_best:
-                cost_best = cost_new - info.EPSILON
+                cost_best = cost_new - tInfo.EPSILON
                 I = i
                 J = j
                 POS = k
 
-    if cost_best < solut.cost - info.EPSILON:
+    if cost_best < solut.cost - tInfo.EPSILON:
         reinsert(solut.s, I, J, POS+1)
         subseq_load(solut, info)
         """
@@ -358,7 +358,7 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
 
 def RVND(solut : tSolution, info : tInfo) -> NoReturn:
 
-    neighbd_list : List[int] = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
+    neighbd_list : List[int] = [tInfo.SWAP, tInfo.TWO_OPT, tInfo.REINSERTION, tInfo.OR_OPT_2, tInfo.OR_OPT_3]
 
     while len(neighbd_list) > 0:
         ##
@@ -372,19 +372,19 @@ def RVND(solut : tSolution, info : tInfo) -> NoReturn:
 
         improve : bool = False
 
-        if neighbd == info.SWAP:
+        if neighbd == tInfo.SWAP:
             improve = search_swap(solut, info)
-        elif neighbd == info.TWO_OPT:
+        elif neighbd == tInfo.TWO_OPT:
             improve = search_two_opt(solut, info)
-        elif neighbd == info.REINSERTION:
-            improve = search_reinsertion(solut, info, info.REINSERTION, solut.seq)
-        elif neighbd == info.OR_OPT_2:
-            improve = search_reinsertion(solut, info, info.OR_OPT_2, solut.seq)
-        elif neighbd == info.OR_OPT_3:
-            improve = search_reinsertion(solut, info, info.OR_OPT_3, solut.seq)
+        elif neighbd == tInfo.REINSERTION:
+            improve = search_reinsertion(solut, info, tInfo.REINSERTION, solut.seq)
+        elif neighbd == tInfo.OR_OPT_2:
+            improve = search_reinsertion(solut, info, tInfo.OR_OPT_2, solut.seq)
+        elif neighbd == tInfo.OR_OPT_3:
+            improve = search_reinsertion(solut, info, tInfo.OR_OPT_3, solut.seq)
 
         if improve == True:
-            neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
+            neighbd_list = [tInfo.SWAP, tInfo.TWO_OPT, tInfo.REINSERTION, tInfo.OR_OPT_2, tInfo.OR_OPT_3]
             
         else:
             neighbd_list.pop(i)

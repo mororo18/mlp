@@ -3,7 +3,7 @@ module data_types
 
     type tInfo
         integer :: dimen
-        real, allocatable :: cost (:,:)
+        real(8), allocatable :: cost (:,:)
         integer :: T = 1
         integer :: C = 2
         integer :: W = 3
@@ -14,7 +14,7 @@ module data_types
         integer :: SWAP         = 4
         integer :: TWO_OPT      = 5
 
-        real :: fmax = 3.4028235E+38
+        real(8) :: fmax = 3.4028235E+38
         
         integer :: reinsert_call = 0
 
@@ -24,15 +24,15 @@ module data_types
 
     type tSolution
         integer, allocatable :: s (:)
-        real, allocatable :: seq (:,:,:)
-        real :: cost
+        real(8), allocatable :: seq (:,:,:)
+        real(8) :: cost
     end type
 
 end module
 
 subroutine print_matrix(c)
     implicit none
-    real, allocatable :: c(:,:)
+    real(8), allocatable :: c(:,:)
 
     integer, allocatable :: nxm(:)
     integer :: dimen
@@ -58,7 +58,7 @@ subroutine print_info(info)
 
     interface
         subroutine print_matrix(c)
-            real, allocatable :: c(:,:)
+            real(8), allocatable :: c(:,:)
         end subroutine
     end interface
 
@@ -189,7 +189,7 @@ function construction(alpha, info) result(ret)
     use data_types
     implicit none
 
-    real :: alpha
+    real(8) :: alpha
     type(tInfo) :: info
     integer, dimension(info%dimen+1) :: ret 
 
@@ -202,7 +202,7 @@ function construction(alpha, info) result(ret)
     integer :: r
     integer :: rng
     integer :: index_
-    real :: RND
+    real(8) :: RND
     integer :: cnt
 
 
@@ -331,12 +331,12 @@ subroutine search_swap(solut, info, ret)
     integer :: I_best
     integer :: J_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
+    real(8) :: cost_best 
+    real(8) :: cost_new
+    real(8) :: cost_concat_1
+    real(8) :: cost_concat_2 
+    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_4
 
     cost_best = info%fmax
     cost_new = 0.0
@@ -357,7 +357,7 @@ subroutine search_swap(solut, info, ret)
                 solut%seq(i_next+1, info%dimen+1, info%W)   * (cost_concat_2) + solut%seq(i_next+1, info%dimen+1, info%C) 
 
         if (cost_new < cost_best) then
-            cost_best = cost_new - EPSILON(1.0)
+            cost_best = cost_new 
             I_best = i
             J_best = i_next
         endif
@@ -381,7 +381,7 @@ subroutine search_swap(solut, info, ret)
                     solut%seq(j_next, info%dimen+1, info%W) * cost_concat_4 + solut%seq(j_next, info%dimen+1, info%C)   ! concat 5th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0);
+                cost_best = cost_new 
                 I_best = i;
                 J_best = j;
             endif
@@ -390,7 +390,7 @@ subroutine search_swap(solut, info, ret)
         
     end do
 
-    if (cost_best < solut%cost - EPSILON(1.0)) then
+    if (cost_best < solut%cost) then
         call swap(solut%s, I_best, J_best)
         call subseq_load(solut, info)
         !print *, "swap", cost_best, solut%cost
@@ -416,13 +416,13 @@ subroutine search_two_opt(solut, info, ret)
     integer :: I_best
     integer :: J_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
-    real :: rev_seq_cost
+    real(8) :: cost_best 
+    real(8) :: cost_new
+    real(8) :: cost_concat_1
+    real(8) :: cost_concat_2 
+    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_4
+    real(8) :: rev_seq_cost
 
     cost_best = info%fmax
     cost_new = 0.0
@@ -446,7 +446,7 @@ subroutine search_two_opt(solut, info, ret)
                     solut%seq(j_next, info%dimen+1, info%W) * cost_concat_2 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 3rd subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0)
+                cost_best = cost_new 
                 I_best = i
                 J_best = j
             endif
@@ -486,12 +486,12 @@ subroutine search_reinsertion(solut, info, opt, ret)
     integer :: J_best
     integer :: POS_best
 
-    real :: cost_best 
-    real :: cost_new
-    real :: cost_concat_1
-    real :: cost_concat_2 
-    real :: cost_concat_3 
-    real :: cost_concat_4
+    real(8) :: cost_best 
+    real(8) :: cost_new
+    real(8) :: cost_concat_1
+    real(8) :: cost_concat_2 
+    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_4
 
     info%reinsert_call = info%reinsert_call + 1
 
@@ -520,7 +520,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
                     solut%seq(j_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0)
+                cost_best = cost_new 
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -545,7 +545,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
                     solut%seq(k_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(k_next, info%dimen+1, info%C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new - EPSILON(1.0)
+                cost_best = cost_new 
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -574,7 +574,7 @@ subroutine RVND(sol, info)
     type(tInfo) :: info
     !integer, intent(out) :: it
 
-    real :: rnd
+    real(8) :: rnd
 
     integer, dimension(5) :: neighbd_list
     integer :: nl_size
@@ -660,7 +660,7 @@ end subroutine
 
 subroutine notnull_rnd(rnd)
     implicit none
-    real, intent(out) :: RND
+    real(8), intent(out) :: RND
 
     call random_number(RND)
     RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
@@ -682,7 +682,7 @@ function perturb(solut, info) result(ret)
     integer :: size_max
     integer :: size_min
     integer :: max_
-    real :: rnd
+    real(8) :: rnd
 
     A_start = 1
     A_end = 1
@@ -764,7 +764,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     !! parameters
     integer :: Imax
     integer :: Iils
-    real, dimension(26) :: R
+    real(8), dimension(26) :: R
     type(tInfo) :: info
     type(tSolution) :: ret
 
@@ -777,15 +777,15 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     integer :: i
     integer :: index_
     integer :: R_size = 26
-    real :: alpha
-    real :: rnd
+    real(8) :: alpha
+    real(8) :: rnd
     integer :: iterILS
 
     interface
         function construction(alpha, info) result (ret)
             use data_types
             implicit none
-            real :: alpha
+            real(8) :: alpha
             type(tInfo) :: info
             integer, dimension(info%dimen+1) :: ret 
         end function
@@ -828,9 +828,9 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         do while (iterILS < Iils)
             call RVND(sol_crnt, info)
 
-            if (sol_crnt%cost < sol_partial%cost - EPSILON(1.0)) then
+            if (sol_crnt%cost < sol_partial%cost ) then
                 sol_partial = sol_crnt
-                sol_partial%cost = sol_partial%cost - EPSILON(1.0)
+                sol_partial%cost = sol_partial%cost
                 iterILS = 0
                 !print *, sol_partial%cost
             endif
@@ -869,7 +869,7 @@ program main
     integer, allocatable :: rnd (:)
     type(tInfo) :: info
     type(tSolution) :: sol
-    real, dimension(26) :: r
+    real(8), dimension(26) :: r
     integer :: Iils
     integer :: Imax
     integer :: i
@@ -880,7 +880,7 @@ program main
         function construction(alpha, info) result (ret)
             use data_types
             implicit none
-            real :: alpha
+            real(8) :: alpha
             type(tInfo) :: info
             integer, dimension(info%dimen+1) :: ret 
         end function
@@ -892,13 +892,13 @@ program main
             !! parameters
             integer :: Imax
             integer :: Iils
-            real, dimension(26) :: R
+            real(8), dimension(26) :: R
             type(tInfo) :: info
             type(tSolution) :: ret
         end function
         subroutine print_matrix(c)
             implicit none
-            real, allocatable :: c(:,:)
+            real(8), allocatable :: c(:,:)
 
             integer, allocatable :: nxm(:)
             integer :: dimen
