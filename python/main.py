@@ -11,6 +11,13 @@ class tRnd:
         self.rnd = rnd
         self.rnd_index = 0
 
+class tSubseq:
+    def __init__(self, T=0.0, W=0.0, C=0.0):
+        self.T = T
+        self.C = C
+        self.W = W
+
+
 EPSILON = 1e-13
 
 SWAP        = 0
@@ -44,7 +51,8 @@ def subseq_info_fill(n):
     for i in range(n+1):
         matrix.append([])
         for j in range(n+1):
-            matrix[i].append([0.0, 0.0, 0.0])
+            matrix[i].append(tSubseq(0.0, 0.0, 0.0))
+            #matrix[i].append([0.0, 0.0, 0.0])
 
     '''
     for i in range(n+1):
@@ -102,26 +110,27 @@ def construction(alpha, rnd):
 
     return s
 
-def subseq_info_load(sol, seq):
+def subseq_info_load(sol):
     i = 0
     d = n + 1
-    W = 0
-    T = 1
-    C = 2
     while i < d:
         k = 1 - i - int(not i)
 
-        seq[i][i][T] = 0.0
-        seq[i][i][C] = 0.0
-        seq[i][i][W] = int(not (i == 0))
+       #seq[i][i][T] = 0.0
+       #seq[i][i][C] = 0.0
+       #seq[i][i][W] = int(not (i == 0))
+
+        subseq[i][i].T = 0.0
+        subseq[i][i].C = 0.0
+        subseq[i][i].W = int(not (i == 0))
 
         j = i + 1
         while j < d:
             a = j - 1
 
-            seq[i][j][T] = m[sol[a]][sol[j]] + seq[i][a][T]
-            seq[i][j][C] = seq[i][j][T] + seq[i][a][C]
-            seq[i][j][W] = j + k
+            subseq[i][j].T = m[sol[a]][sol[j]] + subseq[i][a].T
+            subseq[i][j].C = subseq[i][j].T  + subseq[i][a].C
+            subseq[i][j].W = j + k
 
             """
             seq[T][j][i] = seq[T][i][j]
@@ -149,7 +158,8 @@ def reinsert(s, i, j, pos):
         s[pos:pos] = sub
 
 
-def search_swap(s, seq):
+def search_swap(s):
+    global subseq
     cost_best = float('inf')
     I = None
     J = None
@@ -158,12 +168,12 @@ def search_swap(s, seq):
         i_prev = i - 1
         i_next = i + 1
 
-        cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[i_next]]
-        cost_concat_2 = cost_concat_1 + seq[i][i_next][T] + m[s[i]][s[i_next+1]]
+        cost_concat_1 = subseq[0][i_prev].T  + m[s[i_prev]][s[i_next]]
+        cost_concat_2 = cost_concat_1 + subseq[i][i_next].T + m[s[i]][s[i_next+1]]
 
-        cost = seq[0][i_prev][C]                                            + \
-                seq[i][i_next][W]   * (cost_concat_1) + m[s[i_next]][s[i]]  + \
-                seq[i_next+1][n][W] * (cost_concat_2) + seq[i_next+1][n][C]
+        cost = subseq[0][i_prev].C                                            + \
+                subseq[i][i_next].W   * (cost_concat_1) + m[s[i_next]][s[i]]  + \
+                subseq[i_next+1][n].W * (cost_concat_2) + subseq[i_next+1][n].C
 
         if cost < cost_best:
             cost_best = cost - EPSILON
@@ -174,9 +184,9 @@ def search_swap(s, seq):
             j_next = j + 1
             j_prev = j - 1
 
-            cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[j]]
+            cost_concat_1 = subseq[0][i_prev].T + m[s[i_prev]][s[j]]
             cost_concat_2 = cost_concat_1 + m[s[j]][s[i_next]]
-            cost_concat_3 = cost_concat_2 + seq[i_next][j_prev][T] + m[s[j_prev]][s[i]]
+            cost_concat_3 = cost_concat_2 + subseq[i_next][j_prev].T + m[s[j_prev]][s[i]]
             cost_concat_4 = cost_concat_3 + m[s[i]][s[j_next]]
 
             """
@@ -187,39 +197,41 @@ def search_swap(s, seq):
                     concat 5th subseq
             """
 
-            cost = seq[0][i_prev][C]                                                + \
+            cost = subseq[0][i_prev].C                                                + \
                     cost_concat_1                                                   + \
-                    seq[i_next][j_prev][W] * cost_concat_2 + seq[i_next][j_prev][C] + \
+                    subseq[i_next][j_prev].W * cost_concat_2 + subseq[i_next][j_prev].C + \
                     cost_concat_3                                                   + \
-                    seq[j_next][n][W] * cost_concat_4 + seq[j_next][n][C]
+                    subseq[j_next][n].W * cost_concat_4 + subseq[j_next][n].C
 
             if cost < cost_best:
                 cost_best = cost - EPSILON
                 I = i
                 J = j
 
-    if cost_best < seq[0][n][C] - EPSILON:
+    if cost_best < subseq[0][n].C  - EPSILON:
         #print(cost_best, I, J)
         swap(s, I, J)
-        subseq_info_load(s, seq)
+        subseq_info_load(s)
         #print(seq[C][0][n])
         global improv_flag
         improv_flag = True
 
-def search_two_opt(s, seq):
+def search_two_opt(s):
+    global subseq
     cost_best = float('inf')
+
 
     for i in range(1, n-1):
         i_prev = i - 1
         
-        reverse_cost = seq[i][i+1][T]
+        reverse_cost = subseq[i][i+1].T 
         for j in range(i+2, n):
             j_next = j + 1
 
-            reverse_cost += m[s[j-1]][s[j]] * (seq[i][j][W]-1)
+            reverse_cost += m[s[j-1]][s[j]] * (subseq[i][j].W -1)
 
-            cost_concat_1 = seq[0][i_prev][T] + m[s[j]][s[i_prev]]
-            cost_concat_2 = cost_concat_1 + seq[i][j][T] + m[s[j_next]][s[i]]
+            cost_concat_1 = subseq[0][i_prev].T  + m[s[j]][s[i_prev]]
+            cost_concat_2 = cost_concat_1 + subseq[i][j].T + m[s[j_next]][s[i]]
 
             """
             cost = 1st subseq                           +
@@ -227,9 +239,9 @@ def search_two_opt(s, seq):
                     concat 3rd subseq               
             """
 
-            cost = seq[0][i_prev][C]                                        + \
-                    seq[i][j][W] * cost_concat_1 + reverse_cost             + \
-                    seq[j_next][n][W] * (cost_concat_2) + seq[j_next][n][C]
+            cost = subseq[0][i_prev].C                                        + \
+                    subseq[i][j].W * cost_concat_1 + reverse_cost             + \
+                    subseq[j_next][n].W  * (cost_concat_2) + subseq[j_next][n].C 
 
             #print(cost, i, "        ", j)
             #print(seq[C][0][i_prev], seq[W][i][j] * cost_concat_1,seq[W][j_next][n] * (cost_concat_2), seq[C][j_next][n] )
@@ -238,16 +250,17 @@ def search_two_opt(s, seq):
                 I = i
                 J = j
 
-    if cost_best < seq[0][n][C] - EPSILON:
+    if cost_best < subseq[0][n].C  - EPSILON:
         #print(cost_best)
         #print(I, J)
         reverse(s, I, J)
-        subseq_info_load(s, seq)
+        subseq_info_load(s)
         global improv_flag
         improv_flag = True
 
 
-def search_reinsertion(s, seq, OPT):
+def search_reinsertion(s, OPT):
+    global subseq
     cost_best = float('inf')
     I = None
     J = None
@@ -273,9 +286,9 @@ def search_reinsertion(s, seq, OPT):
         for k in range(0, i_prev):
             k_next = k+1
 
-            cost_concat_1 = seq[0][k][T] + m[s[k]][s[i]]
-            cost_concat_2 = cost_concat_1 + seq[i][j][T] + m[s[j]][s[k_next]]
-            cost_concat_3 = cost_concat_2 + seq[k_next][i_prev][T] + m[s[i_prev]][s[j_next]]
+            cost_concat_1 = subseq[0][k].T  + m[s[k]][s[i]]
+            cost_concat_2 = cost_concat_1 + subseq[i][j].T  + m[s[j]][s[k_next]]
+            cost_concat_3 = cost_concat_2 + subseq[k_next][i_prev].T  + m[s[i_prev]][s[j_next]]
 
             """
             cost = 1st subseq                           +
@@ -284,10 +297,10 @@ def search_reinsertion(s, seq, OPT):
                     concat 4th subseq  
             """
 
-            cost = seq[0][k][C]                                                         + \
-                    seq[i][j][W]            * cost_concat_1 + seq[i][j][C]              + \
-                    seq[k_next][i_prev][W]  * cost_concat_2 + seq[k_next][i_prev][C]    + \
-                    seq[j_next][n][W]       * cost_concat_3 + seq[j_next][n][C]
+            cost = subseq[0][k].C                                                          + \
+                    subseq[i][j].W             * cost_concat_1 + subseq[i][j].C               + \
+                    subseq[k_next][i_prev].W   * cost_concat_2 + subseq[k_next][i_prev].C     + \
+                    subseq[j_next][n].W        * cost_concat_3 + subseq[j_next][n].C 
 
             if cost < cost_best:
                 cost_best = cost - EPSILON
@@ -307,9 +320,9 @@ def search_reinsertion(s, seq, OPT):
         for k in range(i+opt, n):
             k_next = k+1
 
-            cost_concat_1 = seq[0][i_prev][T] + m[s[i_prev]][s[j_next]]
-            cost_concat_2 = cost_concat_1 + seq[j_next][k][T] + m[s[k]][s[i]]
-            cost_concat_3 = cost_concat_2 + seq[i][j][T] + m[s[j]][s[k_next]]
+            cost_concat_1 = subseq[0][i_prev].T  + m[s[i_prev]][s[j_next]]
+            cost_concat_2 = cost_concat_1 + subseq[j_next][k].T  + m[s[k]][s[i]]
+            cost_concat_3 = cost_concat_2 + subseq[i][j].T  + m[s[j]][s[k_next]]
 
             """
             cost = 1st subseq                           +
@@ -318,10 +331,10 @@ def search_reinsertion(s, seq, OPT):
                     concat 4th subseq  
             """
 
-            cost = seq[0][i_prev][C]                                        + \
-                    seq[j_next][k][W]   * cost_concat_1 + seq[j_next][k][C] + \
-                    seq[i][j][W]        * cost_concat_2 + seq[i][j][C]      + \
-                    seq[k_next][n][W]   * cost_concat_3 + seq[k_next][n][C]
+            cost = subseq[0][i_prev].C                                         + \
+                    subseq[j_next][k].W    * cost_concat_1 + subseq[j_next][k].C  + \
+                    subseq[i][j].W         * cost_concat_2 + subseq[i][j].C       + \
+                    subseq[k_next][n].W    * cost_concat_3 + subseq[k_next][n].C 
 
             if cost < cost_best:
                 cost_best = cost - EPSILON
@@ -338,15 +351,16 @@ def search_reinsertion(s, seq, OPT):
             '''
 
     #if COST_arr[BEST] < seq[C][0][n] - EPSILON:
-    if cost_best < seq[0][n][C] - EPSILON:
+    if cost_best < subseq[0][n].C  - EPSILON:
         #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
         reinsert(s, I, J, POS+1)
-        subseq_info_load(s, seq)
+        subseq_info_load(s)
         global improv_flag
         improv_flag = True
 
-def RVND(s, subseq, rnd):
+def RVND(s, rnd):
 
+    global subseq
     global improv_flag
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
@@ -361,15 +375,15 @@ def RVND(s, subseq, rnd):
         improv_flag = False
 
         if neighbd == SWAP:
-            search_swap(s, subseq)
+            search_swap(s)
         elif neighbd == TWO_OPT:
-            search_two_opt(s, subseq)
+            search_two_opt(s)
         elif neighbd == REINSERTION:
-            search_reinsertion(s, subseq, REINSERTION)
+            search_reinsertion(s, REINSERTION)
         elif neighbd == OR_OPT_2:
-            search_reinsertion(s, subseq, OR_OPT_2)
+            search_reinsertion(s, OR_OPT_2)
         elif neighbd == OR_OPT_3:
-            search_reinsertion(s, subseq, OR_OPT_3)
+            search_reinsertion(s, OR_OPT_3)
 
         if improv_flag == True:
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
@@ -417,10 +431,13 @@ def perturb(sl, rnd):
 
 def GILS_RVND(Imax, Iils, R, rnd):
 
+    global subseq
+
     cost_best = float('inf')
     s_best = []
 
 
+    #  TODO:  tornar subseq global
     subseq = subseq_info_fill(n)
 
     for i in range(Imax):
@@ -434,37 +451,38 @@ def GILS_RVND(Imax, Iils, R, rnd):
         print("[+] Local Search {}".format(i+1))
         print("\t[+] Constructing Inital Solution..")
         s = construction(alpha, rnd)
-        subseq_info_load(s, subseq)
+        subseq_info_load(s)
         sl = s[:]
-        rvnd_cost_best = subseq[0][n][C] - EPSILON
-        #print(rvnd_cost_best)
+        rvnd_cost_best = subseq[0][n].C  - EPSILON
+
+        print(rvnd_cost_best)
 
         print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
-            RVND(s, subseq, rnd)
-            rvnd_cost_crnt  = subseq[0][n][C] - EPSILON
+            RVND(s, rnd)
+            rvnd_cost_crnt  = subseq[0][n].C  - EPSILON
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
                 sl = s[:]
                 iterILS = 0
 
             s = perturb(sl, rnd)
-            subseq_info_load(s, subseq)
+            subseq_info_load(s)
             iterILS += 1
 
-        subseq_info_load(sl, subseq)
-        sl_cost = subseq[0][n][C] - EPSILON
+        subseq_info_load(sl)
+        sl_cost = subseq[0][n].C  - EPSILON
 
         if sl_cost < cost_best:
-            s_best = sl
+            s_best = sl[:]
             cost_best = sl_cost
 
         print("\tCurrent best solution cost: {}".format(cost_best))
 
     print("COST: {}".format (cost_best))
     print("SOLUTION: {}".format( s_best))
-    print("Total Iterations RVND {}".format(IT))
+    #print("Total Iterations RVND {}".format(IT))
 
 
 

@@ -1,0 +1,25 @@
+> Total time: 2072.273540 s
+--------------------------------------------------------------------------------------
+| FILE                : FUNCTION                    : LINE   : TIME   : %     : #    |
+--------------------------------------------------------------------------------------
+| main.canc.lua       : main                        :   440  : 2072.2734: 100.0 :    1 |
+| main.canc.lua       : GILS_RVND                   :   379  : 2071.4514: 100.0 :    1 |
+| main.canc.lua       : RVND                        :   304  : 2059.9343: 99.4  : 2455 |
+| main.canc.lua       : search_reinsertion          :   240  : 1577.8376: 76.1  : 58419|
+| main.canc.lua       : search_swap                 :   144  : 250.7606: 12.1  : 19593|
+| main.canc.lua       : subseq_load                 :    56  : 248.2030: 12.0  : 71305|
+| main.canc.lua       : search_two_opt              :   198  : 230.7154: 11.1  : 19149|
+| main.canc.lua       : sort                        :    88  : 2.0157 : 0.1   : 3170 |
+| main.canc.lua       : reinsert                    :   129  : 1.2508 : 0.1   : 45752|
+| main.canc.lua       : reverse                     :   122  : 1.1049 : 0.1   : 13469|
+| Data                : readData                    :     8  : 0.8220 : 0.0   :    1 |
+| main.canc.lua       : perturb                     :   347  : 0.7707 : 0.0   : 2455 |
+| main.canc.lua       : swap                        :   119  : 0.5534 : 0.0   : 365655|
+| main.canc.lua       : clone                       :    33  : 0.1000 : 0.0   : 2617 |
+| main.canc.lua       : subseq_fill                 :    47  : 0.0331 : 0.0   :    3 |
+| main.canc.lua       : s_print                     :     2  : 0.0090 : 0.0   :   10 |
+| main.canc.lua       : solut_clone                 :    40  : 0.0001 : 0.0   :   11 |
+--------------------------------------------------------------------------------------
+| ./profiler          : stop                        :   225  : ~      : ~     :    1 |
+| main.canc.lua       : construction                :    99  : ~      : ~     :   10 |
+--------------------------------------------------------------------------------------

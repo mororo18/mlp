@@ -1,1 +1,4 @@
 28/03 - https://cerfacs.fr/coop/fortran-vs-python
+
+
+seq[i][j].C pior q seq[i][j][C]
