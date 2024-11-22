@@ -107,31 +107,88 @@ subroutine subseq_load(s, seq, dimen, cost)
 
 end subroutine
 
-subroutine sort(cL, lmt, r, dimen, cost)
-    use data_types
-    implicit none
+subroutine sort(arr, len, r, dimen, cost)
 
+    implicit none 
+    integer, intent(inout) :: arr(len)
+    integer :: len
+    integer :: r
     integer :: dimen
     real(8), dimension(dimen, dimen) :: cost(:,:)
-    integer, dimension(dimen-1), intent(out) :: cL
-    integer :: lmt
-    integer :: r
 
-    integer :: i
-    integer :: j
-    integer :: tmp
+    interface
+        recursive subroutine quicksort(arr, left, right, r, dimen, cost)
 
-    do i=1, lmt
-        do j=1, lmt-i
-            if (cost(r, cL(j)) > cost(r, cL(j+1))) then
-                tmp = cL(j)
-                cL(j) = cL(j+1)
-                cL(j+1) = tmp
-            end if
-        end do
+            implicit none 
+            integer, intent(inout) :: arr(*)
+            integer, intent(in) :: left, right, r
+            integer :: dimen
+            real(8), dimension(dimen, dimen) :: cost(:,:)
+
+        end subroutine
+    end interface
+
+    call quicksort(arr, 1, len, r, dimen, cost)
+end subroutine sort
+
+
+function partition(arr, left, right, r, dimen, cost) result(ret)
+
+    implicit none 
+    integer, intent(inout) :: arr(*)
+    integer, intent(in) :: left, right, r
+    integer :: dimen
+    real(8), dimension(dimen, dimen) :: cost(:,:)
+
+    integer :: pivot, i, j, temp
+    integer :: ret
+
+    pivot = arr(right)
+    i = left - 1
+
+    do j = left, right - 1
+        if (cost(r, arr(j)) < cost(r, pivot)) then
+            i = i + 1
+            temp = arr(i)
+            arr(i) = arr(j)
+            arr(j) = temp
+        end if
     end do
+    temp = arr(i + 1)
+    arr(i + 1) = arr(right)
+    arr(right) = temp
 
-end subroutine
+    ret = i + 1
+end function partition
+
+recursive subroutine quicksort(arr, left, right, r, dimen, cost)
+
+    implicit none 
+    integer, intent(inout) :: arr(*)
+    integer, intent(in) :: left, right, r
+    integer :: dimen
+    real(8), dimension(dimen, dimen) :: cost(:,:)
+
+    integer :: pivot
+
+    interface
+        function partition(arr, left, right, r, dimen, cost) result(ret)
+            implicit none 
+            integer, intent(inout) :: arr(*)
+            integer, intent(in) :: left, right, r
+            integer :: dimen
+            real(8), dimension(dimen, dimen) :: cost(:,:)
+
+            integer :: ret
+        end function
+    end interface
+
+    if (left < right) then
+        pivot = partition(arr, left, right, r, dimen, cost)
+        call quicksort(arr, left, pivot - 1, r, dimen, cost)
+        call quicksort(arr, pivot + 1, right, r, dimen, cost)
+    end if
+end subroutine quicksort
 
 subroutine arr_shift(arr, src, tgt, sz)
     implicit none 
@@ -179,15 +236,13 @@ function construction(alpha, dimen, cost, rnd) result(ret)
 
     interface
 
-        subroutine sort(cL, lmt, r, dimen, cost)
-            use data_types
-            implicit none
-
+        subroutine sort(arr, len, r, dimen, cost)
+            implicit none 
+            integer, intent(inout) :: arr(len)
+            integer :: len
+            integer :: r
             integer :: dimen
             real(8), dimension(dimen, dimen) :: cost(:,:)
-            integer, dimension(dimen-1), intent(out) :: cL
-            integer :: lmt
-            integer :: r
         end subroutine
 
     end interface

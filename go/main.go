@@ -183,14 +183,29 @@ func reinsert(s []int, i int, j int, pos int) {
     }
 }
 
-func sort(arr []int, r int) {
-    for i := 0; i < len(arr); i++ {
-        for j := 0; j < len(arr)-i-1; j++ {
-            if cost[r][arr[j]] > cost[r][arr[j+1]] {
-                swap(arr, j, j+1)
-            }
-        }
-    }
+func sort(arr *[]int, r int) {
+	quicksort(arr, 0, len(*arr)-1, r)
+}
+
+func quicksort(arr *[]int, left, right int, r int) {
+	if left < right {
+		pivot := partition(arr, left, right, r)
+		quicksort(arr, left, pivot-1, r)
+		quicksort(arr, pivot+1, right, r)
+	}
+}
+
+func partition(arr *[]int, left, right int, r int) int {
+	pivot := (*arr)[right]
+	i := left - 1
+	for j := left; j < right; j++ {
+		if cost[r][(*arr)[j]] < cost[r][pivot] {
+			i++
+			(*arr)[i], (*arr)[j] = (*arr)[j], (*arr)[i]
+		}
+	}
+	(*arr)[i+1], (*arr)[right] = (*arr)[right], (*arr)[i+1]
+	return i + 1
 }
 
 func construct(alpha float64, s_crnt []int, rnd * tRnd) {
@@ -204,17 +219,13 @@ func construct(alpha float64, s_crnt []int, rnd * tRnd) {
 
     var r = 0
     for len(cL) > 0 {
-        sort(cL, r)
+        sort(&cL, r)
 
-        var rang =  int(float64(len(cL)) * alpha + 1.0)
-        var index = rand.Intn(rang)
         r_index := rnd.index; rnd.index++
-        index = rnd.rnd[r_index]
-        var c = cL[index]
+        index := rnd.rnd[r_index]
+        c := cL[index]
         r = c
-        //fmt.Println(cL)
         cL = remove(cL, index)
-        //fmt.Println(index, cL)
         s = append(s, c)
     }
 
@@ -548,7 +559,6 @@ func GILS_RVND(rnd tRnd) {
         construct(alpha, s_crnt, &rnd)
 
         cost_crnt = subseq_load(s_crnt, seq)
-        //fmt.Println(s_crnt, cost_crnt)
         copy(s_partial, s_crnt)
         cost_partial = cost_crnt
 

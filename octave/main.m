@@ -54,22 +54,34 @@ global W;
     ret = seq;
 end
 
-function ret = sort_by(arr, r)
-    global cost
+function arr = sort(arr, r)
     sz = size(arr);
     sz = sz(2);
+    arr = quicksort(arr, 1, sz, r);
+end
 
-    for i = 1:sz
-        for j = 1:sz-i
-            if (cost(r, arr(j)) > cost(r, arr(j+1)))
-                tmp = arr(j);
-                arr(j) = arr(j+1);
-                arr(j+1) = tmp;
-            end
+function arr = quicksort(arr, left, right, r)
+    if left < right
+        [arr, pivotIndex] = partition(arr, left, right, r);
+        arr = quicksort(arr, left, pivotIndex - 1, r);
+        arr = quicksort(arr, pivotIndex + 1, right, r);
+    end
+end
+
+function [arr, pivotIndex] = partition(arr, left, right, r)
+    global cost
+    pivotValue = arr(right);
+    i = left - 1;
+    for j = left:right - 1
+        if cost(r, arr(j)) < cost(r, pivotValue)
+            i = i + 1;
+            % Troca arr(i) e arr(j)
+            [arr(i), arr(j)] = deal(arr(j), arr(i));
         end
     end
-
-    ret = arr;
+    % Troca o pivô
+    [arr(i + 1), arr(right)] = deal(arr(right), arr(i + 1));
+    pivotIndex = i + 1;
 end
 
 function [ret, index_new] = construction(alpha, rnd)

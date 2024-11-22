@@ -95,29 +95,35 @@ namespace MLP {
                     seq[i][ j][ C] = seq[i][ j][ T] + seq[i][ j_prev][ C];
                     seq[i][ j][ W] = j + k;
 
-                    // a bit faster without it
-                    //seq[j, i, T] = seq[i, j, T];
-                    //seq[j, i, C] = seq[i, j, C];
-                    //seq[j, i, W] = seq[i, j, W];
-
-                    //Console.Write(seq[i, j, C] + " ");
                 }
-                //Console.WriteLine();
             }
-            //t_subseq += Stopwatch.GetTimestamp();
         }
 
         private void sort(List<int> arr, int r) {
-            for (int i = 0; i < arr.Count; i++) {
-                for (int j = 0; j < arr.Count - i-1; j++) {
-                    //Console.WriteLine(arr[j+1]);
-                    if (c[r][arr[j]] > c[r][arr[j+1]]) {
-                        int tmp = arr[j];
-                        arr[j] = arr[j+1];
-                        arr[j+1] = tmp;
-                    }
+            Quicksort(arr, 0, arr.Count - 1, r);
+        }
+
+        private void Quicksort(List<int> arr, int left, int right, int r) {
+            if (left < right) {
+                int pivot = Partition(arr, left, right, r);
+                Quicksort(arr, left, pivot - 1, r);
+                Quicksort(arr, pivot + 1, right, r);
+            }
+        }
+
+        private int Partition(List<int> arr, int left, int right, int r) {
+            int pivotIndex = right;
+            double pivotValue = c[r][arr[pivotIndex]];
+            int i = left - 1;
+
+            for (int j = left; j < right; j++) {
+                if (c[r][arr[j]] < pivotValue) {
+                    i++;
+                    (arr[i], arr[j]) = (arr[j], arr[i]); // Troca os elementos usando tuple swap
                 }
             }
+            (arr[i + 1], arr[right]) = (arr[right], arr[i + 1]); // Troca o pivô
+            return i + 1;
         }
 
         private List<int> construction(double alpha){
@@ -130,15 +136,9 @@ namespace MLP {
 
             int r = 0;
             while(cList.Count > 0){
-                // bug ae (geralmente apos muitas comparacoes)
-                //cList.Sort((int i, int j) => (c[r, i]).Equals(c[r, j]));
-                cList = cList.OrderBy(i => c[r][ i]).ToList();
-                //sort(cList, r);
-                //cList.Sort((int i, int j) => (c[r, i] > c[r, j] ? 1 : -1));
-                int range = (int)(((double)cList.Count) * alpha) +1;
+                sort(cList, r);
 
-                int r_value = rand.Next(range);
-                r_value = rnd[rnd_index++];
+                int r_value = rnd[rnd_index++];
 
                 int cN = cList[r_value];
                 s.Add(cN);
@@ -447,18 +447,6 @@ namespace MLP {
 
 
         public void solve(){
-            /*
-            Console.WriteLine(T);
-            var s = new List<int>();
-            for(int i = 0; i < dimension; i++){
-                s.Add(i);
-            }
-            s.Add(0);
-            s.ForEach(Console.WriteLine);
-            subseq_load(s, subseq);
-            var opa = construction(0.05);
-            Console.WriteLine(string.Format("Inicial: ({0}).", string.Join(", ", opa)));
-            */
 
             double cost_best = Double.MaxValue;
             var s_best = new List<int>();
@@ -471,16 +459,8 @@ namespace MLP {
                 Console.WriteLine("[+] Local Search " + (i+1));
                 Console.WriteLine("\t[+] Constructing Inital Solution..");
 
-                //t_construction -= Stopwatch.GetTimestamp();
                 var s = construction(alpha);
 
-                /*
-                for (int j = 0; j < dimension; j++) {
-                    Console.Write(s[j] + " ");
-                }
-                Console.WriteLine();
-                */
-                //t_construction += Stopwatch.GetTimestamp();
                 var sl = new List<int>(s);
 
                 subseq_load(s, subseq);

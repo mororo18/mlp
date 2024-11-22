@@ -59,6 +59,25 @@ def subseq_info_fill(n):
 
     return matrix
 
+def quicksort(arr, left, right, r):
+    if left < right:
+        pivot = partition(arr, left, right, r)
+        quicksort(arr, left, pivot - 1, r)
+        quicksort(arr, pivot + 1, right, r)
+
+def partition(arr, left, right, r):
+    pivot = arr[right]
+    i = left - 1
+    for j in range(left, right):
+        if m[r][arr[j]] < m[r][pivot]:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[right] = arr[right], arr[i + 1]
+    return i + 1
+
+def sort(arr, r):
+    quicksort(arr, 0, len(arr) - 1, r)
+
 def construction(alpha, rnd):
     s = [0]
     c_list = list(range(1, n))
@@ -66,10 +85,9 @@ def construction(alpha, rnd):
     r = 0
     while len(c_list) > 0:
 
+        sort(c_list, r)
+
         i = int(len(c_list)*alpha) + 1
-
-        c_list = sorted(c_list, key = lambda n : m[n][r], reverse=False)
-
         c = c_list[randint(0, i-1)]
 
         index = rnd.rnd[rnd.rnd_index]
@@ -418,8 +436,8 @@ def GILS_RVND(Imax, Iils, R, rnd):
         s = construction(alpha, rnd)
         subseq_info_load(s, subseq)
         sl = s[:]
-        #sl = s.copy()
         rvnd_cost_best = subseq[0][n][C] - EPSILON
+        #print(rvnd_cost_best)
 
         print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
@@ -429,7 +447,6 @@ def GILS_RVND(Imax, Iils, R, rnd):
             if rvnd_cost_crnt < rvnd_cost_best:
                 rvnd_cost_best = rvnd_cost_crnt
                 sl = s[:]
-                #sl = s.copy()
                 iterILS = 0
 
             s = perturb(sl, rnd)

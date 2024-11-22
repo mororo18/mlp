@@ -58,16 +58,29 @@ function subseq_load(s::Array{Int64, 1}, seq::Array{Float64, 3})
 
 end
 
-function c_sort(arr::Array{Int64,1}, r::Int64)
-    for i in 1:length(arr)
-        for j in 1:length(arr)-i
-            if c[r, arr[j]] > c[r, arr[j+1]]
-                tmp = arr[j]
-                arr[j] = arr[j+1]
-                arr[j+1] = tmp
-            end
+function sort(arr::Array{Int}, r::Int)
+    quicksort(arr, 1, length(arr), r)
+end
+
+function quicksort(arr::Array{Int}, left::Int, right::Int, r::Int)
+    if left < right
+        pivot = partition(arr, left, right, r)
+        quicksort(arr, left, pivot - 1, r)
+        quicksort(arr, pivot + 1, right, r)
+    end
+end
+
+function partition(arr::Array{Int}, left::Int, right::Int, r::Int)
+    pivot = arr[right]
+    i = left - 1
+    for j in left:right-1
+        if c[r, arr[j]] < c[r, pivot]
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
         end
     end
+    arr[i + 1], arr[right] = arr[right], arr[i + 1]
+    return i + 1
 end
 
 function construction(alpha::Float64, rnd::tRnd)
@@ -76,7 +89,7 @@ function construction(alpha::Float64, rnd::tRnd)
 
     r = 1
     while length(cList) > 0
-        c_sort(cList, r)
+        sort(cList, r)
 
         i = convert(Int64, floor(length(cList)*alpha + 1))
         cN = cList[rand(1:i)]

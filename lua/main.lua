@@ -92,18 +92,33 @@ function subseq_load(s, seq)
 
 end
 
-function sort(arr, r) 
-    --s_print(arr)
-    for i = 1, #arr do
-        for j = 1, #arr-i do
-            if c[r][arr[j]] > c[r][arr[j+1]] then
-                local tmp = arr[j]
-                arr[j] = arr[j+1]
-                arr[j+1] = tmp
-            end
-        end
+function sort(arr, r)
+    quicksort(arr, 1, #arr, r)
+end
+
+function quicksort(arr, left, right, r)
+    if left < right then
+        local pivotIndex = partition(arr, left, right, r)
+        quicksort(arr, left, pivotIndex - 1, r)
+        quicksort(arr, pivotIndex + 1, right, r)
     end
 end
+
+function partition(arr, left, right, r)
+    local pivotValue = arr[right]
+    local i = left - 1
+
+    for j = left, right - 1 do
+        if c[r][arr[j]] < c[r][pivotValue] then
+            i = i + 1
+            arr[i], arr[j] = arr[j], arr[i] -- Troca os valores
+        end
+    end
+
+    arr[i + 1], arr[right] = arr[right], arr[i + 1] -- Troca o pivô
+    return i + 1
+end
+
 
 function construction(alpha, rnd) 
     local s = {1}

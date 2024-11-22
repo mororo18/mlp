@@ -81,16 +81,37 @@ class GILS_RVND {
                 seq[i][j][C] = seq[i][j][T] + seq[i][j_prev][C];
                 seq[i][j][W] = j + k;
 
-                //seq[j][i][T] = seq[i][j][T];
-                //seq[j][i][C] = seq[i][j][C];
-                //seq[j][i][W] = seq[i][j][W];
-
-                //System.out.print(seq[i][j][C]);
-                //System.out.print(" ");
             }
-            //System.out.println();
         }
-        //t_subseq += System.nanoTime();
+    }
+
+    public void sort(ArrayList<Integer> arr, int r) {
+        quicksort(arr, 0, arr.size() - 1, r);
+    }
+
+    private void quicksort(ArrayList<Integer> arr, int left, int right, int r) {
+        if (left < right) {
+            int pivot = partition(arr, left, right, r);
+            quicksort(arr, left, pivot - 1, r);
+            quicksort(arr, pivot + 1, right, r);
+        }
+    }
+
+    private int partition(ArrayList<Integer> arr, int left, int right, int r) {
+        int pivot = arr.get(right);
+        int i = left - 1;
+        for (int j = left; j < right; j++) {
+            if (c[r][arr.get(j)] < c[r][pivot]) {
+                i++;
+                int temp = arr.get(i);
+                arr.set(i, arr.get(j));
+                arr.set(j, temp);
+            }
+        }
+        int temp = arr.get(i + 1);
+        arr.set(i + 1, arr.get(right));
+        arr.set(right, temp);
+        return i + 1;
     }
 
     private ArrayList<Integer> construction(double alpha){
@@ -104,9 +125,7 @@ class GILS_RVND {
 
         int r = 0;
         while(!cList.isEmpty()){
-            cList.sort((Integer i, Integer j) -> Double.compare (c[i][s.get(s.size()-1)], c[j][s.get(s.size()-1)]));
-            //erro ao usar variavel 'r' na lambda expression. 'r' n eh final(const)
-            //cList.sort((Integer i, Integer j) -> Double.compare (c[i][r], c[j][r]));
+            sort(cList, r);
 
             int range = (int)(((double)cList.size()) * alpha)+1;
 

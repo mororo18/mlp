@@ -75,17 +75,29 @@ fn subseq_load(s : & Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, c : & Vec<Vec<f6
 
 }
 
+fn sort(arr: &mut Vec<usize>, r: usize, cost : & Vec<Vec<f64>>) {
+    quicksort(arr, 0, arr.len() as isize - 1, cost, r);
+}
 
-fn sort(arr : &mut Vec<usize>, r : usize, c : & Vec<Vec<f64>>) {
-    for i in 0..arr.len() {
-        for j in 0..(arr.len()-1-i) {
-            if c[r][arr[j]] > c[r][arr[j+1]] {
-                let tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
+fn quicksort(arr: &mut Vec<usize>, left: isize, right: isize, cost : & Vec<Vec<f64>>, r: usize) {
+    if left < right {
+        let pivot = partition(arr, left, right, cost, r);
+        quicksort(arr, left, pivot - 1, cost, r);
+        quicksort(arr, pivot + 1, right, cost, r);
+    }
+}
+
+fn partition(arr: &mut Vec<usize>, left: isize, right: isize, cost : & Vec<Vec<f64>>, r: usize) -> isize {
+    let pivot = arr[right as usize];
+    let mut i = left - 1;
+    for j in left..right {
+        if cost[r][arr[j as usize]] < cost[r][pivot] {
+            i += 1;
+            arr.swap(i as usize, j as usize);
         }
     }
+    arr.swap((i + 1) as usize, right as usize);
+    i + 1
 }
 
 fn construction(alpha : f64, c : & Vec<Vec<f64>>, dimen : usize, rnd : &mut tRnd) -> Vec<usize> {

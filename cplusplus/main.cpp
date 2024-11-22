@@ -60,6 +60,31 @@ void print_s(std::vector<int> s) {
     std::cout << std::endl;
 }
 
+int partition(std::vector<int>& arr, int left, int right, int r) {
+    int pivot = arr[right];
+    int i = left - 1;
+    for (int j = left; j < right; j++) {
+        if (cost[r][arr[j]] < cost[r][pivot]) {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[right]);
+    return i + 1;
+}
+
+void quicksort(std::vector<int>& arr, int left, int right, int r) {
+    if (left < right) {
+        int pivot = partition(arr, left, right, r);
+        quicksort(arr, left, pivot - 1, r);
+        quicksort(arr, pivot + 1, right, r);
+    }
+}
+
+void sort(std::vector<int>& arr, int r) {
+    quicksort(arr, 0, arr.size() - 1, r);
+}
+
 std::vector<int> construct(const double alpha, tRnd & rnd){
 
     std::vector<int> s = {0};
@@ -71,10 +96,7 @@ std::vector<int> construct(const double alpha, tRnd & rnd){
 
     int r = 0;
     while (!cL.empty()) {
-        std::stable_sort(cL.begin(), cL.end(), 
-            [r, cost] (const int i, const int j) {
-                return cost[i][r] < cost[j][r];
-            });
+        sort(cL, r);
 
         /**/
         int range = std::ceil(cL.size() * alpha);

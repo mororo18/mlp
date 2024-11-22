@@ -33,48 +33,6 @@ typedef struct tSubseq {
 } tSubseq;
 
 
-//  tSolution Solution_init(tInfo info) {
-//      tSolution solut;
-//      solut.s = (int*) calloc(info.dimen+1, sizeof(int));
-//      //solut.s_size = info.dimen+1;
-
-//      solut.seq = (double ***) calloc(info.dimen+1, sizeof(double **));
-//      for (int i = 0; i < info.dimen+1; i++) {
-//          solut.seq[i] = (double **) calloc(info.dimen+1, sizeof(double *));
-//          for (int j = 0; j < info.dimen+1; j++) {
-//              solut.seq[i][j] = (double *) calloc(3, sizeof(double));
-//          }
-//      }
-
-//      /*
-//      solut.seq = new tSeqInfo * [info.dimen+1];
-//      for (int i = 0; i < info.dimen+1; i++) {
-//          solut.seq[i] = new tSeqInfo [info.dimen+1];
-//          memset(solut.seq[i], 0.0, (info.dimen+1)*sizeof(tSeqInfo));
-//      }
-//      */
-
-//      solut.cost = DBL_MAX;
-
-//      return solut;
-//  }
-
-//  void Solution_cpy(tSolution * src, tSolution * tgt, const tInfo * info) {
-
-//      memcpy(tgt->s, src->s, sizeof(int)*(info->dimen+1));
-//      tgt->cost = src->cost;
-
-//      /*
-//      for (int i = 0; i < info.dimen+1; i++) {
-//          for (int j = 0; j < info.dimen+1; j++) {
-//              //memcpy(tgt.seq[i][j], src.seq[i][j], 3 * sizeof(double));
-//              std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
-//          }
-//      }
-//      */
-
-//  }
-
 double R_table(int i){
     static const double table[] = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                                     0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
@@ -88,17 +46,34 @@ void print_s(int * s, int sz) {
     printf("\n");
 }
 
-void sort(int * arr, int arr_size, int r) {
 
-    for (int i = 0; i < arr_size; i++) {
-        for (int j = 0; j < arr_size-i-1; j++) {
-            if (cost[r][arr[j]] > cost[r][arr[j+1]]) {
-                int tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
+int partition(int *arr, int left, int right, int r) {
+    int pivot = arr[right];
+    int i = left - 1;
+    for (int j = left; j < right; j++) {
+        if (cost[r][arr[j]] < cost[r][pivot]) {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
         }
     }
+    int temp = arr[i + 1];
+    arr[i + 1] = arr[right];
+    arr[right] = temp;
+    return i + 1;
+}
+
+void quicksort(int *arr, int left, int right, int r) {
+    if (left < right) {
+        int pivot = partition(arr, left, right, r);
+        quicksort(arr, left, pivot - 1, r);
+        quicksort(arr, pivot + 1, right, r);
+    }
+}
+
+void sort(int *arr, int len, int r) {
+    quicksort(arr, 0, len - 1, r);
 }
 
 void shift(int * vec, int from, int to, int sz) {
