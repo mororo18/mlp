@@ -85,16 +85,31 @@ function subseq_load(solut, info)
     --print(solut.cost)
 end
 
-function sort(arr, r, info) 
-    for i = 1, #arr do
-        for j = 1, #arr-i do
-            if info.c[r][arr[j]] > info.c[r][arr[j+1]] then
-                local tmp = arr[j]
-                arr[j] = arr[j+1]
-                arr[j+1] = tmp
-            end
+function sort(arr, r, info)
+    quicksort(arr, 1, #arr, r, info)
+end
+
+function quicksort(arr, left, right, r, info)
+    if left < right then
+        local pivotIndex = partition(arr, left, right, r, info)
+        quicksort(arr, left, pivotIndex - 1, r, info)
+        quicksort(arr, pivotIndex + 1, right, r, info)
+    end
+end
+
+function partition(arr, left, right, r, info)
+    local pivotValue = arr[right]
+    local i = left - 1
+
+    for j = left, right - 1 do
+        if info.c[r][arr[j]] < info.c[r][pivotValue] then
+            i = i + 1
+            arr[i], arr[j] = arr[j], arr[i] -- Troca os valores
         end
     end
+
+    arr[i + 1], arr[right] = arr[right], arr[i + 1] -- Troca o pivô
+    return i + 1
 end
 
 function construction(alpha, info) 
@@ -111,8 +126,6 @@ function construction(alpha, info)
 
     --print("alpha", alpha)
     while #cList > 0 do
-    --while table.getn(cList) > 0 do
-        --table.sort(cList, function(i, j) return info.c[r][i] <= info.c[r][j] end)
         sort(cList, r, info)
 
         --print(alpha)
