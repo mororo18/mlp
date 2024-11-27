@@ -3,8 +3,6 @@ mod data;
 
 use subseq::*;
 
-use rand::Rng;
-
 use std::time::Duration;
 use cpu_time::ProcessTime;
 
@@ -322,14 +320,10 @@ fn rvnd(solut: &mut Solution, info: &mut Info) {
     ];
 
 
-    let mut rng = rand::thread_rng();
     while neighbd_list.is_empty() == false {
-        let _ = rng.gen::<usize>() % neighbd_list.len();
 
         let index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
-
-        //println!("{} {}", info.rnd_index, index);
 
         let neighbd = neighbd_list[index];
 
@@ -360,7 +354,6 @@ fn rvnd(solut: &mut Solution, info: &mut Info) {
 }
 
 fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
-    let mut rng = rand::thread_rng();
     let mut s = sl.clone();
     let mut a_start : usize = 1;
     let mut a_end : usize = 1;
@@ -378,11 +371,6 @@ fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
 
     #[allow(unused_assignments)]
     while (a_start <= b_start &&  b_start <= a_end) || (b_start <= a_start && a_start <= b_end) {
-        a_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        a_end = a_start + rng.gen_range(range.clone());
-
-        b_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        b_end = b_start + rng.gen_range(range.clone());
 
         a_start = info.rnd[info.rnd_index];
         info.rnd_index += 1;
@@ -428,13 +416,11 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
     };
 
 
-    let mut rng = rand::thread_rng();
     for _i in 0..imax {
-        let mut alpha : f64 = r[rng.gen::<usize>() % 26];
 
         let r_value = info.rnd[info.rnd_index];
         info.rnd_index += 1;
-        alpha = r[r_value];
+        let alpha = r[r_value];
 
         println!("[+] Local Search {}", _i);
         solut_crnt.s = construction(alpha, info);

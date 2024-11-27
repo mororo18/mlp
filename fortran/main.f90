@@ -189,29 +189,12 @@ function construction(alpha, info) result(ret)
     r = 1
     do j=2, info%dimen
         call sort(cL, cL_size, r, info)
-        !print *, info%cost(1,318)
-        !!print *, info%cost(r, cL(1)-1)
-        !print *, cL
-        !call exit(0)
-        rng = ceiling(cL_size * alpha)
-        !!!
-        !RND  = rand()
-        call random_number(RND)
-        RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
-        index_ = ceiling(rng * RND)
-        index_ = merge(1, index_, index_ < 1 )
-        !!!
 
-#ifndef RANDOM
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
-#endif
 
         cN = cL(index_)
 
-        !print *, "Novo noh", cN
-
-        ! memmove on cL
         call arr_shift(cL, index_+1, index_, cL_size-index_)
         cL_size = cL_size-1
 
@@ -219,7 +202,6 @@ function construction(alpha, info) result(ret)
         r = cN
     end do
 
-    !call exit(0)
     s(info%dimen+1) = 1
 
     ret = s(:)
@@ -617,17 +599,8 @@ subroutine RVND(sol, info, it)
     yes = .false.
     total = 0
     do while (nl_size > 0)
-        !!!
-        !rnd =  rand()
-        call random_number(rnd)
-        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-        index_ = ceiling(rnd*nl_size)
-        !!!
-
-#ifndef RANDOM
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
-#endif
 
 #ifdef DEBUG
         ASSERT(index_ > nl_size, .false.)
@@ -679,17 +652,6 @@ subroutine RVND(sol, info, it)
 
 end subroutine
 
-subroutine notnull_rnd(rnd)
-    use types
-    implicit none
-    real(typeReal), intent(out) :: RND
-
-    !RND =  rand()
-    call random_number(RND)
-
-    RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
-end subroutine
-
 subroutine perturb(solut_crnt, solut_part, info)! result(ret)
     use types
 
@@ -720,21 +682,6 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
     size_min = 2
 
     do while ((A_start <= B_start .and. B_start <= A_end) .or. (B_start <= A_start .and. A_start <= B_end))
-        !!!
-       max_ = (info%dimen+1) -2 -size_max
-       call notnull_rnd(rnd)
-       A_start = ceiling(max_ * rnd) + 1
-       call notnull_rnd(rnd)
-       A_end = A_start + ceiling(((size_max-size_min) * rnd) + size_min)
-
-       call notnull_rnd(rnd)
-       B_start = ceiling(max_ * rnd) + 1
-       call notnull_rnd(rnd)
-       B_end = B_start + ceiling(((size_max-size_min) * rnd) + size_min)
-       !!!
-
-
-#ifndef RANDOM
        A_start = info%rnd(info%rnd_index) + 1
        info%rnd_index = info%rnd_index + 1
        A_end = A_start + info%rnd(info%rnd_index) 
@@ -744,7 +691,6 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
        info%rnd_index = info%rnd_index + 1
        B_end = B_start + info%rnd(info%rnd_index) 
        info%rnd_index = info%rnd_index + 1
-#endif
 
     end do
 
@@ -821,18 +767,9 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
     Tit = 0
     do i=1, Imax
-        !!!
-        !rnd  = rand()
-        call random_number(rnd)
-        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-        index_ = ceiling(rnd*R_size)
-        !!!
 
-#ifndef RANDOM
-        print *, "Not Random"
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
-#endif
 
         alpha = R(index_)
         print *, "[+] Local Search ", i
@@ -909,7 +846,6 @@ program main
     real(typeReal) :: opa
 
     logical :: viabilidade
-!   opa = 10.0
 
     INTEGER :: begin, end_, rate
 
@@ -945,14 +881,10 @@ program main
 
     end interface
 
-    !call srand(0)
-
     call load_matrix(info%cost, info%rnd)
 
     dimensions = shape(info%cost(:,:))
     info%dimen = dimensions(1)
-
-    !call print_matrix(info%cost)
 
     R = (/ 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09,  0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, &
     0.20, 0.21, 0.22, 0.23, 0.24, 0.25 /)

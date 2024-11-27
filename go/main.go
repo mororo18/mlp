@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"os"
 )
 
@@ -208,10 +207,7 @@ func construction(alpha float64, info *tInfo) []int {
 	for len(cL) > 0 {
 		sort(&cL, r, info)
 
-		rg := int(math.Ceil(float64(len(cL))*alpha)) + 1
-
-		index := rand.Intn(rg)
-		index = info.rnd[info.rnd_index]
+        index := info.rnd[info.rnd_index]
 		info.rnd_index++
 
 		c := cL[index]
@@ -220,8 +216,6 @@ func construction(alpha float64, info *tInfo) []int {
 		cL = remove(cL, index)
 		s = append(s, c)
 
-		//fmt.Println(cL)
-		//fmt.Println(s)
 	}
 
 	s = append(s, 0)
@@ -566,8 +560,7 @@ func RVND(solut *tSolution, info *tInfo) {
 	//fmt.Println(solut.s)
 
 	for len(n_list) > 0 {
-		index := rand.Intn(len(n_list))
-		index = info.rnd[info.rnd_index]
+        index := info.rnd[info.rnd_index]
 		info.rnd_index++
 
 		//fmt.Println(n_list)
@@ -606,19 +599,7 @@ func perturb(sl []int, info *tInfo) []int {
 	B_start := 1
 	B_end := 1
 
-	size_max := 3
-	if int(float64(len(s)/10.0)) >= 2 {
-		size_max = int(float64(len(s) / 10.0))
-	}
-
-	size_min := 2
-
 	for (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
-		A_start = rand.Intn(len(s)-2-size_max) + 1
-		A_end = A_start + rand.Intn(size_max-size_min) + size_min
-
-		B_start = rand.Intn(len(s)-2-size_max) + 1
-		B_end = B_start + rand.Intn(size_max-size_min) + size_min
 
 		A_start = info.rnd[info.rnd_index]
 		info.rnd_index++
@@ -692,8 +673,7 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, info tInfo) {
 
 		fmt.Printf("[+] Local Search %d\n", i)
 
-		index := rand.Intn(len(R))
-		index = info.rnd[info.rnd_index]
+        index := info.rnd[info.rnd_index]
 		info.rnd_index++
 
 		solut_crnt.s = construction(R[index], &info)

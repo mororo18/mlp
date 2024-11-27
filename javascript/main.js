@@ -68,9 +68,7 @@ function construction(alpha, info) {
     while (cList.length > 0) {
         sort(cList, r, info);
 
-        var a = Math.random()*(cList.length)*alpha;
-        var i = parseInt(a);
-        i = info.rnd[info.rnd_index++];
+        var i = info.rnd[info.rnd_index++];
         var c = cList.splice(i, 1);
         c = c[0];
         s.push(c);
@@ -303,11 +301,8 @@ function RVND(s, subseq, info) {
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
 
     var improve = false;
-    var ITER = 0;
 
     while (neighbd_list.length > 0) {
-        ITER++;
-        let i = parseInt(Math.random() * neighbd_list.length);
         i = info.rnd[info.rnd_index++];
         let neighbd = neighbd_list[i];
 
@@ -336,8 +331,6 @@ function RVND(s, subseq, info) {
         }
     }
 
-    return ITER;
-
 }
 
 function perturb(sl, info) {
@@ -351,13 +344,6 @@ function perturb(sl, info) {
     var size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        var max = sl.length - 1 - size_max;
-        A_start = parseInt(Math.random()*max) + 1;
-        A_end = A_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
-
-        B_start = parseInt(Math.random()*max) + 1;
-        B_end = B_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
-
 
         A_start = info.rnd[info.rnd_index++];
         A_end = A_start + info.rnd[info.rnd_index++];
@@ -384,11 +370,8 @@ function GILS_RVND(Iils, Imax, R, info) {
     var s_best = [];
     var cost_best = Number.MAX_VALUE;
 
-    var ITER = 0;
-
     for (var i = 0; i < Imax; i++) {
-        var alpha = R[parseInt(Math.random() * 26)];
-        alpha = R[info.rnd[info.rnd_index++]];
+        var alpha = R[info.rnd[info.rnd_index++]];
         console.log("[+] Local Search ", i+1);
         console.log("\t[+] Constructing Inital Solution..");
         var s = construction(alpha, info);
@@ -401,7 +384,7 @@ function GILS_RVND(Iils, Imax, R, info) {
 
         console.log("\t[+] Looking for the best Neighbor..");
         while (iterILS < Iils) {
-            ITER += RVND(s, subseq, info);
+            RVND(s, subseq, info);
             var rvnd_cost_crnt = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
             if (rvnd_cost_crnt < rvnd_cost_best) {
                 rvnd_cost_best = rvnd_cost_crnt;

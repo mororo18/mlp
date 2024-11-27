@@ -11,8 +11,6 @@ class GILS_RVND {
                                         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
     private final int               R_size = 26;
 
-    Random rand;
-
     tInfo info;
 
     GILS_RVND(){
@@ -31,8 +29,6 @@ class GILS_RVND {
         info = new tInfo(dimension, c, rnd);
 
         Iils = (dimension < 100 ? dimension : 100);
-
-        rand = new Random();
     }
 
     private void subseq_load(tSolution solut, tInfo info){
@@ -331,14 +327,6 @@ class GILS_RVND {
         int size_min = 2;
 
         while((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)){
-            int max = sl.size() - 1 - size_max;
-            A_start = rand.nextInt(max) + 1;
-            A_end = A_start + rand.nextInt(size_max - size_min + 1) + size_min;
-
-            B_start = rand.nextInt(max) + 1;
-            B_end = B_start + rand.nextInt(size_max - size_min + 1) + size_min;
-
-
 
             A_start = info.rndCrnt();
             A_end = A_start + info.rndCrnt();
@@ -364,11 +352,9 @@ class GILS_RVND {
         tSolution solut_partial = new tSolution(info.getDimen(), 0);
 
         for(int i = 0; i < Imax; i++){
-            double alpha = R[rand.nextInt(R_size)];
             int index = info.rndCrnt();
 
-            alpha = R[index];
-            //System.out.print(index);
+            double alpha = R[index];
 
             System.out.print("[+] Local Search ");
             System.out.println(i+1);
@@ -387,12 +373,9 @@ class GILS_RVND {
             System.out.println("\t[+] Looking for the best Neighbor..");
             while(iterILS < Iils){
                 RVND(solut_crnt, info);
-                //System.exit(1);
                 if(solut_crnt.getCost() < solut_partial.getCost()){
                     solut_partial.setCost(solut_crnt.getCost());
                     solut_partial.storeSolut(solut_crnt.getSolutCpy());
-                    //sl.clear();
-                    //sl = new ArrayList<>(s);
                     iterILS = 0;
                 }
 
@@ -400,8 +383,6 @@ class GILS_RVND {
                 subseq_load(solut_crnt, info);
                 iterILS++;
             }
-            //subseq_load(sl, subseq);
-            //double sl_cost = subseq[0][dimension][C] - EPSILON;
             
             if(solut_partial.getCost() < solut_best.getCost()){
                 solut_best.storeSolut(solut_partial.getSolutCpy());
@@ -416,21 +397,5 @@ class GILS_RVND {
         System.out.println(solut_best.getCost());
         System.out.print("SOLUTION: ");
         solut_best.getSolut().printPretty();
-        /*
-        System.out.print("Construction: ");
-        System.out.println(t_construction/10e8);
-        System.out.print("swap: ");
-        System.out.println(t_swap/10e8);
-        System.out.print("2_opt: ");
-        System.out.println(t_two_opt/10e8);
-        System.out.print("or_opt2: ");
-        System.out.println(t_or_opt2/10e8);
-        System.out.print("or_opt3: ");
-        System.out.println(t_or_opt3/10e8);
-        System.out.print("reinsertion: ");
-        System.out.println(t_reinsertion/10e8);
-        System.out.print("subseq_load: ");
-        System.out.println(t_subseq/10e8);
-        */
     }
 }

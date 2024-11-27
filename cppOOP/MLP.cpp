@@ -1,7 +1,6 @@
 #include "MLP.hpp"
 
 MLP::MLP(tInfo & info) {
-    srand(clock());
 
     this->info = &info;
 
@@ -71,13 +70,7 @@ std::vector<int> MLP::construct(const double alpha, tInfo & info) {
     while (!cL.empty()) {
         sort(cL, r, info);
 
-        /**/
-        int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = info.getRndCrnt();
+        int index = info.getRndCrnt();
         int c = cL[index];
         s.push_back(c);
         r = c;
@@ -312,7 +305,6 @@ void MLP::RVND(tSolution & solut, tInfo & info) {
 
     while (!neighbd_list.empty()) {
 
-        index = rand() % neighbd_list.size();
         index = info.getRndCrnt();
         neighbd = neighbd_list[index];
 
@@ -378,32 +370,11 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
     //std::cout << "perturbing\n";
     //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (info.getDimen()+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
-
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         A_start = info.getRndCrnt();
-        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + info.getRndCrnt();
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         B_start = info.getRndCrnt();
-        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + info.getRndCrnt();
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
 
     auto reinsert = [](std::vector<int> &vec, int i, int j, int pos){
@@ -441,9 +412,7 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
     tSolution solut_best(info);
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = info.getRndCrnt();
-        //aux = info.rnd[info.rnd_index++];
+        int aux = info.getRndCrnt();
 
         double alpha = R_table(aux);
 

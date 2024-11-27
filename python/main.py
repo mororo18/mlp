@@ -2,7 +2,6 @@
 
 import time
 from read import *
-from random import randint
 import math
 import sys
 #import matplotlib.pyplot as plt 
@@ -85,11 +84,6 @@ def construction(alpha : float, info : tInfo) -> List[int]:
         i = int(len(c_list)*alpha) + 1
 
         sort(c_list, r, info)
-        #c_list = sorted(c_list, key = lambda k : info.cost[k][r], reverse=False)
-
-        ##
-        c = c_list[randint(0, i-1)]
-        ##
 
         r_value = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -417,41 +411,23 @@ def RVND(solut : tSolution, info : tInfo) -> None:
     #print(solut.s)
 
     while len(neighbd_list) > 0:
-        ##
-        i = randint(0, len(neighbd_list)-1)
-        ##
         i = info.rnd[info.rnd_index]
-        #print(info.rnd_index, i )
-        #print(neighbd_list)
         info.rnd_index += 1
-
 
         neighbd = neighbd_list[i]
 
         improve : bool = False
 
         if neighbd == info.SWAP:
-            #t_swap -= time.time()
             improve = search_swap(solut, info)
-            #t_swap += time.time()
         elif neighbd == info.TWO_OPT:
-           #t_two_opt -= time.time()
             improve = search_two_opt(solut, info)
-           #t_two_opt += time.time()
         elif neighbd == info.REINSERTION:
-           #t_reinsertion -= time.time()
             improve = search_reinsertion(solut, info, info.REINSERTION, solut.seq)
-           #t_reinsertion += time.time()
         elif neighbd == info.OR_OPT_2:
-           #t_or_opt2 -= time.time()
             improve = search_reinsertion(solut, info, info.OR_OPT_2, solut.seq)
-           #t_or_opt2 += time.time()
         elif neighbd == info.OR_OPT_3:
-           #t_or_opt3 -= time.time()
             improve = search_reinsertion(solut, info, info.OR_OPT_3, solut.seq)
-           #t_or_opt3 += time.time()
-
-        #print(improve)
 
         if improve == True:
             neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
@@ -469,13 +445,6 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
     size_min = 2
 
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        ##
-        A_start = randint(1, len(s) - 1 - size_max)
-        A_end = A_start + randint(size_min, size_max)
-
-        B_start = randint(1, len(s) - 1 - size_max)
-        B_end = B_start + randint(size_min, size_max)
-        ##
 
         A_start = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -503,12 +472,7 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
     solut_best : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), float('inf'))
 
     for i in range(Imax):
-        ##
-        alpha : float = R[randint(0, len(R)-1)]
-        ##
-
         r_value = info.rnd[info.rnd_index]
-        print(r_value)
         info.rnd_index += 1
 
         alpha = R[r_value]
@@ -524,7 +488,6 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
         print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
-            #print("ILS")
             RVND(solut_crnt, info)
 
             if solut_crnt.cost < solut_partial.cost:
@@ -532,9 +495,7 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
                 solut_partial.cost = solut_crnt.cost
                 iterILS = 0
 
-            #t_perturb -= time.time()
             solut_crnt.s = perturb(solut_partial.s, info)
-            #t_perturb += time.time()
             subseq_load(solut_crnt, info)
             iterILS += 1
 
@@ -548,12 +509,6 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
 
     print("COST: {}".format (solut_best.cost))
     print("SOLUTION: {}".format(solut_best.s))
-   #print("Total Iterations RVND {}".format(IT))
-   #print("swap", improv_swap)
-   #print("two_opt", improv_two_opt)
-   #print("reinsertion", improv_reinsertion)
-   #print("or-opt_2", improv_or_2)
-   #print("or-opt_3", improv_or_3)
 
 def main() -> None:
     dimension :int
@@ -568,20 +523,6 @@ def main() -> None:
 
     info = tInfo(dimension, cost, rnd)
 
-    """
-    test = deepcopy(info)
-
-    print(test.dimen)
-
-    solut = tSolution([i for i in range(info.dimen)], subseq_fill(info), 0)
-
-    solut.s.append(0)
-    subseq_load(solut, info)
-
-    print(solut.s, solut.seq, solut.cost)
-
-"""
-
     start = time.time()
     GILS_RVND(Imax, Iils, R, info)
     print("TIME: %s " % (time.time() - start))
@@ -589,11 +530,3 @@ def main() -> None:
     print("ITERACOES: ", info.IT)
 
 main()
-"""
-print("SWAP %s" % t_swap)
-print("Reinsert %s" % t_reinsertion)
-print("or_opt2 %s" % t_or_opt2)
-print("or_opt3 %s" % t_or_opt3)
-print("two_opt %s" % t_two_opt)
-print("subseq_load %s" % t_seq)
-"""

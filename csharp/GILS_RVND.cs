@@ -5,7 +5,6 @@ using System.Diagnostics;
 
 namespace MLP {
     class GILS_RVND {
-        Random rand;
         tInfo info;
 
         private  int                    Iils;
@@ -39,7 +38,6 @@ namespace MLP {
             int [] rnd = data.GetRnd();
 
             info = new tInfo(dimension, c, rnd);
-            rand = new Random();
         }
 
         private void subseq_load(tSolution solut, tInfo info){
@@ -127,11 +125,7 @@ namespace MLP {
 
                 sort(cList, r, info);
 
-                int range = (int)(((double)cList.Count) * alpha) +1;
-
-                int r_value = rand.Next(range);
-                //r_value = rnd[rnd_index++];
-                r_value = info.GetRndCrnt();
+                int r_value = info.GetRndCrnt();
 
                 int cN = cList[r_value];
                 s.Add(cN);
@@ -361,51 +355,33 @@ namespace MLP {
             */
 
             while(neighbd_list.Count != 0){
-                int i_rand = rand.Next(neighbd_list.Count);
-                i_rand = info.GetRndCrnt();
-                //i_rand = rnd[rnd_index++];
+                int i_rand = info.GetRndCrnt();
 
                 int neighbd = neighbd_list[i_rand];
 
                 bool improve = false;
-                //Console.WriteLine(string.Format("T: ({0}).", string.Join(", ", neighbd_list)));
 
                 switch(neighbd){
                     case tInfo.REINSERTION:
-                        //t_reinsertion -= Stopwatch.GetTimestamp();
                         improve = search_reinsertion(solut, info, tInfo.REINSERTION);
-                        //t_reinsertion += Stopwatch.GetTimestamp();
                         break;
                     case tInfo.OR_OPT2:
-                        //t_or_opt2 -= Stopwatch.GetTimestamp();
                         improve = search_reinsertion(solut, info, tInfo.OR_OPT2);
-                        //t_or_opt2 += Stopwatch.GetTimestamp();
                         break;
                     case tInfo.OR_OPT3:
-                        //t_or_opt3 -= Stopwatch.GetTimestamp();
                         improve = search_reinsertion(solut, info, tInfo.OR_OPT3);
-                        //t_or_opt3 += Stopwatch.GetTimestamp();
                         break;
                     case tInfo.SWAP:
-                        //t_swap -= Stopwatch.GetTimestamp();
                         improve = search_swap(solut, info);
-                        //t_swap += Stopwatch.GetTimestamp();
                         break;
                     case tInfo.TWO_OPT:
-                        //t_two_opt -= Stopwatch.GetTimestamp();
                         improve = search_two_opt(solut, info);
-                        //t_two_opt += Stopwatch.GetTimestamp();
                         break;
                 }
 
-                //Environment.Exit(0);
-
                 if(improve){
-                    //neighbd_list.Clear();
                     neighbd_list = new List<int> {tInfo.SWAP, tInfo.TWO_OPT, tInfo.REINSERTION, tInfo.OR_OPT2, tInfo.OR_OPT3};
-                    //Console.WriteLine("not Removed " + i_rand);
                 }else{
-                    //Console.WriteLine("Removed " + i_rand);
                     neighbd_list.RemoveAt(i_rand);
                 }
             }
@@ -422,11 +398,6 @@ namespace MLP {
             int size_min = 2;
 
             while((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)){
-                int max = sl.Count - 1 - size_max;
-                A_start = rand.Next(max) + 1;
-                A_end = A_start + rand.Next(size_max - size_min + 1) + size_min;
-                B_start = rand.Next(max) + 1;
-                B_end = B_start + rand.Next(size_max - size_min + 1) + size_min;
 
                 A_start = info.GetRndCrnt();
                 A_end = A_start + info.GetRndCrnt();
@@ -453,8 +424,7 @@ namespace MLP {
             var solut_partial = new tSolution(info.GetDimen(), 0.0);
 
             for(int i = 0; i < Imax; i++){
-                int index = rand.Next(R_size);
-                index = info.GetRndCrnt();
+                int index = info.GetRndCrnt();
                 double alpha = R[index];
 
                 Console.WriteLine("[+] Local Search " + (i+1));

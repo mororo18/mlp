@@ -47,29 +47,17 @@ function subseq_load(solut::tSolution, info::tInfo) # dimension::Int, c::Matrix{
          solut.seq[info.T, i, i] = 0.0
          solut.seq[info.C, i, i] = 0.0
          solut.seq[info.W, i, i] = i!=1#convert(Float64, i != 0)
-       #solut.seq[i, i].T = 0.0
-       #solut.seq[i, i].C = 0.0
-       #solut.seq[i, i].W = i!=1#convert(Float64, i != 0)
 
         for j in i+1:info.dimen+1
             j_prev = j-1
 
-            #solut.seq[i, j, info.T] = info.cost[solut.s[j_prev], solut.s[j]] + solut.seq[i, j_prev, info.T]
-            #solut.seq[i, j, info.C] = solut.seq[i, j, info.T] + solut.seq[i, j_prev, info.C]
-            #solut.seq[i, j, info.W] = j + k
             solut.seq[info.T, j, i] = info.cost[solut.s[j_prev], solut.s[j]] + solut.seq[info.T, j_prev, i]
             solut.seq[info.C, j, i] = solut.seq[info.T, j, i] + solut.seq[info.C, j_prev, i]
-            #println(solut.seq[i, j].C)
             solut.seq[info.W, j, i] = j + k
-            #println(solut.seq[i, j])
 
         end
     end
     solut.cost = solut.seq[info.C, info.dimen+1, 1]
-   #println(solut.seq[1, info.dimen])
-   #println(solut.cost)
-   ##println(solut.seq)
-   #exit(0)
 
     return
 end
@@ -107,16 +95,10 @@ function construction(alpha::Float64, info::tInfo)::Array{Int, 1}
     while length(cList) > 0
         sort(cList, r, info)
 
-        i = convert(Int, floor(length(cList)*alpha + 1))
-        r_value = rand(1:i)
-
         r_value = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
 
         cN = cList[r_value]
-
-        #println(r, " ", cN, " ", info.cost[r, cN])
-        #println(r_value, " ", cN)
 
         push!(s, cN)
         r = cN
@@ -334,50 +316,29 @@ function RVND(solut::tSolution, info::tInfo)
     """
 
     while length(neighbd_list) > 0
-        # global it += 1
-        ###
-        i = rand(1:length(neighbd_list))
-        ###
         
         i = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
         
-        ###
-        #push!(info.rand_values, i-1)
-        ###
-        
         neighbd = neighbd_list[i]
-        #println(info.rnd_index, " ", i)
 
         improve = false
 
-        #time_before_search = time_ns()
         if neighbd == info.REINSERTION
             improve = search_reinsertion(solut, info, info.REINSERTION)
-            #t_reinsertion_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.OR_OPT2
             improve = search_reinsertion(solut, info, info.OR_OPT2)
-            #t_or_opt2_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.OR_OPT3
             improve = search_reinsertion(solut, info, info.OR_OPT3)
-            #t_or_opt3_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.SWAP
             improve = search_swap(solut, info)
-            #t_two_opt_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.TWO_OPT
             improve = search_two_opt(solut, info)
-            #t_swap_local += (time_ns() - time_before_search) * 1e9
         end
 
         if improve
             neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3]
         else
-            #println(info.rnd_index)
-            #=
-            if info.rnd_index > 5591
-                exit(0)
-            end
-            =#
             deleteat!(neighbd_list, i)
         end
 
@@ -397,13 +358,6 @@ function perturb(solut_partial::tSolution, info::tInfo)::Array{Int64, 1}
     size_min = 2
 
     while (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)
-        #= =#
-        A_start = rand(2:length(s)-1-size_max)
-        A_end = A_start + rand(size_min:size_max)
-
-        B_start = rand(2:length(s)-1-size_max)
-        B_end = B_start + rand(size_min:size_max)
-        #= =#
 
         A_start = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
@@ -414,14 +368,6 @@ function perturb(solut_partial::tSolution, info::tInfo)::Array{Int64, 1}
         info.rnd_index += 1
         B_end = B_start + info.rnd[info.rnd_index]
         info.rnd_index += 1
-        
-        ###
-       #push!(info.rand_values, A_start-1)
-       #push!(info.rand_values, A_end - A_start)
-       #push!(info.rand_values, B_start-1)
-       #push!(info.rand_values, B_end - B_start)
-        ###
-        #
     end
 
     if A_start < B_start
@@ -445,39 +391,18 @@ end
 
 function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
 
-   #solut_best::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), Inf)
-   #solut_partial::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), 0)
-   #solut_crnt::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), 0)
-   solut_best::tSolution = tSolution(zeros(Int, info.dimen+1), Array{Float64, 3}(undef, 3, info.dimen+1, info.dimen+1), Inf)
+    solut_best::tSolution = tSolution(zeros(Int, info.dimen+1), Array{Float64, 3}(undef, 3, info.dimen+1, info.dimen+1), Inf)
     solut_partial::tSolution = tSolution(zeros(Int, info.dimen+1), Array{Float64, 3}(undef, 3, info.dimen+1, info.dimen+1), 0)
     solut_crnt::tSolution = tSolution(zeros(Int, info.dimen+1), Array{Float64, 3}(undef, 3, info.dimen+1, info.dimen+1), 0)
 
-  # tempo = 0
-  # tempo += @elapsed seq_init(solut_best.seq, info)
-  # tempo += @elapsed seq_init(solut_crnt.seq, info)
-  # tempo += @elapsed  seq_init(solut_partial.seq, info)
-
-  # println("zora :  ", tempo)
-   #fill!(solut_best.seq, tSeqInfo(0.0, 0.0, 0.0))
-   #fill!(solut_crnt.seq, tSeqInfo(0.0, 0.0, 0.0))
-   #fill!(solut_partial.seq, tSeqInfo(0.0, 0.0, 0.0))
-
     for i in 1:Imax
-        ###
-        r_value = rand(1:26)
-        #push!(info.rand_values, r_value - 1)
-        ###
-        #r_value = Base.unsafe_getindex(info.rnd, info.rnd_index) + 1
         r_value = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
-
-        #println(r_value)
 
         alpha = R[r_value]
 
         @printf "[+] Local Search %d\n" i
         solut_crnt.s = construction(alpha, info)
-        #println(solut_crnt.s)
         subseq_load(solut_crnt, info)
         @printf "\t[+] Constructing Inital Solution.. %.2lf\n" solut_crnt.cost
 
@@ -492,8 +417,6 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
                 solut_partial.cost = solut_crnt.cost
                 solut_partial.s = copy(solut_crnt.s)
                 iterILS = 0
-
-                #println(solut_partial.cost, solut_partial.s);
             end
 
             solut_crnt.s = perturb(solut_partial, info)
@@ -501,8 +424,6 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
 
             iterILS += 1
         end
-
-        #exit(0)
 
         subseq_load(solut_partial, info)
 
@@ -531,47 +452,11 @@ function main()
 
     info::tInfo = tInfo(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, 1e-15, 0, rand_values, 1)
 
-    #=
-    solut::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), 0)
-    for i in 1:info.dimen
-        solut.s[i] = i
-    end
-    solut.s[info.dimen+1] = 1
-    =#
-
     time = @elapsed GILS_RVND(Imax, Iils, R, info)
 
     @printf "TIME: %.6lf\n" time
     println("reinsertion calls ", info.reinsert_count)
-    #@printf "RVND iteracoes %d\n" it
-    #println(rand_values) 
-    
-    
-    #=
-    f = open("../rand_iter_values/" * inst_nome, "w")
-    write(f, string(length(info.rand_values)) * "\n")
-    for val in info.rand_values
-        write(f, string(val) * "\n")
-    end
-    close(f)
-    =#
-    #println(info.rand_values)
 
 end
 
-#@pprof main()
 main()
-#@code_warntype main()
-
-# using ProfileView, Profile, PProf
-#=
-Profile.init(delay = 0.00005)
-main()
-Profile.clear()
-# # @profview main()
-@profile main()
-# ProfileView.view()
-Profile.print(format=:flat, sortedby=:count, mincount=:100)
-#pprof(;webport=58599)
-# readline()
- =#

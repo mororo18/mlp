@@ -169,13 +169,7 @@ std::vector<int> construct(const double alpha, tInfo & info){
     while (!cL.empty()) {
         sort(cL, r, info);
 
-        /**/
-        int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = info.rnd[info.rnd_index++];
+        int index = info.rnd[info.rnd_index++];
 
         int c = cL[index];
         s.push_back(c);
@@ -609,8 +603,6 @@ void RVND(tSolution & solut, tInfo & info) {
     while (!neighbd_list.empty()) {
         //k++;
 
-        index = rand() % neighbd_list.size();
-        //cout << info.rnd[info.rnd_index] << endl;
         index = info.rnd[info.rnd_index++];
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
@@ -676,36 +668,14 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
     //std::cout << "perturbing\n";
     //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (info.dimen+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         A_start = info.rnd[info.rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + info.rnd[info.rnd_index++];
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         B_start = info.rnd[info.rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + info.rnd[info.rnd_index++];
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -713,9 +683,6 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
         reinsert(s, A_start, A_end-1, B_end);
         reinsert(s, B_start, B_end-1, A_end);
     }
-
-    //print_s(s);
-    //subseq_load(solut, info);
 
     return s;
 }
@@ -728,8 +695,7 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
     tSolution solut_best = Solution_init(info);
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = info.rnd[info.rnd_index++];
+        int aux = info.rnd[info.rnd_index++];
 
         double alpha = R_table(aux);
 
@@ -740,30 +706,22 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
         solut_crnt.s = construct(alpha, info);
         subseq_load(solut_crnt, info);
 
-        //solut_partial = solut_crnt;
         Solution_cpy(solut_crnt, solut_partial, info);
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
 
         int iterILS = 0;
-        //int k = 0;
         while (iterILS < Iils) {
-            //k++;
             RVND(solut_crnt, info);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
                 Solution_cpy(solut_crnt, solut_partial, info);
-                //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
             solut_crnt.s = perturb(&solut_partial, info);
             subseq_load(solut_crnt, info);
-            //exit(0);
-            //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
-
-        //subseq_load(solut_partial, info);
 
         if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
             Solution_cpy(solut_partial, solut_best, info);

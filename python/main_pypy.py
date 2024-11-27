@@ -2,7 +2,6 @@
 
 import time
 from read import *
-from random import randint
 import math
 import sys
 #import matplotlib.pyplot as plt 
@@ -57,20 +56,32 @@ def subseq_fill(info : tInfo) -> List[List[List[float]]]:
 
     return arr
 
+def quicksort(arr, left, right, info, r):
+    if left < right:
+        pivot = partition(arr, left, right, info, r)
+        quicksort(arr, left, pivot - 1, info, r)
+        quicksort(arr, pivot + 1, right, info, r)
+
+def partition(arr, left, right, info, r):
+    pivot = arr[right]
+    i = left - 1
+    for j in range(left, right):
+        if info.cost[r][arr[j]] < info.cost[r][pivot]:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[right] = arr[right], arr[i + 1]
+    return i + 1
+
+def sort(arr, r, info):
+    quicksort(arr, 0, len(arr) - 1, info, r)
+
 def construction(alpha : float, info : tInfo) -> List[int]:
     s : List[int] = [0]
     c_list : List[int] = list(range(1, info.dimen))
 
     r = 0
     while len(c_list) > 0:
-
-        i = int(len(c_list)*alpha) + 1
-
-        c_list = sorted(c_list, key = lambda k : info.cost[k][r], reverse=False)
-
-        ##
-        c = c_list[randint(0, i-1)]
-        ##
+        sort(c_list, r, info)
 
         r_value = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -367,9 +378,6 @@ def RVND(solut : tSolution, info : tInfo) -> NoReturn:
     #print(solut.s)
 
     while len(neighbd_list) > 0:
-        ##
-        i = randint(0, len(neighbd_list)-1)
-        ##
         i = info.rnd[info.rnd_index]
         #print(info.rnd_index, i )
         #print(neighbd_list)
@@ -419,13 +427,6 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
     size_min = 2
 
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        ##
-        A_start = randint(1, len(s) - 1 - size_max)
-        A_end = A_start + randint(size_min, size_max)
-
-        B_start = randint(1, len(s) - 1 - size_max)
-        B_end = B_start + randint(size_min, size_max)
-        ##
 
         A_start = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -453,10 +454,6 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
     solut_best : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), float('inf'))
 
     for i in range(Imax):
-        ##
-        alpha : float = R[randint(0, len(R)-1)]
-        ##
-
         r_value = info.rnd[info.rnd_index]
         print(r_value)
         info.rnd_index += 1

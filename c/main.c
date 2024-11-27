@@ -97,15 +97,7 @@ void construct(int * ret, const Real alpha, tInfo * info){
     for (int j = 1; j < info->dimen; ++j) {
         sort(cL, cL_size, r, info);
 
-        /**/
-        int range = ceil(cL_size * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-#ifndef RANDOM
-        index = info->rnd[info->rnd_index++];
-#endif
+        int index = info->rnd[info->rnd_index++];
         int c = cL[index];
         s[j] = c;
         //print_s(cL);
@@ -393,14 +385,8 @@ void RVND(tSolution * solut, tInfo * info) {
     int neighbd;
     _Bool improve_flag;
 
-    //printf("RVND\n");
     while (nl_size > 0) {
-        //k++;
-        //printf("\t%.0lf\n", solut->cost);
-        index = rand() % nl_size;
-#ifndef RANDOM
         index = info->rnd[info->rnd_index++];
-#endif
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
         //
@@ -467,21 +453,12 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tInfo * info) {
     //std::cout << "perturbing\n";
     //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (info->dimen+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-
-#ifndef RANDOM
         A_start = info->rnd[info->rnd_index++];
         A_end = A_start + info->rnd[info->rnd_index++];
 
         B_start = info->rnd[info->rnd_index++];
         B_end = B_start + info->rnd[info->rnd_index++];
-#endif
     }
     
     if (A_start < B_start) {
@@ -514,10 +491,7 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
     //exit(0);
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-#ifndef RANDOM
-        aux = info->rnd[info->rnd_index++];
-#endif
+        int aux = info->rnd[info->rnd_index++];
 
         Real alpha = R_table(aux);
 
@@ -587,8 +561,6 @@ int main(int argc, char **argv){
     info.dimen = loadData(&info.cost, &rnd);
     info.rnd = rnd;
     info.rnd_index = 0;
-
-    srand(clock());
 
     Iils = info.dimen < 100 ? info.dimen : 100;
     time_t start = clock();

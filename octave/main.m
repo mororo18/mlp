@@ -33,22 +33,6 @@ function ret = subseq_load (sol, info)
     ret = sol;
 end
 
-function ret = sort_by(arr, r, info)
-    
-    for i = 1:sz
-        for j = 1:sz-i
-            %fprintf("eita");
-            if (info.cost(r, arr(j)) > info.cost(r, arr(j+1)))
-                tmp = arr(j);
-                arr(j) = arr(j+1);
-                arr(j+1) = tmp;
-            end
-        end
-    end
-    %fprintf("eita2");
-    ret = arr;
-end
-
 function arr = sort(arr, r, info)
     sz = size(arr);
     sz = sz(2);
@@ -91,13 +75,7 @@ function [ret, index_new] = construction(alpha, info)
     while (~isempty(cL)) 
         cL = sort(cL, r, info);
 
-        rng = ceil(length(cL)* alpha);
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001](RND < 0.0000000001 + 1);
-        index = ceil(rng * RND);
-        
         index = info.rnd(info.rnd_index) + 1;
-        %info.rnd(info.rnd_index);
         info.rnd_index = info.rnd_index+1;
 
         cN = cL(index);
@@ -105,9 +83,6 @@ function [ret, index_new] = construction(alpha, info)
         cL(index) = [];
         s(length(s)+1) = cN;
         r = cN;
-        %s;
-
-        %sz_cL = sz_cL - 1;
     end
     s(length(s)+1) = 1;
     ret = s;
@@ -330,10 +305,6 @@ function [s, cost, index_new] = RVND(solut, info)
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
     sz_nb = 5;
     while (isempty(neighbd_list) == false)
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(RND*sz_nb);
-        %info.rnd(info.rnd_index);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
 
@@ -369,12 +340,6 @@ function [s, cost, index_new] = RVND(solut, info)
     sz_nb = length(neighbd_list);
 end
 
-function ret = notnull_rnd()
-    RND = rand(1);
-    %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-    ret = RND;
-end
-
 function [ret, index_new] = perturb(solut, info)
     A_start = 1;
     A_end = 1;
@@ -389,30 +354,15 @@ function [ret, index_new] = perturb(solut, info)
     size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
-        max_ = (info.dimen+1) -2 -size_max;
-        rnd = notnull_rnd();
-        A_start = ceil(max_ * rnd) + 1;
-        rnd = notnull_rnd();
-        A_end = A_start + ceil(((size_max-size_min) * rnd) + size_min);
-
-        rnd = notnull_rnd();
-        B_start = ceil(max_ * rnd) + 1;
-        rnd = notnull_rnd();
-        B_end = B_start + ceil(((size_max-size_min) * rnd) + size_min);
-
 
         A_start = info.rnd(info.rnd_index) + 1;
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         A_end = A_start + info.rnd(info.rnd_index);
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
 
         B_start = info.rnd(info.rnd_index) + 1;
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         B_end = B_start + info.rnd(info.rnd_index);
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
     end
 
@@ -442,19 +392,14 @@ function ret = GILS_RVND(Imax, Iils, R, info)
     solut_best = solut_init(info);
 
     for i = 1:Imax
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(columns(R) * RND);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
         alpha = R(index);
 
         fprintf("[+] Search %d\n\n", i);
         fprintf("\t[+] Constructing..\n");
-        %"ITER ", i
 
         [solut_crnt.s, info.rnd_index] = construction(alpha, info);
-        %sout_crnt.s
         solut_crnt = subseq_load(solut_crnt, info);
 
         solut_partial = solut_crnt;
