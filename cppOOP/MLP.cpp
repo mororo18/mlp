@@ -1,7 +1,6 @@
 #include "MLP.hpp"
 
 MLP::MLP(tInfo & info) {
-    srand(clock());
     this->info = info;
 }
 
@@ -76,16 +75,9 @@ std::vector<int> MLP::construct(const double alpha, tInfo & info){
     while (!cL.empty()) {
         sort(cL, r, info);
 
-        /**/
-        int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = info.getRndCrnt();
+        int index = info.getRndCrnt();
         int c = cL[index];
         s.push_back(c);
-        //print_s(cL);
         r = c;
         cL.erase(cL.begin() + index);
     }
@@ -322,67 +314,42 @@ void MLP::RVND(tSolution & solut, tInfo & info) {
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     alignas(INT_SZ) int index;
     alignas(INT_SZ) int neighbd;
-    //int k = 0;
     bool improve_flag;
 
-    //cout << "RVND" << endl;
     while (!neighbd_list.empty()) {
-        //k++;
 
-        index = rand() % neighbd_list.size();
-        //cout << info.rnd[info.rnd_index] << endl;
         index = info.getRndCrnt();
         neighbd = neighbd_list[index];
-        //std::cout <<"aq\n";
 
         improve_flag = false;
 
         switch(neighbd){
             case REINSERTION:
-                //before();
                 improve_flag = search_reinsertion(solut, info, REINSERTION);
-                //after(REINSERTION);
                 break;				
             case OR_OPT_2:
-                //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_2);
-                //after(OR_OPT2);
                 break;				
             case OR_OPT_3:
-                //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_3);
-                //after(OR_OPT3);
                 break;				
             case SWAP:
-                //before();
                 improve_flag = search_swap(solut, info);
-                //after(SWAP);
                 break;
             case TWO_OPT:
-                //before();
                 improve_flag = search_two_opt(solut, info);
-                //after(TWO_OPT);
                 break;				
         }
-        //std::cout << (improve_flag ? "True" : "False") << std::endl;
+
         if (improve_flag) {
 
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
-            //std::cout << index << "  " << neighbd_list.size() << std::endl;
-            //std::cout << solut.cost << std::endl;
-            
-            //std::cout << info.rnd_index << std::endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
-        //std::cout << "cost  " << solut.cost << std::endl ;
-
-
     }
 
-    //exit(0);
-    //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
 std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
@@ -392,38 +359,12 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = std::floor((info.getDimen()+1)/10);
-    size_max = size_max >= 2 ? size_max : 2;
-    int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (info.getDimen()+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
-
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         A_start = info.getRndCrnt();
-        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + info.getRndCrnt();
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         B_start = info.getRndCrnt();
-        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + info.getRndCrnt();
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
 
     auto reinsert = [](std::vector<int> &vec, int i, int j, int pos){
@@ -437,8 +378,6 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
         }
     };
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -446,9 +385,6 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
         reinsert(s, A_start, A_end-1, B_end);
         reinsert(s, B_start, B_end-1, A_end);
     }
-
-    //print_s(s);
-    //subseq_load(solut, info);
 
     return s;
 }
@@ -461,8 +397,7 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
     tSolution solut_best(info);
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = info.getRndCrnt();
+        int aux = info.getRndCrnt();
 
         double alpha = R_table(aux);
 
@@ -472,12 +407,11 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
 
 
         solut_crnt.setSolutVec(
-                construct(alpha, info)
-                );
+            construct(alpha, info)
+        );
 
         subseq_load(solut_crnt, info);
 
-        //solut_partial = solut_crnt;
         solut_partial.copy(solut_crnt);
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.getCost());	
@@ -486,13 +420,10 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
         solut_partial.print();
 
         int iterILS = 0;
-        //int k = 0;
         while (iterILS < Iils) {
-            //k++;
             RVND(solut_crnt, info);
             if(solut_crnt.getCost() < solut_partial.getCost() - DBL_EPSILON){
                 solut_partial.copy(solut_crnt);
-                //solut_partial = solut_crnt;
                 iterILS = 0;
 
             }
@@ -500,25 +431,14 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
             auto s = perturb(&solut_partial, info);
             solut_crnt.setSolutVec(s);
             subseq_load(solut_crnt, info);
-            //exit(0);
-            //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
 
-        //subseq_load(solut_partial, info);
-
         if (solut_partial.getCost() < solut_best.getCost() - DBL_EPSILON) {
             solut_best.copy(solut_partial);
-            //solut_best = solut_partial;
         }
 
-        //after(7);
-
-        //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
         std::cout << "\tCurrent best cost: "<< solut_best.getCost() << std::endl;
-        //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
-        //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
-        //std::cout << k << "  Iteracoes " << std::endl;
 
         std::cout << "SOLUCAO: ";
         for(int i = 0; i < solut_best.getSolutVec().size(); i++){
@@ -527,7 +447,5 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
         std::cout << std::endl;
 
     }
-    //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", solut_best.getCost());
 }
-
