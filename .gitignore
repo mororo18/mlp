@@ -1,6 +1,6 @@
 .*.sw*
 
-rust/main_/target/*
+rust/target/
 python/__pycache__/
 *.mod
 *.mem
