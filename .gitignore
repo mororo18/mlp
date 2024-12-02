@@ -13,3 +13,6 @@ python/__pycache__/
 *.exe
 csharp/bin/
 csharp/obj/
+
+c/obj/*.o
+c/obj/*.d
