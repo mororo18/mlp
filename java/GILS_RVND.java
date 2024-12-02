@@ -39,8 +39,6 @@ class GILS_RVND {
     private static long t_reinsertion = 0;
     private static long t_subseq = 0;
 
-    Random rand;
-
     GILS_RVND(){
         Data data = new Data();
         data.loadData();
@@ -61,8 +59,6 @@ class GILS_RVND {
 
         subseq = new double [dimension+1][dimension+1][3];
         Iils = (dimension < 100 ? dimension : 100);
-
-        rand = new Random();
     }
 
     private void subseq_load(ArrayList<Integer> s, double [][][] seq){
@@ -129,29 +125,23 @@ class GILS_RVND {
 
             int range = (int)(((double)cList.size()) * alpha)+1;
 
-            int c = cList.get(rand.nextInt(range));
-            c = cList.get(rnd[rnd_index++]);
+            int c = cList.get(rnd[rnd_index++]);
 
             s.add(c);
             cList.remove(Integer.valueOf(c));
             r = c;
-            //System.out.println(cList);
         }
 
         s.add(0);
-        //System.out.println(s);
-        //System.exit(1);
         return s;
     }
 
     private void swap(ArrayList<Integer> s, int i, int j){
         Collections.swap(s, i, j);
-        //System.out.println(s);
     }
 
     private void reverse(ArrayList<Integer> s, int i, int j){
         Collections.reverse(s.subList(i,j+1));
-        //System.out.println(s);
     }
 
     private void reinsert(ArrayList<Integer> s, int i, int j, int pos){
@@ -361,37 +351,26 @@ class GILS_RVND {
 
         while(!neighbd_list.isEmpty()){
             
-            int i_rand = rand.nextInt(neighbd_list.size());
-            i_rand = rnd[rnd_index++];
+            int i_rand = rnd[rnd_index++];
             int neighbd = neighbd_list.get(i_rand);
 
             improv_flag = false;
 
             switch(neighbd){
                 case REINSERTION:
-                    //t_reinsertion -= System.nanoTime();
                     search_reinsertion(s, subseq, REINSERTION);
-                    //t_reinsertion += System.nanoTime();
                     break;
                 case OR_OPT2:
-                    //t_or_opt2 -= System.nanoTime();
                     search_reinsertion(s, subseq, OR_OPT2);
-                    //t_or_opt2 += System.nanoTime();
                     break;
                 case OR_OPT3:
-                    //t_or_opt3 -= System.nanoTime();
                     search_reinsertion(s, subseq, OR_OPT3);
-                    //t_or_opt3 += System.nanoTime();
                     break;
                 case SWAP:
-                    //t_swap -= System.nanoTime();
                     search_swap(s, subseq);
-                    //t_swap += System.nanoTime();
                     break;
                 case TWO_OPT:
-                    //t_two_opt -= System.nanoTime();
                     search_two_opt(s, subseq);
-                    //t_two_opt += System.nanoTime();
                     break;
             }
 
@@ -415,19 +394,7 @@ class GILS_RVND {
         int A_start = 1, A_end = 1;
         int B_start = 1, B_end = 1;
 
-        int size_max = (int)Math.floor(sl.size()/10);
-        size_max = (size_max >= 2 ? size_max : 2);
-        int size_min = 2;
-
         while((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)){
-            int max = sl.size() - 1 - size_max;
-            A_start = rand.nextInt(max) + 1;
-            A_end = A_start + rand.nextInt(size_max - size_min + 1) + size_min;
-
-            B_start = rand.nextInt(max) + 1;
-            B_end = B_start + rand.nextInt(size_max - size_min + 1) + size_min;
-
-
 
             A_start = rnd[rnd_index++];
             A_end = A_start + rnd[rnd_index++];
@@ -451,15 +418,12 @@ class GILS_RVND {
         double cost_best = Double.MAX_VALUE;
         ArrayList<Integer> s_best = new ArrayList<>();
         for(int i = 0; i < Imax; i++){
-            double alpha = R[rand.nextInt(R_size)];
-            alpha = R[rnd[rnd_index++]];
+            double alpha = R[rnd[rnd_index++]];
 
             System.out.print("[+] Local Search ");
             System.out.println(i+1);
             System.out.println("\t[+] Constructing Inital Solution..");
-            //t_construction -= System.nanoTime();
             ArrayList<Integer> s = construction(alpha);
-            //t_construction += System.nanoTime();
             ArrayList<Integer> sl = new ArrayList<>(s); 
             subseq_load(s, subseq); 
             double rvnd_cost_best = subseq[0][dimension][C] - EPSILON;
@@ -469,7 +433,6 @@ class GILS_RVND {
             System.out.println("\t[+] Looking for the best Neighbor..");
             while(iterILS < Iils){
                 RVND(s, subseq);
-                //System.exit(1);
                 rvnd_cost_crnt = subseq[0][dimension][C] - EPSILON; 
                 if(rvnd_cost_crnt < rvnd_cost_best){
                     rvnd_cost_best = rvnd_cost_crnt;

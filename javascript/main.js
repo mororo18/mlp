@@ -1,6 +1,5 @@
 #! /usr/bin/node
 
-
 var dimension;
 var c = [];
 var T = 0;
@@ -20,7 +19,6 @@ function subseq_fill(dimension) {
 }
 
 function subseq_load(s, seq) {
-    //console.log(info);
     for (var i = 0; i < dimension+1; i++) {
         var k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -35,7 +33,6 @@ function subseq_load(s, seq) {
             seq[i][j][W] = j + k;
         }
     }
-    //console.log(seq);
 }
 
 function sort(arr, r) {
@@ -69,7 +66,6 @@ function construction(alpha, rnd) {
 
     var r = 0;
     while (cList.length > 0) {
-        //cList.sort((i, j) => info.c[i][r] - info.c[j][r]);
         sort(cList, r);
 
         var i = rnd.rnd[rnd.rnd_index++];
@@ -162,15 +158,7 @@ function search_swap(s, seq) {
 
     if(cost_best < seq[0][dimension][C] - Number.EPSILON){
         swap(s, I, J);
-        /*
-        console.log("swap");
-        console.log(cost_best);
-        */
         subseq_load(s, seq);
-        /*
-        console.log(seq[0][info.dimension][info.C]);
-        console.log();
-        */
 
         return true;
     }
@@ -213,15 +201,7 @@ function search_two_opt(s, seq) {
 
     if(cost_best < seq[0][dimension][C] - Number.EPSILON){
         reverse(s, I, J);
-        /*
-        console.log("two opt");
-        console.log(cost_best);
-        */
         subseq_load(s, seq);
-        /*
-        console.log(seq[0][info.dimension][info.C]);
-        console.log();
-        */
 
         return true;
     }
@@ -284,21 +264,10 @@ function search_reinsertion(s, seq, opt) {
             }
         }
     }
-    //console.log("cost best
 
     if(cost_best < seq[0][dimension][C] - Number.EPSILON){
         reinsert(s, I, J, POS+1);
-        /*
-        console.log("reinsertion", I, POS+1, opt);
-        //console.log(s);
-        console.log(cost_best);
-        */
         subseq_load(s, seq);
-        /*
-        console.log(seq[0][info.dimension][info.C]);
-        //console.log(s);
-        console.log();
-        */
 
         return true;
     }
@@ -313,24 +282,12 @@ function RVND(s, subseq, rnd) {
     const OR_OPT_3    = 3;
     const TWO_OPT     = 4;
 
-    //neighbd_list = [TWO_OPT];//, OR_OPT_2, OR_OPT_3, TWO_OPT];
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
-    /*
-    var s = Array.from({length: info.dimension}, (_, i) => i);
-    s[info.dimension] = 0;
-    console.log(s);
-
-    subseq_load(s, subseq, info);
-    console.log(subseq[0][info.dimension][info.C]);
-    */
     var improve = false;
 
-    //console.log("opa");
     while (neighbd_list.length > 0) {
-        let i = parseInt(Math.random() * neighbd_list.length);
-        i = rnd.rnd[rnd.rnd_index++];
+        let i = rnd.rnd[rnd.rnd_index++];
         let neighbd = neighbd_list[i];
-        //console.log("Current cost: ", subseq[0][info.dimension][info.C]);
 
         switch (neighbd) {
             case SWAP:
@@ -353,16 +310,9 @@ function RVND(s, subseq, rnd) {
         if (improve) {
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
         } else {
-            //console.log(neighbd_list);
             neighbd_list.splice(i, 1);
-            //console.log(neighbd_list);
-            //process.exit();
         }
     }
-    //process.exit();
-    //console.log(s, subseq[0][info.dimension][info.C]);
-    //
-
 }
 
 function perturb(sl, rnd) {
@@ -371,18 +321,7 @@ function perturb(sl, rnd) {
     var A_start = 1, A_end = 1;
     var B_start = 1, B_end = 1;
 
-    var size_max = parseInt(Math.floor(sl.length/10));
-    size_max = (size_max >= 2 ? size_max : 2);
-    var size_min = 2;
-
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        var max = sl.length - 1 - size_max;
-        A_start = parseInt(Math.random()*max) + 1;
-        A_end = A_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
-
-        B_start = parseInt(Math.random()*max) + 1;
-        B_end = B_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
-
 
         A_start = rnd.rnd[rnd.rnd_index++];
         A_end = A_start + rnd.rnd[rnd.rnd_index++];
@@ -400,7 +339,6 @@ function perturb(sl, rnd) {
     }
 
     return s;
-
 }
 
 function GILS_RVND(Iils, Imax, R, rnd) {
@@ -416,8 +354,7 @@ function GILS_RVND(Iils, Imax, R, rnd) {
     var seq = subseq_fill(dimension);
 
     for (var i = 0; i < Imax; i++) {
-        var alpha = R[parseInt(Math.random() * 26)];
-        alpha = R[rnd.rnd[rnd.rnd_index++]];
+        var alpha = R[rnd.rnd[rnd.rnd_index++]];
 
         console.log("[+] Local Search ", i+1);
         console.log("\t[+] Constructing Inital Solution..");
@@ -456,7 +393,6 @@ function GILS_RVND(Iils, Imax, R, rnd) {
     }
 
     console.log("COST: ", cost_best);
-    //console.log("\tRVND ITER ", ITER);
 }
 
 function main() {
@@ -470,22 +406,10 @@ function main() {
     const Imax = 10;
     const R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21,0.22, 0.23, 0.24, 0.25];
 
-    /*
-    s = [];
-    for (var i = 0; i < dimension+1; i++) {
-        s[i] = i;
-    }
-    s[dimension] = 0;
-    */
-
-    //var info = Object.freeze({
     var tRnd = {
         rnd : rnd,
         rnd_index : 0
     };
-
-
-    //process.exit(0);
 
     var start = new Date();
     GILS_RVND(Iils, Imax, R, tRnd);

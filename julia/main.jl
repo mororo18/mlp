@@ -23,14 +23,6 @@ const TWO_OPT     = 5
 dimension, c, rnd = get_instance_info()
 
 improv_flag = true
-it = 0
-
-t_swap = 0
-t_reinsertion = 0
-t_or_opt2 = 0
-t_or_opt3 = 0
-t_two_opt = 0
-t_seq = 0
 
 function subseq_load(s::Array{Int64, 1}, seq::Array{Float64, 3})
 
@@ -48,11 +40,6 @@ function subseq_load(s::Array{Int64, 1}, seq::Array{Float64, 3})
             seq[i,j,C] = seq[i,j,T] + seq[i,j_prev,C]
             seq[i,j,W] = j+k
 
-            """
-            seq[j,i,T] = seq[i,j,T]
-            seq[j,i,C] = seq[i,j,C]
-            seq[j,i,W] = seq[i,j,W]
-            """
         end
     end
 
@@ -90,9 +77,6 @@ function construction(alpha::Float64, rnd::tRnd)
     r = 1
     while length(cList) > 0
         sort(cList, r)
-
-        i = convert(Int64, floor(length(cList)*alpha + 1))
-        cN = cList[rand(1:i)]
 
         index = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index += 1
@@ -297,7 +281,6 @@ function RVND(s::Array{Int64, 1}, seq::Array{Float64, 3}, rnd::tRnd)
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT2, OR_OPT3]
 
     while length(neighbd_list) > 0
-        i = rand(1:length(neighbd_list))
 
         i = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index += 1
@@ -333,16 +316,7 @@ function perturb(sl::Array{Int64, 1}, rnd::tRnd)
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
-    size_max = convert(Int64, floor(length(s)/10))
-    size_max = (size_max >= 2 ? size_max : 2)
-    size_min = 2
-
     while (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)
-        A_start = rand(2:length(s)-1-size_max)
-        A_end = A_start + rand(size_min:size_max)
-
-        B_start = rand(2:length(s)-1-size_max)
-        B_end = B_start + rand(size_min:size_max)
 
         A_start = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index += 1
@@ -373,7 +347,6 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R, rnd::tRnd)
     subseq = zeros(dimension+1, dimension+1, 3)
 
     for i in 1:Imax
-        alpha = R[rand(1:26)]
 
         index = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index += 1

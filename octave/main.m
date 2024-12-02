@@ -97,13 +97,7 @@ function [ret, index_new] = construction(alpha, rnd)
     while (sz_cL > 0) 
         cL = sort_by(cL, r );
 
-        rng = ceil(sz_cL * alpha);
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(rng * RND);
-        
         index = rnd.rnd(rnd.rnd_index) + 1;
-        %info.rnd(info.rnd_index);
         rnd.rnd_index = rnd.rnd_index+1;
 
         cN = cL(index);
@@ -373,10 +367,6 @@ function [s, cost, index_new] = RVND(solut, seq, rnd)
 
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
     while (isempty(neighbd_list) == false)
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(RND*columns(neighbd_list));
-        %info.rnd(info.rnd_index);
         index = rnd.rnd(rnd.rnd_index) + 1;
         rnd.rnd_index = rnd.rnd_index + 1;
 
@@ -409,12 +399,6 @@ function [s, cost, index_new] = RVND(solut, seq, rnd)
     index_new = rnd.rnd_index;
 end
 
-function ret = notnull_rnd()
-    RND = rand(1);
-    %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-    ret = RND;
-end
-
 function [ret, index_new] = perturb(s, rnd)
     global dimen;
     A_start = 1;
@@ -422,35 +406,16 @@ function [ret, index_new] = perturb(s, rnd)
     B_start = 1;
     B_end = 1;
 
-    size_max = ceil((dimen+1) / 10);
-    %size_max = [2, size_max]((size_max >= 2) + 1);
-    size_min = 2;
-
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
-        max_ = (dimen+1) -2 -size_max;
-        RND = notnull_rnd();
-        A_start = ceil(max_ * RND) + 1;
-        RND = notnull_rnd();
-        A_end = A_start + ceil(((size_max-size_min) * RND) + size_min);
-
-        RND = notnull_rnd();
-        B_start = ceil(max_ * RND) + 1;
-        RND = notnull_rnd();
-        B_end = B_start + ceil(((size_max-size_min) * RND) + size_min);
-
 
         A_start = rnd.rnd(rnd.rnd_index) + 1;
-        %info.rnd(info.rnd_index)
         rnd.rnd_index = rnd.rnd_index + 1;
         A_end = A_start + rnd.rnd(rnd.rnd_index);
-        %info.rnd(info.rnd_index)
         rnd.rnd_index = rnd.rnd_index + 1;
 
         B_start = rnd.rnd(rnd.rnd_index) + 1;
-        %info.rnd(info.rnd_index)
         rnd.rnd_index = rnd.rnd_index + 1;
         B_end = B_start + rnd.rnd(rnd.rnd_index);
-        %info.rnd(info.rnd_index)
         rnd.rnd_index = rnd.rnd_index + 1;
     end
 
@@ -488,16 +453,12 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
     seq = zeros(dimen+1, dimen+1, 3);
 
     for i = 1:Imax
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(columns(R) * RND);
         index = rnd.rnd(rnd.rnd_index) + 1;
         rnd.rnd_index = rnd.rnd_index + 1;
         alpha = R(index);
 
         fprintf("[+] Search %d\n", i)
         fprintf("\t[+] Constructing..\n");
-        %"ITER ", i
 
         [solut_crnt, rnd.rnd_index] = construction(alpha, rnd);
         seq = subseq_load(solut_crnt);
@@ -567,27 +528,14 @@ function mainn
     C = 2;
     W = 3;
 
-
-   %for i = 1:info.dimen
-   %    sol.s(i) = i;
-   %end
-   %sol.s(info.dimen+1) = 1;
-   %sol.cost = 0;
-   %sol.seq = zeros(info.dimen+1, info.dimen+1, 3);
-   %sol = subseq_load(sol, info);
-
-   %sol.seq(1, info.dimen+1, info.C);
-   %s = construction(0.1, info);
-   %%s(2:7)
-   %%s(2:7) = flip(s(2:7))
-   %s = reinsert(s, 6, 11, 2);
-
     Imax = 10;
 
     Iils = dimen;
+
     if (dimen > 100)
         Iils = 100;
     end
+
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
     t0 = clock ();
     s = GILS_RVND(Imax, Iils, R, rnd);

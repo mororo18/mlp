@@ -1,6 +1,5 @@
 dofile("Data.lua")
 
-
 local T = 1;
 local C = 2;
 local W = 3;
@@ -47,7 +46,6 @@ end
 
 function table.clone(org)
     if type(jit) == 'table' then
-        --print(jit.version)  --LuaJIT 2.0.2
         return {unpack(org)}
     else
         return {table.unpack(org)}
@@ -57,7 +55,6 @@ end
 
 function solut_clone(solut)
     local cpy = {}
-    --seq_print(solut)    
     cpy.seq = table.clone(solut.seq)
     cpy.s = table.clone(solut.s)
     cpy.cost = solut.cost
@@ -126,29 +123,18 @@ function construction(alpha, rnd)
     local cList = {}
     for i=2,dimension do
         cList[#cList + 1] = i
-        --io.write(cList[i-1], " ")
     end
-    --print()
 
     local r = 1
 
-    --print("alpha", alpha)
     while #cList > 0 do
-    --while table.getn(cList) > 0 do
-        --table.sort(cList, function(i, j) return info.c[r][i] <= info.c[r][j] end)
         sort(cList, r)
 
-        --print(alpha)
-        local range = math.floor(#cList * alpha) + 1
-        local i = math.random(1, range)
-        
-        i = rnd.rnd[rnd.rnd_index] + 1
+        local i = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index = rnd.rnd_index + 1
 
         local cN = table.remove(cList, i)
-        --print(cN)
         table.insert(s, cN)
-        --print(c, info.c[r][c])
         r = cN
     end
     table.insert(s, 1)
@@ -163,7 +149,6 @@ end
 function reverse(s, i, j)
     local l = j
     for k = i,math.floor((j+i)/2) do
-        --print(k, l)
         swap(s, k, l)
         l = l - 1
     end
@@ -240,11 +225,8 @@ function search_swap(s, seq)
     end
 
     if cost_best < seq[1][dimension+1][C] - EPSILON then
-        --print("swap")
-        --print(cost_best)
         swap(s, I, J)
         subseq_load(s, seq)
-        --print(solut.seq[1][info.dimension+1][info.C])
         return true
     end
 
@@ -325,7 +307,6 @@ function search_reinsertion(s, seq, opt)
                 I = i
                 J = j
                 POS = k
-                --test = table.clone(test_a)
             end
         end
 
@@ -346,20 +327,14 @@ function search_reinsertion(s, seq, opt)
                 I = i
                 J = j
                 POS = k
-                --test = table.clone(test_b)
             end
 
         end
     end
 
     if cost_best < seq[1][dimension+1][C] - EPSILON then
-        --print("reinsert", I, J, POS+1)
-        --print(cost_best)
-        --s_print(solut)
         reinsert(s, I, J, POS+1)
-        --s_print(solut)
         subseq_load(s, seq)
-        --print(solut.cost)
 
         if cost_best ~= seq[1][dimension+1][C] then
             print("ERROR")
@@ -380,16 +355,8 @@ function RVND(s, seq, rnd)
 
     local neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
 
-    --s_print(solut)
-    --reinsert(solut.s, 2, 8, 13)
-    --s_print(solut)
-
-    --os.exit()
-
     while #neighbd_list > 0 do
-        local index = math.random(1, #neighbd_list)
-
-        index = rnd.rnd[rnd.rnd_index] + 1
+        local index = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index = rnd.rnd_index + 1
 
         local neighbd = neighbd_list[index]
@@ -398,28 +365,21 @@ function RVND(s, seq, rnd)
 
         if neighbd == SWAP then
             improve = search_swap(s, seq)
-            --print("swap")
         elseif neighbd == REINSERTION then
             improve = search_reinsertion(s, seq, REINSERTION)
-            --print("reinsertion")
         elseif neighbd == OR_OPT_2 then
             improve = search_reinsertion(s, seq, OR_OPT_2)
-            --print("or-opt2")
         elseif neighbd == OR_OPT_3 then
             improve = search_reinsertion(s, seq, OR_OPT_3)
-            --print("or-opt3")
         elseif neighbd == TWO_OPT then
             improve = search_two_opt(s, seq)
-            --print("two-opt")
         end
 
         if improve == true then
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
-            --print(solut.cost, "atual", info.rnd[info.rnd_index], "proximo", info.rnd[info.rnd_index+1])
         else 
             table.remove(neighbd_list, index)
         end
-        --table_print(neighbd_list)
         
     end
 end
@@ -432,17 +392,7 @@ function perturb(sl, rnd)
     local B_start = 1
     local B_end = 1
 
-    local size_max = math.floor(#s/10)
-    size_max = size_max >= 2 and size_max or 2
-    local size_min = 2
-
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end) do
-        A_start = math.random(2, #s-1-size_max)
-        A_end = A_start + math.random(size_min, size_max)
-
-        B_start = math.random(2, #s-1-size_max)
-        B_end = B_start + math.random(size_min, size_max)
-
 
         A_start = rnd.rnd[rnd.rnd_index] + 1
         rnd.rnd_index = rnd.rnd_index +1
@@ -478,20 +428,13 @@ function GILS_RVND(Imax, Iils, R, rnd)
 
     local seq = {};
 
-    --print("value", info.c[1][2])
-    --matrix_print(info)
-    --os.exit(0)
-
     subseq_fill(seq)
 
     cost_best = math.huge
 
     for i=1,Imax do
-        local Rsz = #R
-        local alpha = R[math.random(1, Rsz)]
-        alpha = R[rnd.rnd[rnd.rnd_index] + 1]
+        local alpha = R[rnd.rnd[rnd.rnd_index] + 1]
         rnd.rnd_index = rnd.rnd_index + 1
-
 
         print("[+] Local Search", i)
         print("\t[+] Constructing Inital Solution..")
@@ -504,18 +447,10 @@ function GILS_RVND(Imax, Iils, R, rnd)
         cost_partial = cost_crnt
         solut_partial = table.clone(solut_crnt)
 
-        --print(solut_partial.seq[1][info.dimension+1][info.C])
-        --seq_print(solut_crnt)
-        --local rnvd_cost_best = solut_crnt.seq[1][info.dimension+1][info.C]
-
         print("\t[+] Looking for the best Neighbor..")
         local iterILS = 0
         while iterILS < Iils do
             RVND(solut_crnt, seq, rnd)
-            --os.exit(0)
-            --local rnvd_cost_crnt = solut_crnt.seq[1][info.dimension+1][info.C]
-            --if rnvd_cost_crnt < rvnd_cost_best then
-               --rnvd_cost_best = rnvd_cost_crnt - info.EPSILON
             cost_crnt = seq[1][dimension+1][C]
             if cost_crnt < cost_partial - EPSILON then
                cost_partial = cost_crnt - EPSILON
@@ -529,15 +464,7 @@ function GILS_RVND(Imax, Iils, R, rnd)
             iterILS = iterILS + 1
         end
 
-      --print("partial cost", solut_partial.cost)
-      --print("ITER LAST", info.rnd[info.rnd_index])
-      --s_print(solut_partial)
-
         subseq_load(solut_partial, seq)
-        --local cost_partial = solut_partial.seq[1][info.dimension+1][info.C]
-
-        --if cost_partial < cost_best then
-            --cost_best  = cost_partial
         if cost_partial < cost_best then
             solut_best = table.clone(solut_partial)
             cost_best = cost_partial
@@ -575,16 +502,12 @@ function main()
         rnd_index = 1
     }
     dimension = readData(c, rnd.rnd)
-    --print(info.rnd[a])
-    math.randomseed(os.time()) 
 
     local Imax = 10
     local Iils = math.min(100, dimension)
     local R = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
-
-    --info.c = protect(info.c)
     local start = os.clock()
     GILS_RVND(Imax, Iils, R, rnd)
 
@@ -592,16 +515,3 @@ function main()
 end
 
 main()
-
-
--- b, a = readData(info.c, info.rnd)
-
---[[
-collectgarbage("stop")
-ProFi = require 'ProFi'
-ProFi:start()
-main()
---coroutine.resume( main )
-ProFi:stop()
-ProFi:writeReport( 'MyProfilingReport.txt' )
-]]--

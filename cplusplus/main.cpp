@@ -98,16 +98,9 @@ std::vector<int> construct(const double alpha, tRnd & rnd){
     while (!cL.empty()) {
         sort(cL, r);
 
-        /**/
-        int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = rnd.rnd[rnd.rnd_index++];
+        int index = rnd.rnd[rnd.rnd_index++];
         int c = cL[index];
         s.push_back(c);
-        //print_s(cL);
         r = c;
         cL.erase(cL.begin() + index);
     }
@@ -163,12 +156,10 @@ inline void subseq_load(vector<int> & s, tSubseq & seq, int index = 0){
 bool improve = false;
 
 void search_swap(vector<int> & s, tSubseq & seq) {
-//inline bool search_swap(vector<int> & s, tSubseq & seq) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
     alignas(INT_SZ) int i, j, j_prev, j_next, i_prev, i_next;
-    //alignas(INT_SZ) int dim = dimension - 2;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
 
@@ -216,18 +207,10 @@ void search_swap(vector<int> & s, tSubseq & seq) {
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         swap(s, I, J);
         subseq_load(s, seq, I);
-        if (cost_best != seq[0][dimen].C) {
-            cout << "difere " << endl;
-        }
-
-        //return true;
         improve = true;
     }
-
-    //return false;
 }
 
-//inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
 void search_two_opt(vector<int> & s, tSubseq & seq) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
@@ -263,16 +246,9 @@ void search_two_opt(vector<int> & s, tSubseq & seq) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reverse(s, I, J);
-        subseq_load(s, seq);//, I);  // d olho aq hein
-        if (cost_best != seq[0][dimen].C) {
-            cout << "difere " << endl;
-        }
-
-        //return true;
+        subseq_load(s, seq);
         improve = true;
     }
-
-    //return false;
 }
 
 void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
@@ -335,74 +311,45 @@ void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
         reinsert(s, I, J, POS+1);
         subseq_load(s, seq, I < POS+1 ? I : POS+1);
 
-        if (cost_best != seq[0][dimen].C) {
-            cout << "difere " << endl;
-        }
-
         improve = true;
-        //return true;
     }
-
-    //return false;
 }
 
 void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
 
-    vector<string> nome (6);
-
-    nome[SWAP] = "SWAP";
-    nome[TWO_OPT] = "TWO_OPT";
-    nome[REINSERTION] = "REINSERTION";
-    nome[OR_OPT_2] = "OR_OPT_2";
-    nome[OR_OPT_3] = "OR_OPT_3";
-
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     alignas(INT_SZ) uint index;
     alignas(INT_SZ) int neighbd;
-    //int k = 0;
     bool improve_flag;
 
     while (!neighbd_list.empty()) {
-        //k++;
 
-        index = rand() % neighbd_list.size();
-        //cout << info.rnd[info.rnd_index] << endl;
         index = rnd.rnd[rnd.rnd_index++];
-        //cout << index << endl;
         neighbd = neighbd_list[index];
-        //std::cout <<"aq\n";
 
-        //improve_flag = false;
         improve = false;
 
         switch(neighbd){
             case REINSERTION:
                 search_reinsertion(s, seq, REINSERTION);
-                //improve_flag = search_reinsertion(s, seq, REINSERTION);
                 break;				
             case OR_OPT_2:
                 search_reinsertion(s, seq, OR_OPT_2);
-                //improve_flag = search_reinsertion(s, seq, OR_OPT_2);
                 break;				
             case OR_OPT_3:
                 search_reinsertion(s, seq, OR_OPT_3);
-                //improve_flag = search_reinsertion(s, seq, OR_OPT_3);
                 break;				
             case SWAP:
                 search_swap(s, seq);
-                //improve_flag = search_swap(s, seq);
                 break;
             case TWO_OPT:
                 search_two_opt(s, seq);
-                //improve_flag = search_two_opt(s, seq);
                 break;				
         }
 
         if (improve) {
-            //cout << "improv  " << nome[neighbd] << endl;
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
-            //cout << "delete  " << nome[neighbd] << endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
@@ -417,43 +364,15 @@ std::vector<int> perturb(vector<int> & sl, tRnd & rnd) {
 
     auto s = sl;
 
-
-    int size_max = std::floor((dimen+1)/10);
-    size_max = size_max >= 2 ? size_max : 2;
-    int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (dimen+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         A_start = rnd.rnd[rnd.rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + rnd.rnd[rnd.rnd_index++];
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         B_start = rnd.rnd[rnd.rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + rnd.rnd[rnd.rnd_index++];
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -461,9 +380,6 @@ std::vector<int> perturb(vector<int> & sl, tRnd & rnd) {
         reinsert(s, A_start, A_end-1, B_end);
         reinsert(s, B_start, B_end-1, A_end);
     }
-
-    //print_s(s);
-    //subseq_load(solut, info);
 
     return s;
 }
@@ -481,14 +397,12 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
     tSubseq seq(dimen+1, vector<seqStruct> (dimen+1));
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = rnd.rnd[rnd.rnd_index++];
+        int aux = rnd.rnd[rnd.rnd_index++];
 
         double alpha = R_table(aux);
 
         printf("[+] Search %d\n", i+1);
         printf("\t[+] Constructing..\n");	
-
 
         solut_crnt = construct(alpha, rnd);
         solut_partial = solut_crnt;
@@ -501,41 +415,28 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
         printf("\t    Construction Cost: %.3lf\n", cost_partial);	
 
         int iterILS = 0;
-        //int k = 0;
         while (iterILS < Iils) {
-            //k++;
             RVND(solut_crnt, seq, rnd);
             cost_crnt = seq[0][dimen].C;
 
             if (cost_crnt < cost_partial - DBL_EPSILON) {
                 solut_partial = solut_crnt;
                 cost_partial = cost_crnt;
-                //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
-
             solut_crnt = perturb(solut_partial, rnd);
             subseq_load(solut_crnt, seq);
-            //cout << "perturb  " << seq[0][dimen].C << endl;
 
             iterILS++;
         }
-
-        //subseq_load(solut_partial, info);
 
         if (cost_partial < cost_best - DBL_EPSILON) {
             solut_best = solut_partial;
             cost_best = cost_partial;
         }
 
-        //after(7);
-
-        //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
         std::cout << "\tCurrent best cost: "<< cost_best << std::endl;
-        //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
-        //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
-        //std::cout << k << "  Iteracoes " << std::endl;
 
         std::cout << "SOLUCAO: ";
         for(int i = 0; i < solut_best.size(); i++){
@@ -544,7 +445,6 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
         std::cout << std::endl;
 
     }
-    //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", cost_best);
 }
 
@@ -559,21 +459,7 @@ int main(int argc, char **argv){
     dimen = loadData(&cost, rnd_vec);
     cout << cost[0][dimen-1] << endl;
     rnd.rnd = rnd_vec;
-    //print_s(rnd.rnd);
     rnd.rnd_index = 0;
-
-
-    /*
-    for (int i = 0; i <=n; i++) {
-        for (int j = i+1; j <=n; j++) {
-            std::cout << matrix[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    */
-
-
-    srand(clock());
 
     Iils = dimen < 100 ? dimen : 100;
     auto t1 = high_resolution_clock::now();
@@ -586,35 +472,6 @@ int main(int argc, char **argv){
 
     std::cout << "Tamanho RND " << rnd.rnd.size() << std::endl;
 
-    exit(0);
-    /*
-    flag = true;
-
-    srand(duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
-    readData(argc, argv, &dimension, &c);
-
-    int ar[] = {100, dimension};
-    
-    Iils = ar[dimension < 100];
-
-    auto t1 = high_resolution_clock::now();
-
-    GILS_RVND(Imax, Iils);
-
-    auto t2 = high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
-    double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
-
-    if(flag){
-        std::cout << "Construction time: " << construct_t/10e5 << std::endl;
-        std::cout << "Swap time: " << swap_t/10e5 << std::endl;
-        std::cout << "two_opt time: " << two_opt_t/10e5 << std::endl;
-        std::cout << "reinsertion time: " << reinsertion_t/10e5 << std::endl;
-        std::cout << "or_opt2 time: " << opt2_t/10e5 << std::endl;
-        std::cout << "or_opt3 time: " << opt3_t /10e5<< std::endl;
-    }
-    */
     return 0;
 }
 

@@ -11,7 +11,6 @@ static SIZE : usize = 319;
 #[derive(Debug, Clone)]
 struct tInfo {
     c : Box<[[f64; 350]; 350]>,
-    //c : Vec<Vec<f64>>,
     dimen : usize,
     SWAP         : usize ,
     REINSERTION  : usize ,
@@ -38,11 +37,7 @@ struct tSeqInfo {
 
 #[derive(Debug, Clone)]
 struct tSolution {
-    //seq : Box<[f64]>,
-    //seq : Vec<f64>,
-    //seq : Vec<tSeqInfo>,
     seq : Box<[[tSeqInfo; 319]; 319]>,
-    //seq : Vec<Vec<tSeqInfo>>,
     s : Vec<usize>,
     cost : f64,
 }
@@ -50,9 +45,7 @@ struct tSolution {
 #[inline(always)]
 unsafe
 fn to_1D(x : usize, y : usize, size : usize) -> usize {
-
     return x * (size+1) + y;
-    //return x + (size+1) * (y + (size+1) * z);
 }
 
 fn subseq_load(s : & Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, c : & Vec<Vec<f64>>, dimen : usize) {
@@ -66,13 +59,11 @@ fn subseq_load(s : & Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, c : & Vec<Vec<f6
         for j in (i+1)..(dimen + 1) {
             let j_prev : usize = j - 1;
 
-
-          seq[i][j].T = c[s[j_prev]][s[j]] + seq[i][j_prev].T;
-          seq[i][j].C = seq[i][j].T + seq[i][j_prev].C;
-          seq[i][j].W = (j as i32 + k) as f64;
+            seq[i][j].T = c[s[j_prev]][s[j]] + seq[i][j_prev].T;
+            seq[i][j].C = seq[i][j].T + seq[i][j_prev].C;
+            seq[i][j].W = (j as i32 + k) as f64;
         }
     }
-
 }
 
 fn sort(arr: &mut Vec<usize>, r: usize, cost : & Vec<Vec<f64>>) {
@@ -103,20 +94,16 @@ fn partition(arr: &mut Vec<usize>, left: isize, right: isize, cost : & Vec<Vec<f
 fn construction(alpha : f64, c : & Vec<Vec<f64>>, dimen : usize, rnd : &mut tRnd) -> Vec<usize> {
     let mut s = vec![0; 1];
 
-    //let mut c_list = vec![0; info.dimen -1];
     let mut c_list = vec![];
     for i in 1..dimen {
         c_list.push(i);
     }
 
-    let mut rng = rand::thread_rng();
     let mut r : usize = 0;
     while c_list.is_empty() == false {
         sort(&mut c_list, r, c);
 
-        let range = (c_list.len() as f64 * alpha + 1.0) as usize;
-        let mut index = rng.gen::<usize>() % range;
-        index = rnd.rnd[rnd.rnd_index];
+        let index = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
         let c = c_list[index];
         r = c;
@@ -124,8 +111,6 @@ fn construction(alpha : f64, c : & Vec<Vec<f64>>, dimen : usize, rnd : &mut tRnd
         s.push(c);
     }
     s.push(0);
-    //println!("{:?}", s);
-
     return s;
 }
 
@@ -347,18 +332,12 @@ fn RVND(solut : &mut Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, c : & Vec<Vec<f6
     let mut neighbd_list = vec![SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
     let mut improv_flag = false;
 
-    let mut rng = rand::thread_rng();
     while neighbd_list.is_empty() == false {
-        //println!("is empty {} \n", neighbd_list.is_empty());
-        let mut index : usize = rng.gen::<usize>() % neighbd_list.len();
 
-        index = rnd.rnd[rnd.rnd_index];
+        let index = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
 
-        //println!("{} {}", info.rnd_index, index);
-
         let neighbd : usize = neighbd_list[index];
-
 
         improv_flag = false;
 
@@ -380,35 +359,17 @@ fn RVND(solut : &mut Vec<usize>, seq : &mut Vec<Vec<tSeqInfo>>, c : & Vec<Vec<f6
             neighbd_list.remove(index);
         }
 
-        //println!("{:?} \n{}\n", s, seq[0][info.dimension][C]);
-        //println!("{:?} \n", s);
-        //exit(1);
     }
 }
 
 fn perturb(sl : & Vec<usize>, dimen : usize, rnd : &mut tRnd) -> Vec<usize> {
-    let mut rng = rand::thread_rng();
     let mut s = sl.clone();
     let mut A_start : usize = 1;
     let mut A_end : usize = 1;
     let mut B_start : usize = 1;
     let mut B_end : usize = 1;
 
-    let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {(s.len() as f64 / 10.0) as usize} else {2};
-    let size_min = 2;
-
-    let mut range = size_min..size_max;
-
-    if size_max == 2 {
-        range = 0..1;
-    }
-
     while (A_start <= B_start &&  B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
-        A_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        A_end = A_start + rng.gen_range(range.clone());
-
-        B_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        B_end = B_start + rng.gen_range(range.clone());
     
         A_start = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
@@ -420,8 +381,6 @@ fn perturb(sl : & Vec<usize>, dimen : usize, rnd : &mut tRnd) -> Vec<usize> {
         B_end = B_start + rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
 
-
-        //println!("perturbaa");
     }
 
     if A_start < B_start {
@@ -448,13 +407,10 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], c : &Vec<Vec<f64>>, dime
     let mut cost_crnt = f64::MAX;
 
 
-    let mut rng = rand::thread_rng();
     for _i in 0..Imax {
-        let mut alpha : f64 = R[rng.gen::<usize>() % 26];
-
         let r_value = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
-        alpha = R[r_value];
+        let alpha = R[r_value];
 
         println!("[+] Local Search {}", _i);
         solut_crnt = construction(alpha, & c, dimen, rnd);
@@ -483,8 +439,6 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], c : &Vec<Vec<f64>>, dime
             iterILS += 1;
         }
 
-        //subseq_load(&sl, &mut subseq, info);
-
         if cost_partial < cost_best {
             solut_best = solut_partial.clone();
             cost_best = cost_partial;
@@ -492,7 +446,6 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], c : &Vec<Vec<f64>>, dime
 
         println!("\tCurrent Best Cost {}", cost_best);
     }
-
 
     println!("{:?}", solut_best);
     println!("COST: {}", cost_best);
@@ -511,28 +464,10 @@ fn main() {
 
     data::load(&mut dimension, &mut c, &mut rnd_vec);
 
-    //println!("{:?}", c);
-
     let mut rnd = tRnd {
         rnd : rnd_vec,
         rnd_index : 0,
     };
-
-    /*
-    let mut info = tInfo {
-        SWAP : 0,
-        REINSERTION : 1,
-        OR_OPT_2 : 2,
-        OR_OPT_3 : 3,
-        TWO_OPT : 4,
-        rnd : rnd,
-        rnd_index : 0,
-    };
-    */
-
-
-
-    //println!("TEST");
 
     let Imax = 10;
     let Iils = if dimension < 100 {dimension} else {100};
@@ -542,20 +477,8 @@ fn main() {
 
     let now = Instant::now();
 
-
-    //test!();
     GILS_RVND(Imax, Iils, R, &c, dimension, &mut rnd);
 
     let new_now = Instant::now();
     println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
-
-    /*
-    for i in 0..dimension {
-        for j in 0..dimension {
-            print!("{} ", info.c[i][j]);
-        }
-        println!();
-    }
-    */
-
 }

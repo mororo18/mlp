@@ -114,24 +114,15 @@ void construct(int * ret, const double alpha, tRnd * rnd){
     for (int j = 1; j < dimen; ++j) {
         sort(cL, cL_size, r);
 
-        /**/
-        int range = ceil(cL_size * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = rnd->rnd[rnd->rnd_index++];
+        int index = rnd->rnd[rnd->rnd_index++];
         int c = cL[index];
         s[j] = c;
-        //print_s(cL);
         r = c;
-        //memmove(cL+index, cL+index+1, sizeof(int)*(cL_size-index));
         shift(cL, index+1, index, cL_size-index);
         cL_size--;
     }
 
     cpy(s, ret, (dimen+1));
-    //memcpy(ret, s, sizeof(int)*(dimen+1));
 }	
 
 void swap(int * vec, int i, int j){
@@ -150,21 +141,16 @@ void reverse(int * vec, int i, int j){
 
 void reinsert(int * vec, int i, int j, int pos){
     int seq[j-i+1];
-    //memcpy(seq, vec + i, sizeof(int)*(j-i+1));
     cpy(vec + i, seq, (j-i+1));
 
     if(pos < i){
         int sz = i-pos;
         shift(vec, pos, j+1-sz, sz);
-        //memmove(vec + j+1-sz, vec + pos, sizeof(int)*sz);
         cpy(seq, vec + pos, j-i+1);
-        //memcpy(vec + pos, seq, sizeof(int)*(j-i+1));
     }else{
         int sz = pos-j-1;
         shift(vec, j+1, i, sz);
-        //memmove(vec + i, vec + j+1, sizeof(int)*sz);
         cpy(seq, vec+i+sz, j-i+1);
-        //memcpy(vec + i+sz, seq, sizeof(int)*(j-i+1));
     }
 }
 
@@ -394,45 +380,31 @@ void RVND(int * solut, tSubseq seq[][dimen+1], tRnd * rnd) {
     int neighbd;
     char improve_flag;
 
-    //cout << "RVND" << endl;
     while (nl_size > 0) {
-        //k++;
 
-        index = rand() % nl_size;
         index = rnd->rnd[rnd->rnd_index++];
         neighbd = neighbd_list[index];
-        //std::cout <<"aq\n";
 
         improve_flag = FALSE;
 
         switch(neighbd){
             case REINSERTION:
-                //before();
                 improve_flag = search_reinsertion(solut, seq, REINSERTION);
-                //after(REINSERTION);
                 break;				
             case OR_OPT_2:
-                //before();
                 improve_flag = search_reinsertion(solut, seq, OR_OPT_2);
-                //after(OR_OPT2);
                 break;				
             case OR_OPT_3:
-                //before();
                 improve_flag = search_reinsertion(solut, seq, OR_OPT_3);
-                //after(OR_OPT3);
                 break;				
             case SWAP:
-                //before();
                 improve_flag = search_swap(solut, seq);
-                //after(SWAP);
                 break;
             case TWO_OPT:
-                //before();
                 improve_flag = search_two_opt(solut, seq);
-                //after(TWO_OPT);
                 break;				
         }
-        //std::cout << (improve_flag ? "True" : "False") << std::endl;
+
         if (improve_flag) {
             neighbd_list[0] = SWAP;
             neighbd_list[1] = TWO_OPT;
@@ -441,22 +413,12 @@ void RVND(int * solut, tSubseq seq[][dimen+1], tRnd * rnd) {
             neighbd_list[4] = OR_OPT_3;
             nl_size = 5;
         } else {
-            //std::cout << index << "  " << neighbd_list.size() << std::endl;
-            //std::cout << solut.cost << std::endl;
-            
-            //std::cout << info.rnd_index << std::endl;
-            //memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
             shift(neighbd_list, index+1, index, (nl_size-index-1));
             nl_size--;
         }
 
-        //std::cout << "cost  " << solut.cost << std::endl ;
-
-
     }
 
-    //exit(0);
-    //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
 void perturb(int * s_crnt, int * s_partial, tRnd * rnd) {
@@ -468,42 +430,14 @@ void perturb(int * s_crnt, int * s_partial, tRnd * rnd) {
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = floor((dimen+1)/10);
-    size_max = size_max >= 2 ? size_max : 2;
-    int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (dimen+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
-
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         A_start = rnd->rnd[rnd->rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + rnd->rnd[rnd->rnd_index++];
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         B_start = rnd->rnd[rnd->rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + rnd->rnd[rnd->rnd_index++];
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -512,11 +446,7 @@ void perturb(int * s_crnt, int * s_partial, tRnd * rnd) {
         reinsert(s, B_start, B_end-1, A_end);
     }
 
-    //print_s(s);
-    //subseq_load(solut, info);
-
     cpy(s, s_crnt, (dimen+1));
-    //memcpy(s_crnt, s, sizeof(int)*(dimen+1));
 }
 
 
@@ -538,8 +468,7 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
     memset(s_best, 0, sizeof(int)*(dimen+1));
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = rnd->rnd[rnd->rnd_index++];
+        int aux = rnd->rnd[rnd->rnd_index++];
 
         double alpha = R_table(aux);
 
@@ -551,51 +480,32 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
         cost_crnt = subseq_load(s_crnt, seq);
 
         cpy(s_crnt, s_partial, (dimen+1));
-        //memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
         cost_partial = cost_crnt;
 
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", cost_partial);	
 
         int iterILS = 0;
-        //int k = 0;
         while (iterILS < Iils) {
-            //k++;
             RVND(s_crnt, seq, rnd);
             cost_crnt = seq[0][dimen].C;
             if(cost_crnt < cost_partial - DBL_EPSILON){
-                //Solution_cpy(&solut_crnt, &solut_partial, info);
                 cpy(s_crnt, s_partial, (dimen+1));
-                //memcpy(s_partial, s_crnt, sizeof(int)*(dimen+1));
                 cost_partial = cost_crnt;
-                //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
             perturb(s_crnt, s_partial, rnd);
             subseq_load(s_crnt, seq);
-            //exit(0);
-            //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
 
-        //subseq_load(solut_partial, info);
-
         if (cost_partial < cost_best - DBL_EPSILON) {
             cpy(s_partial, s_best, (dimen+1));
-            //memcpy(s_best, s_partial, sizeof(int)*(dimen+1));
             cost_best = cost_partial;
-            //solut_best = solut_partial;
         }
 
-        //after(7);
-
-        //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
         printf("\tCurrent best cost: %.2lf\n", cost_best);
-        //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
-        //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
-        //std::cout << k << "  Iteracoes " << std::endl;
-
         printf("SOLUCAO: ");
         for(int i = 0; i < dimen+1; i++){
             printf("%d ", s_best[i]);
@@ -603,7 +513,6 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
         printf("\n");
 
     }
-    //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", cost_best);
 }
 
@@ -618,8 +527,6 @@ int main(int argc, char **argv){
     dimen = loadData(&cost, &rnd_adr);
     rnd.rnd = rnd_adr;
     rnd.rnd_index = 0;
-    //print_s(rnd);
-    //printf("%d\n", rnd[10]);
 
     srand(clock());
 
@@ -630,34 +537,6 @@ int main(int argc, char **argv){
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
     printf("TIME: %.6lf\n", res);
 
-    /*
-    flag = true;
-
-    srand(duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
-    readData(argc, argv, &dimension, &c);
-
-    int ar[] = {100, dimension};
-    
-    Iils = ar[dimension < 100];
-
-    auto t1 = high_resolution_clock::now();
-
-    GILS_RVND(Imax, Iils);
-
-    auto t2 = high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
-    double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
-
-    if(flag){
-        std::cout << "Construction time: " << construct_t/10e5 << std::endl;
-        std::cout << "Swap time: " << swap_t/10e5 << std::endl;
-        std::cout << "two_opt time: " << two_opt_t/10e5 << std::endl;
-        std::cout << "reinsertion time: " << reinsertion_t/10e5 << std::endl;
-        std::cout << "or_opt2 time: " << opt2_t/10e5 << std::endl;
-        std::cout << "or_opt3 time: " << opt3_t /10e5<< std::endl;
-    }
-    */
     return 0;
 }
 

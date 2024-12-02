@@ -2,7 +2,6 @@
 
 import time
 from read import *
-from random import randint
 import math
 import sys
 
@@ -95,9 +94,6 @@ def construction(alpha, rnd):
 
         sort(c_list, r)
 
-        i = int(len(c_list)*alpha) + 1
-        c = c_list[randint(0, i-1)]
-
         index = rnd.rnd[rnd.rnd_index]
         rnd.rnd_index += 1
         c = c_list[index]
@@ -116,10 +112,6 @@ def subseq_info_load(sol):
     while i < d:
         k = 1 - i - int(not i)
 
-       #seq[i][i][T] = 0.0
-       #seq[i][i][C] = 0.0
-       #seq[i][i][W] = int(not (i == 0))
-
         subseq[i][i].T = 0.0
         subseq[i][i].C = 0.0
         subseq[i][i].W = int(not (i == 0))
@@ -131,12 +123,6 @@ def subseq_info_load(sol):
             subseq[i][j].T = m[sol[a]][sol[j]] + subseq[i][a].T
             subseq[i][j].C = subseq[i][j].T  + subseq[i][a].C
             subseq[i][j].W = j + k
-
-            """
-            seq[T][j][i] = seq[T][i][j]
-            seq[C][j][i] = seq[C][i][j]
-            seq[W][j][i] = seq[W][i][j]
-            """
 
             j += 1
 
@@ -365,8 +351,6 @@ def RVND(s, rnd):
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3]
 
     while len(neighbd_list) > 0:
-        i = randint(0, len(neighbd_list)-1)
-
         i = rnd.rnd[rnd.rnd_index]
         rnd.rnd_index += 1
 
@@ -394,20 +378,10 @@ def RVND(s, rnd):
 
 def perturb(sl, rnd):
     s = sl[:]
-    #s = sl.copy()
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
-    size_max = math.floor(len(s)/10) if math.floor(len(s)/10) >= 2 else 2
-    size_min = 2
-
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        A_start = randint(1, len(s) - 1 - size_max)
-        A_end = A_start + randint(size_min, size_max)
-
-        B_start = randint(1, len(s) - 1 - size_max)
-        B_end = B_start + randint(size_min, size_max)
-
 
         A_start = rnd.rnd[rnd.rnd_index]
         rnd.rnd_index += 1
@@ -426,7 +400,6 @@ def perturb(sl, rnd):
         reinsert(s, A_start, A_end-1, B_end)
         reinsert(s, B_start, B_end-1, A_end )
 
-
     return s
 
 def GILS_RVND(Imax, Iils, R, rnd):
@@ -441,8 +414,6 @@ def GILS_RVND(Imax, Iils, R, rnd):
     subseq = subseq_info_fill(n)
 
     for i in range(Imax):
-        alpha = R[randint(0, len(R)-1)]
-
         index = rnd.rnd[rnd.rnd_index]
         rnd.rnd_index += 1
 
@@ -482,9 +453,6 @@ def GILS_RVND(Imax, Iils, R, rnd):
 
     print("COST: {}".format (cost_best))
     print("SOLUTION: {}".format( s_best))
-    #print("Total Iterations RVND {}".format(IT))
-
-
 
 
 def main(rnd):

@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    "math/rand"
     "math"
     "os"
     "time"
@@ -53,7 +52,6 @@ func loadData() (int, [][]float64, []int) {
 
     scanner.Scan(); line = scanner.Text()
     fmt.Sscanf(line, "%d ", &dimension)
-    //fmt.Println(dimension)
 
     cost = make([][]float64, dimension)
 
@@ -61,38 +59,22 @@ func loadData() (int, [][]float64, []int) {
         cost[i] = make([]float64, dimension)
     }
 
-
-    /*
-    scanner.Scan(); line = scanner.Text()
-
-    fmt.Println(line)
-    fmt.Println(line[0:2])
-    fmt.Println(line[0])
-    fmt.Println()
-    */
-
     for i := 0; i < dimension; i++ {
         scanner.Scan(); line = scanner.Text()
         strs := strings.Split(line, " ")
         index := len(strs)-1
         strs = append(strs[:index], strs[index+1:]...)
-        //fmt.Printf("%q\n", strs);
         for j := i+1; j < dimension; j++ {
-            //index :=  strings.Index(line, " ")
             fmt.Sscanf(strs[j-(i+1)], "%v", &value)
             cost[i][j] = value;
             cost[j][i] = value;
         }
-        //fmt.Println( cost[i])
     }
 
     scanner.Scan(); line = scanner.Text()
-    //fmt.Println(line)
     scanner.Scan(); line = scanner.Text()
-    //fmt.Println(line)
     scanner.Scan(); line = scanner.Text()
     fmt.Sscanf(line, "%d", &rnd_size)
-    //fmt.Println(rnd_size)
 
     rnd = make([]int, rnd_size)
 
@@ -103,13 +85,6 @@ func loadData() (int, [][]float64, []int) {
 
     return dimension, cost, rnd
 
-    /*
-    fmt.Sscanf(line, "%v ", &value)
-    fmt.Println(value)
-    for scanner.Scan() {
-        fmt.Println(scanner.Text())
-    }
-    */
 }
 
 func ternary(s bool, t int, f int) int {if s {return t} else {return f}}
@@ -234,23 +209,6 @@ func construct(alpha float64, s_crnt []int, rnd * tRnd) {
     copy(s_crnt, s)
 }
 
-func fea(s []int) bool {
-    check := make([]bool, dimension)
-    for i, v := range s {
-        _ = i
-        check[v] = true
-    }
-
-    for i, v := range check {
-        _ = i
-        if !v {
-            return false
-        }
-    }
-
-    return true
-}
-
 func search_swap(s []int, seq [][]tSeqInfo) bool {
     var cost_new, cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4 float64
     var cost_best float64 = math.MaxFloat64
@@ -262,7 +220,6 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
         i_prev = i - 1
         i_next = i + 1
 
-        //consecutive nodes
         cost_concat_1 =                 seq[0][i_prev].T + cost[s[i_prev]][s[i_next]]
         cost_concat_2 = cost_concat_1 + seq[i][i_next].T  + cost[s[i]][s[i_next+1]]
 
@@ -302,7 +259,6 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
     if cost_best < seq[0][dimension].C -math.SmallestNonzeroFloat64 {
         swap(s, I, J);
         subseq_load(s, seq);
-        //subseq_load_b(s, seq, I);
         return true;
     }
 
@@ -407,12 +363,8 @@ func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
     }
 
     if cost_best < seq[0][dimension].C - math.SmallestNonzeroFloat64 {
-      //fmt.Println(cost_best, seq[0][dimension].C)
-      //fmt.Println(s, I, J, POS+1)
         reinsert(s, I, J, POS+1)
-      //fmt.Println(s, I, J, POS+1)
         subseq_load(s, seq)
-        //subseq_load_b(s, seq, I < POS+1 ? I : POS+1);
         return true;
     }
 
@@ -444,12 +396,6 @@ func RVND(s []int , seq [][]tSeqInfo, rnd *tRnd) {
             improve = search_two_opt(s, seq)
         }
 
-        if !fea(s) {
-            fmt.Println("qebrad")
-            os.Exit(0)
-        }
-        //fmt.Println(index, seq[0][dimension].C)
-
         if improve {
             neighbd_list = []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
         } else {
@@ -470,46 +416,18 @@ func perturb(s_crnt []int, s_partial []int, rnd *tRnd) {
     var B_start = 1
     var B_end = 1
 
-    var size_max = (dimension+1)/10
-    size_max = ternary(size_max >= 2, size_max, 2)
-    var size_min = 2
-    //std::cout << "perturbing\n";
-    //print_s(s);
     for (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
-        /**/
-        max := (dimension+1) -2 -size_max
-        A_start = rand.Intn(max + 1)
-        A_end = A_start + rand.Intn(size_max - size_min + 1) + size_min
-
-        B_start = rand.Intn(max + 1)
-        B_end = B_start + rand.Intn(size_max - size_min + 1) + size_min
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         r_index := rnd.index; rnd.index++
         A_start = rnd.rnd[r_index]
-        //cout << info.rnd[info.rnd_index] << endl;
         r_index = rnd.index; rnd.index++
         A_end = A_start + rnd.rnd[r_index]
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         r_index = rnd.index; rnd.index++
         B_start = rnd.rnd[r_index]
-        //cout << info.rnd[info.rnd_index] << endl;
         r_index = rnd.index; rnd.index++
         B_end = B_start + rnd.rnd[r_index]
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if A_start < B_start {
         reinsert(s, B_start, B_end-1, A_end)
         reinsert(s, A_start, A_end-1, B_end)
@@ -518,14 +436,9 @@ func perturb(s_crnt []int, s_partial []int, rnd *tRnd) {
         reinsert(s, B_start, B_end-1, A_end)
     }
 
-    //print_s(s);
-    //subseq_load(solut, info);
-
     copy(s_crnt, s)
-    //memcpy(s_crnt, s, sizeof(int)*(dimen+1));
 }
 
-//func GILS_RVND(Imax int, Iils int, R []float64) {
 func GILS_RVND(rnd tRnd) {
     Imax := 10
     Iils := ternary(dimension < 100, dimension, 100)
@@ -549,10 +462,9 @@ func GILS_RVND(rnd tRnd) {
     }
 
     for i := 0; i < Imax; i++ {
-        var alpha = R[rand.Intn(len(R))]
         var r_index = rnd.index; rnd.index++
         var index = rnd.rnd[r_index]
-        alpha = R[index]
+        var alpha = R[index]
         fmt.Printf("[+] Search %d\n", i+1)
         fmt.Printf("\t[+] Constructing..\n");	
 
