@@ -360,16 +360,6 @@ fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
     let mut b_start : usize = 1;
     let mut b_end : usize = 1;
 
-    let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {(s.len() as f64 / 10.0) as usize} else {2};
-    let size_min = 2;
-
-    let mut range = size_min..size_max;
-
-    if size_max == 2 {
-        range = 0..1;
-    }
-
-    #[allow(unused_assignments)]
     while (a_start <= b_start &&  b_start <= a_end) || (b_start <= a_start && a_start <= b_end) {
 
         a_start = info.rnd[info.rnd_index];
