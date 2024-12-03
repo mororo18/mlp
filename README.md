@@ -11,6 +11,7 @@ git clone https://github.com/mororo18/mlp.git
 cd mlp/
 git submodule update --init
 ```
+Then, you need to set up the [mlp-instances](https://github.com/mororo18/mlp-instances/blob/master/README.md) submodule repository.
 
 ## how to build (if necessary)
 
