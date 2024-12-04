@@ -8,12 +8,12 @@
 typedef double Real;
 
 
-typedef struct tInfo {
+typedef struct tData {
     Real ** cost;
     int dimen;
     int * rnd;
     int rnd_index;
-} tInfo;
+} tData;
 
 typedef struct tSeqInfo {
     Real T, C, W;
@@ -52,11 +52,11 @@ static void seq_set_W(tSolution * solut, int i, int j, Real value);
 static Real seq_get_C(const tSolution * solut, int i, int j);
 static Real seq_get_T(const tSolution * solut, int i, int j);
 static Real seq_get_W(const tSolution * solut, int i, int j);
-tSolution Solution_init(tInfo info);
-void      Solution_cpy(tSolution * src, tSolution * tgt, const tInfo * info);
+tSolution Solution_init(tData data);
+void      Solution_cpy(tSolution * src, tSolution * tgt, const tData * data);
 void      Solution_free(tSolution * solut);
 
-void tInfo_free(tInfo * info);
+void tData_free(tData * data);
 
 /*==========================inline==========================*/
 
