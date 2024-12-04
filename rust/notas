@@ -1,18 +1,18 @@
-10/03 - Utilização de arrays #d de tamanha fixo (500) alocados na heap (Box<T>) até então parece ser a melhor solução. Alguns resultados: 
+10/03 - Utilização de arrays #d de tamanha fixo (500) alocados na heap (Box<T>) até então parece ser a melhor solução. Alguns resultados:
         rat99       1.89s
         pr152       6.44s
-        gil262      45.52s  
+        gil262      45.52s
 
-14/03 - Utilização de arrays #d de tamanha fixo (300). Alguns resultados: 
+14/03 - Utilização de arrays #d de tamanha fixo (300). Alguns resultados:
         rat99       1.80s
         pr152       6.17s
-        gil262      42.13s  
+        gil262      42.13s
 
 
         obs: preciso verificar/trabalhar novamente a ideia do flat-vector (luc)
              verificar tbm usar a funcao to_1D sem o parametro de referencia para tInfo.
 
-     -- Utilização de flat vector apenas na função subseq_load, com algumas tentativas de microotimização. Alguns resultados:
+     -- Utilização de flat vector apenas na função update_subseq_info_matrix, com algumas tentativas de microotimização. Alguns resultados:
                     standart    into_boxed_slice
         rat99       5.08s       5.00s
         pr152       16.56s      20.36s
@@ -38,7 +38,7 @@
         gil262  101.0s
 
 17/03 - Comparacao entre o uso e o nao uso do metodo into_boxed_slice no vector.
-        
+
         Com uso:
 
         rat99   3.21s
@@ -46,7 +46,7 @@
         gil262  71.51s
 
         Sem uso:
-        
+
         rat99   3.21s
         pr152   10.91s
         gil262  72.62s
@@ -63,7 +63,7 @@
         gil262  50.27s
 
 29/03 - Comparação entre matriz vector e matriz array (uso de structs em ambos -- tSeqInfo) com uso do 'get_unchecked'.
-    
+
         MATRIX vector
         rat99   1.82s
         pr152   6.51s
