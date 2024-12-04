@@ -1,7 +1,7 @@
 # minimum latency problem
 
 ## setup
-The steps to set up the enviroment are decribed [here](https://github.com/mororo18/mlp/blob/main/SETUP.md).
+The steps to set up the enviroment are described [here](https://github.com/mororo18/mlp/blob/main/SETUP.md).
 
 ## how to build (if necessary)
 
