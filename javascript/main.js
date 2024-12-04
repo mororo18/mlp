@@ -12,7 +12,7 @@ function subseq_fill(dimension) {
     return seq;
 }
 
-function subseq_load(solut, info) {
+function update_subseq_info_matrix(solut, info) {
     //console.log(info);
     for (var i = 0; i < info.dimension+1; i++) {
         var k = 1 - i - (i != 0 ? 0 : 1);
@@ -161,7 +161,7 @@ function search_swap(solut, info) {
         console.log("swap");
         console.log(cost_best);
         */
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         console.log();
@@ -212,7 +212,7 @@ function search_two_opt(solut, info) {
         console.log("two opt");
         console.log(cost_best);
         */
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         console.log();
@@ -288,7 +288,7 @@ function search_reinsertion(solut, info, opt) {
         //console.log(s);
         console.log(cost_best);
         */
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         //console.log(s);
@@ -315,7 +315,7 @@ function RVND(solut, info) {
     s[info.dimension] = 0;
     console.log(s);
 
-    subseq_load(s, subseq, info);
+    update_subseq_info_matrix(s, subseq, info);
     console.log(subseq[0][info.dimension][info.C]);
     */
     var improve = false;
@@ -424,7 +424,7 @@ function GILS_RVND(Iils, Imax, R, info) {
         console.log("[+] Local Search ", i+1);
         console.log("\t[+] Constructing Inital Solution..");
         solut_crnt.s = construction(alpha, info);
-        subseq_load(solut_crnt, info);
+        update_subseq_info_matrix(solut_crnt, info);
 
         solut_partial.s = [...solut_crnt.s];
         solut_partial.cost = solut_crnt.cost;
@@ -444,12 +444,12 @@ function GILS_RVND(Iils, Imax, R, info) {
             }
 
             solut_crnt.s = perturb(solut_partial.s, info);
-            subseq_load(solut_crnt, info);
+            update_subseq_info_matrix(solut_crnt, info);
             iterILS++;
         }
 
 
-        //subseq_load(sl, subseq, info);
+        //update_subseq_info_matrix(sl, subseq, info);
         //var sl_cost = subseq[0][info.dimension][info.C] - Number.EPSILON;
 
         if (solut_partial.cost < solut_best.cost) {
