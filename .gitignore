@@ -26,6 +26,7 @@ csharp/test/obj/
 # c
 c/solve
 
+# go
 rust/main
 go/main
 
