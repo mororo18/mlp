@@ -16,3 +16,5 @@ csharp/obj/
 
 c/obj/*.o
 c/obj/*.d
+
+go/main
