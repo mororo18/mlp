@@ -17,7 +17,7 @@ function subseq_fill(dimension) {
     return seq;
 }
 
-function subseq_load(s, seq, info) {
+function update_subseq_info_matrix(s, seq, info) {
 
     for (var i = 0; i < info.dimension+1; i++) {
         var k = 1 - i - (i != 0 ? 0 : 1);
@@ -162,7 +162,7 @@ function search_swap(s, seq, info) {
         console.log("swap");
         console.log(cost_best);
         */
-        subseq_load(s, seq, info);
+        update_subseq_info_matrix(s, seq, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         console.log();
@@ -213,7 +213,7 @@ function search_two_opt(s, seq, info) {
         console.log("two opt");
         console.log(cost_best);
         */
-        subseq_load(s, seq, info);
+        update_subseq_info_matrix(s, seq, info);
         /*
         console.log(seq[0][info.dimension][info.C]);
         console.log();
@@ -283,7 +283,7 @@ function search_reinsertion(s, seq, info, opt) {
 
     if(cost_best < seq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON){
         reinsert(s, I, J, POS+1);
-        subseq_load(s, seq, info);
+        update_subseq_info_matrix(s, seq, info);
 
         return true;
     }
@@ -377,7 +377,7 @@ function GILS_RVND(Iils, Imax, R, info) {
         var s = construction(alpha, info);
         var sl = [...s];
 
-        subseq_load(s, subseq, info);
+        update_subseq_info_matrix(s, subseq, info);
         var rvnd_cost_best = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
         console.log("Construction cost", rvnd_cost_best);
         var iterILS = 0;
@@ -393,12 +393,12 @@ function GILS_RVND(Iils, Imax, R, info) {
             }
 
             s = perturb(sl, info);
-            subseq_load(s, subseq, info);
+            update_subseq_info_matrix(s, subseq, info);
             iterILS++;
         }
 
 
-        subseq_load(sl, subseq, info);
+        update_subseq_info_matrix(sl, subseq, info);
         var sl_cost = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
 
         if (sl_cost < cost_best) {
