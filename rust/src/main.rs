@@ -6,7 +6,7 @@ use subseq::*;
 use std::time::Duration;
 use cpu_time::ProcessTime;
 
-fn subseq_load(solut: &mut Solution, info: &Info) {
+fn update_subseq_info_matrix(solut: &mut Solution, info: &Info) {
     for i in 0..=info.dimen {
         let k: i32 = 1 - (i as i32) - if i == 0 { 1 } else { 0 };
 
@@ -168,7 +168,7 @@ fn search_swap(solut : &mut Solution, info : & Info) -> bool {
     if cost_best < solut.cost - f64::EPSILON {
         //println!("swap \n{}", cost_best);
         swap(&mut solut.s, I, J);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         return true;
     } else {
         return false;
@@ -214,7 +214,7 @@ fn search_two_opt(solut: &mut Solution, info: & Info) -> bool {
 
     if cost_best < solut.cost - f64::EPSILON {
         reverse(&mut solut.s, I, J);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         return true;
     } else {
         return false;
@@ -301,7 +301,7 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Info) -> bool {
     if cost_best < solut.cost - f64::EPSILON {
         //println!("reinsertion {}   {} {} {}\n{}", opt,I,J, 1+POS, cost_best);
         reinsert(&mut solut.s, I, J, POS+1);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         //println!("{}", seq[0][info.dimension][C]);
         return true;
     } else {
@@ -416,7 +416,7 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
         solut_crnt.s = construction(alpha, info);
         println!("{:?}", solut_crnt.s);
 
-        subseq_load(&mut solut_crnt, info);
+        update_subseq_info_matrix(&mut solut_crnt, info);
         println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
         solut_partial.s = solut_crnt.s.clone();
         solut_partial.cost = solut_crnt.cost;
@@ -433,7 +433,7 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
             }
 
             solut_crnt.s = perturb(&solut_partial.s, info);
-            subseq_load(&mut solut_crnt, info);
+            update_subseq_info_matrix(&mut solut_crnt, info);
             iter_ils += 1;
         }
 
