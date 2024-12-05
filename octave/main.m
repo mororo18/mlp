@@ -53,19 +53,15 @@ function [arr, pivotIndex] = partition(arr, left, right, r, data)
     for j = left:right - 1
         if data.cost(r, arr(j)) < data.cost(r, pivotValue)
             i = i + 1;
-            % Troca arr(i) e arr(j)
             [arr(i), arr(j)] = deal(arr(j), arr(i));
         end
     end
-    % Troca o pivô
     [arr(i + 1), arr(right)] = deal(arr(right), arr(i + 1));
     pivotIndex = i + 1;
 end
 
 function [ret, index_new] = construction(data)
-    %s = zeros(data.dimen+1,1);
     s(1) = 1;
-    %clear cL;
     cL = zeros(1, data.dimen-1);
     for i = 1:data.dimen-1
         cL(i) = i+1;
@@ -173,10 +169,8 @@ function [solut_new, ret] = search_swap(solut, info, data)
     end
 
     if (cost_best < solut.cost - eps)
-        %cost_best
         solut.s = swap(solut.s, I_best, J_best);
         solut = update_subseq_info_matrix(solut, info, data);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -218,10 +212,8 @@ function [solut_new, ret] = search_two_opt(solut, info, data)
     end
 
     if (cost_best < solut.cost - eps)
-        %cost_best
         solut.s = reverse(solut.s, I_best, J_best);
         solut = update_subseq_info_matrix(solut, info, data);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -287,10 +279,8 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt, data)
     end
 
     if (cost_best < solut.cost)
-        %cost_best
         solut.s = reinsert(solut.s, I_best, J_best, POS_best+1);
         solut = update_subseq_info_matrix(solut, info, data);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -336,7 +326,6 @@ function [s, cost, index_new] = RVND(solut, info, data)
     cost = solut.cost;
     index_new = data.rnd_index;
 
-    %sz_nb = size(neighbd_list);
     sz_nb = length(neighbd_list);
 end
 
@@ -350,7 +339,6 @@ function [ret, index_new] = perturb(solut, data)
     if (size_max < 2)
         size_max = 2;
     end
-    %size_max = [2, size_max]((size_max >= 2) + 1);
     size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
@@ -428,7 +416,6 @@ function ret = GILS_RVND(Imax, Iils, R, info, data)
         fprintf("\tCurrent best cost: %.2f\n", solut_best.cost)
         fprintf('SOLUCAO: ')
         print_s(solut_best.s)
-        %typeinfo(solut_crnt.s)
     end
 
     fprintf('COST: %.2f\n', solut_best.cost)
@@ -452,28 +439,12 @@ function mainn
     info.SWAP = 4;
     info.TWO_OPT = 5;
     
-
-   %for i = 1:data.dimen
-   %    sol.s(i) = i;
-   %end
-   %sol.s(data.dimen+1) = 1;
-   %sol.cost = 0;
-   %sol.seq = zeros(data.dimen+1, data.dimen+1, 3);
-   %sol = update_subseq_info_matrix(sol, info, data);
-
-   %sol.seq(1, data.dimen+1, info.C);
-   %s = construction(0.1, info, data);
-   %%s(2:7)
-   %%s(2:7) = flip(s(2:7))
-   %s = reinsert(s, 6, 11, 2);
-
     Imax = 10;
     Iils = data.dimen;
     if (data.dimen > 100)
         Iils = 100;
     end
 
-    %Iils = [100, data.dimen]((data.dimen < 100) +1);
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
     t0 = clock ();
     s = GILS_RVND(Imax, Iils, R, info, data);
