@@ -7,15 +7,15 @@ module data_types
         integer :: T = 1
         integer :: C = 2
         integer :: W = 3
-        
+
         integer :: REINSERTION  = 1
         integer :: OR_OPT_2     = 2
-        integer :: OR_OPT_3     = 3 
+        integer :: OR_OPT_3     = 3
         integer :: SWAP         = 4
         integer :: TWO_OPT      = 5
 
         real(8) :: fmax = 3.4028235E+38
-        
+
         integer :: reinsert_call = 0
 
         integer, allocatable :: rnd(:)
@@ -43,7 +43,7 @@ subroutine print_matrix(c)
     dimen = nxm(1)
 
     do i=1, 2
-        do j=1, dimen 
+        do j=1, dimen
             write(*, "(F6.1, a)", advance="no") c(i,j),  ' '
         end do
         print *, new_line('A')
@@ -67,7 +67,7 @@ subroutine print_info(info)
 
 end subroutine
 
-subroutine subseq_load(sol, info)
+subroutine update_subseq_info_matrix(sol, info)
     use data_types
     type(tSolution) :: sol
     type(tInfo) :: info
@@ -98,7 +98,7 @@ end subroutine
 
 subroutine sort(arr, len, r, info)
     use data_types
-    implicit none 
+    implicit none
 
     integer, intent(inout) :: arr(len)
     integer :: len
@@ -110,7 +110,7 @@ end subroutine sort
 
 function partition(arr, left, right, info, r) result(ret)
     use data_types
-    implicit none 
+    implicit none
 
     integer, intent(inout) :: arr(*)
     integer, intent(in) :: left, right, r
@@ -138,7 +138,7 @@ end function partition
 
 recursive subroutine quicksort(arr, left, right, info, r)
     use data_types
-    implicit none 
+    implicit none
 
     integer, intent(inout) :: arr(*)
     integer, intent(in) :: left, right, r
@@ -148,7 +148,7 @@ recursive subroutine quicksort(arr, left, right, info, r)
     interface
         function partition(arr, left, right, info, r) result(ret)
             use data_types
-            implicit none 
+            implicit none
 
             integer, intent(inout) :: arr(*)
             integer, intent(in) :: left, right, r
@@ -165,7 +165,7 @@ recursive subroutine quicksort(arr, left, right, info, r)
 end subroutine quicksort
 
 subroutine arr_shift(arr, src, tgt, sz)
-    implicit none 
+    implicit none
     integer, dimension(*), intent(out) :: arr
     integer :: src, tgt
     integer :: i
@@ -177,7 +177,7 @@ subroutine arr_shift(arr, src, tgt, sz)
         do i=src+sz-1, src, -1
             arr(i+diff) = arr(i)
         end do
-    else 
+    else
         do i=1, sz
             arr(tgt+i-1) = arr(i+src-1)
         end do
@@ -191,7 +191,7 @@ function construction(alpha, info) result(ret)
 
     real(8) :: alpha
     type(tInfo) :: info
-    integer, dimension(info%dimen+1) :: ret 
+    integer, dimension(info%dimen+1) :: ret
 
     integer :: i
     integer :: j
@@ -257,7 +257,7 @@ end function
 subroutine swap(s, i, j)
     implicit none
 
-    integer, dimension(*), intent(out) :: s 
+    integer, dimension(*), intent(out) :: s
     integer :: i
     integer :: j
 
@@ -272,7 +272,7 @@ end subroutine
 subroutine reverse(s, i, j)
     implicit none
 
-    integer, dimension(*), intent(out) :: s 
+    integer, dimension(*), intent(out) :: s
     integer :: i
     integer :: j
 
@@ -290,7 +290,7 @@ end subroutine
 subroutine reinsert(s, i, j, pos)
     implicit none
 
-    integer, dimension(*), intent(out) :: s 
+    integer, dimension(*), intent(out) :: s
     integer :: i
     integer :: j
     integer :: pos
@@ -301,7 +301,7 @@ subroutine reinsert(s, i, j, pos)
     allocate(sub(j-i+1))
 
     sub(:) = s(i:j)
-     
+
     if (i < pos) then
         sz = pos-j-1
         call arr_shift(s, j+1, i, sz)
@@ -314,7 +314,7 @@ subroutine reinsert(s, i, j, pos)
 
 end subroutine
 
-subroutine search_swap(solut, info, ret) 
+subroutine search_swap(solut, info, ret)
     use data_types
     implicit none
     type(tSolution) :: solut
@@ -331,11 +331,11 @@ subroutine search_swap(solut, info, ret)
     integer :: I_best
     integer :: J_best
 
-    real(8) :: cost_best 
+    real(8) :: cost_best
     real(8) :: cost_new
     real(8) :: cost_concat_1
-    real(8) :: cost_concat_2 
-    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_2
+    real(8) :: cost_concat_3
     real(8) :: cost_concat_4
 
     cost_best = info%fmax
@@ -354,10 +354,10 @@ subroutine search_swap(solut, info, ret)
 
         cost_new = solut%seq(1, i_prev, info%C)                                                    + &
                 solut%seq(i, i_next, info%W)               * (cost_concat_1) + info%cost(solut%s(i_next), solut%s(i))  + &
-                solut%seq(i_next+1, info%dimen+1, info%W)   * (cost_concat_2) + solut%seq(i_next+1, info%dimen+1, info%C) 
+                solut%seq(i_next+1, info%dimen+1, info%W)   * (cost_concat_2) + solut%seq(i_next+1, info%dimen+1, info%C)
 
         if (cost_new < cost_best) then
-            cost_best = cost_new 
+            cost_best = cost_new
             I_best = i
             J_best = i_next
         endif
@@ -381,18 +381,18 @@ subroutine search_swap(solut, info, ret)
                     solut%seq(j_next, info%dimen+1, info%W) * cost_concat_4 + solut%seq(j_next, info%dimen+1, info%C)   ! concat 5th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new 
+                cost_best = cost_new
                 I_best = i;
                 J_best = j;
             endif
 
         end do
-        
+
     end do
 
     if (cost_best < solut%cost) then
         call swap(solut%s, I_best, J_best)
-        call subseq_load(solut, info)
+        call update_subseq_info_matrix(solut, info)
         !print *, "swap", cost_best, solut%cost
         ret = .true.
     else
@@ -401,7 +401,7 @@ subroutine search_swap(solut, info, ret)
 
 end subroutine
 
-subroutine search_two_opt(solut, info, ret) 
+subroutine search_two_opt(solut, info, ret)
     use data_types
     implicit none
     type(tSolution) :: solut
@@ -416,11 +416,11 @@ subroutine search_two_opt(solut, info, ret)
     integer :: I_best
     integer :: J_best
 
-    real(8) :: cost_best 
+    real(8) :: cost_best
     real(8) :: cost_new
     real(8) :: cost_concat_1
-    real(8) :: cost_concat_2 
-    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_2
+    real(8) :: cost_concat_3
     real(8) :: cost_concat_4
     real(8) :: rev_seq_cost
 
@@ -446,7 +446,7 @@ subroutine search_two_opt(solut, info, ret)
                     solut%seq(j_next, info%dimen+1, info%W) * cost_concat_2 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 3rd subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new 
+                cost_best = cost_new
                 I_best = i
                 J_best = j
             endif
@@ -457,7 +457,7 @@ subroutine search_two_opt(solut, info, ret)
 
     if (cost_best < solut%cost) then
         call reverse(solut%s, I_best, J_best)
-        call subseq_load(solut, info)
+        call update_subseq_info_matrix(solut, info)
         !print *,  "reverse", cost_best, solut%cost
         !print *, I_best, J_best
         ret = .true.
@@ -467,7 +467,7 @@ subroutine search_two_opt(solut, info, ret)
 
 end subroutine
 
-subroutine search_reinsertion(solut, info, opt, ret) 
+subroutine search_reinsertion(solut, info, opt, ret)
     use data_types
     implicit none
     type(tSolution) :: solut
@@ -486,11 +486,11 @@ subroutine search_reinsertion(solut, info, opt, ret)
     integer :: J_best
     integer :: POS_best
 
-    real(8) :: cost_best 
+    real(8) :: cost_best
     real(8) :: cost_new
     real(8) :: cost_concat_1
-    real(8) :: cost_concat_2 
-    real(8) :: cost_concat_3 
+    real(8) :: cost_concat_2
+    real(8) :: cost_concat_3
     real(8) :: cost_concat_4
 
     info%reinsert_call = info%reinsert_call + 1
@@ -520,7 +520,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
                     solut%seq(j_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(j_next, info%dimen+1, info%C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new 
+                cost_best = cost_new
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -545,7 +545,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
                     solut%seq(k_next, info%dimen+1, info%W) * cost_concat_3 + solut%seq(k_next, info%dimen+1, info%C)       ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new 
+                cost_best = cost_new
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -555,7 +555,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
 
     if (cost_best < solut%cost) then
         call reinsert(solut%s, I_best, J_best, POS_best+1)
-        call subseq_load(solut, info)
+        call update_subseq_info_matrix(solut, info)
         !print *, "reinsertion", cost_best, solut%cost
         !print *, "reinsertion", I_best, J_best, POS_best
         ret = .true.
@@ -592,7 +592,7 @@ subroutine RVND(sol, info)
   !sol%s = (/ (i, i=1, info%dimen+1) /)
   !sol%s(info%dimen+1) = 1
   !!print *, sol%s
-  !call subseq_load(sol, info)
+  !call update_subseq_info_matrix(sol, info)
   !!!call exit(0)
     nl_size = 5
   ! nl_size = 1
@@ -611,7 +611,7 @@ subroutine RVND(sol, info)
         info%rnd_index = info%rnd_index + 1
 
         neighbd = neighbd_list(index_)
-        
+
         !print *, neighbd
        !do i=1, nl_size
        !    write(*, '(I1, a)', advance='no') neighbd_list(i), ' '
@@ -712,13 +712,13 @@ function perturb(solut, info) result(ret)
 
        A_start = info%rnd(info%rnd_index) + 1
        info%rnd_index = info%rnd_index + 1
-       A_end = A_start + info%rnd(info%rnd_index) 
+       A_end = A_start + info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
 
        B_start = info%rnd(info%rnd_index) + 1
        !print *, info%rnd_index, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
-       B_end = B_start + info%rnd(info%rnd_index) 
+       B_end = B_start + info%rnd(info%rnd_index)
        !!print *, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
 
@@ -738,7 +738,7 @@ function perturb(solut, info) result(ret)
    !    call exit(0)
    !end if
 
-    call subseq_load(solut_pert, info)
+    call update_subseq_info_matrix(solut_pert, info)
 
     ret = solut_pert
 
@@ -787,7 +787,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
             implicit none
             real(8) :: alpha
             type(tInfo) :: info
-            integer, dimension(info%dimen+1) :: ret 
+            integer, dimension(info%dimen+1) :: ret
         end function
         function perturb(solut, info) result(ret)
             use data_types
@@ -816,7 +816,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         alpha = R(index_)
         print *, "[+] Local Search ", i
         sol_crnt%s = construction(alpha, info)
-        call subseq_load(sol_crnt, info)
+        call update_subseq_info_matrix(sol_crnt, info)
         sol_partial = sol_crnt
         print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
 
@@ -842,15 +842,15 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         end do
        !print *, sol_partial%cost
        !print *, ""
-        
-        call subseq_load(sol_partial, info)
+
+        call update_subseq_info_matrix(sol_partial, info)
 
         if (sol_partial%cost < sol_best%cost) then
             sol_best = sol_partial
         endif
 
         print *, "        Current best solution cost:", sol_best%cost
-    
+
     end do
 
     print *, sol_best%s
@@ -882,7 +882,7 @@ program main
             implicit none
             real(8) :: alpha
             type(tInfo) :: info
-            integer, dimension(info%dimen+1) :: ret 
+            integer, dimension(info%dimen+1) :: ret
         end function
         function GILS_RVND(Imax, Iils, R, info) result(ret)
             use data_types
