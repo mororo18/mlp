@@ -25,7 +25,7 @@ function print_s(s)
     fprintf('\n')
 end
 
-function ret = subseq_load (s)
+function ret = update_subseq_info_matrix (s)
 global dimen;
 global cost;
 global T;
@@ -95,7 +95,7 @@ function [ret, index_new] = construction(alpha, rnd)
     sz_cL = size(cL);
     sz_cL = sz_cL(2);
     while (sz_cL > 0) 
-        cL = sort_by(cL, r );
+        cL = sort(cL, r );
 
         index = rnd.rnd(rnd.rnd_index) + 1;
         rnd.rnd_index = rnd.rnd_index+1;
@@ -209,7 +209,7 @@ function [solut_new, seq_new, ret] = search_swap(s, seq)
     if (cost_best < seq(1, dimen+1, C) - eps)
         %cost_best
         s = swap(s, I_best, J_best);
-        seq = subseq_load(s);
+        seq = update_subseq_info_matrix(s);
         %solut.cost
         solut_new = s;
         seq_new = seq;
@@ -263,7 +263,7 @@ function [solut_new, seq_new, ret] = search_two_opt(s, seq)
     if (cost_best < seq(1, dimen+1, C) - eps)
         %cost_best
         s = reverse(s, I_best, J_best);
-        seq = subseq_load(s);
+        seq = update_subseq_info_matrix(s);
         %solut.cost
         solut_new = s;
         seq_new = seq;
@@ -342,7 +342,7 @@ function [solut_new, seq_new, ret] = search_reinsertion(s, seq, opt)
     if (cost_best < seq(1, dimen+1, C))
         %cost_best
         s = reinsert(s, I_best, J_best, POS_best+1);
-        seq = subseq_load(s);
+        seq = update_subseq_info_matrix(s);
         %solut.cost
 
         solut_new = s;
@@ -461,7 +461,7 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
         fprintf("\t[+] Constructing..\n");
 
         [solut_crnt, rnd.rnd_index] = construction(alpha, rnd);
-        seq = subseq_load(solut_crnt);
+        seq = update_subseq_info_matrix(solut_crnt);
 
         cost_crnt = seq(1, dimen+1, C);
         cost_partial = cost_crnt;
@@ -481,7 +481,7 @@ function ret = GILS_RVND(Imax, Iils, R, rnd)
             end
 
             [solut_crnt, rnd.rnd_index] = perturb(solut_partial, rnd);
-            seq = subseq_load(solut_crnt);
+            seq = update_subseq_info_matrix(solut_crnt);
             iterILS = iterILS + 1;
         end
 
