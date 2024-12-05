@@ -1,18 +1,41 @@
-.*.sw*
+# vim
+/**/.*.sw*
 
-rust/target/
+solve
+fortran/*.mod
+
 python/__pycache__/
-*.mod
+*.pdb
+*.dll
+*.json
 *.mem
 *.class
 *.pyo
 *.pyc
 *.prof
 *.o
-*.csproj
-*.exe
+*.d
+
+# dotnet 
 csharp/bin/
 csharp/obj/
+csharp/.vs/
+csharp/test/bin/
+csharp/test/obj/
 
-c/obj/*.o
-c/obj/*.d
+# c
+c/solve
+
+# go
+rust/main
+go/main
+
+# rust
+rust/debug/
+rust/target/
+rust/Cargo.lock
+rust/**/*.rs.bk
+rust/*.pdb
+rust/solve
+
+load
