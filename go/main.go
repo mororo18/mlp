@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-type tSubseq struct {
+type tInfo struct {
 	T float64
 	W float64
 	C float64
@@ -25,7 +25,7 @@ type tData struct {
 
 type tSolution struct {
 	s    []int
-	seq  [][]tSubseq
+	seq  [][]tInfo
 	cost float64
 }
 
@@ -227,9 +227,9 @@ func NewSolution(data tData) tSolution {
 	solut := tSolution{}
 
 	solut.s = make([]int, data.dimen+1)
-	solut.seq = make([][]tSubseq, data.dimen+1)
+	solut.seq = make([][]tInfo, data.dimen+1)
 	for i := 0; i < data.dimen+1; i++ {
-		solut.seq[i] = make([]tSubseq, data.dimen+1)
+		solut.seq[i] = make([]tInfo, data.dimen+1)
 	}
 
 	return solut
