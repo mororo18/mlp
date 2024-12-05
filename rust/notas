@@ -12,7 +12,7 @@
         obs: preciso verificar/trabalhar novamente a ideia do flat-vector (luc)
              verificar tbm usar a funcao to_1D sem o parametro de referencia para tInfo.
 
-     -- Utilização de flat vector apenas na função subseq_load, com algumas tentativas de microotimização. Alguns resultados:
+     -- Utilização de flat vector apenas na função update_subseq_info_matrix, com algumas tentativas de microotimização. Alguns resultados:
                     standart    into_boxed_slice
         rat99       5.08s       5.00s
         pr152       16.56s      20.36s
