@@ -130,7 +130,7 @@ inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
 
 }
 
-inline void subseq_load(vector<int> & s, tSubseq & seq, int index = 0){
+inline void update_subseq_info_matrix(vector<int> & s, tSubseq & seq, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
@@ -206,7 +206,7 @@ void search_swap(vector<int> & s, tSubseq & seq) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         swap(s, I, J);
-        subseq_load(s, seq, I);
+        update_subseq_info_matrix(s, seq, I);
         improve = true;
     }
 }
@@ -246,7 +246,7 @@ void search_two_opt(vector<int> & s, tSubseq & seq) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reverse(s, I, J);
-        subseq_load(s, seq);
+        update_subseq_info_matrix(s, seq);
         improve = true;
     }
 }
@@ -309,7 +309,7 @@ void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reinsert(s, I, J, POS+1);
-        subseq_load(s, seq, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix(s, seq, I < POS+1 ? I : POS+1);
 
         improve = true;
     }
@@ -407,7 +407,7 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
         solut_crnt = construct(alpha, rnd);
         solut_partial = solut_crnt;
 
-        subseq_load(solut_crnt, seq);
+        update_subseq_info_matrix(solut_crnt, seq);
         cost_crnt = seq[0][dimen].C;
         cost_partial = seq[0][dimen].C;
 
@@ -426,7 +426,7 @@ void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
             }
 
             solut_crnt = perturb(solut_partial, rnd);
-            subseq_load(solut_crnt, seq);
+            update_subseq_info_matrix(solut_crnt, seq);
 
             iterILS++;
         }
