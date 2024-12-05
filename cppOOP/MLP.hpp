@@ -3,17 +3,9 @@
 
 #include <vector>
 #include <cfloat>
-#include <iostream>
-#include <cstdint>
 #include <cstring>
-#include <new>
-#include <chrono>
-#include <fstream>
-#include <algorithm>
 #include <vector>
 
-#include <stdio.h>
-#include <time.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -32,18 +24,18 @@
 
 class MLP {
 private:
-    tInfo * info;
+    tData * info;
 
-    std::vector<int> construct(const double alpha, tInfo & info);
-    void subseq_load(tSolution & solut, tInfo & info, int index);
-    bool search_swap(tSolution & solut, tInfo & info);
-    bool search_two_opt(tSolution & solut, tInfo & info);
-    bool search_reinsertion(tSolution & solut, tInfo & info, const int opt);
-    void RVND(tSolution & solut, tInfo & info);
-    std::vector<int> perturb(tSolution * solut, tInfo & info);
-    void GILS_RVND(int Imax, int Iils, tInfo & info);
+    std::vector<int> construct(const double alpha, tData & info);
+    void update_subseq_info_matrix(tSolution & solut, tData & info, int index);
+    bool search_swap(tSolution & solut, tData & info);
+    bool search_two_opt(tSolution & solut, tData & info);
+    bool search_reinsertion(tSolution & solut, tData & info, const int opt);
+    void RVND(tSolution & solut, tData & info);
+    std::vector<int> perturb(tSolution * solut, tData & info);
+    void GILS_RVND(int Imax, int Iils, tData & info);
 public:
-    MLP(tInfo & info);
+    MLP(tData & info);
     void solve();
 };
 

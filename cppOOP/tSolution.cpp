@@ -1,18 +1,14 @@
 #include "tSolution.hpp"
 
-tSolution::tSolution(tInfo & info) : s(info.getDimen()+1) {
-    //this->s = vector<int>();
+#include <iostream>
+
+tSolution::tSolution(tData & info) : s(info.getDimen()+1) {
 
     this->seq = new tSeqInfo * [info.getDimen()+1];
     for (int i = 0; i < info.getDimen()+1; i++) {
         this->seq[i] = new tSeqInfo [info.getDimen()+1];
     }
 
-    /*
-    solut.seq = std::vector<std::vector<std::vector<double>>> (
-            info.dimen+1, std::vector<std::vector<double>> (
-                info.dimen+1, std::vector<double> (3)));
-                */
     this->cost = DBL_MAX;
 }
 

@@ -1,10 +1,10 @@
 #ifndef _SOLUTION_HPP
 #define _SOLUTION_HPP
 
-#include <iostream>
 #include <vector>
 #include <cfloat>
 #include <algorithm>
+
 #include "tInfo.hpp"
 
 typedef struct tSeqInfo {
@@ -20,9 +20,8 @@ private:
     tSeqInfo ** seq;
     double cost;
 
-    //void setCost(double c) {this->cost = c;}
 public:
-    tSolution(tInfo & info);
+    tSolution(tData & info);
 
     double getCost() {return cost;}
     std::vector<int> getSolutVec() {return s;}

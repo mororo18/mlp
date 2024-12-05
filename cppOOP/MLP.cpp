@@ -1,6 +1,9 @@
 #include "MLP.hpp"
 
-MLP::MLP(tInfo & info) {
+#include <ctime>
+#include <iostream>
+
+MLP::MLP(tData & info) {
 
     this->info = &info;
 
@@ -24,14 +27,14 @@ static double R_table(int i){
     return table[i];
 }
 
-static void print_s(std::vector<int> s) {
+static void print_s(const std::vector<int>& s) {
 
     for (int i = 0; i < s.size(); i++)
         std::cout << s[i]+1 << " ";
     std::cout << std::endl;
 }
 
-static int partition(std::vector<int>& arr, int left, int right, tInfo& info, int r) {
+static int partition(std::vector<int>& arr, int left, int right, tData& info, int r) {
     int pivot = arr[right];
     int i = left - 1;
     for (int j = left; j < right; j++) {
@@ -44,7 +47,7 @@ static int partition(std::vector<int>& arr, int left, int right, tInfo& info, in
     return i + 1;
 }
 
-static void quicksort(std::vector<int>& arr, int left, int right, tInfo& info, int r) {
+static void quicksort(std::vector<int>& arr, int left, int right, tData& info, int r) {
     if (left < right) {
         int pivot = partition(arr, left, right, info, r);
         quicksort(arr, left, pivot - 1, info, r);
@@ -52,12 +55,12 @@ static void quicksort(std::vector<int>& arr, int left, int right, tInfo& info, i
     }
 }
 
-static void sort(std::vector<int>& arr, int r, tInfo& info) {
+static void sort(std::vector<int>& arr, int r, tData& info) {
     quicksort(arr, 0, arr.size() - 1, info, r);
 }
 
 
-std::vector<int> MLP::construct(const double alpha, tInfo & info) {
+std::vector<int> MLP::construct(const double alpha, tData & info) {
 
     std::vector<int> s = {0};
     s.reserve(info.getDimen()+1);
@@ -82,7 +85,7 @@ std::vector<int> MLP::construct(const double alpha, tInfo & info) {
     return s;
 }	
 
-void MLP::subseq_load(tSolution & solut, tInfo & info, int index = 0) {
+void MLP::update_subseq_info_matrix(tSolution & solut, tData & info, int index = 0) {
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
@@ -99,21 +102,18 @@ void MLP::subseq_load(tSolution & solut, tInfo & info, int index = 0) {
         double some_T = 0.0;
         double some_C = 0.0;
 
-        //if (i+1 < info.getDimen()+1) 
-            s_j_prev = solut.getPos(i);
+        s_j_prev = solut.getPos(i);
 
         for (j = i+1; j < info.getDimen()+1; j++) {
             j_prev = j-1;
 
             s_j = solut.getPos(j);
 
-            //double T = info.getCost(solut.getPos(j_prev), solut.getPos(j)) + solut.getT(i, j_prev);
             double T = info.getCost(s_j_prev, s_j) + some_T;
 
             solut.setT(i, j, T);
 
             double C = T + some_C;
-            //double C = solut.getT(i, j) + solut.getC(i, j_prev);
             solut.setC(i, j, C);
 
             double W = j + k;
@@ -131,7 +131,7 @@ void MLP::subseq_load(tSolution & solut, tInfo & info, int index = 0) {
 }
 
 
-bool MLP::search_swap(tSolution & solut, tInfo & info) {
+bool MLP::search_swap(tSolution & solut, tData & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -182,14 +182,14 @@ bool MLP::search_swap(tSolution & solut, tInfo & info) {
 
     if (cost_best < solut.getCost() - DBL_EPSILON) {
         solut.swap(I, J);
-        subseq_load(solut, info, I);
+        update_subseq_info_matrix(solut, info, I);
         return true;
     }
 
     return false;
 }
 
-bool MLP::search_two_opt(tSolution & solut, tInfo & info) {
+bool MLP::search_two_opt(tSolution & solut, tData & info) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -226,14 +226,14 @@ bool MLP::search_two_opt(tSolution & solut, tInfo & info) {
 
     if (cost_best < solut.getCost() - DBL_EPSILON) {
         solut.reverse(I, J);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         return true;
     }
 
     return false;
 }
 
-bool MLP::search_reinsertion(tSolution & solut, tInfo & info, const int opt) {
+bool MLP::search_reinsertion(tSolution & solut, tData & info, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -289,14 +289,14 @@ bool MLP::search_reinsertion(tSolution & solut, tInfo & info, const int opt) {
 
     if (cost_best < solut.getCost() - DBL_EPSILON) {
         solut.reinsert(I, J, POS+1);
-        subseq_load(solut, info, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix(solut, info, I < POS+1 ? I : POS+1);
         return true;
     }
 
     return false;
 }
 
-void MLP::RVND(tSolution & solut, tInfo & info) {
+void MLP::RVND(tSolution & solut, tData & info) {
 
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     alignas(INT_SZ) uint index;
@@ -312,52 +312,30 @@ void MLP::RVND(tSolution & solut, tInfo & info) {
 
         switch(neighbd){
             case REINSERTION:
-                //before();
                 improve_flag = search_reinsertion(solut, info, REINSERTION);
-                //after(REINSERTION);
                 break;				
             case OR_OPT_2:
-                //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_2);
-                //after(OR_OPT2);
                 break;				
             case OR_OPT_3:
-                //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_3);
-                //after(OR_OPT3);
                 break;				
             case SWAP:
-                //before();
                 improve_flag = search_swap(solut, info);
-                //after(SWAP);
                 break;
             case TWO_OPT:
-                //before();
                 improve_flag = search_two_opt(solut, info);
-                //after(TWO_OPT);
                 break;				
         }
-        //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
-            //std::cout << index << "  " << neighbd_list.size() << std::endl;
-            //std::cout << solut.getCost() << std::endl;
-            
-            //std::cout << info.rnd_index << std::endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
-
-        //std::cout << "cost  " << solut.getCost() << std::endl ;
-
-
     }
-
-    //exit(0);
-    //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
-std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
+std::vector<int> MLP::perturb(tSolution * solut, tData & info) {
     auto s = solut->getSolutVec();
     int A_start = 1;
     int A_end = 1;
@@ -367,8 +345,6 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
     int size_max = std::floor((info.getDimen()+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
     int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
         A_start = info.getRndCrnt();
         A_end = A_start + info.getRndCrnt();
@@ -388,8 +364,6 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
         }
     };
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -398,14 +372,11 @@ std::vector<int> MLP::perturb(tSolution * solut, tInfo & info) {
         reinsert(s, B_start, B_end-1, A_end);
     }
 
-    //print_s(s);
-    //subseq_load(solut, info);
-
     return s;
 }
 
 
-void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
+void MLP::GILS_RVND(int Imax, int Iils, tData & info) {
 
     tSolution solut_partial(info);
     tSolution solut_crnt(info);
@@ -424,52 +395,35 @@ void MLP::GILS_RVND(int Imax, int Iils, tInfo & info) {
                 construct(alpha, info)
                 );
 
-        //print_s(solut_crnt.s);
-        subseq_load(solut_crnt, info);
+        update_subseq_info_matrix(solut_crnt, info);
 
-        //solut_partial = solut_crnt;
         solut_partial.copy(solut_crnt);
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.getCost());	
 
         int iterILS = 0;
-        //int k = 0;
         while (iterILS < Iils) {
-            //k++;
             RVND(solut_crnt, info);
             if(solut_crnt.getCost() < solut_partial.getCost() - DBL_EPSILON){
                 solut_partial.copy(solut_crnt);
-                //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
             auto s = perturb(&solut_partial, info);
             solut_crnt.setSolutVec(s);
-            subseq_load(solut_crnt, info);
-            //exit(0);
-            //std::cout << "ITER  " << iterILS << std::endl;
+            update_subseq_info_matrix(solut_crnt, info);
             iterILS++;
         }
 
-        //subseq_load(solut_partial, info);
-
         if (solut_partial.getCost() < solut_best.getCost() - DBL_EPSILON) {
             solut_best.copy(solut_partial);
-            //solut_best = solut_partial;
         }
 
-        //after(7);
-
-        //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
         std::cout << "\tCurrent best cost: "<< solut_best.getCost() << std::endl;
-        //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
-        //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
-        //std::cout << k << "  Iteracoes " << std::endl;
 
         std::cout << "SOLUCAO: ";
         solut_best.print();
 
     }
-    //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", solut_best.getCost());
 }

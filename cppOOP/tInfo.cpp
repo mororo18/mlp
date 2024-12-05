@@ -1,5 +1,3 @@
 #include "tInfo.hpp"
 
-
-tInfo::tInfo() {this->rnd_index=0;}
-
+tData::tData() {this->rnd_index=0;}
