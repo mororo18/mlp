@@ -22,6 +22,13 @@
 
 typedef unsigned uint;
 
+typedef struct tData {
+    double ** cost;
+    int dimen;
+    int * rnd;
+    uint rnd_index;
+} tData;
+
 typedef struct tInfo {
     double ** cost;
     int dimen;
@@ -39,24 +46,24 @@ typedef struct tSolution {
     //int s_size;
 } tSolution;
 
-tSolution Solution_init(tInfo info) {
+tSolution Solution_init(tInfo info, tData data) {
     tSolution solut;
-    solut.s = (int*) calloc(info.dimen+1, sizeof(int));
-    //solut.s_size = info.dimen+1;
+    solut.s = (int*) calloc(data.dimen+1, sizeof(int));
+    //solut.s_size = data.dimen+1;
 
-    solut.seq = (double ***) calloc(info.dimen+1, sizeof(double **));
-    for (int i = 0; i < info.dimen+1; i++) {
-        solut.seq[i] = (double **) calloc(info.dimen+1, sizeof(double *));
-        for (int j = 0; j < info.dimen+1; j++) {
+    solut.seq = (double ***) calloc(data.dimen+1, sizeof(double **));
+    for (int i = 0; i < data.dimen+1; i++) {
+        solut.seq[i] = (double **) calloc(data.dimen+1, sizeof(double *));
+        for (int j = 0; j < data.dimen+1; j++) {
             solut.seq[i][j] = (double *) calloc(3, sizeof(double));
         }
     }
 
     /*
-    solut.seq = new tSeqInfo * [info.dimen+1];
-    for (int i = 0; i < info.dimen+1; i++) {
-        solut.seq[i] = new tSeqInfo [info.dimen+1];
-        memset(solut.seq[i], 0.0, (info.dimen+1)*sizeof(tSeqInfo));
+    solut.seq = new tSeqInfo * [data.dimen+1];
+    for (int i = 0; i < data.dimen+1; i++) {
+        solut.seq[i] = new tSeqInfo [data.dimen+1];
+        memset(solut.seq[i], 0.0, (data.dimen+1)*sizeof(tSeqInfo));
     }
     */
 
@@ -65,14 +72,14 @@ tSolution Solution_init(tInfo info) {
     return solut;
 }
 
-void Solution_cpy(tSolution * src, tSolution * tgt, const tInfo * info) {
+void Solution_cpy(tSolution * src, tSolution * tgt, const tData * data) {
 
-    memcpy(tgt->s, src->s, sizeof(int)*(info->dimen+1));
+    memcpy(tgt->s, src->s, sizeof(int)*(data->dimen+1));
     tgt->cost = src->cost;
 
     /*
-    for (int i = 0; i < info.dimen+1; i++) {
-        for (int j = 0; j < info.dimen+1; j++) {
+    for (int i = 0; i < data.dimen+1; i++) {
+        for (int j = 0; j < data.dimen+1; j++) {
             //memcpy(tgt.seq[i][j], src.seq[i][j], 3 * sizeof(double));
             std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
         }
@@ -95,11 +102,11 @@ void print_s(int * s, int sz) {
 }
 
 
-int partition(int *arr, int left, int right, tInfo *info, int r) {
+int partition(int *arr, int left, int right, tData * data, int r) {
     int pivot = arr[right];
     int i = left - 1;
     for (int j = left; j < right; j++) {
-        if (info->cost[r][arr[j]] < info->cost[r][pivot]) {
+        if (data->cost[r][arr[j]] < data->cost[r][pivot]) {
             i++;
             int temp = arr[i];
             arr[i] = arr[j];
@@ -112,42 +119,42 @@ int partition(int *arr, int left, int right, tInfo *info, int r) {
     return i + 1;
 }
 
-void quicksort(int *arr, int left, int right, tInfo *info, int r) {
+void quicksort(int *arr, int left, int right, tData *data, int r) {
     if (left < right) {
-        int pivot = partition(arr, left, right, info, r);
-        quicksort(arr, left, pivot - 1, info, r);
-        quicksort(arr, pivot + 1, right, info, r);
+        int pivot = partition(arr, left, right, data, r);
+        quicksort(arr, left, pivot - 1, data, r);
+        quicksort(arr, pivot + 1, right, data, r);
     }
 }
 
-void sort(int *arr, int len, int r, tInfo *info) {
-    quicksort(arr, 0, len - 1, info, r);
+void sort(int *arr, int len, int r, tData *data) {
+    quicksort(arr, 0, len - 1, data, r);
 }
 
-void construct(int ** ret, const double alpha, tInfo * info){
+void construct(int ** ret, const double alpha, tData * data){
 
-    int s[info->dimen+1];
+    int s[data->dimen+1];
 
-    memset(s, 0, (info->dimen+1)*sizeof(int));
+    memset(s, 0, (data->dimen+1)*sizeof(int));
 
-    int cL[info->dimen-1];
-    int cL_size = info->dimen-1;
+    int cL[data->dimen-1];
+    int cL_size = data->dimen-1;
     
-    for (int i = 1; i < info->dimen; ++i) {
+    for (int i = 1; i < data->dimen; ++i) {
         cL[i-1] = i;
     }
 
     int r = 0;
-    for (int j = 1; j < info->dimen; ++j) {
-        sort(cL, cL_size, r, info);
+    for (int j = 1; j < data->dimen; ++j) {
+        sort(cL, cL_size, r, data);
 
         /**/
         int range = ceil(cL_size * alpha);
         int index = range > 0 ? rand() % range : 0;
         /**/
 
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = info->rnd[info->rnd_index++];
+        //std::cout << data.rnd[data.rnd_index]<< std::endl;
+        index = data->rnd[data->rnd_index++];
         int c = cL[index];
         s[j] = c;
         //print_s(cL);
@@ -156,7 +163,7 @@ void construct(int ** ret, const double alpha, tInfo * info){
         cL_size--;
     }
 
-    memcpy(*ret, s, sizeof(int)*(info->dimen+1));
+    memcpy(*ret, s, sizeof(int)*(data->dimen+1));
 }	
 
 void swap(int * vec, int i, int j){
@@ -188,11 +195,11 @@ void reinsert(int * vec, int i, int j, int pos){
     }
 }
 
-void subseq_load(tSolution * solut, const tInfo * info){
+void update_subseq_info_matrix(tSolution * solut, const tInfo * info, const tData * data){
     int i, j, j_prev, k;
     int from = 0;
     char t;
-    for (i = 0; i < info->dimen+1; i++) {
+    for (i = 0; i < data->dimen+1; i++) {
         k = 1 - i - (!i);
         t = i == from;
 
@@ -200,10 +207,10 @@ void subseq_load(tSolution * solut, const tInfo * info){
         solut->seq[i][i][info->C] = 0.0;
         solut->seq[i][i][info->W] = (double) !(i == 0);
 
-        for (j = i+1; j < info->dimen+1; j++) {
+        for (j = i+1; j < data->dimen+1; j++) {
             j_prev = j-1;
             
-            solut->seq[i][j][info->T] = info->cost[solut->s[j_prev]][solut->s[j]] + solut->seq[i][j_prev][info->T];
+            solut->seq[i][j][info->T] = data->cost[solut->s[j_prev]][solut->s[j]] + solut->seq[i][j_prev][info->T];
             solut->seq[i][j][info->C] = solut->seq[i][j][info->T] + solut->seq[i][j_prev][info->C];
             solut->seq[i][j][info->W] = j + k;
 
@@ -211,14 +218,14 @@ void subseq_load(tSolution * solut, const tInfo * info){
         from += t;
     }
 
-    solut->cost = solut->seq[0][info->dimen][info->C];
+    solut->cost = solut->seq[0][data->dimen][info->C];
 }
 
-void subseq_load_b(tSolution * solut, const tInfo * info, int index){
+void update_subseq_info_matrix_b(tSolution * solut, const tInfo * info, const tData * data, int index){
     int i, j, j_prev, k;
     int from = index;
     char t;
-    for (i = 0; i < info->dimen+1; i++) {
+    for (i = 0; i < data->dimen+1; i++) {
         k = 1 - i - (!i);
         t = i == from;
 
@@ -226,10 +233,10 @@ void subseq_load_b(tSolution * solut, const tInfo * info, int index){
         solut->seq[i][i][info->C] = 0.0;
         solut->seq[i][i][info->W] = (double) !(i == 0);
 
-        for (j = i+1; j < info->dimen+1; j++) {
+        for (j = i+1; j < data->dimen+1; j++) {
             j_prev = j-1;
             
-            solut->seq[i][j][info->T] = info->cost[solut->s[j_prev]][solut->s[j]] + solut->seq[i][j_prev][info->T];
+            solut->seq[i][j][info->T] = data->cost[solut->s[j_prev]][solut->s[j]] + solut->seq[i][j_prev][info->T];
             solut->seq[i][j][info->C] = solut->seq[i][j][info->T] + solut->seq[i][j_prev][info->C];
             solut->seq[i][j][info->W] = j + k;
 
@@ -237,10 +244,10 @@ void subseq_load_b(tSolution * solut, const tInfo * info, int index){
         from += t;
     }
 
-    solut->cost = solut->seq[0][info->dimen][info->C];
+    solut->cost = solut->seq[0][data->dimen][info->C];
 }
 
-char search_swap(tSolution * solut, const tInfo * info) {
+char search_swap(tSolution * solut, const tInfo * info, const tData * data) {
     double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     double cost_best = DBL_MAX;
@@ -248,17 +255,17 @@ char search_swap(tSolution * solut, const tInfo * info) {
     int I;
     int J;
 
-    for (i = 1; i < info->dimen-1; ++i) {
+    for (i = 1; i < data->dimen-1; ++i) {
         i_prev = i - 1;
         i_next = i + 1;
 
         //consecutive nodes
-        cost_concat_1 =                 solut->seq[0][i_prev][info->T] + info->cost[solut->s[i_prev]][solut->s[i_next]];
-        cost_concat_2 = cost_concat_1 + solut->seq[i][i_next][info->T]  + info->cost[solut->s[i]][solut->s[i_next+1]];
+        cost_concat_1 =                 solut->seq[0][i_prev][info->T] + data->cost[solut->s[i_prev]][solut->s[i_next]];
+        cost_concat_2 = cost_concat_1 + solut->seq[i][i_next][info->T]  + data->cost[solut->s[i]][solut->s[i_next+1]];
 
         cost_new = solut->seq[0][i_prev][info->C]                                                    +           //       1st subseq
-        solut->seq[i][i_next][info->W]               * (cost_concat_1) + info->cost[solut->s[i_next]][solut->s[i]]  +           // concat 2nd subseq
-        solut->seq[i_next+1][info->dimen][info->W]   * (cost_concat_2) + solut->seq[i_next+1][info->dimen][info->C];   // concat 3rd subseq
+        solut->seq[i][i_next][info->W]               * (cost_concat_1) + data->cost[solut->s[i_next]][solut->s[i]]  +           // concat 2nd subseq
+        solut->seq[i_next+1][data->dimen][info->W]   * (cost_concat_2) + solut->seq[i_next+1][data->dimen][info->C];   // concat 3rd subseq
 
         if (cost_new < cost_best) {
             cost_best = cost_new - DBL_EPSILON;
@@ -266,20 +273,20 @@ char search_swap(tSolution * solut, const tInfo * info) {
             J = i_next;
         }
 
-        for (j = i_next+1; j < info->dimen; ++j) {
+        for (j = i_next+1; j < data->dimen; ++j) {
             j_next = j + 1;
             j_prev = j - 1;
 
-            cost_concat_1 =                 solut->seq[0][i_prev][info->T]       + info->cost[solut->s[i_prev]][solut->s[j]];
-            cost_concat_2 = cost_concat_1                           + info->cost[solut->s[j]][solut->s[i_next]];
-            cost_concat_3 = cost_concat_2 + solut->seq[i_next][j_prev][info->T]  + info->cost[solut->s[j_prev]][solut->s[i]];
-            cost_concat_4 = cost_concat_3                           + info->cost[solut->s[i]][solut->s[j_next]];
+            cost_concat_1 =                 solut->seq[0][i_prev][info->T]       + data->cost[solut->s[i_prev]][solut->s[j]];
+            cost_concat_2 = cost_concat_1                           + data->cost[solut->s[j]][solut->s[i_next]];
+            cost_concat_3 = cost_concat_2 + solut->seq[i_next][j_prev][info->T]  + data->cost[solut->s[j_prev]][solut->s[i]];
+            cost_concat_4 = cost_concat_3                           + data->cost[solut->s[i]][solut->s[j_next]];
 
             cost_new = solut->seq[0][i_prev][info->C]                                                 +      // 1st subseq
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
             solut->seq[i_next][j_prev][info->W]      * cost_concat_2 + solut->seq[i_next][j_prev][info->C] +      // concat 3rd subseq
             cost_concat_3 +                                                             // concat 4th subseq (single node)
-            solut->seq[j_next][info->dimen][info->W] * cost_concat_4 + solut->seq[j_next][info->dimen][info->C];   // concat 5th subseq
+            solut->seq[j_next][data->dimen][info->W] * cost_concat_4 + solut->seq[j_next][data->dimen][info->C];   // concat 5th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -291,14 +298,14 @@ char search_swap(tSolution * solut, const tInfo * info) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         swap(solut->s, I, J);
-        subseq_load_b(solut, info, I);
+        update_subseq_info_matrix_b(solut, info, data, I);
         return TRUE;
     }
 
     return FALSE;
 }
 
-char search_two_opt(tSolution * solut, const tInfo * info) {
+char search_two_opt(tSolution * solut, const tInfo * info, const tData * data) {
     double cost_new, 
         cost_concat_1, cost_concat_2;
     double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -307,22 +314,22 @@ char search_two_opt(tSolution * solut, const tInfo * info) {
     int I;
     int J;
 
-    for (i = 1; i < info->dimen-1; ++i) {
+    for (i = 1; i < data->dimen-1; ++i) {
         i_prev = i - 1;
 
         rev_seq_cost = solut->seq[i][i+1][info->T];
-        for (j = i + 2; j < info->dimen; ++j) {
+        for (j = i + 2; j < data->dimen; ++j) {
             j_next = j + 1;
 
 
-          rev_seq_cost += info->cost[solut->s[j-1]][solut->s[j]] * (solut->seq[i][j][info->W]-1.0);
+          rev_seq_cost += data->cost[solut->s[j-1]][solut->s[j]] * (solut->seq[i][j][info->W]-1.0);
 
-          cost_concat_1 =                 solut->seq[0][i_prev][info->T]   + info->cost[solut->s[j]][solut->s[i_prev]];
-          cost_concat_2 = cost_concat_1 + solut->seq[i][j][info->T]        + info->cost[solut->s[j_next]][solut->s[i]];
+          cost_concat_1 =                 solut->seq[0][i_prev][info->T]   + data->cost[solut->s[j]][solut->s[i_prev]];
+          cost_concat_2 = cost_concat_1 + solut->seq[i][j][info->T]        + data->cost[solut->s[j_next]][solut->s[i]];
 
           cost_new = solut->seq[0][i_prev][info->C]                                                        +   //  1st subseq
               solut->seq[i][j][info->W]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
-              solut->seq[j_next][info->dimen][info->W] * cost_concat_2 + solut->seq[j_next][info->dimen][info->C];      // concat 3rd subseq
+              solut->seq[j_next][data->dimen][info->W] * cost_concat_2 + solut->seq[j_next][data->dimen][info->C];      // concat 3rd subseq
 
             
             if (cost_new < cost_best) {
@@ -335,14 +342,14 @@ char search_two_opt(tSolution * solut, const tInfo * info) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         reverse(solut->s, I, J);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info, data);
         return TRUE;
     }
 
     return FALSE;
 }
 
-char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
+char search_reinsertion(tSolution * solut, const tInfo * info, const tData * data, const int opt) {
     double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     int i, j, k, k_next, i_prev, j_next;
@@ -350,7 +357,7 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
     int J;
     int POS;
 
-    for (i = 1, j = opt +i-1; i < info->dimen-opt+1; ++i, ++j) {
+    for (i = 1, j = opt +i-1; i < data->dimen-opt+1; ++i, ++j) {
         j_next = j + 1;
         i_prev = i - 1;
 
@@ -358,14 +365,14 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
         for(k = 0; k < i_prev; ++k){
             k_next = k+1;
 
-          cost_concat_1 =                 solut->seq[0][k][info->T]            + info->cost[solut->s[k]][solut->s[i]];
-          cost_concat_2 = cost_concat_1 + solut->seq[i][j][info->T]            + info->cost[solut->s[j]][solut->s[k_next]];
-          cost_concat_3 = cost_concat_2 + solut->seq[k_next][i_prev][info->T]  + info->cost[solut->s[i_prev]][solut->s[j_next]];
+          cost_concat_1 =                 solut->seq[0][k][info->T]            + data->cost[solut->s[k]][solut->s[i]];
+          cost_concat_2 = cost_concat_1 + solut->seq[i][j][info->T]            + data->cost[solut->s[j]][solut->s[k_next]];
+          cost_concat_3 = cost_concat_2 + solut->seq[k_next][i_prev][info->T]  + data->cost[solut->s[i_prev]][solut->s[j_next]];
 
           cost_new = solut->seq[0][k][info->C]                                                                   +   //       1st subseq
               solut->seq[i][j][info->W]               * cost_concat_1 + solut->seq[i][j][info->C]                  +   //  concat 2nd subseq (reinserted seq)
               solut->seq[k_next][i_prev][info->W]     * cost_concat_2 + solut->seq[k_next][i_prev][info->C]        +   //  concat 3rd subseq
-              solut->seq[j_next][info->dimen][info->W] * cost_concat_3 + solut->seq[j_next][info->dimen][info->C];       // concat 4th subseq
+              solut->seq[j_next][data->dimen][info->W] * cost_concat_3 + solut->seq[j_next][data->dimen][info->C];       // concat 4th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -375,17 +382,17 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
             }
         }
 
-        for (k = i + opt; k < info->dimen; ++k) {
+        for (k = i + opt; k < data->dimen; ++k) {
             k_next = k + 1;
 
-          cost_concat_1 =                 solut->seq[0][i_prev][info->T]  + info->cost[solut->s[i_prev]][solut->s[j_next]];
-          cost_concat_2 = cost_concat_1 + solut->seq[j_next][k][info->T]  + info->cost[solut->s[k]][solut->s[i]];
-          cost_concat_3 = cost_concat_2 + solut->seq[i][j][info->T]       + info->cost[solut->s[j]][solut->s[k_next]];
+          cost_concat_1 =                 solut->seq[0][i_prev][info->T]  + data->cost[solut->s[i_prev]][solut->s[j_next]];
+          cost_concat_2 = cost_concat_1 + solut->seq[j_next][k][info->T]  + data->cost[solut->s[k]][solut->s[i]];
+          cost_concat_3 = cost_concat_2 + solut->seq[i][j][info->T]       + data->cost[solut->s[j]][solut->s[k_next]];
 
           cost_new = solut->seq[0][i_prev][info->C]                                                                  +   //       1st subseq
                   solut->seq[j_next][k][info->W]          * cost_concat_1 + solut->seq[j_next][k][info->C]             +   // concat 2nd subseq
                   solut->seq[i][j][info->W]               * cost_concat_2 + solut->seq[i][j][info->C]                  +   // concat 3rd subseq (reinserted seq)
-                  solut->seq[k_next][info->dimen][info->W] * cost_concat_3 + solut->seq[k_next][info->dimen][info->C];       // concat 4th subseq
+                  solut->seq[k_next][data->dimen][info->W] * cost_concat_3 + solut->seq[k_next][data->dimen][info->C];       // concat 4th subseq
           
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -398,7 +405,7 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         reinsert(solut->s, I, J, POS+1);
-        subseq_load_b(solut, info, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix_b(solut, info, data, I < POS+1 ? I : POS+1);
         return TRUE;
     }
 
@@ -406,7 +413,7 @@ char search_reinsertion(tSolution * solut, const tInfo * info, const int opt) {
 }
 
 
-void RVND(tSolution * solut, tInfo * info) {
+void RVND(tSolution * solut, tInfo * info, tData * data) {
 
     int neighbd_list[] = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     int nl_size = 5;
@@ -419,7 +426,7 @@ void RVND(tSolution * solut, tInfo * info) {
         //k++;
 
         index = rand() % nl_size;
-        index = info->rnd[info->rnd_index++];
+        index = data->rnd[data->rnd_index++];
         neighbd = neighbd_list[index];
         //std::cout <<"aq\n";
 
@@ -428,27 +435,27 @@ void RVND(tSolution * solut, tInfo * info) {
         switch(neighbd){
             case REINSERTION:
                 //before();
-                improve_flag = search_reinsertion(solut, info, REINSERTION);
+                improve_flag = search_reinsertion(solut, info, data, REINSERTION);
                 //after(REINSERTION);
                 break;				
             case OR_OPT_2:
                 //before();
-                improve_flag = search_reinsertion(solut, info, OR_OPT_2);
+                improve_flag = search_reinsertion(solut, info, data, OR_OPT_2);
                 //after(OR_OPT2);
                 break;				
             case OR_OPT_3:
                 //before();
-                improve_flag = search_reinsertion(solut, info, OR_OPT_3);
+                improve_flag = search_reinsertion(solut, info, data, OR_OPT_3);
                 //after(OR_OPT3);
                 break;				
             case SWAP:
                 //before();
-                improve_flag = search_swap(solut, info);
+                improve_flag = search_swap(solut, info, data);
                 //after(SWAP);
                 break;
             case TWO_OPT:
                 //before();
-                improve_flag = search_two_opt(solut, info);
+                improve_flag = search_two_opt(solut, info, data);
                 //after(TWO_OPT);
                 break;				
         }
@@ -464,7 +471,7 @@ void RVND(tSolution * solut, tInfo * info) {
             //std::cout << index << "  " << neighbd_list.size() << std::endl;
             //std::cout << solut.cost << std::endl;
             
-            //std::cout << info.rnd_index << std::endl;
+            //std::cout << data.rnd_index << std::endl;
             memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
             nl_size--;
         }
@@ -478,23 +485,23 @@ void RVND(tSolution * solut, tInfo * info) {
     //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
-void perturb(tSolution * solut_crnt, tSolution * solut_partial, tInfo * info) {
-    int s[info->dimen+1];
-    memmove(s, solut_partial->s, sizeof(int)*(info->dimen+1));
+void perturb(tSolution * solut_crnt, tSolution * solut_partial, tData * data) {
+    int s[data->dimen+1];
+    memmove(s, solut_partial->s, sizeof(int)*(data->dimen+1));
 
     int A_start = 1;
     int A_end = 1;
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = floor((info->dimen+1)/10);
+    int size_max = floor((data->dimen+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
     int size_min = 2;
     //std::cout << "perturbing\n";
     //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
         /**/
-        int max = (info->dimen+1) -2 -size_max;
+        int max = (data->dimen+1) -2 -size_max;
         A_start = rand() % max + 1;
         A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
 
@@ -506,17 +513,17 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tInfo * info) {
 
         //std::cout << "paa\n";
 
-        //cout << info.rnd[info.rnd_index] << endl;
-        A_start = info->rnd[info->rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
-        A_end = A_start + info->rnd[info->rnd_index++];
+        //cout << data.rnd[data.rnd_index] << endl;
+        A_start = data->rnd[data->rnd_index++];
+        //cout << data.rnd[data.rnd_index] << endl;
+        A_end = A_start + data->rnd[data->rnd_index++];
         //std::cout << "A start  " << A_start << std::endl;
         //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
-        B_start = info->rnd[info->rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
-        B_end = B_start + info->rnd[info->rnd_index++];
+        //cout << data.rnd[data.rnd_index] << endl;
+        B_start = data->rnd[data->rnd_index++];
+        //cout << data.rnd[data.rnd_index] << endl;
+        B_end = B_start + data->rnd[data->rnd_index++];
         //std::cout << "B start  " << B_start << std::endl;
         //std::cout << "B end  " << B_end << std::endl;
     }
@@ -532,21 +539,21 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tInfo * info) {
     }
 
     //print_s(s);
-    //subseq_load(solut, info);
+    //update_subseq_info_matrix(solut, info);
 
-    memcpy(solut_crnt->s, s, sizeof(int)*(info->dimen+1));
+    memcpy(solut_crnt->s, s, sizeof(int)*(data->dimen+1));
 }
 
 
-void GILS_RVND(int Imax, int Iils, tInfo * info) {
+void GILS_RVND(int Imax, int Iils, tInfo * info, tData * data) {
 
-    tSolution solut_partial = Solution_init(*info);
-    tSolution solut_crnt = Solution_init(*info);
-    tSolution solut_best = Solution_init(*info);
+    tSolution solut_partial = Solution_init(*info, *data);
+    tSolution solut_crnt = Solution_init(*info, *data);
+    tSolution solut_best = Solution_init(*info, *data);
 
     for(int i = 0; i < Imax; ++i){
         /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = info->rnd[info->rnd_index++];
+        aux = data->rnd[data->rnd_index++];
 
         double alpha = R_table(aux);
 
@@ -554,12 +561,12 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         printf("\t[+] Constructing..\n");	
 
 
-        construct(&solut_crnt.s, alpha, info);
+        construct(&solut_crnt.s, alpha, data);
         //print_s(solut_crnt.s);
-        subseq_load(&solut_crnt, info);
+        update_subseq_info_matrix(&solut_crnt, info, data);
 
         //solut_partial = solut_crnt;
-        Solution_cpy(&solut_crnt, &solut_partial, info);
+        Solution_cpy(&solut_crnt, &solut_partial, data);
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
 
@@ -567,24 +574,24 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         //int k = 0;
         while (iterILS < Iils) {
             //k++;
-            RVND(&solut_crnt, info);
+            RVND(&solut_crnt, info, data);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
-                Solution_cpy(&solut_crnt, &solut_partial, info);
+                Solution_cpy(&solut_crnt, &solut_partial, data);
                 //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
-            perturb(&solut_crnt, &solut_partial, info);
-            subseq_load(&solut_crnt, info);
+            perturb(&solut_crnt, &solut_partial, data);
+            update_subseq_info_matrix(&solut_crnt, info, data);
             //exit(0);
             //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
 
-        //subseq_load(solut_partial, info);
+        //update_subseq_info_matrix(solut_partial, info);
 
         if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
-            Solution_cpy(&solut_partial, &solut_best, info);
+            Solution_cpy(&solut_partial, &solut_best, data);
             //solut_best = solut_partial;
         }
 
@@ -597,7 +604,7 @@ void GILS_RVND(int Imax, int Iils, tInfo * info) {
         //std::cout << k << "  Iteracoes " << std::endl;
 
         printf("SOLUCAO: ");
-        for(int i = 0; i < info->dimen+1; i++){
+        for(int i = 0; i < data->dimen+1; i++){
             printf("%d ", solut_best.s[i]);
         }
         printf("\n");
@@ -618,13 +625,14 @@ int main(int argc, char **argv){
 
     int * rnd;
 
-    info.dimen = loadData(&info.cost, &rnd);
-    info.rnd = rnd;
+    tData data = {0};
+    data.dimen = loadData(&data.cost, &rnd);
+    data.rnd = rnd;
     //print_s(rnd);
     //printf("%d\n", rnd[10]);
-    info.rnd_index = 0;
+    data.rnd_index = 0;
 
-    tSolution solut = Solution_init(info);
+    tSolution solut = Solution_init(info, data);
 
     //exit(0);
     /*
@@ -639,9 +647,9 @@ int main(int argc, char **argv){
 
     srand(clock());
 
-    Iils = info.dimen < 100 ? info.dimen : 100;
+    Iils = data.dimen < 100 ? data.dimen : 100;
     time_t start = clock();
-    GILS_RVND(Imax, Iils, &info);
+    GILS_RVND(Imax, Iils, &info, &data);
 
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
     printf("TIME: %.6lf\n", res);
