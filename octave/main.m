@@ -54,11 +54,9 @@ function [arr, pivotIndex] = partition(arr, left, right, r, data)
     for j = left:right - 1
         if data.cost(r, arr(j)) < data.cost(r, pivotValue)
             i = i + 1;
-            % Troca arr(i) e arr(j)
             [arr(i), arr(j)] = deal(arr(j), arr(i));
         end
     end
-    % Troca o pivô
     [arr(i + 1), arr(right)] = deal(arr(right), arr(i + 1));
     pivotIndex = i + 1;
 end
@@ -77,11 +75,9 @@ function [ret, index_new] = construction(alpha, data)
 
         rng = ceil(size_cL * alpha);
         RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
         index = ceil(rng * RND);
         
         index = data.rnd(data.rnd_index) + 1;
-        %data.rnd(data.rnd_index);
         data.rnd_index = data.rnd_index+1;
 
         cN = cL(index);
@@ -184,10 +180,8 @@ function [solut_new, ret] = search_swap(solut, info, data)
     end
 
     if (cost_best < solut.cost - eps)
-        %cost_best
         solut.s = swap(solut.s, I_best, J_best);
         solut = update_subseq_info_matrix(solut, info, data);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -229,10 +223,8 @@ function [solut_new, ret] = search_two_opt(solut, info, data)
     end
 
     if (cost_best < solut.cost - eps)
-        %cost_best
         solut.s = reverse(solut.s, I_best, J_best);
         solut = update_subseq_info_matrix(solut, info, data);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -298,10 +290,8 @@ function [solut_new, ret] = search_reinsertion(solut, info, data, opt)
     end
 
     if (cost_best < solut.cost)
-        %cost_best
         solut.s = reinsert(solut.s, I_best, J_best, POS_best+1);
         solut = update_subseq_info_matrix(solut, info, data);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -316,12 +306,8 @@ function [s, cost, index_new] = RVND(solut, info, data)
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
     while (isempty(neighbd_list) == false)
         RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(RND*columns(neighbd_list));
-        %data.rnd(data.rnd_index);
         index = data.rnd(data.rnd_index) + 1;
         data.rnd_index = data.rnd_index + 1;
-        % index
         neighbd = neighbd_list(index);
         improve_flag = false;
         switch (neighbd)
@@ -352,7 +338,6 @@ end
 
 function ret = notnull_rnd()
     RND = rand(1);
-    %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
     ret = RND;
 end
 
@@ -363,7 +348,6 @@ function [ret, index_new] = perturb(solut, data)
     B_end = 1;
 
     size_max = ceil((data.dimen+1) / 10);
-    %size_max = [2, size_max]((size_max >= 2) + 1);
     size_min = 2;
 
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
@@ -380,17 +364,13 @@ function [ret, index_new] = perturb(solut, data)
 
 
         A_start = data.rnd(data.rnd_index) + 1;
-        %data.rnd(data.rnd_index)
         data.rnd_index = data.rnd_index + 1;
         A_end = A_start + data.rnd(data.rnd_index);
-        %data.rnd(data.rnd_index)
         data.rnd_index = data.rnd_index + 1;
 
         B_start = data.rnd(data.rnd_index) + 1;
-        %data.rnd(data.rnd_index)
         data.rnd_index = data.rnd_index + 1;
         B_end = B_start + data.rnd(data.rnd_index);
-        %data.rnd(data.rnd_index)
         data.rnd_index = data.rnd_index + 1;
     end
 
@@ -421,15 +401,13 @@ function ret = GILS_RVND(Imax, Iils, R, info, data)
 
     for i = 1:Imax
         RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(columns(R) * RND);
+
         index = data.rnd(data.rnd_index) + 1;
         data.rnd_index = data.rnd_index + 1;
         alpha = R(index);
 
         fprintf("[+] Search %d\n", i)
         fprintf("\t[+] Constructing..\n");
-        %"ITER ", i
 
         [solut_crnt.s, data.rnd_index] = construction(alpha, data);
         solut_crnt = update_subseq_info_matrix(solut_crnt, info, data);
@@ -460,7 +438,6 @@ function ret = GILS_RVND(Imax, Iils, R, info, data)
         fprintf("\tCurrent best cost: %.2f\n", solut_best.cost)
         fprintf('SOLUCAO: ')
         print_s(solut_best.s)
-        %typeinfo(solut_crnt.s)
     end
 
     fprintf('COST: %.2f\n', solut_best.cost)
@@ -481,21 +458,6 @@ function mainn
     info.SWAP = 4;
     info.TWO_OPT = 5;
     
-
-   %for i = 1:data.dimen
-   %    sol.s(i) = i;
-   %end
-   %sol.s(data.dimen+1) = 1;
-   %sol.cost = 0;
-   %sol.seq = zeros(data.dimen+1, data.dimen+1, 3);
-   %sol = update_subseq_info_matrix(sol, info, data);
-
-   %sol.seq(1, data.dimen+1, info.C);
-   %s = construction(0.1, info, data);
-   %%s(2:7)
-   %%s(2:7) = flip(s(2:7))
-   %s = reinsert(s, 6, 11, 2);
-
     Imax = 10;
     Iils = 100;
     if data.dimen < 100
