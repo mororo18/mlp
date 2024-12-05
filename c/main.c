@@ -30,13 +30,9 @@ typedef struct tData {
 } tData;
 
 typedef struct tInfo {
-    double ** cost;
-    int dimen;
     uint T;
     uint C;
     uint W;
-    int * rnd;
-    uint rnd_index;
 } tInfo;
 
 typedef struct tSolution {
