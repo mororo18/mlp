@@ -10,7 +10,7 @@ import (
     "strings"
 )
 
-type tSeqInfo struct {
+type tInfo struct {
     T, W, C float64
 }
 
@@ -89,7 +89,7 @@ func loadData() (int, [][]float64, []int) {
 
 func ternary(s bool, t int, f int) int {if s {return t} else {return f}}
 
-func subseq_load(s []int, seq [][]tSeqInfo) float64 {
+func subseq_load(s []int, seq [][]tInfo) float64 {
 
     for i := 0; i < dimension+1; i++ {
         k := 1 - i - ternary(i == 0, 1, 0)
@@ -209,7 +209,7 @@ func construct(alpha float64, s_crnt []int, rnd * tRnd) {
     copy(s_crnt, s)
 }
 
-func search_swap(s []int, seq [][]tSeqInfo) bool {
+func search_swap(s []int, seq [][]tInfo) bool {
     var cost_new, cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4 float64
     var cost_best float64 = math.MaxFloat64
     var j_prev, j_next, i_prev, i_next int
@@ -265,7 +265,7 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
     return false;
 }
 
-func search_two_opt(s []int, seq [][]tSeqInfo) bool {
+func search_two_opt(s []int, seq [][]tInfo) bool {
     var cost_new, cost_concat_1, cost_concat_2 float64
     var cost_best = math.MaxFloat64 
     var rev_seq_cost float64
@@ -307,7 +307,7 @@ func search_two_opt(s []int, seq [][]tSeqInfo) bool {
     return false
 }
 
-func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
+func search_reinsertion(s []int, seq [][]tInfo, opt int) bool {
     var cost_new, cost_concat_1, cost_concat_2, cost_concat_3 float64
     var cost_best = math.MaxFloat64
     var k_next, i_prev, j_next int
@@ -371,7 +371,7 @@ func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
     return false;
 }
 
-func RVND(s []int , seq [][]tSeqInfo, rnd *tRnd) {
+func RVND(s []int , seq [][]tInfo, rnd *tRnd) {
     var neighbd_list []int
     _ = neighbd_list
     neighbd_list = []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
@@ -456,9 +456,9 @@ func GILS_RVND(rnd tRnd) {
     _, _, _ = s_best, s_crnt, s_partial
     _, _, _ = cost_best, cost_crnt, cost_partial
 
-    seq := make([][]tSeqInfo, dimension+1)
+    seq := make([][]tInfo, dimension+1)
     for i := 0; i < dimension+1; i++ {
-        seq[i] = make([]tSeqInfo, dimension+1)
+        seq[i] = make([]tInfo, dimension+1)
     }
 
     for i := 0; i < Imax; i++ {
