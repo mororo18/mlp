@@ -11,7 +11,7 @@ import (
 )
 
 /*
-type tSubseq struct {
+type tInfo struct {
     T   float64
     W   float64
     C   float64
@@ -24,7 +24,7 @@ const (
 	C = 2
 )
 
-type tSubseq struct {
+type tInfo struct {
 	T int
 	W int
 	C int
@@ -40,7 +40,7 @@ type tData struct {
 type tSolution struct {
 	s   []int
 	seq [][][]float64
-	//seq [][]tSubseq
+	//seq [][]tInfo
 	cost float64
 }
 
@@ -257,7 +257,7 @@ func NewSolution(data tData) tSolution {
 
 }
 
-func update_subseq_info_matrix(solut *tSolution, data tData, info tSubseq) {
+func update_subseq_info_matrix(solut *tSolution, data tData, info tInfo) {
 
 	for i := 0; i < data.dimen+1; i++ {
 		k := 1 - i
@@ -300,7 +300,7 @@ func swap(solut *tSolution, i int, j int) {
 	solut.s[j] = tmp
 }
 
-func search_swap(solut *tSolution, data tData, info tSubseq) bool {
+func search_swap(solut *tSolution, data tData, info tInfo) bool {
 
 	var cost_concat_1 float64
 	var cost_concat_2 float64
@@ -391,7 +391,7 @@ func reverse(solut *tSolution, i int, j int) {
 	}
 }
 
-func search_two_opt(solut *tSolution, data tData, info tSubseq) bool {
+func search_two_opt(solut *tSolution, data tData, info tInfo) bool {
 	var cost_new float64
 	cost_best := math.MaxFloat64
 
@@ -490,7 +490,7 @@ func reinsert(solut *tSolution, i int, j int, pos int) {
 
 }
 
-func search_reinsertion(solut *tSolution, data tData, info tSubseq, opt int) bool {
+func search_reinsertion(solut *tSolution, data tData, info tInfo, opt int) bool {
 	cost_best := math.MaxFloat64
 	var cost_new float64
 
@@ -570,7 +570,7 @@ func search_reinsertion(solut *tSolution, data tData, info tSubseq, opt int) boo
 	return false
 }
 
-func RVND(solut *tSolution, data *tData, info *tSubseq) {
+func RVND(solut *tSolution, data *tData, info *tInfo) {
 	n_list_b := []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
 	n_list := make([]int, 5)
 
@@ -694,7 +694,7 @@ func perturb(sl []int, data *tData) []int {
 	return s
 }
 
-func GILS_RVND(Imax int, Iils int, R [26]float64, data tData, info tSubseq) {
+func GILS_RVND(Imax int, Iils int, R [26]float64, data tData, info tInfo) {
 
 	solut_crnt := NewSolution(data)
 	solut_partial := NewSolution(data)
@@ -754,7 +754,7 @@ func main() {
 
 	data.dimen, data.c, data.rnd = read_data()
 
-	info := tSubseq{
+	info := tInfo{
 		T: T,
 		W: W,
 		C: C,
