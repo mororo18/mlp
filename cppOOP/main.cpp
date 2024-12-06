@@ -1,17 +1,12 @@
 #include <iostream>
-#include <cstdint>
 #include <cstring>
 #include <cfloat>
-#include <new>
 #include <chrono>
-#include <fstream>
 #include <stdio.h>
 #include <algorithm>
 #include <vector>
-#include <time.h>
 #include <math.h>
 #include <stdlib.h>
-#include "readData.h"
 #include "Data.hpp"
 
 #define REINSERTION 1
@@ -133,7 +128,7 @@ public:
 
     }
 
-    void subseq_load(vector<int> & s, tSubseq & seq, int index = 0){
+    void update_subseq_info_matrix(vector<int> & s, tSubseq & seq, int index = 0){
         alignas(INT_SZ) int i, j, j_prev, k;
         alignas(INT_SZ) int from = index;
         alignas(1) bool t;
@@ -211,7 +206,7 @@ public:
 
         if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
             swap(s, I, J);
-            subseq_load(s, seq, I);
+            update_subseq_info_matrix(s, seq, I);
             if (cost_best != seq[0][dimen].C) {
                 cout << "difere " << endl;
             }
@@ -259,7 +254,7 @@ public:
 
         if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
             reverse(s, I, J);
-            subseq_load(s, seq);//, I);  // d olho aq hein
+            update_subseq_info_matrix(s, seq);//, I);  // d olho aq hein
             if (cost_best != seq[0][dimen].C) {
                 cout << "difere " << endl;
             }
@@ -329,7 +324,7 @@ public:
 
         if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
             reinsert(s, I, J, POS+1);
-            subseq_load(s, seq, I < POS+1 ? I : POS+1);
+            update_subseq_info_matrix(s, seq, I < POS+1 ? I : POS+1);
 
             if (cost_best != seq[0][dimen].C) {
                 cout << "difere " << endl;
@@ -444,7 +439,7 @@ public:
             solut_crnt = construct(alpha, rnd);
             solut_partial = solut_crnt;
 
-            subseq_load(solut_crnt, seq);
+            update_subseq_info_matrix(solut_crnt, seq);
             cost_crnt = seq[0][dimen].C;
             cost_partial = seq[0][dimen].C;
 
@@ -464,7 +459,7 @@ public:
 
 
                 solut_crnt = perturb(solut_partial, rnd);
-                subseq_load(solut_crnt, seq);
+                update_subseq_info_matrix(solut_crnt, seq);
 
                 iterILS++;
             }
