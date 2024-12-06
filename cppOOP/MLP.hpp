@@ -24,8 +24,6 @@ private:
 
     tData data;
 
-
-
     std::vector<int> construct(const double, tData &);
 
     void subseq_load(tSolution & solut, tData & data, int index );

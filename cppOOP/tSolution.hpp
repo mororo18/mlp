@@ -15,7 +15,6 @@ private:
     double cost;
     tData * data;
 
-    //void setCost(double c) {this->cost = c;}
 public:
     tSolution(tData & data);
 
