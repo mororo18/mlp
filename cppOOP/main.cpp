@@ -1,11 +1,6 @@
 #include "Data.hpp"
 #include "MLP.hpp"
 
-
-using std::chrono::high_resolution_clock;
-
-
-
 int main(int argc, char **argv){
     int Imax = 10;
     int Iils;
@@ -24,7 +19,6 @@ int main(int argc, char **argv){
     MLP mlp(info);
 
     mlp.solve();
-
 
     return 0;
 }

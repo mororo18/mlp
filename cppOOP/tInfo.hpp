@@ -20,11 +20,5 @@ public:
     inline int getRndCrnt()                    {return this->rnd[this->rnd_index++];}
     inline int getDimen()                      {return this->dimension;}
     inline int getCost(int i, int j)           {return this->cost[i][j];}
-
-
-    static const int T = 0;
-    static const int C = 1;
-    static const int W = 2;
-
 };
 #endif

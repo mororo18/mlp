@@ -1,5 +1,8 @@
 #include "MLP.hpp"
 
+#include <ctime>
+#include <iostream>
+
 MLP::MLP(tInfo & info) {
     srand(clock());
     this->info = info;

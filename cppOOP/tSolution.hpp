@@ -1,11 +1,12 @@
 #ifndef _SOLUTION_HPP
 #define _SOLUTION_HPP
 
-#include <iostream>
 #include <vector>
 #include <cfloat>
 #include <algorithm>
 #include "tInfo.hpp"
+
+enum {INDEX_T, INDEX_C, INDEX_W};
 
 class tSolution {
 private:
@@ -23,13 +24,13 @@ public:
 
     void setSolutVec(std::vector<int> s) {this->s = s;}
 
-    inline void setT(int i, int j, double T) {this->seq[i][j][info->T] = T;}
-    inline void setC(int i, int j, double C) {this->seq[i][j][info->C] = C;}
-    inline void setW(int i, int j, double W) {this->seq[i][j][info->W] = W;}
+    inline void setT(int i, int j, double T) {this->seq[i][j][INDEX_T] = T;}
+    inline void setC(int i, int j, double C) {this->seq[i][j][INDEX_C] = C;}
+    inline void setW(int i, int j, double W) {this->seq[i][j][INDEX_W] = W;}
 
-    inline double getT(int i, int j) {return this->seq[i][j][info->T];}
-    inline double getC(int i, int j) {return this->seq[i][j][info->C];}
-    inline double getW(int i, int j) {return this->seq[i][j][info->W];}
+    inline double getT(int i, int j) {return this->seq[i][j][INDEX_T];}
+    inline double getC(int i, int j) {return this->seq[i][j][INDEX_C];}
+    inline double getW(int i, int j) {return this->seq[i][j][INDEX_W];}
 
     inline int getPos(int i) {return this->s[i];}
     inline void setCost(double cost) {this->cost = cost;}

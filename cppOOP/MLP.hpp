@@ -1,17 +1,9 @@
 #ifndef MLP_HPP
 #define MLP_HPP
 
-#include <iostream>
-#include <cstdint>
 #include <cstring>
 #include <cfloat>
-#include <new>
-#include <chrono>
-#include <fstream>
-#include <stdio.h>
-#include <algorithm>
 #include <vector>
-#include <time.h>
 #include <math.h>
 #include <stdlib.h>
 #include "tSolution.hpp"

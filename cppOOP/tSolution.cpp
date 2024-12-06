@@ -1,8 +1,8 @@
 #include "tSolution.hpp"
 
-tSolution::tSolution(tInfo & info) : s(info.getDimen()+1) {
-    //this->s = vector<int>();
+#include <iostream>
 
+tSolution::tSolution(tInfo & info) : s(info.getDimen()+1) {
     this->seq = new double ** [info.getDimen()+1];
     for (int i = 0; i < info.getDimen()+1; i++) {
         this->seq[i] = new double * [info.getDimen()+1];
@@ -45,7 +45,7 @@ double tSolution::recalcCost() {
     double total = 0;
     int n = this->s.size()-1;
     for (int i = 0; i < this->s.size()-1; i++) {
-        //std::cout << "b\n";
         total += info->getCost(getPos(i), getPos(i+1)) * n--;
     }
+    return total;
 }
