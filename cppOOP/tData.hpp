@@ -1,16 +1,16 @@
-#ifndef _INFO_HPP
-#define _INFO_HPP
+#ifndef _DATA_HPP
+#define _DATA_HPP
 
 #include <vector>
 
-class tInfo {
+class tData {
 private:
     double ** cost;
     int dimension;
     std::vector<int> rnd;
     int rnd_index;
 public:
-    tInfo();    
+    tData();    
     inline void setRnd(std::vector<int> rnd)   {this->rnd          = rnd; 
                                         this->rnd_index     = 0;}
     inline void setDimen(int dimen)            {this->dimension    = dimen;}

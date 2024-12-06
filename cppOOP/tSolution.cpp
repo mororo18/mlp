@@ -2,18 +2,18 @@
 
 #include <iostream>
 
-tSolution::tSolution(tInfo & info) : s(info.getDimen()+1) {
-    this->seq = new double ** [info.getDimen()+1];
-    for (int i = 0; i < info.getDimen()+1; i++) {
-        this->seq[i] = new double * [info.getDimen()+1];
-        for (int j = 0; j < info.getDimen()+1; j++) {
+tSolution::tSolution(tData & data) : s(data.getDimen()+1) {
+    this->seq = new double ** [data.getDimen()+1];
+    for (int i = 0; i < data.getDimen()+1; i++) {
+        this->seq[i] = new double * [data.getDimen()+1];
+        for (int j = 0; j < data.getDimen()+1; j++) {
             this->seq[i][j] = new double [3];
         }
     }
 
     this->cost = DBL_MAX;
 
-    this->info = &info;
+    this->data = &data;
 }
 
 void tSolution::copy(tSolution & solut) {
@@ -45,7 +45,7 @@ double tSolution::recalcCost() {
     double total = 0;
     int n = this->s.size()-1;
     for (int i = 0; i < this->s.size()-1; i++) {
-        total += info->getCost(getPos(i), getPos(i+1)) * n--;
+        total += data->getCost(getPos(i), getPos(i+1)) * n--;
     }
     return total;
 }

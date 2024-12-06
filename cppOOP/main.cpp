@@ -2,21 +2,18 @@
 #include "MLP.hpp"
 
 int main(int argc, char **argv){
-    int Imax = 10;
-    int Iils;
-
     std::vector<int> rnd;
     double ** cost;
     int dimen;
 
     dimen = loadData(&cost, rnd);
 
-    tInfo info;
-    info.setDimen(dimen);
-    info.setCostPtr(cost);
-    info.setRnd(rnd);
+    tData data;
+    data.setDimen(dimen);
+    data.setCostPtr(cost);
+    data.setRnd(rnd);
 
-    MLP mlp(info);
+    MLP mlp(data);
 
     mlp.solve();
 

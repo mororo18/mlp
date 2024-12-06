@@ -7,7 +7,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include "tSolution.hpp"
-#include "tInfo.hpp"
+#include "tData.hpp"
 
 #define REINSERTION 1
 #define OR_OPT_2 	2
@@ -18,61 +18,26 @@
 #define DBL_SZ      8
 #define INT_SZ      4
 
-
-/*
-typedef struct tSolution {
-    std::vector<int> s;
-    double *** seq;
-    double cost;
-} tSolution;
-
-static
-tSolution Solution_init(tInfo info) {
-    tSolution solut;
-    solut.s = std::vector<int>(info.dimen+1);
-
-    solut.seq = new double ** [info.dimen+1];
-    for (int i = 0; i < info.dimen+1; i++) {
-        solut.seq[i] = new double * [info.dimen+1];
-        for (int j = 0; j < info.dimen+1; j++) {
-            solut.seq[i][j] = new double [3];
-        }
-    }
-
-    solut.cost = DBL_MAX;
-
-    return solut;
-}
-
-static void Solution_cpy( tSolution & src, tSolution & tgt, const tInfo & info) {
-
-    tgt.s = src.s;
-    tgt.cost = src.cost;
-
-}
-
-*/
-
 class MLP {
 
 private:
 
-    tInfo info;
+    tData data;
 
 
 
-    std::vector<int> construct(const double, tInfo &);
+    std::vector<int> construct(const double, tData &);
 
-    void subseq_load(tSolution & solut, tInfo & info, int index );
-    bool search_swap(tSolution & solut, tInfo & info);
-    bool search_two_opt(tSolution & solut, tInfo & info);
-    bool search_reinsertion(tSolution & solut, tInfo & info, const int opt);
-    void RVND(tSolution & solut, tInfo & info);
-    std::vector<int> perturb(tSolution * solut, tInfo & info);
-    void GILS_RVND(int Imax, int Iils, tInfo & info);
+    void subseq_load(tSolution & solut, tData & data, int index );
+    bool search_swap(tSolution & solut, tData & data);
+    bool search_two_opt(tSolution & solut, tData & data);
+    bool search_reinsertion(tSolution & solut, tData & data, const int opt);
+    void RVND(tSolution & solut, tData & data);
+    std::vector<int> perturb(tSolution * solut, tData & data);
+    void GILS_RVND(int Imax, int Iils, tData & data);
 
 public:
-    MLP(tInfo & info);
+    MLP(tData & data);
     void solve();
 
 };

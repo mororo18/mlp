@@ -4,7 +4,7 @@
 #include <vector>
 #include <cfloat>
 #include <algorithm>
-#include "tInfo.hpp"
+#include "tData.hpp"
 
 enum {INDEX_T, INDEX_C, INDEX_W};
 
@@ -13,11 +13,11 @@ private:
     std::vector<int> s;
     double *** seq;
     double cost;
-    tInfo * info;
+    tData * data;
 
     //void setCost(double c) {this->cost = c;}
 public:
-    tSolution(tInfo & info);
+    tSolution(tData & data);
 
     double getCost() {return cost;}
     std::vector<int> getSolutVec() {return s;}
