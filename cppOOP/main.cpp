@@ -3,15 +3,15 @@
 
 int main(int argc, char **argv){
 
-    Data data;
-    data.load();
+    Data instance;
+    instance.load();
 
-    tData info;
-    info.setDimen(data.getDimen());
-    info.setCostPtr(data.getCostPtr());
-    info.setRnd(data.getRndVec());
+    tData data;
+    data.setDimen(instance.getDimen());
+    data.setCostPtr(instance.getCostPtr());
+    data.setRnd(instance.getRndVec());
 
-    MLP mlp(info);
+    MLP mlp(data);
 
     mlp.solve();
 

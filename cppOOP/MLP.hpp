@@ -9,7 +9,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "tInfo.hpp"
+#include "tData.hpp"
 #include "tSolution.hpp"
 
 #define REINSERTION 1
@@ -24,18 +24,18 @@
 
 class MLP {
 private:
-    tData * info;
+    tData * data;
 
-    std::vector<int> construct(const double alpha, tData & info);
-    void update_subseq_info_matrix(tSolution & solut, tData & info, int index);
-    bool search_swap(tSolution & solut, tData & info);
-    bool search_two_opt(tSolution & solut, tData & info);
-    bool search_reinsertion(tSolution & solut, tData & info, const int opt);
-    void RVND(tSolution & solut, tData & info);
-    std::vector<int> perturb(tSolution * solut, tData & info);
-    void GILS_RVND(int Imax, int Iils, tData & info);
+    std::vector<int> construct(const double alpha, tData & data);
+    void update_subseq_info_matrix(tSolution & solut, tData & data, int index);
+    bool search_swap(tSolution & solut, tData & data);
+    bool search_two_opt(tSolution & solut, tData & data);
+    bool search_reinsertion(tSolution & solut, tData & data, const int opt);
+    void RVND(tSolution & solut, tData & data);
+    std::vector<int> perturb(tSolution * solut, tData & data);
+    void GILS_RVND(int Imax, int Iils, tData & data);
 public:
-    MLP(tData & info);
+    MLP(tData & data);
     void solve();
 };
 

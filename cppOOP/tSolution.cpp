@@ -2,11 +2,11 @@
 
 #include <iostream>
 
-tSolution::tSolution(tData & info) : s(info.getDimen()+1) {
+tSolution::tSolution(tData & data) : s(data.getDimen()+1) {
 
-    this->seq = new tSeqInfo * [info.getDimen()+1];
-    for (int i = 0; i < info.getDimen()+1; i++) {
-        this->seq[i] = new tSeqInfo [info.getDimen()+1];
+    this->seq = new tSeqInfo * [data.getDimen()+1];
+    for (int i = 0; i < data.getDimen()+1; i++) {
+        this->seq[i] = new tSeqInfo [data.getDimen()+1];
     }
 
     this->cost = DBL_MAX;

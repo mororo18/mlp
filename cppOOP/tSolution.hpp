@@ -5,7 +5,7 @@
 #include <cfloat>
 #include <algorithm>
 
-#include "tInfo.hpp"
+#include "tData.hpp"
 
 typedef struct tSeqInfo {
     double T;
@@ -21,7 +21,7 @@ private:
     double cost;
 
 public:
-    tSolution(tData & info);
+    tSolution(tData & data);
 
     double getCost() {return cost;}
     std::vector<int> getSolutVec() {return s;}
