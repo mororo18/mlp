@@ -149,7 +149,7 @@ impl IndexMut<(usize, usize)> for CostMatrix {
 }
 
 #[derive(Debug, Clone)]
-pub struct Info {
+pub struct Data {
     pub c : CostMatrix,
     pub dimen : usize,
     pub rnd : Vec<usize>,
