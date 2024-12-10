@@ -1,9 +1,7 @@
 mod data;
-extern crate rand;
 
 use std::time::Instant;
 use std::process::exit;
-use rand::Rng;
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone)]
@@ -84,14 +82,12 @@ fn construction(alpha : f64, info : &mut Info) -> Vec<usize> {
         c_list.push(i);
     }
 
-    let mut rng = rand::thread_rng();
     let mut r : usize = 0;
     while c_list.is_empty() == false {
         sort(&mut c_list, r, & info);
 
         let range = (c_list.len() as f64 * alpha + 1.0) as usize;
-        let mut index = rng.gen::<usize>() % range;
-        index = info.rnd[info.rnd_index];
+        let mut index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
         let c = c_list[index];
         r = c;
@@ -302,22 +298,14 @@ fn search_reinsertion(solut : &mut tSolution, opt : usize, info : & Info) -> boo
 
 fn RVND(solut : &mut tSolution, info : &mut Info) {
 
-    //let mut neighbd_list = vec![REINSERTION, OR_OPT_2, OR_OPT_3];
     let mut neighbd_list = vec![info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
     let mut improv_flag = false;
 
-    let mut rng = rand::thread_rng();
     while neighbd_list.is_empty() == false {
-        //println!("is empty {} \n", neighbd_list.is_empty());
-        let mut index : usize = rng.gen::<usize>() % neighbd_list.len();
-
-        index = info.rnd[info.rnd_index];
+        let mut index : usize = info.rnd[info.rnd_index];
         info.rnd_index += 1;
 
-        //println!("{} {}", info.rnd_index, index);
-
         let neighbd : usize = neighbd_list[index];
-
 
         improv_flag = false;
 
@@ -339,35 +327,17 @@ fn RVND(solut : &mut tSolution, info : &mut Info) {
             neighbd_list.remove(index);
         }
 
-        //println!("{:?} \n{}\n", s, seq[0][info.dimension][C]);
-        //println!("{:?} \n", s);
-        //exit(1);
     }
 }
 
 fn perturb(sl : & Vec<usize>, info : &mut Info) -> Vec<usize> {
-    let mut rng = rand::thread_rng();
     let mut s = sl.clone();
     let mut A_start : usize = 1;
     let mut A_end : usize = 1;
     let mut B_start : usize = 1;
     let mut B_end : usize = 1;
 
-    let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {(s.len() as f64 / 10.0) as usize} else {2};
-    let size_min = 2;
-
-    let mut range = size_min..size_max;
-
-    if size_max == 2 {
-        range = 0..1;
-    }
-
     while (A_start <= B_start &&  B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
-        A_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        A_end = A_start + rng.gen_range(range.clone());
-
-        B_start = rng.gen_range(1.. s.len() - 1 - size_max);
-        B_end = B_start + rng.gen_range(range.clone());
 
         A_start = info.rnd[info.rnd_index];
         info.rnd_index += 1;
@@ -378,9 +348,6 @@ fn perturb(sl : & Vec<usize>, info : &mut Info) -> Vec<usize> {
         info.rnd_index += 1;
         B_end = B_start + info.rnd[info.rnd_index];
         info.rnd_index += 1;
-
-
-        //println!("perturbaa");
     }
 
     if A_start < B_start {
@@ -415,13 +382,10 @@ fn GILS_RVND(Imax : usize, Iils : usize, R : [f64; 26], info : &mut Info) {
     };
 
 
-    let mut rng = rand::thread_rng();
     for _i in 0..Imax {
-        let mut alpha : f64 = R[rng.gen::<usize>() % 26];
-
         let r_value = info.rnd[info.rnd_index];
         info.rnd_index += 1;
-        alpha = R[r_value];
+        let alpha = R[r_value];
 
         println!("[+] Local Search {}", _i);
         solut_crnt.s = construction(alpha, info);

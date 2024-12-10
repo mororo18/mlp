@@ -221,25 +221,12 @@ function construction(alpha, info) result(ret)
     r = 1
     do j=2, info%dimen
         call sort(cL, cL_size, r, info)
-        !print *, info%cost(1,318)
-        !!print *, info%cost(r, cL(1)-1)
-        !print *, cL
-        !call exit(0)
-       !rng = ceiling(cL_size * alpha)
-        !!!
-        call random_number(RND)
-        RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
-        index_ = ceiling(rng * RND)
-        !!!
 
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
 
         cN = cL(index_)
 
-        !print *, "Novo noh", cN
-
-        ! memmove on cL
         call arr_shift(cL, index_+1, index_, cL_size-index_)
         cL_size = cL_size-1
 
@@ -589,36 +576,16 @@ subroutine RVND(sol, info)
     integer, dimension(5) :: improv
     improv = 0.0
 
-  !sol%s = (/ (i, i=1, info%dimen+1) /)
-  !sol%s(info%dimen+1) = 1
-  !!print *, sol%s
-  !call subseq_load(sol, info)
-  !!!call exit(0)
     nl_size = 5
-  ! nl_size = 1
-  ! neighbd_list = (/  info%TWO_OPT, info%OR_OPT_2, info%OR_OPT_3, info%SWAP, info%TWO_OPT /)
     neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
     yes = .false.
     total = 0
     do while (nl_size > 0)
-        !!!
-        call random_number(rnd)
-        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-        index_ = ceiling(rnd*nl_size)
-        !!!
-
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
 
         neighbd = neighbd_list(index_)
         
-        !print *, neighbd
-       !do i=1, nl_size
-       !    write(*, '(I1, a)', advance='no') neighbd_list(i), ' '
-       !end do
-       !print *, ''
-
-        !print *, neighbd
         improve_flag = .false.
         if (neighbd == info%REINSERTION) then
             call search_reinsertion(sol, info, info%REINSERTION, improve_flag)
@@ -635,7 +602,6 @@ subroutine RVND(sol, info)
         if (improve_flag .eqv. .true.) then
             neighbd_list = (/ info%SWAP, info%TWO_OPT, info%REINSERTION, info%OR_OPT_2, info%OR_OPT_3 /)
             nl_size = 5
-            !print *, "IMPROV", sol%cost
             improv(neighbd) = improv(neighbd) + 1
             yes = .true.
 
@@ -644,26 +610,9 @@ subroutine RVND(sol, info)
             nl_size = nl_size-1
             total = total + 1
         endif
-        !print *, nl_size
 
     end do
 
-   !if (yes .eqv. .true.) then
-   !print *, "reinsert", improv(info%reinsertion)
-   !print *, "or-2", improv(info%or_opt_2)
-   !print *, "or-3", improv(info%or_opt_3)
-   !print *, "swap", improv(info%swap)
-   !print *, "two_opt", improv(info%two_opt)
-   !print *, "TOTAL", total
-   !end if
-end subroutine
-
-subroutine notnull_rnd(rnd)
-    implicit none
-    real(8), intent(out) :: RND
-
-    call random_number(RND)
-    RND = merge(RND+0.0000000001, RND, RND < 0.0000000001)
 end subroutine
 
 function perturb(solut, info) result(ret)
@@ -691,35 +640,15 @@ function perturb(solut, info) result(ret)
 
     solut_pert = solut
 
-    size_max = (info%dimen+1) / 10
-    size_max = merge(size_max, 2, size_max >= 2)
-    size_min = 2
-
     do while ((A_start <= B_start .and. B_start <= A_end) .or. (B_start <= A_start .and. A_start <= B_end))
-        !!!
-       max_ = (info%dimen+1) -2 -size_max
-       call notnull_rnd(rnd)
-       A_start = ceiling(max_ * rnd) + 1
-       call notnull_rnd(rnd)
-       A_end = A_start + ceiling(((size_max-size_min) * rnd) + size_min)
-
-       call notnull_rnd(rnd)
-       B_start = ceiling(max_ * rnd) + 1
-       call notnull_rnd(rnd)
-       B_end = B_start + ceiling(((size_max-size_min) * rnd) + size_min)
-       !!!
-
-
        A_start = info%rnd(info%rnd_index) + 1
        info%rnd_index = info%rnd_index + 1
        A_end = A_start + info%rnd(info%rnd_index) 
        info%rnd_index = info%rnd_index + 1
 
        B_start = info%rnd(info%rnd_index) + 1
-       !print *, info%rnd_index, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
        B_end = B_start + info%rnd(info%rnd_index) 
-       !!print *, info%rnd(info%rnd_index)
        info%rnd_index = info%rnd_index + 1
 
     end do
@@ -732,16 +661,9 @@ function perturb(solut, info) result(ret)
         call reinsert (solut_pert%s, B_start, B_end - 1, A_end)
     end if
 
-   !if (B_start == 1) then !! .or. B_start == 1) then
-   !    !print *, " opaaaaaa"
-   !    print *, solut_pert%s
-   !    call exit(0)
-   !end if
-
     call subseq_load(solut_pert, info)
 
     ret = solut_pert
-
 end function
 
 subroutine solut_init(solut, info)
@@ -804,11 +726,6 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     sol_best%cost = info%fmax
 
     do i=1, Imax
-        !!!
-        call random_number(rnd)
-        rnd = merge(rnd+0.0000000001, rnd, rnd < 0.0000000001)
-        index_ = ceiling(rnd*R_size)
-        !!!
 
         index_ = info%rnd(info%rnd_index) + 1
         info%rnd_index = info%rnd_index + 1
@@ -820,11 +737,8 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         sol_partial = sol_crnt
         print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
 
-        !call exit(0)
-
         print *, "        [+] Looking for the best Neighbor.."
         iterILS = 0
-        !print *, sol_crnt%cost
         do while (iterILS < Iils)
             call RVND(sol_crnt, info)
 
@@ -832,16 +746,12 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
                 sol_partial = sol_crnt
                 sol_partial%cost = sol_partial%cost
                 iterILS = 0
-                !print *, sol_partial%cost
             endif
 
             sol_crnt = perturb(sol_partial, info)
-            !print *, "perturbed", sol_crnt%cost
 
             iterILS = iterILS + 1
         end do
-       !print *, sol_partial%cost
-       !print *, ""
         
         call subseq_load(sol_partial, info)
 
@@ -910,20 +820,12 @@ program main
 
     call load_matrix(info%cost, info%rnd)
 
-    !call print_matrix(info%cost)
-    !call exit(0)
-    !print *, info%rnd(2)
-
     dimensions = shape(info%cost(:,:))
     info%dimen = dimensions(1)
-
-    !call print_info(info)
-
 
     R = (/ (i/100.0 + 0.000000001, i=1, 26) /)
     Iils = min(100, info%dimen)
     Imax = 10
-    !call solut_init(sol, info)
     CALL SYSTEM_CLOCK(begin, rate)
     sol = GILS_RVND(Imax, Iils, R, info)
     CALL SYSTEM_CLOCK(end_)

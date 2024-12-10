@@ -4,7 +4,6 @@
 #include <iostream>
 
 MLP::MLP(tData & data) {
-    srand(clock());
     this->data = data;
 }
 
@@ -79,10 +78,7 @@ std::vector<int> MLP::construct(const double alpha, tData & data){
     while (!cL.empty()) {
         sort(cL, r, data);
 
-        int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
-
-        index = data.getRndCrnt();
+        int index = data.getRndCrnt();
         int c = cL[index];
         s.push_back(c);
         r = c;
@@ -325,7 +321,6 @@ void MLP::RVND(tSolution & solut, tData & data) {
 
     while (!neighbd_list.empty()) {
 
-        index = rand() % neighbd_list.size();
         index = data.getRndCrnt();
         neighbd = neighbd_list[index];
 
@@ -365,17 +360,7 @@ std::vector<int> MLP::perturb(tSolution * solut, tData & data) {
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = std::floor((data.getDimen()+1)/10);
-    size_max = size_max >= 2 ? size_max : 2;
-    int size_min = 2;
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        int max = (data.getDimen()+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
-
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-
         A_start = data.getRndCrnt();
         A_end = A_start + data.getRndCrnt();
 
@@ -413,8 +398,7 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
     tSolution solut_best(data);
 
     for(int i = 0; i < Imax; ++i){
-        int aux = (unsigned)rand() % TABLE_SZ;
-        aux = data.getRndCrnt();
+        int aux = data.getRndCrnt();
 
         double alpha = R_table(aux);
 
@@ -422,8 +406,8 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
         printf("\t[+] Constructing..\n");	
 
         solut_crnt.setSolutVec(
-                construct(alpha, data)
-                );
+            construct(alpha, data)
+        );
 
         subseq_load(solut_crnt, data);
 
@@ -454,6 +438,7 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
         }
 
         std::cout << "\tCurrent best cost: "<< solut_best.getCost() << std::endl;
+
         std::cout << "SOLUCAO: ";
         for(int i = 0; i < solut_best.getSolutVec().size(); i++){
             std::cout << solut_best.getPos(i) << " ";
@@ -463,4 +448,3 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
     }
     printf("COST: %.2lf\n", solut_best.getCost());
 }
-
