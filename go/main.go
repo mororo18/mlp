@@ -169,7 +169,7 @@ func NewSolution(info tInfo) tSolution {
 
 }
 
-func subseq_load(solut *tSolution, info tInfo) {
+func update_subseq_info_matrix(solut *tSolution, info tInfo) {
 
     for i := 0; i < info.dimen+1; i++ {
         k := 1 - i;
@@ -270,7 +270,7 @@ func search_swap(solut *tSolution, info tInfo) bool {
 
     if cost_best < solut.seq[0][info.dimen][info.C] {
         swap(solut, I, J)
-        subseq_load(solut, info)
+        update_subseq_info_matrix(solut, info)
         return true
     }
 
@@ -327,7 +327,7 @@ func search_two_opt(solut  *tSolution, info tInfo) bool {
 
     if cost_best < solut.cost {
         reverse(solut, I, J)
-        subseq_load(solut, info)
+        update_subseq_info_matrix(solut, info)
         return true
     } 
 
@@ -413,7 +413,7 @@ func search_reinsertion(solut * tSolution, info tInfo, opt int) bool {
 
     if cost_best < solut.cost {
         reinsert(solut, I, J, POS+1)
-        subseq_load(solut, info)
+        update_subseq_info_matrix(solut, info)
 
         return true
     }
@@ -522,7 +522,7 @@ func GILS_RVND(Imax int, Iils int , R [26]float64, info tInfo) {
         info.rnd_index++
 
         solut_crnt.s = construction(R[index], &info)
-        subseq_load(&solut_crnt, info)
+        update_subseq_info_matrix(&solut_crnt, info)
         fmt.Printf("\t[+] Constructing Inital Solution.. %.2f\n", solut_crnt.cost)
         fmt.Println("\t", solut_crnt.s)
 
@@ -541,7 +541,7 @@ func GILS_RVND(Imax int, Iils int , R [26]float64, info tInfo) {
 
 
             solut_crnt.s = perturb(solut_partial.s, &info)
-            subseq_load(&solut_crnt, info)
+            update_subseq_info_matrix(&solut_crnt, info)
             iterILS++
         }
 
