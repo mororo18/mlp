@@ -9,19 +9,6 @@ use std::time::Instant;
 static SIZE: usize = 319;
 
 #[derive(Debug, Clone)]
-struct tInfo {
-    c: Box<[[f64; 350]; 350]>,
-    dimen: usize,
-    SWAP: usize,
-    REINSERTION: usize,
-    OR_OPT_2: usize,
-    OR_OPT_3: usize,
-    TWO_OPT: usize,
-    rnd: Vec<usize>,
-    rnd_index: usize,
-}
-
-#[derive(Debug, Clone)]
 struct tRnd {
     rnd: Vec<usize>,
     rnd_index: usize,
