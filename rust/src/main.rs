@@ -6,7 +6,7 @@ use subseq::*;
 use std::time::Duration;
 use cpu_time::ProcessTime;
 
-fn subseq_load(solut: &mut Solution, info: &Info) {
+fn update_subseq_info_matrix(solut: &mut Solution, info: &Data) {
     for i in 0..=info.dimen {
         let k: i32 = 1 - (i as i32) - if i == 0 { 1 } else { 0 };
 
@@ -36,11 +36,11 @@ fn subseq_load(solut: &mut Solution, info: &Info) {
 }
 
 
-fn sort(arr: &mut Vec<usize>, r: usize, info: &Info) {
+fn sort(arr: &mut Vec<usize>, r: usize, info: &Data) {
     quicksort(arr, 0, arr.len() as isize - 1, info, r);
 }
 
-fn quicksort(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: usize) {
+fn quicksort(arr: &mut Vec<usize>, left: isize, right: isize, info: &Data, r: usize) {
     if left < right {
         let pivot = partition(arr, left, right, info, r);
         quicksort(arr, left, pivot - 1, info, r);
@@ -48,7 +48,7 @@ fn quicksort(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: us
     }
 }
 
-fn partition(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: usize) -> isize {
+fn partition(arr: &mut Vec<usize>, left: isize, right: isize, info: &Data, r: usize) -> isize {
     let pivot = arr[right as usize];
     let mut i = left - 1;
     for j in left..right {
@@ -61,7 +61,7 @@ fn partition(arr: &mut Vec<usize>, left: isize, right: isize, info: &Info, r: us
     i + 1
 }
 
-fn construction(alpha : f64, info : &mut Info) -> Vec<usize> {
+fn construction(alpha : f64, info : &mut Data) -> Vec<usize> {
     let mut s = vec![0; 1];
 
     let mut c_list = vec![];
@@ -109,7 +109,7 @@ fn reinsert(s : &mut Vec<usize>, i : usize, j : usize, pos : usize){
     }
 }
 
-fn search_swap(solut : &mut Solution, info : & Info) -> bool {
+fn search_swap(solut : &mut Solution, info : & Data) -> bool {
     let mut cost_concat_1 : f64;
     let mut cost_concat_2 : f64;
     let mut cost_concat_3 : f64;
@@ -168,14 +168,14 @@ fn search_swap(solut : &mut Solution, info : & Info) -> bool {
     if cost_best < solut.cost - f64::EPSILON {
         //println!("swap \n{}", cost_best);
         swap(&mut solut.s, I, J);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         return true;
     } else {
         return false;
     }
 }
 
-fn search_two_opt(solut: &mut Solution, info: & Info) -> bool {
+fn search_two_opt(solut: &mut Solution, info: & Data) -> bool {
     let mut cost_new : f64;
     let mut cost_best : f64 = f64::MAX;
 
@@ -214,14 +214,14 @@ fn search_two_opt(solut: &mut Solution, info: & Info) -> bool {
 
     if cost_best < solut.cost - f64::EPSILON {
         reverse(&mut solut.s, I, J);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         return true;
     } else {
         return false;
     }
 }
 
-fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Info) -> bool {
+fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
     let mut cost_best : f64 = f64::MAX;
     let mut cost_new : f64;
 
@@ -301,7 +301,7 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Info) -> bool {
     if cost_best < solut.cost - f64::EPSILON {
         //println!("reinsertion {}   {} {} {}\n{}", opt,I,J, 1+POS, cost_best);
         reinsert(&mut solut.s, I, J, POS+1);
-        subseq_load(solut, info);
+        update_subseq_info_matrix(solut, info);
         //println!("{}", seq[0][info.dimension][C]);
         return true;
     } else {
@@ -309,7 +309,7 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Info) -> bool {
     }
 }
 
-fn rvnd(solut: &mut Solution, info: &mut Info) {
+fn rvnd(solut: &mut Solution, info: &mut Data) {
 
     let mut neighbd_list = vec![
         Operator::Swap,
@@ -353,7 +353,7 @@ fn rvnd(solut: &mut Solution, info: &mut Info) {
     }
 }
 
-fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
+fn perturb(sl: & Vec<usize>, info: &mut Data) -> Vec<usize> {
     let mut s = sl.clone();
     let mut a_start : usize = 1;
     let mut a_end : usize = 1;
@@ -385,7 +385,7 @@ fn perturb(sl: & Vec<usize>, info: &mut Info) -> Vec<usize> {
     return s;
 }
 
-fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
+fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Data) {
 
     let mut solut_best = Solution {
         seq : SubseqMatrix::new(info.dimen),
@@ -416,7 +416,7 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
         solut_crnt.s = construction(alpha, info);
         println!("{:?}", solut_crnt.s);
 
-        subseq_load(&mut solut_crnt, info);
+        update_subseq_info_matrix(&mut solut_crnt, info);
         println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
         solut_partial.s = solut_crnt.s.clone();
         solut_partial.cost = solut_crnt.cost;
@@ -433,7 +433,7 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Info) {
             }
 
             solut_crnt.s = perturb(&solut_partial.s, info);
-            subseq_load(&mut solut_crnt, info);
+            update_subseq_info_matrix(&mut solut_crnt, info);
             iter_ils += 1;
         }
 
@@ -456,7 +456,7 @@ fn main() {
 
     let (dimension, c, rnd) = data::load(filename);
 
-    let mut info = Info {
+    let mut info = Data {
         dimen : dimension,
         c,
         rnd,
