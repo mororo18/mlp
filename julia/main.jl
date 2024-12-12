@@ -37,7 +37,7 @@ mutable struct tSolution
     cost::Float64
 end
 
-function subseq_load(solut::tSolution, data::tData)
+function update_subseq_info_matrix(solut::tSolution, data::tData)
     for i in 1:data.dimen+1
         k::Int = 1 - i - (i==1)
 
@@ -179,7 +179,7 @@ function search_swap(solut::tSolution, data::tData)::Bool
 
     if cost_best < solut.cost - data.EPSILON
         swap(solut.s, I, J)
-        subseq_load(solut, data)
+        update_subseq_info_matrix(solut, data)
         return true
     end
 
@@ -220,7 +220,7 @@ function search_two_opt(solut::tSolution, data::tData)::Bool
 
     if cost_best < solut.cost - data.EPSILON
         reverse!(solut.s, I, J)
-        subseq_load(solut, data)
+        update_subseq_info_matrix(solut, data)
         return true
     end
 
@@ -290,7 +290,7 @@ function search_reinsertion(solut::tSolution, data::tData, opt::Int)::Bool
 
     if cost_best < solut.cost - data.EPSILON
         reinsert(solut.s, I, J, POS+1)
-        subseq_load(solut, data)
+        update_subseq_info_matrix(solut, data)
         return true
     end
 
@@ -396,7 +396,7 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData)
 
         @printf "[+] Local Search %d\n" i
         solut_crnt.s = construction(alpha, data)
-        subseq_load(solut_crnt, data)
+        update_subseq_info_matrix(solut_crnt, data)
         @printf "\t[+] Constructing Inital Solution.. %.2lf\n" solut_crnt.cost
 
         solut_partial.cost = solut_crnt.cost
@@ -413,12 +413,12 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData)
             end
 
             solut_crnt.s = perturb(solut_partial, data)
-            subseq_load(solut_crnt, data)
+            update_subseq_info_matrix(solut_crnt, data)
 
             iterILS += 1
         end
 
-        subseq_load(solut_partial, data)
+        update_subseq_info_matrix(solut_partial, data)
 
         if solut_partial.cost < solut_best.cost
             solut_best.cost = solut_partial.cost
