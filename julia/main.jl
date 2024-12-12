@@ -32,7 +32,6 @@ end
 
 mutable struct tSolution
     s::Array{Int, 1}
-    #seq::Array{tSeqInfo, 2}
     seq::Array{Float64, 3}
     cost::Float64
 end
@@ -443,7 +442,7 @@ function main()
     Imax = 10
     Iils = min(dimension, 100)
 
-    data::tData = tData(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, 1e-15, 0, rand_values, 1)
+    data::tData = tData(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, eps(Float64), 0, rand_values, 1)
 
     time = @elapsed GILS_RVND(Imax, Iils, R, data)
 
