@@ -90,7 +90,7 @@ std::vector<int> MLP::construct(const double alpha, tData & data){
     return s;
 }	
 
-void MLP::subseq_load(tSolution & solut, tData & data, int index = 0){
+void MLP::update_subseq_info_matrix(tSolution & solut, tData & data, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
@@ -175,7 +175,7 @@ bool MLP::search_swap(tSolution & solut, tData & data) {
 
     if (cost_best < solut.getCost() - DBL_EPSILON) {
         solut.swap(I, J);
-        subseq_load(solut, data, I);
+        update_subseq_info_matrix(solut, data, I);
 
         return true;
     }
@@ -222,7 +222,7 @@ bool MLP::search_two_opt(tSolution & solut, tData & data) {
 
     if (cost_best < solut.getCost() - DBL_EPSILON) {
         solut.reverse(I, J);
-        subseq_load(solut, data);
+        update_subseq_info_matrix(solut, data);
 
         solut.validate();
 
@@ -297,7 +297,7 @@ bool MLP::search_reinsertion(tSolution & solut, tData & data, const int opt) {
 
     if (cost_best < solut.getCost() - DBL_EPSILON) {
         solut.reinsert(I, J, POS+1);
-        subseq_load(solut, data, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix(solut, data, I < POS+1 ? I : POS+1);
 
         solut.validate();
 
@@ -409,7 +409,7 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
             construct(alpha, data)
         );
 
-        subseq_load(solut_crnt, data);
+        update_subseq_info_matrix(solut_crnt, data);
 
         solut_partial.copy(solut_crnt);
         printf("\t[+] Looking for the best Neighbor..\n");
@@ -429,7 +429,7 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
 
             auto s = perturb(&solut_partial, data);
             solut_crnt.setSolutVec(s);
-            subseq_load(solut_crnt, data);
+            update_subseq_info_matrix(solut_crnt, data);
             iterILS++;
         }
 

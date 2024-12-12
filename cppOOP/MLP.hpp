@@ -26,7 +26,7 @@ private:
 
     std::vector<int> construct(const double, tData &);
 
-    void subseq_load(tSolution & solut, tData & data, int index );
+    void update_subseq_info_matrix(tSolution & solut, tData & data, int index );
     bool search_swap(tSolution & solut, tData & data);
     bool search_two_opt(tSolution & solut, tData & data);
     bool search_reinsertion(tSolution & solut, tData & data, const int opt);
