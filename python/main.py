@@ -98,7 +98,7 @@ def construction(alpha : float, info : tInfo) -> List[int]:
 
     return s
 
-def subseq_load(solut : tSolution, info : tInfo) -> None:
+def update_subseq_info_matrix(solut : tSolution, info : tInfo) -> None:
     T = info.T
     C = info.C
     W = info.W
@@ -204,7 +204,7 @@ def search_swap(solut : tSolution, info : tInfo) -> bool:
     #print(cost_best, solut.cost, I, J)
     if cost_best < solut.cost - info.EPSILON:
         swap(solut.s, I, J)
-        subseq_load(solut, info)
+        update_subseq_info_matrix(solut, info)
         return True
     #print(seq[C][0][n])
         #if cost_best != seq[C][0][n]:
@@ -264,7 +264,7 @@ def search_two_opt(solut : tSolution, info : tInfo) -> bool:
         #print(cost_best)
         #print(I, J)
         reverse(solut.s, I, J)
-        subseq_load(solut, info)
+        update_subseq_info_matrix(solut, info)
 #       global improv_flag
 #       global improv_two_opt
 #       improv_flag = True
@@ -382,7 +382,7 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
         #print(solut.s)
         reinsert(solut.s, I, J, POS+1)
         #print(solut.s)
-        subseq_load(solut, info)
+        update_subseq_info_matrix(solut, info)
         """
         print("\nreinsertion", opt)
         print(cost_best)
@@ -479,7 +479,7 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
 
         print("[+] Local Search {}".format(i+1))
         solut_crnt.s = construction(alpha, info)
-        subseq_load(solut_crnt, info)
+        update_subseq_info_matrix(solut_crnt, info)
 
         solut_partial.s = solut_crnt.s.copy()
         solut_partial.cost = solut_crnt.cost
@@ -496,10 +496,10 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> None:
                 iterILS = 0
 
             solut_crnt.s = perturb(solut_partial.s, info)
-            subseq_load(solut_crnt, info)
+            update_subseq_info_matrix(solut_crnt, info)
             iterILS += 1
 
-        subseq_load(solut_partial, info)
+        update_subseq_info_matrix(solut_partial, info)
 
         if solut_partial.cost < solut_best.cost:
             solut_best.s = solut_partial.s.copy()
