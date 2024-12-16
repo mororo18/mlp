@@ -154,7 +154,7 @@ void reinsert(int * vec, int i, int j, int pos){
     }
 }
 
-double subseq_load(int * s, tSubseq seq[][dimen+1]){
+double update_subseq_info_matrix(int * s, tSubseq seq[][dimen+1]){
     int i, j, j_prev, k;
     int from = 0;
     char t;
@@ -180,7 +180,7 @@ double subseq_load(int * s, tSubseq seq[][dimen+1]){
     return seq[0][dimen].C;
 }
 
-double subseq_load_b(int * s, tSubseq seq[][dimen+1], int index){
+double update_subseq_info_matrix_b(int * s, tSubseq seq[][dimen+1], int index){
     int i, j, j_prev, k;
     int from = index;
     char t;
@@ -257,7 +257,7 @@ char search_swap(int * s, tSubseq seq[][dimen+1]) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         swap(s, I, J);
-        subseq_load_b(s, seq, I);
+        update_subseq_info_matrix_b(s, seq, I);
         return TRUE;
     }
 
@@ -301,7 +301,7 @@ char search_two_opt(int * s, tSubseq seq[][dimen+1]) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reverse(s, I, J);
-        subseq_load(s, seq);
+        update_subseq_info_matrix(s, seq);
         return TRUE;
     }
 
@@ -364,7 +364,7 @@ char search_reinsertion(int * s, tSubseq seq[][dimen+1], const int opt) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reinsert(s, I, J, POS+1);
-        subseq_load_b(s, seq, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix_b(s, seq, I < POS+1 ? I : POS+1);
         return TRUE;
     }
 
@@ -477,7 +477,7 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
 
         construct(s_crnt, alpha, rnd);
         print_s(s_crnt, dimen+1);
-        cost_crnt = subseq_load(s_crnt, seq);
+        cost_crnt = update_subseq_info_matrix(s_crnt, seq);
 
         cpy(s_crnt, s_partial, (dimen+1));
         cost_partial = cost_crnt;
@@ -496,7 +496,7 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
             }
 
             perturb(s_crnt, s_partial, rnd);
-            subseq_load(s_crnt, seq);
+            update_subseq_info_matrix(s_crnt, seq);
             iterILS++;
         }
 
