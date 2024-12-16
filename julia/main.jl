@@ -87,17 +87,10 @@ function construction(alpha::Float64, info::tInfo)::Array{Int, 1}
         sort(cList, r, info)
 
         i = convert(Int, floor(length(cList)*alpha + 1))
-        ###
-        r_value = rand(1:i)
-        #push!(info.rand_values, r_value-1)
-        ###
         r_value = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
 
         cN = cList[r_value]
-
-        #println(r, " ", cN, " ", info.cost[r, cN])
-        #println(r_value, " ", cN)
 
         push!(s, cN)
         r = cN
@@ -305,59 +298,30 @@ end
 
 function RVND(solut::tSolution, info::tInfo)
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3]
-    """
-    t_reinsertion_local = 0
-    t_or_opt2_local = 0
-    t_or_opt3_local = 0
-    t_two_opt_local = 0
-    t_swap_local = 0
-    """
 
     while length(neighbd_list) > 0
-        # global it += 1
-        ###
-        i = rand(1:length(neighbd_list))
-        ###
         
         i = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
         
-        ###
-        #push!(info.rand_values, i-1)
-        ###
-        
         neighbd = neighbd_list[i]
-        #println(info.rnd_index, " ", i)
-
         improve = false
 
-        #time_before_search = time_ns()
         if neighbd == info.REINSERTION
             improve = search_reinsertion(solut, info, info.REINSERTION)
-            #t_reinsertion_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.OR_OPT2
             improve = search_reinsertion(solut, info, info.OR_OPT2)
-            #t_or_opt2_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.OR_OPT3
             improve = search_reinsertion(solut, info, info.OR_OPT3)
-            #t_or_opt3_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.SWAP
             improve = search_swap(solut, info)
-            #t_two_opt_local += (time_ns() - time_before_search) * 1e9
         elseif neighbd == info.TWO_OPT
             improve = search_two_opt(solut, info)
-            #t_swap_local += (time_ns() - time_before_search) * 1e9
         end
 
         if improve
             neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT2, info.OR_OPT3]
         else
-            #println(info.rnd_index)
-            #=
-            if info.rnd_index > 5591
-                exit(0)
-            end
-            =#
             deleteat!(neighbd_list, i)
         end
 
@@ -374,18 +338,7 @@ function perturb(solut_partial::tSolution, info::tInfo)::tSolution
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
-    size_max = Int(floor(length(s)/10))
-    size_max = (size_max >= 2 ? size_max : 2)
-    size_min = 2
-
     while (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)
-        #= =#
-        A_start = rand(2:length(s)-1-size_max)
-        A_end = A_start + rand(size_min:size_max)
-
-        B_start = rand(2:length(s)-1-size_max)
-        B_end = B_start + rand(size_min:size_max)
-        #= =#
 
         A_start = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
@@ -397,13 +350,6 @@ function perturb(solut_partial::tSolution, info::tInfo)::tSolution
         B_end = B_start + info.rnd[info.rnd_index]
         info.rnd_index += 1
         
-        ###
-       #push!(info.rand_values, A_start-1)
-       #push!(info.rand_values, A_end - A_start)
-       #push!(info.rand_values, B_start-1)
-       #push!(info.rand_values, B_end - B_start)
-        ###
-        #
     end
 
     if A_start < B_start
@@ -424,14 +370,8 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
     solut_crnt::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), 0)
 
     for i in 1:Imax
-        ###
-        r_value = rand(1:26)
-        #push!(info.rand_values, r_value - 1)
-        ###
         r_value = info.rnd[info.rnd_index] + 1
         info.rnd_index += 1
-
-        println(r_value)
 
         alpha = R[r_value]
 
@@ -477,7 +417,6 @@ function main()
 
     dimension, cost, rand_values = get_instance_info()
 
-
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
          0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
 
@@ -486,45 +425,11 @@ function main()
 
     info::tInfo = tInfo(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, 1e-15, 0, rand_values, 1)
 
-    #=
-    solut::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), 0)
-    for i in 1:info.dimen
-        solut.s[i] = i
-    end
-    solut.s[info.dimen+1] = 1
-    =#
-
     time = @elapsed GILS_RVND(Imax, Iils, R, info)
 
     @printf "TIME: %.6lf\n" time
     println("reinsertion calls ", info.reinsert_count)
-    #@printf "RVND iteracoes %d\n" it
-    #println(rand_values) 
     
-    
-    #=
-    f = open("../rand_iter_values/" * inst_nome, "w")
-    write(f, string(length(info.rand_values)) * "\n")
-    for val in info.rand_values
-        write(f, string(val) * "\n")
-    end
-    close(f)
-    =#
-    #println(info.rand_values)
-
 end
 
 main()
-
-# using ProfileView, Profile, PProf
-#=
-Profile.init(delay = 0.00005)
-main()
-Profile.clear()
-# # @profview main()
-@profile main()
-# ProfileView.view()
-Profile.print(format=:flat, sortedby=:count, mincount=:100)
-#pprof(;webport=58599)
-# readline()
- =#
