@@ -86,7 +86,7 @@ fn partition(arr: &mut Vec<usize>, left: isize, right: isize, r: usize, data: &D
     i + 1
 }
 
-fn construction(alpha: f64, rnd: &mut Rnd, data: &Data) -> Vec<usize> {
+fn construction(rnd: &mut Rnd, data: &Data) -> Vec<usize> {
     let mut s = vec![0; 1];
     let mut c_list = vec![];
 
@@ -368,33 +368,13 @@ fn RVND(solut: &mut tSolution, rnd: &mut Rnd, data: &Data) {
 }
 
 fn perturb(sl: &Vec<usize>, rnd: &mut Rnd) -> Vec<usize> {
-    let mut rng = rand::thread_rng();
     let mut s = sl.clone();
     let mut A_start: usize = 1;
     let mut A_end: usize = 1;
     let mut B_start: usize = 1;
     let mut B_end: usize = 1;
 
-    let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {
-        (s.len() as f64 / 10.0) as usize
-    } else {
-        2
-    };
-    let size_min = 2;
-
-    let mut range = size_min..size_max;
-
-    if size_max == 2 {
-        range = 0..1;
-    }
-
     while (A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end) {
-        A_start = rng.gen_range(1..s.len() - 1 - size_max);
-        A_end = A_start + rng.gen_range(range.clone());
-
-        B_start = rng.gen_range(1..s.len() - 1 - size_max);
-        B_end = B_start + rng.gen_range(range.clone());
-
         A_start = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
         A_end = A_start + rnd.rnd[rnd.rnd_index];
@@ -404,7 +384,6 @@ fn perturb(sl: &Vec<usize>, rnd: &mut Rnd) -> Vec<usize> {
         rnd.rnd_index += 1;
         B_end = B_start + rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
-
     }
 
     if A_start < B_start {
@@ -438,12 +417,11 @@ fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data)
     };
 
     for _i in 0..Imax {
-        let r_value = rnd.rnd[rnd.rnd_index];
+        let _r_value = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
-        let alpha = R[r_value];
-
+        
         println!("[+] Local Search {}", _i);
-        solut_crnt.s = construction(alpha, rnd, data);
+        solut_crnt.s = construction(rnd, data);
         println!("{:?}", solut_crnt.s);
         update_subseq_info_matrix(&mut solut_crnt, data);
         println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
