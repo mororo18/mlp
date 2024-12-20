@@ -10,10 +10,10 @@
 #define FALSE 0
 
 #define REINSERTION 1
-#define OR_OPT_2 	2
-#define OR_OPT_3 	3
-#define SWAP 		4
-#define TWO_OPT		5
+#define OR_OPT_2 		2
+#define OR_OPT_3 		3
+#define SWAP 				4
+#define TWO_OPT			5
 #define TABLE_SZ    26
 #define DBL_SZ      8
 #define INT_SZ      4
@@ -257,7 +257,7 @@ char search_swap(int * s, tSubseq seq[][dimen+1]) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         swap(s, I, J);
-        update_subseq_info_matrix_b(s, seq, I);
+        update_subseq_info_matrix(s, seq);
         return TRUE;
     }
 
@@ -267,7 +267,7 @@ char search_swap(int * s, tSubseq seq[][dimen+1]) {
 char search_two_opt(int * s, tSubseq seq[][dimen+1]) {
     double cost_new, 
         cost_concat_1, cost_concat_2;
-    double cost_best = DBL_MAX;// cost_l1, cost_l2;
+    double cost_best = DBL_MAX;
     double rev_seq_cost;
     int i, j, i_prev, j_next;
     int I;
@@ -310,7 +310,7 @@ char search_two_opt(int * s, tSubseq seq[][dimen+1]) {
 
 char search_reinsertion(int * s, tSubseq seq[][dimen+1], const int opt) {
     double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-    double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+    double cost_best = DBL_MAX;
     int i, j, k, k_next, i_prev, j_next;
     int I;
     int J;
@@ -364,7 +364,7 @@ char search_reinsertion(int * s, tSubseq seq[][dimen+1], const int opt) {
 
     if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
         reinsert(s, I, J, POS+1);
-        update_subseq_info_matrix_b(s, seq, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix(s, seq);
         return TRUE;
     }
 
