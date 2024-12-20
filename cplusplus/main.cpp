@@ -35,9 +35,6 @@ typedef std::vector<std::vector<std::vector<double>>> tSubseq;
 typedef struct tData {
     double ** cost;
     int dimen;
-    //uint T;
-    //uint C;
-    //uint W;
     vector<int> rnd;
     uint rnd_index;
 } tData;
@@ -51,20 +48,16 @@ typedef struct tSeqInfo {
 typedef struct tSolution {
     std::vector<int> s;
 #ifdef FLAT
-    //double * seq;
     tSeqInfo * seq;
 #elif defined(MATRIX)
     tSeqInfo ** seq;
-    //double *** seq;
 #endif
-    //tSubseq seq;
     double cost;
 } tSolution;
 
 inline unsigned to_1D(int x, int y, int size) {
-//inline unsigned to_1D(int x, int y, int z, int size) {
     int a = x*(size+1) + y;
-    //int b = 3*x*(size+1) + 3*y + z;
+
     return a;
 }
 
@@ -74,17 +67,8 @@ tSolution Solution_init(tData data) {
 
 #ifdef FLAT
     solut.seq = new tSeqInfo [(data.dimen+1) * (data.dimen+1)];
-    //solut.seq = new double [(data.dimen+1) * (data.dimen+1) *3];
 #elif defined(MATRIX)
-    /*
-    solut.seq = new double ** [data.dimen+1];
-    for (int i = 0; i < data.dimen+1; i++) {
-        solut.seq[i] = new double * [data.dimen+1];
-        for (int j = 0; j < data.dimen+1; j++) {
-            solut.seq[i][j] = new double [3];
-        }
-    }
-    */
+
     solut.seq = new tSeqInfo * [data.dimen+1];
     for (int i = 0; i < data.dimen+1; i++) {
         solut.seq[i] = new tSeqInfo [data.dimen+1];
@@ -92,11 +76,6 @@ tSolution Solution_init(tData data) {
     }
 
 #endif
-    /*
-    solut.seq = std::vector<std::vector<std::vector<double>>> (
-            data.dimen+1, std::vector<std::vector<double>> (
-                data.dimen+1, std::vector<double> (3)));
-                */
     solut.cost = DBL_MAX;
 
     return solut;
@@ -106,15 +85,6 @@ void Solution_cpy( tSolution & src, tSolution & tgt, const tData & data) {
 
     tgt.s = src.s;
     tgt.cost = src.cost;
-
-    /*
-    for (int i = 0; i < data.dimen+1; i++) {
-        for (int j = 0; j < data.dimen+1; j++) {
-            //memcpy(tgt.seq[i][j], src.seq[i][j], 3 * sizeof(double));
-            std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
-        }
-    }
-    */
 
 }
 
@@ -173,7 +143,6 @@ std::vector<int> construct(const double alpha, tData & data){
 
         int c = cL[index];
         s.push_back(c);
-        //print_s(cL);
         r = c;
         cL.erase(cL.begin() + index);
     }
@@ -235,7 +204,6 @@ bool search_swap(tSolution & solut, const tData & data) {
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
     alignas(INT_SZ) int i, j, j_prev, j_next, i_prev, i_next;
-    //alignas(INT_SZ) int dim = dimension - 2;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
 
@@ -292,7 +260,7 @@ bool search_swap(tSolution & solut, const tData & data) {
 bool search_two_opt(tSolution & solut, const tData & data) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
-    alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
+    alignas(DBL_SZ) double cost_best = DBL_MAX; // cost_l1, cost_l2;
     alignas(DBL_SZ) double rev_seq_cost;
     alignas(INT_SZ) int i, j, i_prev, j_next;
     alignas(INT_SZ) int I;
@@ -333,7 +301,7 @@ bool search_two_opt(tSolution & solut, const tData & data) {
 
 bool search_reinsertion(tSolution & solut, const tData & data, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-    alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+    alignas(DBL_SZ) double cost_best = DBL_MAX; //, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
@@ -428,7 +396,6 @@ bool search_swap(tSolution & solut, const tData & data) {
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
     alignas(INT_SZ) int i, j, j_prev, j_next, i_prev, i_next;
-    //alignas(INT_SZ) int dim = dimension - 2;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
 
@@ -485,7 +452,7 @@ bool search_swap(tSolution & solut, const tData & data) {
 bool search_two_opt(tSolution & solut, const tData & data) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
-    alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
+    alignas(DBL_SZ) double cost_best = DBL_MAX; // cost_l1, cost_l2;
     alignas(DBL_SZ) double rev_seq_cost;
     alignas(INT_SZ) int i, j, i_prev, j_next;
     alignas(INT_SZ) int I;
@@ -528,7 +495,7 @@ bool search_two_opt(tSolution & solut, const tData & data) {
 
 bool search_reinsertion(tSolution & solut, const tData & data, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-    alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+    alignas(DBL_SZ) double cost_best = DBL_MAX; //, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
@@ -596,63 +563,39 @@ void RVND(tSolution & solut, tData & data) {
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     alignas(INT_SZ) uint index;
     alignas(INT_SZ) int neighbd;
-    //int k = 0;
     bool improve_flag;
 
-    //cout << "RVND" << endl;
     while (!neighbd_list.empty()) {
-        //k++;
 
         index = data.rnd[data.rnd_index++];
         neighbd = neighbd_list[index];
-        //std::cout <<"aq\n";
         improve_flag = false;
 
         switch(neighbd){
             case REINSERTION:
-                //before();
                 improve_flag = search_reinsertion(solut, data, REINSERTION);
-                //after(REINSERTION);
                 break;				
             case OR_OPT_2:
-                //before();
                 improve_flag = search_reinsertion(solut, data, OR_OPT_2);
-                //after(OR_OPT2);
                 break;				
             case OR_OPT_3:
-                //before();
                 improve_flag = search_reinsertion(solut, data, OR_OPT_3);
-                //after(OR_OPT3);
                 break;				
             case SWAP:
-                //before();
                 improve_flag = search_swap(solut, data);
-                //after(SWAP);
                 break;
             case TWO_OPT:
-                //before();
                 improve_flag = search_two_opt(solut, data);
-                //after(TWO_OPT);
                 break;				
         }
-        //std::cout << (improve_flag ? "True" : "False") << std::endl;
         if (improve_flag) {
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
-            //std::cout << index << "  " << neighbd_list.size() << std::endl;
-            //std::cout << solut.cost << std::endl;
-            
-            //std::cout << data.rnd_index << std::endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
 
-        //std::cout << "cost  " << solut.cost << std::endl ;
-
-
     }
 
-    //exit(0);
-    //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
 std::vector<int> perturb(tSolution * solut, tData & data) {
@@ -665,8 +608,6 @@ std::vector<int> perturb(tSolution * solut, tData & data) {
     int size_max = std::floor((data.dimen+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
     int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
 
         A_start = data.rnd[data.rnd_index++];
@@ -725,16 +666,9 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
 
         if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
             Solution_cpy(solut_partial, solut_best, data);
-            //solut_best = solut_partial;
         }
 
-        //after(7);
-
-        //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
         std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
-        //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
-        //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
-        //std::cout << k << "  Iteracoes " << std::endl;
 
         std::cout << "SOLUCAO: ";
         for(int i = 0; i < solut_best.s.size(); i++){
@@ -743,7 +677,6 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
         std::cout << std::endl;
 
     }
-    //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", solut_best.cost);
 }
 
@@ -759,20 +692,9 @@ int main(int argc, char **argv){
 
     data.dimen = loadData(&data.cost, rnd);
     data.rnd = rnd;
-    //print_s(rnd);
     data.rnd_index = 0;
 
     tSolution solut = Solution_init(data);
-
-    /*
-    for (int i = 0; i <=n; i++) {
-        for (int j = i+1; j <=n; j++) {
-            std::cout << matrix[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    */
-
 
     srand(clock());
 
@@ -791,34 +713,7 @@ int main(int argc, char **argv){
     std::cout << "Tamanho RND " << rnd.size() << std::endl;
 
     exit(0);
-    /*
-    flag = true;
-
-    srand(duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
-    readData(argc, argv, &dimension, &c);
-
-    int ar[] = {100, dimension};
     
-    Iils = ar[dimension < 100];
-
-    auto t1 = high_resolution_clock::now();
-
-    GILS_RVND(Imax, Iils);
-
-    auto t2 = high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
-    double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
-
-    if(flag){
-        std::cout << "Construction time: " << construct_t/10e5 << std::endl;
-        std::cout << "Swap time: " << swap_t/10e5 << std::endl;
-        std::cout << "two_opt time: " << two_opt_t/10e5 << std::endl;
-        std::cout << "reinsertion time: " << reinsertion_t/10e5 << std::endl;
-        std::cout << "or_opt2 time: " << opt2_t/10e5 << std::endl;
-        std::cout << "or_opt3 time: " << opt3_t /10e5<< std::endl;
-    }
-    */
     return 0;
 }
 
