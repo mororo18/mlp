@@ -140,7 +140,7 @@ fn search_swap(solut: &mut tSolution, data: &Data) -> bool {
     let mut cost_concat_4: f64;
 
     let mut cost_best: f64 = f64::MAX;
-    let mut cost_new: f64; // = std::f64::MAX;
+    let mut cost_new: f64;
     let mut I: usize = 0;
     let mut J: usize = 0;
 
@@ -463,7 +463,7 @@ fn print_type_of<T>(_: &T) {
 
 fn main() {
     let mut dimension: usize = 0;
-    let mut c: Vec<Vec<f64>> = vec![]; //vec![0.0; 0]];
+    let mut c: Vec<Vec<f64>> = vec![];
 
     let mut rnd: Vec<usize> = vec![];
 
@@ -479,43 +479,6 @@ fn main() {
         rnd_index: 0,
     };
 
-    //let mut a  = array![0; 500];
-
-    //println!(" {:#?} , {}", a);
-
-    //exit(0);
-
-    //let mut temperature = Array3::<f64>::zeros((3, 4, 5));
-    //temperature[[2, 2, 2]] += 0.5;
-
-    //println!("{}", temperature);
-
-    /*
-    let mut a : Vec<f64> = vec![];
-
-    for i in 0..(info.dimen+1) * (info.dimen+1) * 3 {
-        a.push(0.0);
-    }
-
-    let mut solut_test = tSolution {
-        seq : a.into_boxed_slice(),
-        //seq : vec![vec![[0.0; 3]; info.dimen+1]; info.dimen+1],
-        s : vec![0; info.dimen],
-        cost : f64::MAX,
-    };
-
-    for i in 0..info.dimen {
-        solut_test.s[i] = i;
-    }
-    solut_test.s.push(0);
-
-    update_subseq_info_matrix(&mut solut_test);
-
-
-    println!(" {:?}\nCost {}", solut_test.s, solut_test.cost);
-    //exit(0);
-    */
-
     println!("TEST");
 
     let Imax = 10;
@@ -528,18 +491,9 @@ fn main() {
 
     let now = Instant::now();
 
-    //test!();
     GILS_RVND(Imax, Iils, R, &mut rnd, &data);
 
     let new_now = Instant::now();
     println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
 
-    /*
-    for i in 0..dimension {
-        for j in 0..dimension {
-            print!("{} ", Info::C as usize[i][j]);
-        }
-        println!();
-    }
-    */
 }
