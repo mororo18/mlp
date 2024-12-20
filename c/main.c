@@ -198,32 +198,6 @@ void update_subseq_info_matrix(tSolution * solut, const tData * data){
     solut->cost = solut->seq[0][data->dimen][C];
 }
 
-void update_subseq_info_matrix_b(tSolution * solut, const tData * data, int index){
-    int i, j, j_prev, k;
-    int from = index;
-    char t;
-    for (i = 0; i < data->dimen+1; i++) {
-        k = 1 - i - (!i);
-        t = i == from;
-
-        solut->seq[i][i][T] = 0.0;
-        solut->seq[i][i][C] = 0.0;
-        solut->seq[i][i][W] = (double) !(i == 0);
-
-        for (j = i+1; j < data->dimen+1; j++) {
-            j_prev = j-1;
-            
-            solut->seq[i][j][T] = data->cost[solut->s[j_prev]][solut->s[j]] + solut->seq[i][j_prev][T];
-            solut->seq[i][j][C] = solut->seq[i][j][T] + solut->seq[i][j_prev][C];
-            solut->seq[i][j][W] = j + k;
-
-        }
-        from += t;
-    }
-
-    solut->cost = solut->seq[0][data->dimen][C];
-}
-
 char search_swap(tSolution * solut, const tData * data) {
     double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
@@ -275,7 +249,7 @@ char search_swap(tSolution * solut, const tData * data) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         swap(solut->s, I, J);
-        update_subseq_info_matrix_b(solut, data, I);
+        update_subseq_info_matrix(solut, data);
         return TRUE;
     }
 
@@ -382,7 +356,7 @@ char search_reinsertion(tSolution * solut, const tData * data, const int opt) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         reinsert(solut->s, I, J, POS+1);
-        update_subseq_info_matrix_b(solut, data, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix(solut, data);
         return TRUE;
     }
 
