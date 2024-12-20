@@ -185,7 +185,7 @@ func NewSolution(data tData) tSolution {
 
 }
 
-func update_subseq_info_matrix(solut *tSolution, data tData) {
+func update_subseq_info_matrix(solut *tSolution, data *tData) {
 
 	for i := 0; i < data.dimen+1; i++ {
 		k := 1 - i
@@ -224,7 +224,7 @@ func swap(solut *tSolution, i int, j int) {
 	solut.s[j] = tmp
 }
 
-func search_swap(solut *tSolution, data tData) bool {
+func search_swap(solut *tSolution, data *tData) bool {
 
 	var cost_concat_1 float64
 	var cost_concat_2 float64
@@ -299,7 +299,7 @@ func reverse(solut *tSolution, i int, j int) {
 	}
 }
 
-func search_two_opt(solut *tSolution, data tData) bool {
+func search_two_opt(solut *tSolution, data *tData) bool {
 	var cost_new float64
 	cost_best := math.MaxFloat64
 
@@ -362,7 +362,7 @@ func reinsert(solut *tSolution, i int, j int, pos int) {
 
 }
 
-func search_reinsertion(solut *tSolution, data tData, opt int) bool {
+func search_reinsertion(solut *tSolution, data *tData, opt int) bool {
 	cost_best := math.MaxFloat64
 	var cost_new float64
 
@@ -444,15 +444,15 @@ func RVND(solut *tSolution, data *tData) {
 		improve := false
 		switch n_list[index] {
 		case REINSERTION:
-			improve = search_reinsertion(solut, *data, REINSERTION)
+			improve = search_reinsertion(solut, data, REINSERTION)
 		case OR_OPT_2:
-			improve = search_reinsertion(solut, *data, OR_OPT_2)
+			improve = search_reinsertion(solut, data, OR_OPT_2)
 		case OR_OPT_3:
-			improve = search_reinsertion(solut, *data, OR_OPT_3)
+			improve = search_reinsertion(solut, data, OR_OPT_3)
 		case TWO_OPT:
-			improve = search_two_opt(solut, *data)
+			improve = search_two_opt(solut, data)
 		case SWAP:
-			improve = search_swap(solut, *data)
+			improve = search_swap(solut, data)
 		}
 
 		if improve == true {
@@ -537,7 +537,7 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
 		data.rnd_index++
 
 		solut_crnt.s = construction(R[index], &data)
-		update_subseq_info_matrix(&solut_crnt, data)
+		update_subseq_info_matrix(&solut_crnt, &data)
 		fmt.Printf("\t[+] Constructing Inital Solution.. %.2f\n", solut_crnt.cost)
 		fmt.Println("\t", solut_crnt.s)
 
@@ -555,7 +555,7 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
 			}
 
 			solut_crnt.s = perturb(solut_partial.s, &data)
-			update_subseq_info_matrix(&solut_crnt, data)
+			update_subseq_info_matrix(&solut_crnt, &data)
 			iterILS++
 		}
 
@@ -587,21 +587,11 @@ func main() {
 		Iils = data.dimen
 	}
 
-	//  f, err := os.Create("privateJourneyFindAll.prof")
-	//  if err != nil {
-	//      log.Fatal(err)
-	//  }
-	//  pprof.StartCPUProfile(f)
-	//  defer pprof.StopCPUProfile()
-
 	start := time.Now()
 
 	GILS_RVND(Imax, Iils, R, data)
 
-	//elapsed :=
 	t := time.Now()
 	elapsed := t.Sub(start)
 	fmt.Println("TIME:", elapsed.Seconds())
-	//GILS_RVND()
-
 }
