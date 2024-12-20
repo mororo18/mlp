@@ -214,7 +214,7 @@ void search_swap(vector<int> & s, tSubseq & seq) {
 void search_two_opt(vector<int> & s, tSubseq & seq) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
-    alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
+    alignas(DBL_SZ) double cost_best = DBL_MAX; // cost_l1, cost_l2;
     alignas(DBL_SZ) double rev_seq_cost;
     alignas(INT_SZ) int i, j, i_prev, j_next;
     alignas(INT_SZ) int I;
@@ -252,9 +252,8 @@ void search_two_opt(vector<int> & s, tSubseq & seq) {
 }
 
 void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
-//inline bool search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-    alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+    alignas(DBL_SZ) double cost_best = DBL_MAX; //, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
     alignas(INT_SZ) int I;
     alignas(INT_SZ) int J;
