@@ -3,7 +3,6 @@ package main
 import (
 	_ "runtime/pprof"
 	"time"
-	//"bufio"
 	"fmt"
 	"log"
 	"math"
@@ -82,17 +81,6 @@ func read_data() (int, [][]float64, []int) {
 	fmt.Fscanf(file, "%s\n", &buff)
 	fmt.Fscanf(file, "%s\n", &buff)
 	fmt.Println(buff)
-
-	/*
-	   scanner := bufio.NewScanner(file)
-	   scanner.Scan()
-	   scanner.Scan()
-	   scanner.Scan()
-	   fmt.Println(scanner.Text())
-	*/
-	//fmt.Fscanf(file, "%s", &buff)
-	//fmt.Fscanf(file, "%s", &buff)
-
 	fmt.Fscanf(file, "%d", &rnd_size)
 	fmt.Println(rnd_size)
 
@@ -100,7 +88,6 @@ func read_data() (int, [][]float64, []int) {
 
 	for i := 0; i < rnd_size; i++ {
 		fmt.Fscanf(file, "%d", &rnd[i])
-		//if i < 10 {fmt.Println(rnd[i])}
 	}
 
 	return dimen, cost, rnd
@@ -124,46 +111,8 @@ func feasible_(s []int, data tData) bool {
 		}
 	}
 
-	//fmt.Println(s)
-
 	return true
 }
-
-/*
-func feasible(solut * tSolution, data tData) bool {
-    is := make([]bool, data.dimen)
-
-    for i:=0; i < data.dimen; i++ {
-        is[i] = false
-    }
-
-    for i:=0; i < data.dimen; i++ {
-        is[solut.s[i]] = true
-    }
-
-    for i:=0; i < data.dimen; i++ {
-        if is[i] == false {
-            return false
-        }
-    }
-
-    //fmt.Println(solut.s)
-
-    return true
-}
-
-func calc_cost(solut * tSolution, data tData) float64 {
-    total := 0.0
-    n := data.dimen
-
-    for i := 0; i < data.dimen; i++ {
-        total += data.c[solut.s[i]][solut.s[i+1]] * float64(n)
-        n--
-    }
-
-    return total
-}
-*/
 
 func remove(arr []int, i int) []int {
 	return append(arr[:i], arr[i+1:]...)
@@ -236,7 +185,7 @@ func NewSolution(data tData) tSolution {
 
 }
 
-func update_subseq_info_matrix(solut *tSolution, data tData) {
+func update_subseq_info_matrix(solut *tSolution, data *tData) {
 
 	for i := 0; i < data.dimen+1; i++ {
 		k := 1 - i
@@ -261,7 +210,6 @@ func update_subseq_info_matrix(solut *tSolution, data tData) {
 			solut.seq[i][j].C = solut.seq[i][j].T + solut.seq[i][j_prev].C
 
 			solut.seq[i][j].W = float64(j + k)
-			//= W
 
 		}
 	}
@@ -276,7 +224,7 @@ func swap(solut *tSolution, i int, j int) {
 	solut.s[j] = tmp
 }
 
-func search_swap(solut *tSolution, data tData) bool {
+func search_swap(solut *tSolution, data *tData) bool {
 
 	var cost_concat_1 float64
 	var cost_concat_2 float64
@@ -329,27 +277,9 @@ func search_swap(solut *tSolution, data tData) bool {
 	}
 
 	if cost_best < solut.seq[0][data.dimen].C {
-		//println!("swap \n{}", cost_best);
 		swap(solut, I, J)
 
 		update_subseq_info_matrix(solut, data)
-
-		/*
-		   if (feasible(solut, data) == false) {
-		       fmt.Println("qebro swap\n")
-		       os.Exit(0)
-		   }
-
-		   //fmt.Println(calc_cost(solut, data), cost_best)
-		   if (calc_cost(solut, data) != cost_best) {
-		       fmt.Println("qebro swap\n")
-		       os.Exit(0)
-		   }
-		*/
-
-		//fmt.Println("swap", solut.cost)
-		//update_subseq_info_matrix(s, data);
-		//println!("{}", seq[0][data.dimension][C]);
 		return true
 	}
 
@@ -369,7 +299,7 @@ func reverse(solut *tSolution, i int, j int) {
 	}
 }
 
-func search_two_opt(solut *tSolution, data tData) bool {
+func search_two_opt(solut *tSolution, data *tData) bool {
 	var cost_new float64
 	cost_best := math.MaxFloat64
 
@@ -404,28 +334,9 @@ func search_two_opt(solut *tSolution, data tData) bool {
 	}
 
 	if cost_best < solut.cost {
-		//fmt.Println(solut.s)
-		//fmt.Println(solut.s, I, J)
 		reverse(solut, I, J)
 
-		//antes := solut.cost
 		update_subseq_info_matrix(solut, data)
-
-		/*
-		   if (feasible(solut, data) == false) {
-		       fmt.Println("qebro two_opt")
-		       os.Exit(0)
-		   }
-
-		   if (calc_cost(solut, data) != cost_best) {
-		       //fmt.Println(solut.s, "qebro two_opt")
-		       //fmt.Println("Antes ", antes, "\nDepois ", solut.cost)
-		       fmt.Println("Cost Best ", cost_best)
-		       os.Exit(0)
-		   }
-		*/
-
-		//fmt.Println("two_opt", solut.cost)
 
 		return true
 	}
@@ -437,39 +348,21 @@ func reinsert(solut *tSolution, i int, j int, pos int) {
 	sz := j - i + 1
 	sub := make([]int, sz)
 
-	/*
-	   remove_seq := func(arr []int, a int, b int) []int {
-	       return append(arr[:a], arr[b+1:]...)
-	   }
-	*/
-	//s_cpy := make([]int, len(solut.s))
-
 	copy(sub, solut.s[i:j+1])
-	//copy(s_cpy, solut.s)
 
 	if pos < i {
-		//fmt.Println("Antes", solut.s)
 		copy(solut.s[pos+sz:j+1], solut.s[pos:i])
 		copy(solut.s[pos:pos+sz], sub)
-		//solut.s = remove_seq(solut.s, i, j)
-		//sub = append(solut.s[:pos], sub...)
-		//solut.s = append(sub, solut.s[pos:]...)
 
 	} else {
-		//fmt.Println("Depois", solut.s)
 		copy(solut.s[i:i+pos-j], solut.s[j+1:pos])
 		copy(solut.s[pos-(j-i+1):pos], sub)
-		//sub = append((*solut).s[:pos], sub...)
-		//fmt.Println("sub=",sub, "solut.s", solut.s)
-		//sub = append(sub, solut.s[pos+1:]...)
-		//fmt.Println("sub=",sub)
-		//solut.s = remove_seq(solut.s, i, j)
-		//fmt.Println("solut.s=",solut.s)
+
 	}
 
 }
 
-func search_reinsertion(solut *tSolution, data tData, opt int) bool {
+func search_reinsertion(solut *tSolution, data *tData, opt int) bool {
 	cost_best := math.MaxFloat64
 	var cost_new float64
 
@@ -530,20 +423,7 @@ func search_reinsertion(solut *tSolution, data tData, opt int) bool {
 	if cost_best < solut.cost {
 		reinsert(solut, I, J, POS+1)
 
-		/*
-		   if (feasible(solut, data) == false) {
-		       //fmt.Println("qebro reinsert\n")
-		       os.Exit(0)
-		   }
-
-		   if (calc_cost(solut, data) != cost_best) {
-		       fmt.Println("qebro reinsert\n", solut.s)
-		       os.Exit(0)
-		   }
-		*/
-
 		update_subseq_info_matrix(solut, data)
-		//fmt.Println("reinsert", solut.cost)
 
 		return true
 	}
@@ -557,26 +437,22 @@ func RVND(solut *tSolution, data *tData) {
 
 	copy(n_list, n_list_b)
 
-	//fmt.Println(solut.s)
-
 	for len(n_list) > 0 {
         index := data.rnd[data.rnd_index]
 		data.rnd_index++
 
-		//fmt.Println(n_list)
-
 		improve := false
 		switch n_list[index] {
 		case REINSERTION:
-			improve = search_reinsertion(solut, *data, REINSERTION)
+			improve = search_reinsertion(solut, data, REINSERTION)
 		case OR_OPT_2:
-			improve = search_reinsertion(solut, *data, OR_OPT_2)
+			improve = search_reinsertion(solut, data, OR_OPT_2)
 		case OR_OPT_3:
-			improve = search_reinsertion(solut, *data, OR_OPT_3)
+			improve = search_reinsertion(solut, data, OR_OPT_3)
 		case TWO_OPT:
-			improve = search_two_opt(solut, *data)
+			improve = search_two_opt(solut, data)
 		case SWAP:
-			improve = search_swap(solut, *data)
+			improve = search_swap(solut, data)
 		}
 
 		if improve == true {
@@ -590,7 +466,6 @@ func RVND(solut *tSolution, data *tData) {
 }
 
 func perturb(sl []int, data *tData) []int {
-	//fmt.Println("Perturbacion")
 	s := make([]int, data.dimen+1)
 	copy(s, sl)
 
@@ -618,46 +493,31 @@ func perturb(sl []int, data *tData) []int {
 		sub := make([]int, j-i+1)
 
 		copy(sub, (*s_)[i:j+1])
-		//fmt.Println("sub", sub)
 
 		if pos < i {
-			//fmt.Println("Antes ", s_)
 			copy((*s_)[pos+sz:j+1], (*s_)[pos:i])
-			//fmt.Println(s_)
 			copy((*s_)[pos:pos+sz], sub)
-			//fmt.Println(s_)
-			//solut.s = remove_seq(solut.s, i, j)
-			//sub = append(solut.s[:pos], sub...)
-			//solut.s = append(sub, solut.s[pos:]...)
 
 		} else {
-			//fmt.Println("Depois", s_)
 			copy((*s_)[i:i+pos-j], (*s_)[j+1:pos])
 			copy((*s_)[pos-(j-i+1):pos], sub)
 		}
 
 		if feasible_(*s_, *data) == false {
-			//fmt.Println("Perturb qebrad")
 			os.Exit(0)
 		}
 
 	}
 
-	//fmt.Println("B s e", B_start, B_end)
-
 	if A_start < B_start {
 		reinsert_s(&s, B_start, B_end-1, A_end)
-		//fmt.Println("Reinsercao 1", s)
 		reinsert_s(&s, A_start, A_end-1, B_end)
-		//fmt.Println("Reinsercao 2", s)
+
 	} else {
 		reinsert_s(&s, A_start, A_end-1, B_end)
-		//fmt.Println("Reinsercao 1", s)
 		reinsert_s(&s, B_start, B_end-1, A_end)
-		//fmt.Println("Reinsercao 2", s)
-	}
 
-	//fmt.Println("PERTURBACOA Resultado = ", s)
+	}
 
 	return s
 }
@@ -677,7 +537,7 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
 		data.rnd_index++
 
 		solut_crnt.s = construction(R[index], &data)
-		update_subseq_info_matrix(&solut_crnt, data)
+		update_subseq_info_matrix(&solut_crnt, &data)
 		fmt.Printf("\t[+] Constructing Inital Solution.. %.2f\n", solut_crnt.cost)
 		fmt.Println("\t", solut_crnt.s)
 
@@ -695,9 +555,7 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
 			}
 
 			solut_crnt.s = perturb(solut_partial.s, &data)
-			update_subseq_info_matrix(&solut_crnt, data)
-			//fmt.Println(solut_crnt.cost, solut_crnt.s)
-			// perturbación
+			update_subseq_info_matrix(&solut_crnt, &data)
 			iterILS++
 		}
 
@@ -721,8 +579,6 @@ func main() {
 
 	data.dimen, data.c, data.rnd = read_data()
 
-	//solut := NewSolution(data)
-
 	R := [...]float64{0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
 	Imax := 10
@@ -731,21 +587,11 @@ func main() {
 		Iils = data.dimen
 	}
 
-	//  f, err := os.Create("privateJourneyFindAll.prof")
-	//  if err != nil {
-	//      log.Fatal(err)
-	//  }
-	//  pprof.StartCPUProfile(f)
-	//  defer pprof.StopCPUProfile()
-
 	start := time.Now()
 
 	GILS_RVND(Imax, Iils, R, data)
 
-	//elapsed :=
 	t := time.Now()
 	elapsed := t.Sub(start)
 	fmt.Println("TIME:", elapsed.Seconds())
-	//GILS_RVND()
-
 }
