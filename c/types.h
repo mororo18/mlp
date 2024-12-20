@@ -7,13 +7,20 @@
 
 typedef double Real;
 
-
 typedef struct tData {
     Real ** cost;
     int dimen;
     int * rnd;
     int rnd_index;
 } tData;
+
+typedef enum {
+    REINSERTION = 1,
+    OR_OPT_2 = 2,
+    OR_OPT_3 = 3,
+    SWAP = 4,
+    TWO_OPT = 5
+} tNeighborhood;
 
 typedef struct tSeqInfo {
     Real T, C, W;
