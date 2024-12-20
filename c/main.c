@@ -9,11 +9,6 @@
 #include "data.h"
 #include "types.h"
 
-#define REINSERTION 1
-#define OR_OPT_2 	2
-#define OR_OPT_3 	3
-#define SWAP 		4
-#define TWO_OPT		5
 #define TABLE_SZ    26
 #define DBL_SZ      8
 #define INT_SZ      4
