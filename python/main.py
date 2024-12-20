@@ -106,7 +106,7 @@ def construction(alpha, rnd):
 
     return s
 
-def subseq_info_load(sol):
+def update_subseq_info_matrix(sol):
     i = 0
     d = n + 1
     while i < d:
@@ -197,7 +197,7 @@ def search_swap(s):
     if cost_best < subseq[0][n].C  - EPSILON:
         #print(cost_best, I, J)
         swap(s, I, J)
-        subseq_info_load(s)
+        update_subseq_info_matrix(s)
         #print(seq[C][0][n])
         global improv_flag
         improv_flag = True
@@ -240,7 +240,7 @@ def search_two_opt(s):
         #print(cost_best)
         #print(I, J)
         reverse(s, I, J)
-        subseq_info_load(s)
+        update_subseq_info_matrix(s)
         global improv_flag
         improv_flag = True
 
@@ -340,7 +340,7 @@ def search_reinsertion(s, OPT):
     if cost_best < subseq[0][n].C  - EPSILON:
         #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
         reinsert(s, I, J, POS+1)
-        subseq_info_load(s)
+        update_subseq_info_matrix(s)
         global improv_flag
         improv_flag = True
 
@@ -422,7 +422,7 @@ def GILS_RVND(Imax, Iils, R, rnd):
         print("[+] Local Search {}".format(i+1))
         print("\t[+] Constructing Inital Solution..")
         s = construction(alpha, rnd)
-        subseq_info_load(s)
+        update_subseq_info_matrix(s)
         sl = s[:]
         rvnd_cost_best = subseq[0][n].C  - EPSILON
 
@@ -439,10 +439,10 @@ def GILS_RVND(Imax, Iils, R, rnd):
                 iterILS = 0
 
             s = perturb(sl, rnd)
-            subseq_info_load(s)
+            update_subseq_info_matrix(s)
             iterILS += 1
 
-        subseq_info_load(sl)
+        update_subseq_info_matrix(sl)
         sl_cost = subseq[0][n].C  - EPSILON
 
         if sl_cost < cost_best:
