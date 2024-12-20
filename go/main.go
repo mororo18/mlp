@@ -89,7 +89,7 @@ func loadData() (int, [][]float64, []int) {
 
 func ternary(s bool, t int, f int) int {if s {return t} else {return f}}
 
-func subseq_load(s []int, seq [][]tSeqInfo) float64 {
+func update_subseq_info_matrix(s []int, seq [][]tSeqInfo) float64 {
 
     for i := 0; i < dimension+1; i++ {
         k := 1 - i - ternary(i == 0, 1, 0)
@@ -258,7 +258,7 @@ func search_swap(s []int, seq [][]tSeqInfo) bool {
 
     if cost_best < seq[0][dimension].C -math.SmallestNonzeroFloat64 {
         swap(s, I, J);
-        subseq_load(s, seq);
+        update_subseq_info_matrix(s, seq);
         return true;
     }
 
@@ -300,7 +300,7 @@ func search_two_opt(s []int, seq [][]tSeqInfo) bool {
 
     if cost_best < seq[0][dimension].C - math.SmallestNonzeroFloat64 {
         reverse(s, I, J)
-        subseq_load(s, seq)
+        update_subseq_info_matrix(s, seq)
         return true
     }
 
@@ -364,7 +364,7 @@ func search_reinsertion(s []int, seq [][]tSeqInfo, opt int) bool {
 
     if cost_best < seq[0][dimension].C - math.SmallestNonzeroFloat64 {
         reinsert(s, I, J, POS+1)
-        subseq_load(s, seq)
+        update_subseq_info_matrix(s, seq)
         return true;
     }
 
@@ -470,7 +470,7 @@ func GILS_RVND(rnd tRnd) {
 
         construct(alpha, s_crnt, &rnd)
 
-        cost_crnt = subseq_load(s_crnt, seq)
+        cost_crnt = update_subseq_info_matrix(s_crnt, seq)
         copy(s_partial, s_crnt)
         cost_partial = cost_crnt
 
@@ -486,7 +486,7 @@ func GILS_RVND(rnd tRnd) {
             }
 
             perturb(s_crnt, s_partial, &rnd)
-            subseq_load(s_crnt, seq)
+            update_subseq_info_matrix(s_crnt, seq)
             iterILS++
         }
 

@@ -18,7 +18,7 @@ function subseq_fill(dimension) {
     return seq;
 }
 
-function subseq_load(s, seq) {
+function update_subseq_info_matrix(s, seq) {
     for (var i = 0; i < dimension+1; i++) {
         var k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -158,7 +158,7 @@ function search_swap(s, seq) {
 
     if(cost_best < seq[0][dimension][C] - Number.EPSILON){
         swap(s, I, J);
-        subseq_load(s, seq);
+        update_subseq_info_matrix(s, seq);
 
         return true;
     }
@@ -201,7 +201,7 @@ function search_two_opt(s, seq) {
 
     if(cost_best < seq[0][dimension][C] - Number.EPSILON){
         reverse(s, I, J);
-        subseq_load(s, seq);
+        update_subseq_info_matrix(s, seq);
 
         return true;
     }
@@ -267,7 +267,7 @@ function search_reinsertion(s, seq, opt) {
 
     if(cost_best < seq[0][dimension][C] - Number.EPSILON){
         reinsert(s, I, J, POS+1);
-        subseq_load(s, seq);
+        update_subseq_info_matrix(s, seq);
 
         return true;
     }
@@ -362,7 +362,7 @@ function GILS_RVND(Iils, Imax, R, rnd) {
         solut_crnt = construction(alpha, rnd);
         solut_partial = [...solut_crnt];
 
-        subseq_load(solut_crnt, seq);
+        update_subseq_info_matrix(solut_crnt, seq);
         var cost_crnt = seq[0][dimension][C] - Number.EPSILON;
         var cost_partial = cost_crnt;
         console.log("Construction cost", cost_crnt);
@@ -380,7 +380,7 @@ function GILS_RVND(Iils, Imax, R, rnd) {
             }
 
             solut_crnt = perturb(solut_partial, rnd);
-            subseq_load(solut_crnt, seq);
+            update_subseq_info_matrix(solut_crnt, seq);
             iterILS++;
         }
 
