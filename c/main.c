@@ -170,38 +170,6 @@ void update_subseq_info_matrix(tSolution * solut, const tData * data){
     solut->cost = seq_get_C(solut,  0,  data->dimen);
 }
 
-void update_subseq_info_matrix_b(tSolution * solut, const tData * data, int index){
-    int i, j, j_prev, k;
-    int from = index;
-    _Bool t;
-    for (i = 0; i < data->dimen+1; i++) {
-        k = 1 - i - (!i);
-        t = i == from;
-
-        seq_set_T(solut, i, i, 0.0);
-        seq_set_C(solut, i, i, 0.0);
-        seq_set_W(solut, i, i, (Real)!(i == 0));
-
-        for (j = i+1; j < data->dimen+1; j++) {
-            j_prev = j-1;
-            
-            Real T = data->cost[solut->s[j_prev]][solut->s[j]] + seq_get_T(solut,  i,  j_prev);
-            seq_set_T(solut, i, j, T);
-
-            Real C = seq_get_T(solut,  i,  j) + seq_get_C(solut,  i,  j_prev);
-            seq_set_C(solut, i, j, C);
-
-            Real W = j + k;
-            seq_set_W(solut, i, j, W);
-
-
-        }
-        from += t;
-    }
-
-    solut->cost = seq_get_C(solut,  0,  data->dimen);
-}
-
 _Bool search_swap(tSolution * solut, const tData * data) {
     Real cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
@@ -253,7 +221,7 @@ _Bool search_swap(tSolution * solut, const tData * data) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         swap(solut->s, I, J);
-        update_subseq_info_matrix_b(solut, data, I);
+        update_subseq_info_matrix(solut, data);
 
         assert(abs(cost_best-solut->cost) < DBL_EPSILON);
         assert(feasible(solut->s, data->dimen));
@@ -266,7 +234,7 @@ _Bool search_swap(tSolution * solut, const tData * data) {
 _Bool search_two_opt(tSolution * solut, const tData * data) {
     Real cost_new, 
         cost_concat_1, cost_concat_2;
-    Real cost_best = DBL_MAX;// cost_l1, cost_l2;
+    Real cost_best = DBL_MAX;
     Real rev_seq_cost;
     int i, j, i_prev, j_next;
     int I;
@@ -311,7 +279,7 @@ _Bool search_two_opt(tSolution * solut, const tData * data) {
 
 _Bool search_reinsertion(tSolution * solut, const tData * data, int opt) {
     Real cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-    Real cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+    Real cost_best = DBL_MAX;
     int i, j, k, k_next, i_prev, j_next;
     int I;
     int J;
@@ -365,7 +333,7 @@ _Bool search_reinsertion(tSolution * solut, const tData * data, int opt) {
 
     if (cost_best < solut->cost - DBL_EPSILON) {
         reinsert(solut->s, I, J, POS+1);
-        update_subseq_info_matrix_b(solut, data, I < POS+1 ? I : POS+1);
+        update_subseq_info_matrix(solut, data);
 
         assert(abs(cost_best-solut->cost) < DBL_EPSILON);
         assert(feasible(solut->s, data->dimen));
@@ -387,8 +355,7 @@ void RVND(tSolution * solut, tData * data) {
     while (nl_size > 0) {
         index = data->rnd[data->rnd_index++];
         neighbd = neighbd_list[index];
-        //std::cout <<"aq\n";
-        //
+
         assert(index < nl_size);
 
         improve_flag = false;
@@ -412,11 +379,7 @@ void RVND(tSolution * solut, tData * data) {
         }
 
         assert(feasible(solut->s, data->dimen));
-      //if (feasible(solut->s, data->dimen+1)) {
-      //    printf("qebrad\n");
-      //    exit(0);
-      //}
-        //std::cout << (improve_flag ? "True" : "False") << std::endl;
+
         if (improve_flag) {
             neighbd_list[0] = SWAP;
             neighbd_list[1] = TWO_OPT;
@@ -424,10 +387,7 @@ void RVND(tSolution * solut, tData * data) {
             neighbd_list[3] = OR_OPT_2;
             neighbd_list[4] = OR_OPT_3;
             nl_size = 5;
-
-            //print_s(solut->s, info->dimen+1);
         } else {
-            //print_s(neighbd_list, nl_size);
             memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
             nl_size--;
         }
@@ -449,8 +409,7 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tData * data) {
     int size_max = floor((data->dimen+1)/10);
     size_max = size_max >= 2 ? size_max : 2;
     int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
+
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
 
         A_start = data->rnd[data->rnd_index++];
