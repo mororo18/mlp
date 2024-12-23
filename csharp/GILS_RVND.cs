@@ -32,7 +32,7 @@ namespace MLP {
     
         }
 
-        private void subseq_load(tSolution solut){
+        private void update_subseq_info_matrix(tSolution solut){
             var solutSolut = solut.GetSolut();  
             for(int i = 0; i < data.GetDimen()+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
@@ -196,7 +196,7 @@ namespace MLP {
               //    Console.WriteLine(string.Format("Swap: ({0}, {1}, {2}).", cost_best, solut.GetCost(), -cost_best+solut.GetCost()));
               //}
                 swap(solutSolut, I, J);
-                subseq_load(solut);
+                update_subseq_info_matrix(solut);
                 return true;
             }
 
@@ -244,7 +244,7 @@ namespace MLP {
 
             if(cost_best < solut.GetCost() - EPSILON){
                 reverse(solutSolut, I, J);
-                subseq_load(solut);
+                update_subseq_info_matrix(solut);
                 return true;
             }
 
@@ -313,7 +313,7 @@ namespace MLP {
                 //Console.WriteLine("Reinsertion");
                 //Console.WriteLine(cost_best);
                 reinsert(solutSolut, I, J, POS+1);
-                subseq_load(solut);
+                update_subseq_info_matrix(solut);
                 //Console.WriteLine(seq[0, dimension, C]);
                 return true;
             }
@@ -410,7 +410,7 @@ namespace MLP {
 
                 solut_crnt.StoreSolut(construction(alpha));
 
-                subseq_load(solut_crnt);
+                update_subseq_info_matrix(solut_crnt);
 
                 solut_partial.StoreSolut(solut_crnt.GetSolutCpy());
                 solut_partial.SetCost(solut_crnt.GetCost());
@@ -429,7 +429,7 @@ namespace MLP {
                     }
 
                     solut_crnt.StoreSolut(perturb(solut_partial.GetSolut()));
-                    subseq_load(solut_crnt);
+                    update_subseq_info_matrix(solut_crnt);
                     iterILS++;
                 }
 
