@@ -1,5 +1,4 @@
 mod data;
-extern crate rand;
 
 use rand::Rng;
 use std::time::Instant;
@@ -100,6 +99,7 @@ fn construction(rnd: &mut Rnd, data: &Data) -> Vec<usize> {
 
         let index = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
+
         let c = c_list[index];
         r = c;
         c_list.remove(index);

@@ -2,10 +2,8 @@
 
 import time
 from read import *
-from random import randint
 import math
 import sys
-#import matplotlib.pyplot as plt 
 from typing import List, NoReturn
 
 Matrix = List[List[float]]
@@ -85,10 +83,6 @@ def construction(alpha : float, info : tInfo) -> List[int]:
         i = int(len(c_list)*alpha) + 1
 
         sort(c_list, r, info)
-
-        ##
-        c = c_list[randint(0, i-1)]
-        ##
 
         r_value = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -361,9 +355,6 @@ def RVND(solut : tSolution, info : tInfo) -> NoReturn:
     neighbd_list : List[int] = [tInfo.SWAP, tInfo.TWO_OPT, tInfo.REINSERTION, tInfo.OR_OPT_2, tInfo.OR_OPT_3]
 
     while len(neighbd_list) > 0:
-        ##
-        i = randint(0, len(neighbd_list)-1)
-        ##
         i = info.rnd[info.rnd_index]
         info.rnd_index += 1
 
@@ -395,17 +386,7 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
-    size_max = math.floor(len(s)/10) if math.floor(len(s)/10) >= 2 else 2
-    size_min = 2
-
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        ##
-        A_start = randint(1, len(s) - 1 - size_max)
-        A_end = A_start + randint(size_min, size_max)
-
-        B_start = randint(1, len(s) - 1 - size_max)
-        B_end = B_start + randint(size_min, size_max)
-        ##
 
         A_start = info.rnd[info.rnd_index]
         info.rnd_index += 1
@@ -433,12 +414,8 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
     solut_best : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), float('inf'))
 
     for i in range(Imax):
-        ##
-        alpha : float = R[randint(0, len(R)-1)]
-        ##
 
         r_value = info.rnd[info.rnd_index]
-        print(r_value)
         info.rnd_index += 1
 
         alpha : float = R[r_value]
@@ -454,7 +431,6 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
         print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
-            #print("ILS")
             RVND(solut_crnt, info)
 
             if solut_crnt.cost < solut_partial.cost:
@@ -500,11 +476,3 @@ def main() -> NoReturn:
     print("ITERACOES: ", info.IT)
 
 main()
-"""
-print("SWAP %s" % t_swap)
-print("Reinsert %s" % t_reinsertion)
-print("or_opt2 %s" % t_or_opt2)
-print("or_opt3 %s" % t_or_opt3)
-print("two_opt %s" % t_two_opt)
-print("subseq_load %s" % t_seq)
-"""

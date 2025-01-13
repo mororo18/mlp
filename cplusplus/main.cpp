@@ -141,16 +141,9 @@ std::vector<int> construct(const double alpha, tInfo & info){
     while (!cL.empty()) {
         sort(cL, r, info);
 
-        /**/
-        int range = std::ceil(cL.size() * alpha);
-        int index = range > 0 ? rand() % range : 0;
-        /**/
-
-        //std::cout << info.rnd[info.rnd_index]<< std::endl;
-        index = info.rnd[info.rnd_index++];
+        int index = info.rnd[info.rnd_index++];
         int c = cL[index];
         s.push_back(c);
-        //print_s(cL);
         r = c;
         cL.erase(cL.begin() + index);
     }
@@ -379,66 +372,40 @@ void RVND(tSolution & solut, tInfo & info) {
     alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
     alignas(INT_SZ) uint index;
     alignas(INT_SZ) int neighbd;
-    //int k = 0;
     bool improve_flag;
 
-    //cout << "RVND" << endl;
     while (!neighbd_list.empty()) {
-        //k++;
 
-        index = rand() % neighbd_list.size();
-        //cout << info.rnd[info.rnd_index] << endl;
         index = info.rnd[info.rnd_index++];
         neighbd = neighbd_list[index];
-        //std::cout <<"aq\n";
 
         improve_flag = false;
 
         switch(neighbd){
             case REINSERTION:
-                //before();
                 improve_flag = search_reinsertion(solut, info, REINSERTION);
-                //after(REINSERTION);
                 break;				
             case OR_OPT_2:
-                //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_2);
-                //after(OR_OPT2);
                 break;				
             case OR_OPT_3:
-                //before();
                 improve_flag = search_reinsertion(solut, info, OR_OPT_3);
-                //after(OR_OPT3);
                 break;				
             case SWAP:
-                //before();
                 improve_flag = search_swap(solut, info);
-                //after(SWAP);
                 break;
             case TWO_OPT:
-                //before();
                 improve_flag = search_two_opt(solut, info);
-                //after(TWO_OPT);
                 break;				
         }
-        //std::cout << (improve_flag ? "True" : "False") << std::endl;
+
         if (improve_flag) {
             neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         } else {
-            //std::cout << index << "  " << neighbd_list.size() << std::endl;
-            //std::cout << solut.cost << std::endl;
-            
-            //std::cout << info.rnd_index << std::endl;
             neighbd_list.erase(neighbd_list.begin() + index);
         }
-
-        //std::cout << "cost  " << solut.cost << std::endl ;
-
-
     }
 
-    //exit(0);
-    //std::cout << k << " RVND iteracoes" << std::endl;
 }
 
 std::vector<int> perturb(tSolution * solut, tInfo & info) {
@@ -448,42 +415,14 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = std::floor((info.dimen+1)/10);
-    size_max = size_max >= 2 ? size_max : 2;
-    int size_min = 2;
-    //std::cout << "perturbing\n";
-    //print_s(s);
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        /**/
-        int max = (info.dimen+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
-
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-        /**/
-
-
-
-        //std::cout << "paa\n";
-
-        //cout << info.rnd[info.rnd_index] << endl;
         A_start = info.rnd[info.rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         A_end = A_start + info.rnd[info.rnd_index++];
-        //std::cout << "A start  " << A_start << std::endl;
-        //std::cout << "A end  " << A_end << std::endl;
 
-        //cout << info.rnd[info.rnd_index] << endl;
         B_start = info.rnd[info.rnd_index++];
-        //cout << info.rnd[info.rnd_index] << endl;
         B_end = B_start + info.rnd[info.rnd_index++];
-        //std::cout << "B start  " << B_start << std::endl;
-        //std::cout << "B end  " << B_end << std::endl;
     }
     
-    //cout << "A_end  " << A_end << endl << "B_end  " << B_end << endl;
-
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -491,9 +430,6 @@ std::vector<int> perturb(tSolution * solut, tInfo & info) {
         reinsert(s, A_start, A_end-1, B_end);
         reinsert(s, B_start, B_end-1, A_end);
     }
-
-    //print_s(s);
-    //subseq_load(solut, info);
 
     return s;
 }
@@ -506,8 +442,7 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
     tSolution solut_best = Solution_init(info);
 
     for(int i = 0; i < Imax; ++i){
-        /**/ int aux = (unsigned)rand() % TABLE_SZ;
-        aux = info.rnd[info.rnd_index++];
+        int aux = info.rnd[info.rnd_index++];
 
         double alpha = R_table(aux);
 
@@ -516,46 +451,30 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
 
 
         solut_crnt.s = construct(alpha, info);
-        //print_s(solut_crnt.s);
         subseq_load(solut_crnt, info);
 
-        //solut_partial = solut_crnt;
         Solution_cpy(solut_crnt, solut_partial, info);
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
 
         int iterILS = 0;
-        //int k = 0;
         while (iterILS < Iils) {
-            //k++;
             RVND(solut_crnt, info);
             if(solut_crnt.cost < solut_partial.cost - DBL_EPSILON){
                 Solution_cpy(solut_crnt, solut_partial, info);
-                //solut_partial = solut_crnt;
                 iterILS = 0;
             }
 
             solut_crnt.s = perturb(&solut_partial, info);
             subseq_load(solut_crnt, info);
-            //exit(0);
-            //std::cout << "ITER  " << iterILS << std::endl;
             iterILS++;
         }
 
-        //subseq_load(solut_partial, info);
-
         if (solut_partial.cost < solut_best.cost - DBL_EPSILON) {
             Solution_cpy(solut_partial, solut_best, info);
-            //solut_best = solut_partial;
         }
 
-        //after(7);
-
-        //std::cout << "\tCurrent search cost: "<< cost_sl << std::endl;
         std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
-        //std::cout << "\tCurrent search time: "<< search_t / 10e5<< std::endl;
-        //std::cout << "\tCurrent search time average: "<< (search_t_average / (i+1)) / 10e5 << std::endl;
-        //std::cout << k << "  Iteracoes " << std::endl;
 
         std::cout << "SOLUCAO: ";
         for(int i = 0; i < solut_best.s.size(); i++){
@@ -564,7 +483,6 @@ void GILS_RVND(int Imax, int Iils, tInfo & info) {
         std::cout << std::endl;
 
     }
-    //std::cout << "Dimension: " << dimension << std::endl;
     printf("COST: %.2lf\n", solut_best.cost);
 }
 
@@ -577,27 +495,13 @@ int main(int argc, char **argv){
     info.W = 1;
     info.C = 2;
 
-
     std::vector<int> rnd;
 
     info.dimen = loadData(&info.cost, rnd);
     info.rnd = rnd;
-    //print_s(rnd);
     info.rnd_index = 0;
 
     tSolution solut = Solution_init(info);
-
-    /*
-    for (int i = 0; i <=n; i++) {
-        for (int j = i+1; j <=n; j++) {
-            std::cout << matrix[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    */
-
-
-    srand(clock());
 
     Iils = info.dimen < 100 ? info.dimen : 100;
     auto t1 = high_resolution_clock::now();
@@ -608,34 +512,6 @@ int main(int argc, char **argv){
     double res = (double)duration / 10e2;
     std::cout << "TIME: " << res << std::endl;
 
-    /*
-    flag = true;
-
-    srand(duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
-    readData(argc, argv, &dimension, &c);
-
-    int ar[] = {100, dimension};
-    
-    Iils = ar[dimension < 100];
-
-    auto t1 = high_resolution_clock::now();
-
-    GILS_RVND(Imax, Iils);
-
-    auto t2 = high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
-    double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
-
-    if(flag){
-        std::cout << "Construction time: " << construct_t/10e5 << std::endl;
-        std::cout << "Swap time: " << swap_t/10e5 << std::endl;
-        std::cout << "two_opt time: " << two_opt_t/10e5 << std::endl;
-        std::cout << "reinsertion time: " << reinsertion_t/10e5 << std::endl;
-        std::cout << "or_opt2 time: " << opt2_t/10e5 << std::endl;
-        std::cout << "or_opt3 time: " << opt3_t /10e5<< std::endl;
-    }
-    */
     return 0;
 }
 
