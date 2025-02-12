@@ -1,5 +1,4 @@
 mod data;
-extern crate rand;
 
 use rand::Rng;
 use std::time::Instant;
@@ -95,11 +94,13 @@ fn construction(alpha: f64, rnd: &mut Rnd, data: &Data) -> Vec<usize> {
     }
 
     let mut r: usize = 0;
+
     while c_list.is_empty() == false {
         sort(&mut c_list, r, data);
 
         let index = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
+
         let c = c_list[index];
         r = c;
         c_list.remove(index);
@@ -337,7 +338,7 @@ fn RVND(solut: &mut tSolution, rnd: &mut Rnd, data: &Data) {
         Moves::OR_OPT_3(3),
     ];
     let mut improv_flag: bool;
-
+  
     while neighbd_list.is_empty() == false {
         let index: usize = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
@@ -369,11 +370,6 @@ fn RVND(solut: &mut tSolution, rnd: &mut Rnd, data: &Data) {
 
 fn perturb(sl: &Vec<usize>, rnd: &mut Rnd) -> Vec<usize> {
     let mut rng = rand::thread_rng();
-    let mut s = sl.clone();
-    let mut A_start: usize = 1;
-    let mut A_end: usize = 1;
-    let mut B_start: usize = 1;
-    let mut B_end: usize = 1;
 
     let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {
         (s.len() as f64 / 10.0) as usize
@@ -404,7 +400,6 @@ fn perturb(sl: &Vec<usize>, rnd: &mut Rnd) -> Vec<usize> {
         rnd.rnd_index += 1;
         B_end = B_start + rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
-
     }
 
     if A_start < B_start {

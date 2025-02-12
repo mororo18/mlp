@@ -12,8 +12,6 @@ class GILS_RVND {
                                         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25};
     private final int               R_size = 26;
 
-    Random rand;
-
     tInfo info;
 
     GILS_RVND(){
@@ -33,7 +31,6 @@ class GILS_RVND {
 
         Iils = (dimension < 100 ? dimension : 100);
 
-        rand = new Random();
     }
 
     private void subseq_load(tSolution solut, tInfo info){
@@ -103,9 +100,8 @@ class GILS_RVND {
 
             int range = (int)(((double)cList.size()) * alpha)+1;
 
-            int c = cList.get(rand.nextInt(range));
             int index = info.rndCrnt();
-            c = cList.get(index);
+            int c = cList.get(index);
 
             s.add(c);
             cList.remove(Integer.valueOf(c));
@@ -338,10 +334,8 @@ class GILS_RVND {
 
         while(!neighbd_list.isEmpty()){
             
-            int i_rand = rand.nextInt(neighbd_list.size());
-            i_rand = info.rndCrnt();
+            int i_rand = info.rndCrnt();
             int neighbd = neighbd_list.get(i_rand);
-
             
             boolean improve = false;
 
@@ -377,19 +371,7 @@ class GILS_RVND {
         int A_start = 1, A_end = 1;
         int B_start = 1, B_end = 1;
 
-        int size_max = (int)Math.floor(sl.size()/10);
-        size_max = (size_max >= 2 ? size_max : 2);
-        int size_min = 2;
-
         while((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)){
-            int max = sl.size() - 1 - size_max;
-            A_start = rand.nextInt(max) + 1;
-            A_end = A_start + rand.nextInt(size_max - size_min + 1) + size_min;
-
-            B_start = rand.nextInt(max) + 1;
-            B_end = B_start + rand.nextInt(size_max - size_min + 1) + size_min;
-
-
 
             A_start = info.rndCrnt();
             A_end = A_start + info.rndCrnt();
@@ -415,10 +397,8 @@ class GILS_RVND {
         tSolution solut_partial = new tSolution(info.getDimen(), 0);
 
         for(int i = 0; i < Imax; i++){
-            double alpha = R[rand.nextInt(R_size)];
             int index = info.rndCrnt();
-
-            alpha = R[index];
+            double alpha = R[index];
 
             System.out.print("[+] Local Search ");
             System.out.println(i+1);
