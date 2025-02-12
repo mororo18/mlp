@@ -1,28 +1,29 @@
-use std::process::exit;
 use std::fs;
-use std::vec;
 use std::fs::File;
 use std::io::prelude::*;
+use std::process::exit;
+use std::vec;
 
 fn print_type_of<T>(_: &T) {
-        println!("{}", std::any::type_name::<T>())
+    println!("{}", std::any::type_name::<T>())
 }
 
-pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize>) {
+pub fn load(dimension: &mut usize, c: &mut Vec<Vec<f64>>, rnd: &mut Vec<usize>) {
     let filename = "../distance_matrix";
 
-    let contents = fs::read_to_string(filename)
-        .expect("Something went wrong reading the file");
+    let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
     let mut line_i = 0;
 
-    let mut lines : Vec<String> = vec![];
+    let mut lines: Vec<String> = vec![];
     for l in contents.lines() {
         lines.push(l.to_string());
     }
 
     *dimension = lines[line_i].parse::<usize>().unwrap();
-    for k in 0..*dimension {c.push(vec![0.0; *dimension]);}
+    for k in 0..*dimension {
+        c.push(vec![0.0; *dimension]);
+    }
     line_i += 1;
 
     for l_i in 0..*dimension {
@@ -39,7 +40,6 @@ pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize
             n = iter.next();
             j += 1;
         }
-
     }
 
     line_i += 2;
@@ -50,5 +50,4 @@ pub fn load(dimension : &mut usize, c : &mut Vec<Vec<f64>>, rnd : &mut Vec<usize
         rnd.push(lines[line_i].parse::<usize>().unwrap());
         line_i += 1;
     }
-
 }

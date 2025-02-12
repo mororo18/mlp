@@ -24,11 +24,11 @@ struct Rnd {
 
 #[derive(Debug, Clone)]
 enum Moves {
-    SWAP(usize),
-    REINSERTION(usize),
-    OR_OPT_2(usize),
-    OR_OPT_3(usize),
-    TWO_OPT(usize),
+    SWAP = 0,
+    REINSERTION = 1,
+    OR_OPT_2 = 2,
+    OR_OPT_3 = 3,
+    TWO_OPT = 4,
 }
 
 #[derive(Debug, Clone)]
@@ -330,11 +330,11 @@ fn search_reinsertion(solut: &mut tSolution, opt: usize, data: &Data) -> bool {
 
 fn RVND(solut: &mut tSolution, rnd: &mut Rnd, data: &Data) {
     let mut neighbd_list: Vec<Moves> = vec![
-        Moves::SWAP(0),
-        Moves::TWO_OPT(4),
-        Moves::REINSERTION(1),
-        Moves::OR_OPT_2(2),
-        Moves::OR_OPT_3(3),
+        Moves::SWAP,
+        Moves::TWO_OPT,
+        Moves::REINSERTION,
+        Moves::OR_OPT_2,
+        Moves::OR_OPT_3,
     ];
     let mut improv_flag: bool;
 
@@ -345,25 +345,24 @@ fn RVND(solut: &mut tSolution, rnd: &mut Rnd, data: &Data) {
         let neighbd: &Moves = &neighbd_list[index];
 
         improv_flag = match *neighbd {
-            Moves::SWAP(_) => search_swap(solut, data),
-            Moves::TWO_OPT(_) => search_two_opt(solut, data),
-            Moves::OR_OPT_2(opt) => search_reinsertion(solut, opt, data),
-            Moves::OR_OPT_3(opt) => search_reinsertion(solut, opt, data),
-            Moves::REINSERTION(opt) => search_reinsertion(solut, opt, data),
+            Moves::SWAP => search_swap(solut, data),
+            Moves::TWO_OPT => search_two_opt(solut, data),
+            Moves::OR_OPT_2 => search_reinsertion(solut, Moves::OR_OPT_2 as usize, data),
+            Moves::OR_OPT_3 => search_reinsertion(solut, Moves::OR_OPT_3 as usize, data),
+            Moves::REINSERTION => search_reinsertion(solut, Moves::REINSERTION as usize, data),
         };
 
         if improv_flag {
             neighbd_list = vec![
-                Moves::SWAP(0),
-                Moves::TWO_OPT(4),
-                Moves::REINSERTION(1),
-                Moves::OR_OPT_2(2),
-                Moves::OR_OPT_3(3),
+                Moves::SWAP,
+                Moves::TWO_OPT,
+                Moves::REINSERTION,
+                Moves::OR_OPT_2,
+                Moves::OR_OPT_3,
             ];
         } else {
             neighbd_list.remove(index);
         }
-
     }
 }
 
@@ -419,7 +418,7 @@ fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data)
     for _i in 0..Imax {
         let _r_value = rnd.rnd[rnd.rnd_index];
         rnd.rnd_index += 1;
-        
+
         println!("[+] Local Search {}", _i);
         solut_crnt.s = construction(rnd, data);
         println!("{:?}", solut_crnt.s);
@@ -436,14 +435,12 @@ fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data)
                 solut_partial.s = solut_crnt.s.clone();
                 solut_partial.cost = solut_crnt.cost;
                 iterILS = 0;
-
             }
 
             solut_crnt.s = perturb(&solut_partial.s, rnd);
             update_subseq_info_matrix(&mut solut_crnt, data);
             iterILS += 1;
         }
-
 
         if solut_partial.cost < solut_best.cost {
             solut_best.s = solut_partial.s.clone();
@@ -455,10 +452,6 @@ fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data)
 
     println!("{:?}", solut_best.s);
     println!("COST: {}", solut_best.cost);
-}
-
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
 }
 
 fn main() {
@@ -479,8 +472,6 @@ fn main() {
         rnd_index: 0,
     };
 
-    println!("TEST");
-
     let Imax = 10;
     let Iils = if dimension < 100 { dimension } else { 100 };
 
@@ -495,5 +486,4 @@ fn main() {
 
     let new_now = Instant::now();
     println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
-
 }
