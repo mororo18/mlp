@@ -64,10 +64,7 @@ function construction(alpha, data) {
     var r = 0;
     while (cList.length > 0) {
         sort(cList, r, data);
-
-        var a = Math.random()*(cList.length)*alpha;
-        var i = parseInt(a);
-        i = data.rnd[data.rnd_index++];
+        var i = data.rnd[data.rnd_index++];
         var c = cList.splice(i, 1);
         c = c[0];
         s.push(c);
@@ -308,24 +305,12 @@ function RVND(solut, info, data) {
     const OR_OPT_3    = 3;
     const TWO_OPT     = 4;
 
-    //neighbd_list = [TWO_OPT];//, OR_OPT_2, OR_OPT_3, TWO_OPT];
     neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
-    /*
-    var s = Array.from({length: data.dimension}, (_, i) => i);
-    s[data.dimension] = 0;
-    console.log(s);
-
-    update_subseq_info_matrix(s, subseq, info);
-    console.log(subseq[0][data.dimension][info.C]);
-    */
     var improve = false;
 
-    //console.log("opa");
     while (neighbd_list.length > 0) {
-        let i = parseInt(Math.random() * neighbd_list.length);
-        i = data.rnd[data.rnd_index++];
+        let i = data.rnd[data.rnd_index++];
         let neighbd = neighbd_list[i];
-        //console.log("Current cost: ", subseq[0][data.dimension][info.C]);
 
         switch (neighbd) {
             case SWAP:
@@ -348,15 +333,9 @@ function RVND(solut, info, data) {
         if (improve) {
             neighbd_list = [SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3];
         } else {
-            //console.log(neighbd_list);
             neighbd_list.splice(i, 1);
-            //console.log(neighbd_list);
-            //process.exit();
         }
     }
-    //process.exit();
-    //console.log(s, subseq[0][data.dimension][info.C]);
-
 }
 
 function perturb(sl, data) {
@@ -365,19 +344,7 @@ function perturb(sl, data) {
     var A_start = 1, A_end = 1;
     var B_start = 1, B_end = 1;
 
-    var size_max = parseInt(Math.floor(sl.length/10));
-    size_max = (size_max >= 2 ? size_max : 2);
-    var size_min = 2;
-
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        var max = sl.length - 1 - size_max;
-        A_start = parseInt(Math.random()*max) + 1;
-        A_end = A_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
-
-        B_start = parseInt(Math.random()*max) + 1;
-        B_end = B_start + parseInt(Math.random() * (size_max - size_min + 1)) + size_min;
-
-
         A_start = data.rnd[data.rnd_index++];
         A_end = A_start + data.rnd[data.rnd_index++];
 
@@ -419,8 +386,7 @@ function GILS_RVND(Iils, Imax, R, info, data) {
         cost : Number.MAX_VALUE};
 
     for (var i = 0; i < Imax; i++) {
-        var alpha = R[parseInt(Math.random() * 26)];
-        alpha = R[data.rnd[data.rnd_index++]];
+        var alpha = R[data.rnd[data.rnd_index++]];
         console.log("[+] Local Search ", i+1);
         console.log("\t[+] Constructing Inital Solution..");
         solut_crnt.s = construction(alpha, data);
@@ -428,8 +394,7 @@ function GILS_RVND(Iils, Imax, R, info, data) {
 
         solut_partial.s = [...solut_crnt.s];
         solut_partial.cost = solut_crnt.cost;
-
-        //var rvnd_cost_best = subseq[0][data.dimension][info.C] - Number.EPSILON;
+      
         console.log("Construction cost", solut_partial.cost);
         var iterILS = 0;
 
@@ -448,10 +413,6 @@ function GILS_RVND(Iils, Imax, R, info, data) {
             iterILS++;
         }
 
-
-        //update_subseq_info_matrix(sl, subseq, info);
-        //var sl_cost = subseq[0][data.dimension][info.C] - Number.EPSILON;
-
         if (solut_partial.cost < solut_best.cost) {
             solut_best.s = [...solut_partial.s];
             solut_best.cost = solut_partial.cost;
@@ -462,7 +423,6 @@ function GILS_RVND(Iils, Imax, R, info, data) {
     }
 
     console.log("COST: ", solut_best.cost);
-    //console.log("\tRVND ITER ", ITER);
 }
 
 function main() {
@@ -478,14 +438,6 @@ function main() {
     const Imax = 10;
     const R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21,0.22, 0.23, 0.24, 0.25];
 
-    /*
-    s = [];
-    for (var i = 0; i < dimension+1; i++) {
-        s[i] = i;
-    }
-    s[dimension] = 0;
-    */
-
     var data = {
         c : c,
         rnd : rnd,
@@ -499,10 +451,6 @@ function main() {
         C : 1, 
         W : 2, 
     };
-
-
-    //console.log(rnd);
-    //process.exit(0);
 
     var start = new Date();
     GILS_RVND(Iils, Imax, R, info, data);
