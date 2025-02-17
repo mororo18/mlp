@@ -1,4 +1,3 @@
-1;
 mainn()
 
 function print_s(s)
@@ -75,13 +74,8 @@ function [ret, index_new] = construction(alpha, info)
     while (size_cL > 0) 
         cL = sort(cL, r, info);
 
-        rng = ceil(size_cL * alpha);
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        index = ceil(rng * RND);
         
         index = info.rnd(info.rnd_index) + 1;
-        %info.rnd(info.rnd_index);
         info.rnd_index = info.rnd_index+1;
 
         cN = cL(index);
@@ -229,10 +223,8 @@ function [solut_new, ret] = search_two_opt(solut, info)
     end
 
     if (cost_best < solut.cost - eps)
-        %cost_best
         solut.s = reverse(solut.s, I_best, J_best);
         solut = subseq_load(solut, info);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -298,10 +290,8 @@ function [solut_new, ret] = search_reinsertion(solut, info, opt)
     end
 
     if (cost_best < solut.cost)
-        %cost_best
         solut.s = reinsert(solut.s, I_best, J_best, POS_best+1);
         solut = subseq_load(solut, info);
-        %solut.cost
         solut_new = solut;
         ret = true;
     else
@@ -315,10 +305,6 @@ function [s, cost, index_new] = RVND(solut, info)
 
     neighbd_list = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3];
     while (isempty(neighbd_list) == false)
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(RND*columns(neighbd_list));
-        %info.rnd(info.rnd_index);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
 
@@ -351,47 +337,22 @@ function [s, cost, index_new] = RVND(solut, info)
     index_new = info.rnd_index;
 end
 
-function ret = notnull_rnd()
-    RND = rand(1);
-    %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-    ret = RND;
-end
-
 function [ret, index_new] = perturb(solut, info)
     A_start = 1;
     A_end = 1;
     B_start = 1;
     B_end = 1;
 
-    size_max = ceil((info.dimen+1) / 10);
-    %size_max = [2, size_max]((size_max >= 2) + 1);
-    size_min = 2;
-
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end))
-        max_ = (info.dimen+1) -2 -size_max;
-        rnd = notnull_rnd();
-        A_start = ceil(max_ * rnd) + 1;
-        rnd = notnull_rnd();
-        A_end = A_start + ceil(((size_max-size_min) * rnd) + size_min);
-
-        rnd = notnull_rnd();
-        B_start = ceil(max_ * rnd) + 1;
-        rnd = notnull_rnd();
-        B_end = B_start + ceil(((size_max-size_min) * rnd) + size_min);
-
 
         A_start = info.rnd(info.rnd_index) + 1;
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         A_end = A_start + info.rnd(info.rnd_index);
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
 
         B_start = info.rnd(info.rnd_index) + 1;
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
         B_end = B_start + info.rnd(info.rnd_index);
-        %info.rnd(info.rnd_index)
         info.rnd_index = info.rnd_index + 1;
     end
 
@@ -421,16 +382,12 @@ function ret = GILS_RVND(Imax, Iils, R, info)
     solut_best = solut_init(info);
 
     for i = 1:Imax
-        RND = rand(1);
-        %RND = [RND, RND+0.0000000001]((RND < 0.0000000001) + 1);
-        %index = ceil(columns(R) * RND);
         index = info.rnd(info.rnd_index) + 1;
         info.rnd_index = info.rnd_index + 1;
         alpha = R(index);
 
         fprintf("[+] Search %d\n", i)
         fprintf("\t[+] Constructing..\n");
-        %"ITER ", i
 
         [solut_crnt.s, info.rnd_index] = construction(alpha, info);
         solut_crnt = subseq_load(solut_crnt, info);
@@ -461,7 +418,6 @@ function ret = GILS_RVND(Imax, Iils, R, info)
         fprintf("\tCurrent best cost: %.2f\n", solut_best.cost)
         fprintf('SOLUCAO: ')
         print_s(solut_best.s)
-        %typeinfo(solut_crnt.s)
     end
 
     fprintf('COST: %.2f\n', solut_best.cost)
@@ -482,20 +438,6 @@ function mainn
     info.SWAP = 4;
     info.TWO_OPT = 5;
     info.rnd_index = 1;
-
-   %for i = 1:info.dimen
-   %    sol.s(i) = i;
-   %end
-   %sol.s(info.dimen+1) = 1;
-   %sol.cost = 0;
-   %sol.seq = zeros(info.dimen+1, info.dimen+1, 3);
-   %sol = subseq_load(sol, info);
-
-   %sol.seq(1, info.dimen+1, info.C);
-   %s = construction(0.1, info);
-   %%s(2:7)
-   %%s(2:7) = flip(s(2:7))
-   %s = reinsert(s, 6, 11, 2);
 
     Imax = 10;
     Iils = 100;
