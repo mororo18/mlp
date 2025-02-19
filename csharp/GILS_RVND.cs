@@ -73,7 +73,7 @@ namespace MLP {
 
         }
 
-        private void subseq_load(List<int> s, double [][][] seq){
+        private void update_subseq_info_matrix(List<int> s, double [][][] seq){
             for(int i = 0; i < dimension+1; i++){
                 int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -214,7 +214,7 @@ namespace MLP {
 
             if(cost_best < seq[0][ dimension][ C] - EPSILON){
                 swap(s, I, J);
-                subseq_load(s, seq);
+                update_subseq_info_matrix(s, seq);
                 improv_flag = true;
             }
         }
@@ -254,7 +254,7 @@ namespace MLP {
 
             if(cost_best < seq[0][ dimension][ C] - EPSILON){
                 reverse(s, I, J);
-                subseq_load(s, seq);
+                update_subseq_info_matrix(s, seq);
                 improv_flag = true;
             }
         }
@@ -316,7 +316,7 @@ namespace MLP {
 
             if(cost_best < seq[0][ dimension][ C] - EPSILON){
                 reinsert(s, I, J, POS+1);
-                subseq_load(s, seq);
+                update_subseq_info_matrix(s, seq);
                 improv_flag = true;
             }
 
@@ -403,7 +403,7 @@ namespace MLP {
 
                 var sl = new List<int>(s);
 
-                subseq_load(s, subseq);
+                update_subseq_info_matrix(s, subseq);
 
                 double rvnd_cost_best = subseq[0][ dimension][ C] - EPSILON;
                 double rvnd_cost_crnt;
@@ -420,10 +420,10 @@ namespace MLP {
                     }
 
                     s = perturb(sl);
-                    subseq_load(s, subseq);
+                    update_subseq_info_matrix(s, subseq);
                     iterILS++;
                 }
-                subseq_load(sl, subseq);
+                update_subseq_info_matrix(sl, subseq);
                 double sl_cost = subseq[0][ dimension][ C] - EPSILON;
 
                 if(sl_cost < cost_best){
@@ -440,7 +440,7 @@ namespace MLP {
             Console.WriteLine("or_opt2: " + t_or_opt2/10e6);
             Console.WriteLine("or_opt3: " + t_or_opt3/10e6);
             Console.WriteLine("reinseriton: " + t_reinsertion/10e6);
-            Console.WriteLine("subseq_load: " + t_subseq/10e6);
+            Console.WriteLine("update_subseq_info_matrix: " + t_subseq/10e6);
         }
     }
 }
