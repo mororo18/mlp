@@ -44,7 +44,6 @@ typedef struct tData {
 
 typedef struct tSolution {
     std::vector<int> s;
-    //tSeqInfo ** seq;
     double *** seq;
     double cost;
 } tSolution;
@@ -61,13 +60,6 @@ tSolution Solution_init(tData data) {
         }
     }
 
-    /*
-    solut.seq = new tSeqInfo * [data.dimen+1];
-    for (int i = 0; i < data.dimen+1; i++) {
-        solut.seq[i] = new tSeqInfo [data.dimen+1];
-        memset(solut.seq[i], 0.0, (data.dimen+1)*sizeof(tSeqInfo));
-    }
-    */
 
     solut.cost = DBL_MAX;
 
@@ -78,15 +70,6 @@ inline void Solution_cpy( tSolution & src, tSolution & tgt, const tData & data) 
 
     tgt.s = src.s;
     tgt.cost = src.cost;
-
-    /*
-    for (int i = 0; i < data.dimen+1; i++) {
-        for (int j = 0; j < data.dimen+1; j++) {
-            //memcpy(tgt.seq[i][j], src.seq[i][j], 3 * sizeof(double));
-            std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
-        }
-    }
-    */
 
 }
 
