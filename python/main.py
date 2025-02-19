@@ -2,11 +2,7 @@
 
 import time
 from read import *
-from random import randint
-import math
-import sys
-#import matplotlib.pyplot as plt 
-from typing import List, NoReturn
+from typing import List
 
 Matrix = List[List[float]]
 
@@ -69,13 +65,13 @@ def subseq_fill(data : tData) -> List[List[List[float]]]:
 
     return arr
 
-def quicksort(arr, left, right, data : tData, r):
+def quicksort(arr, left, right, data : tData, r) -> None:
     if left < right:
         pivot = partition(arr, left, right, data, r)
         quicksort(arr, left, pivot - 1, data, r)
         quicksort(arr, pivot + 1, right, data, r)
 
-def partition(arr, left, right, data : tData, r):
+def partition(arr, left, right, data : tData, r) -> int:
     pivot = arr[right]
     i = left - 1
     for j in range(left, right):
@@ -85,7 +81,7 @@ def partition(arr, left, right, data : tData, r):
     arr[i + 1], arr[right] = arr[right], arr[i + 1]
     return i + 1
 
-def sort(arr, r, data : tData):
+def sort(arr, r, data : tData) -> None:
     quicksort(arr, 0, len(arr) - 1, data, r)
 
 def construction(alpha : float, data : tData) -> List[int]:
@@ -94,13 +90,8 @@ def construction(alpha : float, data : tData) -> List[int]:
 
     r = 0
     while len(c_list) > 0:
-
-        i = int(len(c_list)*alpha) + 1
-
         sort(c_list, r, data)
-
-        c = c_list[randint(0, i-1)]
-
+        
         r_value = data.rnd[data.rnd_index]
         data.rnd_index += 1
 
@@ -114,7 +105,7 @@ def construction(alpha : float, data : tData) -> List[int]:
 
     return s
 
-def update_subseq_info_matrix(solut : tSolution, data : tData) -> NoReturn:
+def update_subseq_info_matrix(solut : tSolution, data : tData) -> None:
     for i in range(0, data.dimen+1):
         k : int = 1 - i - int(not i)
 
@@ -131,13 +122,13 @@ def update_subseq_info_matrix(solut : tSolution, data : tData) -> NoReturn:
 
     solut.cost = solut.seq[0][data.dimen][tInfo.C] - tData.EPSILON
 
-def swap(s : List[int], i : int, j : int) -> NoReturn:
+def swap(s : List[int], i : int, j : int) -> None:
     s[i], s[j] = s[j], s[i]
 
-def reverse(s : List[int], i : int, j : int) -> NoReturn:
+def reverse(s : List[int], i : int, j : int) -> None:
     s[i:j+1] = s[i:j+1][::-1]
 
-def reinsert(s : List[int], i : int, j : int, pos : int) -> NoReturn:
+def reinsert(s : List[int], i : int, j : int, pos : int) -> None:
     if i < pos:
         s[pos:pos] = s[i:j+1]
         s[:] = s[:i] + s[j+1:]
@@ -239,57 +230,22 @@ def search_two_opt(solut : tSolution, data : tData) -> bool:
 
     return False
 
-"""
-Movimento avalido me maneira incorreta (nesse caso). Os que presenciei aparentavam realizar a avaliacao de maneira correta
-[0, 7, 8, 10, 12, 6, 5, 4, 1, 2, 3, 11, 13, 9, 0]
-[0, 7, 8, 10, 12, 6, 11, 5, 4, 1, 2, 3, 13, 9, 0]
-
-reinsertion 1
-15752.0
-24694.0
-11 11 5
-"""
-
-# TODO (EUEU) testar acessando as infos das estruturas pelo 1o indice do array3D. Ex: seq[C][...
-
-#def search_reinsertion(solut , info , opt , seq ) :
 def search_reinsertion(solut : tSolution, data : tData, opt : int, seq : List[List[List[float]]]) -> bool:
-    """
-    cost_concat_1 : float
-    cost_concat_2 : float
-    cost_concat_3 : float
-    cost_new : float
-    """
-
     cost_best : float = float('inf')
-    #cost_best : float = float('inf')
 
-    """
-    I : int 
-    J : int 
-    POS : int
-    MAX : int = info.dimen - opt 
-    """
     I = -1
     J  = -1 
     POS  = -1
     MAX = data.dimen - opt 
 
-
-    #seq = solut.seq
-
     for i in range(1, MAX + 1):
         j  = opt + i - 1
-        #j : int = opt + i - 1
 
         j_next  = j+1
         i_prev  = i-1
-       #j_next : int = j+1
-       #i_prev : int = i-1
 
         for k in range(0, i_prev):
             k_next  = k+1
-            #k_next : int = k+1
 
 
             cost_concat_1 =                 seq[0]     [k]     [tInfo.T] + data.cost[solut.s[k]]     [solut.s[i]]
@@ -336,17 +292,13 @@ def search_reinsertion(solut : tSolution, data : tData, opt : int, seq : List[Li
 
     return False
 
-def RVND(solut : tSolution, data : tData) -> NoReturn:
+def RVND(solut : tSolution, data : tData) -> None:
 
     neighbd_list : List[int] = [tInfo.SWAP, tInfo.TWO_OPT, tInfo.REINSERTION, tInfo.OR_OPT_2, tInfo.OR_OPT_3]
 
     while len(neighbd_list) > 0:
-        ##
-        i = randint(0, len(neighbd_list)-1)
-        ##
         i = data.rnd[data.rnd_index]
         data.rnd_index += 1
-
 
         neighbd = neighbd_list[i]
 
@@ -375,18 +327,7 @@ def perturb(sl : List[int], data : tData) -> List[int]:
     A_start, A_end = 1, 1
     B_start, B_end = 1, 1
 
-    size_max = math.floor(len(s)/10) if math.floor(len(s)/10) >= 2 else 2
-    size_min = 2
-
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end):
-        ##
-        A_start = randint(1, len(s) - 1 - size_max)
-        A_end = A_start + randint(size_min, size_max)
-
-        B_start = randint(1, len(s) - 1 - size_max)
-        B_end = B_start + randint(size_min, size_max)
-        ##
-
         A_start = data.rnd[data.rnd_index]
         data.rnd_index += 1
         A_end = A_start + data.rnd[data.rnd_index]
@@ -406,19 +347,14 @@ def perturb(sl : List[int], data : tData) -> List[int]:
 
     return s
 
-def GILS_RVND(Imax : int, Iils : int, R : List[float], data : tData) -> NoReturn:
+def GILS_RVND(Imax : int, Iils : int, R : List[float], data : tData) -> None:
 
     solut_partial : tSolution = tSolution([0 for i in range(data.dimen+1)], subseq_fill(data), 0.0)
     solut_crnt : tSolution = tSolution([0 for i in range(data.dimen+1)], subseq_fill(data), 0.0)
     solut_best : tSolution = tSolution([0 for i in range(data.dimen+1)], subseq_fill(data), float('inf'))
 
     for i in range(Imax):
-        ##
-        alpha : float = R[randint(0, len(R)-1)]
-        ##
-
         r_value = data.rnd[data.rnd_index]
-        print(r_value)
         data.rnd_index += 1
 
         alpha : float = R[r_value]
@@ -434,7 +370,6 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], data : tData) -> NoReturn
         print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
-            #print("ILS")
             RVND(solut_crnt, data)
 
             if solut_crnt.cost < solut_partial.cost:
@@ -442,9 +377,7 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], data : tData) -> NoReturn
                 solut_partial.cost = solut_crnt.cost
                 iterILS = 0
 
-            #t_perturb -= time.time()
             solut_crnt.s = perturb(solut_partial.s, data)
-            #t_perturb += time.time()
             update_subseq_info_matrix(solut_crnt, data)
             iterILS += 1
 
@@ -459,7 +392,7 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], data : tData) -> NoReturn
     print("COST: {}".format (solut_best.cost))
     print("SOLUTION: {}".format(solut_best.s))
 
-def main() -> NoReturn:
+def main() -> None:
     dimension :int
     cost : Matrix
 
