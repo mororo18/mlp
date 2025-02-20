@@ -24,26 +24,29 @@ using std::chrono::high_resolution_clock;
 
 typedef unsigned uint;
 
-enum class Operator : int {
-    REINSERTION = 1,
-    OR_OPT_2 	,
-    OR_OPT_3 	,
-    SWAP 		,
-    TWO_OPT		
-};
-
 // 3D array
 typedef std::vector<std::vector<std::vector<double>>> tSubseq;
 
-typedef struct tData {
+typedef struct Data {
     double ** cost;
-    int dimen;
-    uint T;
-    uint C;
-    uint W;
     vector<int> rnd;
     uint rnd_index;
-} tData;
+    int dimen;
+} Data;
+
+enum class InfoIndex : int {
+    T = 0,
+    C,
+    W,
+};
+
+enum class Neighborhood : int {
+    REINSERTION = 1,
+    OR_OPT_2,
+    OR_OPT_3,
+    SWAP,
+    TWO_OPT		
+};
 
 typedef struct tSolution {
     std::vector<int> s;
@@ -51,7 +54,7 @@ typedef struct tSolution {
     double cost;
 } tSolution;
 
-tSolution Solution_init(tData data) {
+tSolution Solution_init(Data data) {
     tSolution solut;
     solut.s = vector<int>(data.dimen+1);
 
@@ -69,7 +72,7 @@ tSolution Solution_init(tData data) {
     return solut;
 }
 
-inline void Solution_cpy( tSolution & src, tSolution & tgt, const tData & data) {
+inline void Solution_cpy( tSolution & src, tSolution & tgt, const Data & data) {
 
     tgt.s = src.s;
     tgt.cost = src.cost;
@@ -89,7 +92,7 @@ void print_s(std::vector<int> s) {
     std::cout << std::endl;
 }
 
-int partition(std::vector<int>& arr, int left, int right, const tData& data, int r) {
+int partition(std::vector<int>& arr, int left, int right, const Data& data, int r) {
     int pivot = arr[right];
     int i = left - 1;
     for (int j = left; j < right; j++) {
@@ -102,7 +105,7 @@ int partition(std::vector<int>& arr, int left, int right, const tData& data, int
     return i + 1;
 }
 
-void quicksort(std::vector<int>& arr, int left, int right, const tData& data, int r) {
+void quicksort(std::vector<int>& arr, int left, int right, const Data& data, int r) {
     if (left < right) {
         int pivot = partition(arr, left, right, data, r);
         quicksort(arr, left, pivot - 1, data, r);
@@ -110,11 +113,11 @@ void quicksort(std::vector<int>& arr, int left, int right, const tData& data, in
     }
 }
 
-void sort(std::vector<int>& arr, int r, const tData& data) {
+void sort(std::vector<int>& arr, int r, const Data& data) {
     quicksort(arr, 0, arr.size() - 1, data, r);
 }
 
-std::vector<int> construct(const double alpha, tData & data){
+std::vector<int> construct(const double alpha, Data & data){
 
     std::vector<int> s = {0};
     s.reserve(data.dimen+1);
@@ -161,7 +164,7 @@ inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
 
 
 
-inline void update_subseq_info_matrix(tSolution & solut, const tData & data, int index = 0){
+inline void update_subseq_info_matrix(tSolution & solut, const Data & data, int index = 0){
     alignas(INT_SZ) int i, j, j_prev, k;
     alignas(INT_SZ) int from = index;
     alignas(1) bool t;
@@ -169,25 +172,25 @@ inline void update_subseq_info_matrix(tSolution & solut, const tData & data, int
         k = 1 - i - (!i);
         t = i == from;
 
-        solut.seq[i][i][data.T] = 0.0;
-        solut.seq[i][i][data.C] = 0.0;
-        solut.seq[i][i][data.W] = (double) !(i == 0);
+        solut.seq[i][i][static_cast<int>(InfoIndex::T)] = 0.0;
+        solut.seq[i][i][static_cast<int>(InfoIndex::C)] = 0.0;
+        solut.seq[i][i][static_cast<int>(InfoIndex::W)] = (double) !(i == 0);
 
         for (j = i+1; j < data.dimen+1; j++) {
             j_prev = j-1;
             
-            solut.seq[i][j][data.T] = data.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][data.T];
-            solut.seq[i][j][data.C] = solut.seq[i][j][data.T] + solut.seq[i][j_prev][data.C];
-            solut.seq[i][j][data.W] = j + k;
+            solut.seq[i][j][static_cast<int>(InfoIndex::T)] = data.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][static_cast<int>(InfoIndex::T)];
+            solut.seq[i][j][static_cast<int>(InfoIndex::C)] = solut.seq[i][j][static_cast<int>(InfoIndex::T)] + solut.seq[i][j_prev][static_cast<int>(InfoIndex::C)];
+            solut.seq[i][j][static_cast<int>(InfoIndex::W)] = j + k;
 
         }
         from += t;
     }
 
-    solut.cost = solut.seq[0][data.dimen][data.C];
+    solut.cost = solut.seq[0][data.dimen][static_cast<int>(InfoIndex::C)];
 }
 
-inline bool search_swap(tSolution & solut, const tData & data) {
+inline bool search_swap(tSolution & solut, const Data & data) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
     alignas(DBL_SZ) double cost_best = DBL_MAX;
@@ -200,12 +203,12 @@ inline bool search_swap(tSolution & solut, const tData & data) {
         i_next = i + 1;
 
         //consecutive nodes
-        cost_concat_1 =                 solut.seq[0][i_prev][data.T] + data.cost[solut.s[i_prev]][solut.s[i_next]];
-        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][data.T]  + data.cost[solut.s[i]][solut.s[i_next+1]];
+        cost_concat_1 =                 solut.seq[0][i_prev][static_cast<int>(InfoIndex::T)] + data.cost[solut.s[i_prev]][solut.s[i_next]];
+        cost_concat_2 = cost_concat_1 + solut.seq[i][i_next][static_cast<int>(InfoIndex::T)]  + data.cost[solut.s[i]][solut.s[i_next+1]];
 
-        cost_new = solut.seq[0][i_prev][data.C]                                                    +           //       1st subseq
-        solut.seq[i][i_next][data.W]               * (cost_concat_1) + data.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
-        solut.seq[i_next+1][data.dimen][data.W]   * (cost_concat_2) + solut.seq[i_next+1][data.dimen][data.C];   // concat 3rd subseq
+        cost_new = solut.seq[0][i_prev][static_cast<int>(InfoIndex::C)]                                                    +           //       1st subseq
+        solut.seq[i][i_next][static_cast<int>(InfoIndex::W)]               * (cost_concat_1) + data.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
+        solut.seq[i_next+1][data.dimen][static_cast<int>(InfoIndex::W)]   * (cost_concat_2) + solut.seq[i_next+1][data.dimen][static_cast<int>(InfoIndex::C)];   // concat 3rd subseq
 
         if (cost_new < cost_best) {
             cost_best = cost_new - DBL_EPSILON;
@@ -217,16 +220,16 @@ inline bool search_swap(tSolution & solut, const tData & data) {
             j_next = j + 1;
             j_prev = j - 1;
 
-            cost_concat_1 =                 solut.seq[0][i_prev][data.T]       + data.cost[solut.s[i_prev]][solut.s[j]];
+            cost_concat_1 =                 solut.seq[0][i_prev][static_cast<int>(InfoIndex::T)]       + data.cost[solut.s[i_prev]][solut.s[j]];
             cost_concat_2 = cost_concat_1                           + data.cost[solut.s[j]][solut.s[i_next]];
-            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][data.T]  + data.cost[solut.s[j_prev]][solut.s[i]];
+            cost_concat_3 = cost_concat_2 + solut.seq[i_next][j_prev][static_cast<int>(InfoIndex::T)]  + data.cost[solut.s[j_prev]][solut.s[i]];
             cost_concat_4 = cost_concat_3                           + data.cost[solut.s[i]][solut.s[j_next]];
 
-            cost_new = solut.seq[0][i_prev][data.C]                                                 +      // 1st subseq
+            cost_new = solut.seq[0][i_prev][static_cast<int>(InfoIndex::C)]                                                 +      // 1st subseq
             cost_concat_1 +                                                             // concat 2nd subseq (single node)
-            solut.seq[i_next][j_prev][data.W]      * cost_concat_2 + solut.seq[i_next][j_prev][data.C] +      // concat 3rd subseq
+            solut.seq[i_next][j_prev][static_cast<int>(InfoIndex::W)]      * cost_concat_2 + solut.seq[i_next][j_prev][static_cast<int>(InfoIndex::C)] +      // concat 3rd subseq
             cost_concat_3 +                                                             // concat 4th subseq (single node)
-            solut.seq[j_next][data.dimen][data.W] * cost_concat_4 + solut.seq[j_next][data.dimen][data.C];   // concat 5th subseq
+            solut.seq[j_next][data.dimen][static_cast<int>(InfoIndex::W)] * cost_concat_4 + solut.seq[j_next][data.dimen][static_cast<int>(InfoIndex::C)];   // concat 5th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -245,7 +248,7 @@ inline bool search_swap(tSolution & solut, const tData & data) {
     return false;
 }
 
-inline bool search_two_opt(tSolution & solut, const tData & data) {
+inline bool search_two_opt(tSolution & solut, const Data & data) {
     alignas(DBL_SZ) double cost_new, 
         cost_concat_1, cost_concat_2;
     alignas(DBL_SZ) double cost_best = DBL_MAX;// cost_l1, cost_l2;
@@ -257,19 +260,19 @@ inline bool search_two_opt(tSolution & solut, const tData & data) {
     for (i = 1; i < data.dimen-1; ++i) {
         i_prev = i - 1;
 
-        rev_seq_cost = solut.seq[i][i+1][data.T];
+        rev_seq_cost = solut.seq[i][i+1][static_cast<int>(InfoIndex::T)];
         for (j = i + 2; j < data.dimen; ++j) {
             j_next = j + 1;
 
 
-          rev_seq_cost += data.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][data.W]-1.0);
+          rev_seq_cost += data.cost[solut.s[j-1]][solut.s[j]] * (solut.seq[i][j][static_cast<int>(InfoIndex::W)]-1.0);
 
-          cost_concat_1 =                 solut.seq[0][i_prev][data.T]   + data.cost[solut.s[j]][solut.s[i_prev]];
-          cost_concat_2 = cost_concat_1 + solut.seq[i][j][data.T]        + data.cost[solut.s[j_next]][solut.s[i]];
+          cost_concat_1 =                 solut.seq[0][i_prev][static_cast<int>(InfoIndex::T)]   + data.cost[solut.s[j]][solut.s[i_prev]];
+          cost_concat_2 = cost_concat_1 + solut.seq[i][j][static_cast<int>(InfoIndex::T)]        + data.cost[solut.s[j_next]][solut.s[i]];
 
-          cost_new = solut.seq[0][i_prev][data.C]                                                        +   //  1st subseq
-              solut.seq[i][j][data.W]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
-              solut.seq[j_next][data.dimen][data.W] * cost_concat_2 + solut.seq[j_next][data.dimen][data.C];      // concat 3rd subseq
+          cost_new = solut.seq[0][i_prev][static_cast<int>(InfoIndex::C)]                                                        +   //  1st subseq
+              solut.seq[i][j][static_cast<int>(InfoIndex::W)]                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
+              solut.seq[j_next][data.dimen][static_cast<int>(InfoIndex::W)] * cost_concat_2 + solut.seq[j_next][data.dimen][static_cast<int>(InfoIndex::C)];      // concat 3rd subseq
 
             
             if (cost_new < cost_best) {
@@ -289,7 +292,7 @@ inline bool search_two_opt(tSolution & solut, const tData & data) {
     return false;
 }
 
-inline bool search_reinsertion(tSolution & solut, const tData & data, const int opt) {
+inline bool search_reinsertion(tSolution & solut, const Data & data, const int opt) {
     alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
     alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
     alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -305,14 +308,14 @@ inline bool search_reinsertion(tSolution & solut, const tData & data, const int 
         for(k = 0; k < i_prev; ++k){
             k_next = k+1;
 
-          cost_concat_1 =                 solut.seq[0][k][data.T]            + data.cost[solut.s[k]][solut.s[i]];
-          cost_concat_2 = cost_concat_1 + solut.seq[i][j][data.T]            + data.cost[solut.s[j]][solut.s[k_next]];
-          cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][data.T]  + data.cost[solut.s[i_prev]][solut.s[j_next]];
+          cost_concat_1 =                 solut.seq[0][k][static_cast<int>(InfoIndex::T)]            + data.cost[solut.s[k]][solut.s[i]];
+          cost_concat_2 = cost_concat_1 + solut.seq[i][j][static_cast<int>(InfoIndex::T)]            + data.cost[solut.s[j]][solut.s[k_next]];
+          cost_concat_3 = cost_concat_2 + solut.seq[k_next][i_prev][static_cast<int>(InfoIndex::T)]  + data.cost[solut.s[i_prev]][solut.s[j_next]];
 
-          cost_new = solut.seq[0][k][data.C]                                                                   +   //       1st subseq
-              solut.seq[i][j][data.W]               * cost_concat_1 + solut.seq[i][j][data.C]                  +   //  concat 2nd subseq (reinserted seq)
-              solut.seq[k_next][i_prev][data.W]     * cost_concat_2 + solut.seq[k_next][i_prev][data.C]        +   //  concat 3rd subseq
-              solut.seq[j_next][data.dimen][data.W] * cost_concat_3 + solut.seq[j_next][data.dimen][data.C];       // concat 4th subseq
+          cost_new = solut.seq[0][k][static_cast<int>(InfoIndex::C)]                                                                   +   //       1st subseq
+              solut.seq[i][j][static_cast<int>(InfoIndex::W)]               * cost_concat_1 + solut.seq[i][j][static_cast<int>(InfoIndex::C)]                  +   //  concat 2nd subseq (reinserted seq)
+              solut.seq[k_next][i_prev][static_cast<int>(InfoIndex::W)]     * cost_concat_2 + solut.seq[k_next][i_prev][static_cast<int>(InfoIndex::C)]        +   //  concat 3rd subseq
+              solut.seq[j_next][data.dimen][static_cast<int>(InfoIndex::W)] * cost_concat_3 + solut.seq[j_next][data.dimen][static_cast<int>(InfoIndex::C)];       // concat 4th subseq
 
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -325,14 +328,14 @@ inline bool search_reinsertion(tSolution & solut, const tData & data, const int 
         for (k = i + opt; k < data.dimen; ++k) {
             k_next = k + 1;
 
-          cost_concat_1 =                 solut.seq[0][i_prev][data.T]  + data.cost[solut.s[i_prev]][solut.s[j_next]];
-          cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][data.T]  + data.cost[solut.s[k]][solut.s[i]];
-          cost_concat_3 = cost_concat_2 + solut.seq[i][j][data.T]       + data.cost[solut.s[j]][solut.s[k_next]];
+          cost_concat_1 =                 solut.seq[0][i_prev][static_cast<int>(InfoIndex::T)]  + data.cost[solut.s[i_prev]][solut.s[j_next]];
+          cost_concat_2 = cost_concat_1 + solut.seq[j_next][k][static_cast<int>(InfoIndex::T)]  + data.cost[solut.s[k]][solut.s[i]];
+          cost_concat_3 = cost_concat_2 + solut.seq[i][j][static_cast<int>(InfoIndex::T)]       + data.cost[solut.s[j]][solut.s[k_next]];
 
-          cost_new = solut.seq[0][i_prev][data.C]                                                                  +   //       1st subseq
-                  solut.seq[j_next][k][data.W]          * cost_concat_1 + solut.seq[j_next][k][data.C]             +   // concat 2nd subseq
-                  solut.seq[i][j][data.W]               * cost_concat_2 + solut.seq[i][j][data.C]                  +   // concat 3rd subseq (reinserted seq)
-                  solut.seq[k_next][data.dimen][data.W] * cost_concat_3 + solut.seq[k_next][data.dimen][data.C];       // concat 4th subseq
+          cost_new = solut.seq[0][i_prev][static_cast<int>(InfoIndex::C)]                                                                  +   //       1st subseq
+                  solut.seq[j_next][k][static_cast<int>(InfoIndex::W)]          * cost_concat_1 + solut.seq[j_next][k][static_cast<int>(InfoIndex::C)]             +   // concat 2nd subseq
+                  solut.seq[i][j][static_cast<int>(InfoIndex::W)]               * cost_concat_2 + solut.seq[i][j][static_cast<int>(InfoIndex::C)]                  +   // concat 3rd subseq (reinserted seq)
+                  solut.seq[k_next][data.dimen][static_cast<int>(InfoIndex::W)] * cost_concat_3 + solut.seq[k_next][data.dimen][static_cast<int>(InfoIndex::C)];       // concat 4th subseq
           
             if (cost_new < cost_best) {
                 cost_best = cost_new - DBL_EPSILON;
@@ -353,18 +356,18 @@ inline bool search_reinsertion(tSolution & solut, const tData & data, const int 
 }
 
 
-void RVND(tSolution & solut, tData & data) {
+void RVND(tSolution & solut, Data & data) {
 
-    alignas(alignof(std::vector<Operator>)) std::vector<Operator> neighbd_list = {
-        Operator::SWAP, 
-        Operator::TWO_OPT, 
-        Operator::REINSERTION, 
-        Operator::OR_OPT_2, 
-        Operator::OR_OPT_3
+    alignas(alignof(std::vector<Neighborhood>)) std::vector<Neighborhood> neighbd_list = {
+        Neighborhood::SWAP, 
+        Neighborhood::TWO_OPT, 
+        Neighborhood::REINSERTION, 
+        Neighborhood::OR_OPT_2, 
+        Neighborhood::OR_OPT_3
     };
 
     alignas(INT_SZ) uint index;
-    alignas(INT_SZ) Operator neighbd;
+    alignas(INT_SZ) Neighborhood neighbd;
     bool improve_flag;
 
     while (!neighbd_list.empty()) {
@@ -375,30 +378,30 @@ void RVND(tSolution & solut, tData & data) {
         improve_flag = false;
 
         switch(neighbd){
-            case Operator::REINSERTION:
-                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::REINSERTION));
+            case Neighborhood::REINSERTION:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Neighborhood::REINSERTION));
                 break;				
-            case Operator::OR_OPT_2:
-                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::OR_OPT_2));
+            case Neighborhood::OR_OPT_2:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Neighborhood::OR_OPT_2));
                 break;				
-            case Operator::OR_OPT_3:
-                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::OR_OPT_3));
+            case Neighborhood::OR_OPT_3:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Neighborhood::OR_OPT_3));
                 break;				
-            case Operator::SWAP:
+            case Neighborhood::SWAP:
                 improve_flag = search_swap(solut, data);
                 break;
-            case Operator::TWO_OPT:
+            case Neighborhood::TWO_OPT:
                 improve_flag = search_two_opt(solut, data);
                 break;				
         }
 
         if (improve_flag) {
             neighbd_list = {
-                Operator::SWAP, 
-                Operator::TWO_OPT,
-                Operator::REINSERTION, 
-                Operator::OR_OPT_2, 
-                Operator::OR_OPT_3
+                Neighborhood::SWAP, 
+                Neighborhood::TWO_OPT,
+                Neighborhood::REINSERTION, 
+                Neighborhood::OR_OPT_2, 
+                Neighborhood::OR_OPT_3
             };
         } else {
             neighbd_list.erase(neighbd_list.begin() + index);
@@ -407,7 +410,7 @@ void RVND(tSolution & solut, tData & data) {
 
 }
 
-std::vector<int> perturb(tSolution * solut, tData & data) {
+std::vector<int> perturb(tSolution * solut, Data & data) {
     auto s = solut->s;
     int A_start = 1;
     int A_end = 1;
@@ -434,7 +437,7 @@ std::vector<int> perturb(tSolution * solut, tData & data) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tData & data) {
+void GILS_RVND(int Imax, int Iils, Data & data) {
 
     tSolution solut_partial = Solution_init(data);
     tSolution solut_crnt = Solution_init(data);
@@ -488,10 +491,7 @@ int main(int argc, char **argv){
     int Imax = 10;
     int Iils;
 
-    tData data = {};
-    data.T = 0;
-    data.W = 1;
-    data.C = 2;
+    Data data = {};
 
     std::vector<int> rnd;
 
