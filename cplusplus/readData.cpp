@@ -31,8 +31,6 @@ void readData( int argc, char** argv, int* Dimension, double ***Mdist )
      char *instancia;
      instancia = argv[1];
 
-     //ifstream in(argv[1], ios::in);
-
 
     ifstream in( instancia, ios::in);
 

@@ -8,7 +8,7 @@ using namespace std;
 double ** matrix_allocate(size_t sz) {
     double ** ptr = new double*[sz];
 
-    for ( int i = 0; i < sz; i++ ) {
+    for ( size_t i = 0; i < sz; i++ ) {
         ptr[i] = new double [sz];
     }
     return ptr;
@@ -26,13 +26,11 @@ int loadData(double *** matrix, vector<int> & rnd) {
         getline(file, line);
         dimension = stoi(line);
         *matrix = matrix_allocate((size_t) dimension);
-        //cout << "dimension " << dimension << endl;
 
         bool flag = false;
         int rnd_size = -1;
         int i = 0;
         while (getline(file, line)) {
-            //cout << line << "\n";
             int j = i + 1;
             while (line.find(" ") != string::npos) {
                 size_t pos = line.find(" ");
@@ -40,7 +38,6 @@ int loadData(double *** matrix, vector<int> & rnd) {
                 line = line.substr(pos+1);
                 (*matrix)[i][j] = value;
                 (*matrix)[j][i] = value;
-                //cout << line << endl;
                 j++;
             }
 
@@ -53,7 +50,6 @@ int loadData(double *** matrix, vector<int> & rnd) {
                     rnd_size = stoi(line);
                     rnd.reserve(rnd_size);
                 } else {
-                    //cout << line << endl;
                     rnd.push_back(stoi(line));
                 }
             }

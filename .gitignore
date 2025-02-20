@@ -29,3 +29,5 @@ rust/target/
 subprocess
 tempfile
 
+cplusplus/solve
+cplusplus/obj
