@@ -24,14 +24,6 @@ using std::chrono::steady_clock;
 
 typedef unsigned uint;
 
-enum class Operator : int {
-    REINSERTION = 1,
-    OR_OPT_2 	,
-    OR_OPT_3 	,
-    SWAP 		,
-    TWO_OPT		,
-};
-
 // 3D array
 typedef std::vector<std::vector<std::vector<double>>> tSubseq;
 
@@ -47,6 +39,14 @@ typedef struct tSeqInfo {
     double C;
     double W;
 } tSeqInfo;
+
+enum class Neighborhood : int {
+    REINSERTION = 1,
+    OR_OPT_2,
+    OR_OPT_3,
+    SWAP,
+    TWO_OPT
+};
 
 typedef struct tSolution {
     std::vector<int> s;
@@ -563,9 +563,9 @@ bool search_reinsertion(tSolution & solut, const tData & data, const int opt) {
 
 void RVND(tSolution & solut, tData & data) {
 
-    alignas(alignof(std::vector<Operator>)) std::vector<Operator> neighbd_list = {Operator::SWAP, Operator::TWO_OPT, Operator::REINSERTION, Operator::OR_OPT_2, Operator::OR_OPT_3};
+    alignas(alignof(std::vector<Neighborhood>)) std::vector<Neighborhood> neighbd_list = {Neighborhood::SWAP, Neighborhood::TWO_OPT, Neighborhood::REINSERTION, Neighborhood::OR_OPT_2, Neighborhood::OR_OPT_3};
     alignas(INT_SZ) uint index;
-    alignas(INT_SZ) Operator neighbd;
+    alignas(INT_SZ) Neighborhood neighbd;
     bool improve_flag;
 
     while (!neighbd_list.empty()) {
@@ -575,24 +575,24 @@ void RVND(tSolution & solut, tData & data) {
         improve_flag = false;
 
         switch(neighbd){
-            case Operator::REINSERTION:
-                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::REINSERTION) );
+            case Neighborhood::REINSERTION:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Neighborhood::REINSERTION) );
                 break;				
-            case Operator::OR_OPT_2:
-                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::OR_OPT_2) );
+            case Neighborhood::OR_OPT_2:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Neighborhood::OR_OPT_2) );
                 break;				
-            case Operator::OR_OPT_3:
-                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::OR_OPT_3) );
+            case Neighborhood::OR_OPT_3:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Neighborhood::OR_OPT_3) );
                 break;				
-            case Operator::SWAP:
+            case Neighborhood::SWAP:
                 improve_flag = search_swap(solut, data);
                 break;
-            case Operator::TWO_OPT:
+            case Neighborhood::TWO_OPT:
                 improve_flag = search_two_opt(solut, data);
                 break;				
         }
         if (improve_flag) {
-            neighbd_list = {Operator::SWAP, Operator::TWO_OPT, Operator::REINSERTION, Operator::OR_OPT_2, Operator::OR_OPT_3};
+            neighbd_list = {Neighborhood::SWAP, Neighborhood::TWO_OPT, Neighborhood::REINSERTION, Neighborhood::OR_OPT_2, Neighborhood::OR_OPT_3};
         } else {
             neighbd_list.erase(neighbd_list.begin() + index);
         }
