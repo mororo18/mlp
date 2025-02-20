@@ -8,7 +8,7 @@ using namespace std;
 double ** matrix_allocate(size_t sz) {
     double ** ptr = new double*[sz];
 
-    for ( int i = 0; i < sz; i++ ) {
+    for ( size_t i = 0; i < sz; i++ ) {
         ptr[i] = new double [sz];
     }
     return ptr;

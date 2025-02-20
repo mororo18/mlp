@@ -14,11 +14,6 @@
 #include "readData.h"
 #include "Data.hpp"
 
-#define REINSERTION 1
-#define OR_OPT_2 	2
-#define OR_OPT_3 	3
-#define SWAP 		4
-#define TWO_OPT		5
 #define TABLE_SZ    26
 #define DBL_SZ      8
 #define INT_SZ      4
@@ -28,6 +23,14 @@
 using std::chrono::high_resolution_clock;
 
 typedef unsigned uint;
+
+enum class Operator : int {
+    REINSERTION = 1,
+    OR_OPT_2 	,
+    OR_OPT_3 	,
+    SWAP 		,
+    TWO_OPT		
+};
 
 // 3D array
 typedef std::vector<std::vector<std::vector<double>>> tSubseq;
@@ -81,7 +84,7 @@ double R_table(int i){
 
 void print_s(std::vector<int> s) {
 
-    for (int i = 0; i < s.size(); i++)
+    for (size_t i = 0; i < s.size(); i++)
         std::cout << s[i]+1 << " ";
     std::cout << std::endl;
 }
@@ -352,9 +355,16 @@ inline bool search_reinsertion(tSolution & solut, const tData & data, const int 
 
 void RVND(tSolution & solut, tData & data) {
 
-    alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
+    alignas(alignof(std::vector<Operator>)) std::vector<Operator> neighbd_list = {
+        Operator::SWAP, 
+        Operator::TWO_OPT, 
+        Operator::REINSERTION, 
+        Operator::OR_OPT_2, 
+        Operator::OR_OPT_3
+    };
+
     alignas(INT_SZ) uint index;
-    alignas(INT_SZ) int neighbd;
+    alignas(INT_SZ) Operator neighbd;
     bool improve_flag;
 
     while (!neighbd_list.empty()) {
@@ -365,25 +375,31 @@ void RVND(tSolution & solut, tData & data) {
         improve_flag = false;
 
         switch(neighbd){
-            case REINSERTION:
-                improve_flag = search_reinsertion(solut, data, REINSERTION);
+            case Operator::REINSERTION:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::REINSERTION));
                 break;				
-            case OR_OPT_2:
-                improve_flag = search_reinsertion(solut, data, OR_OPT_2);
+            case Operator::OR_OPT_2:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::OR_OPT_2));
                 break;				
-            case OR_OPT_3:
-                improve_flag = search_reinsertion(solut, data, OR_OPT_3);
+            case Operator::OR_OPT_3:
+                improve_flag = search_reinsertion(solut, data, static_cast<int>(Operator::OR_OPT_3));
                 break;				
-            case SWAP:
+            case Operator::SWAP:
                 improve_flag = search_swap(solut, data);
                 break;
-            case TWO_OPT:
+            case Operator::TWO_OPT:
                 improve_flag = search_two_opt(solut, data);
                 break;				
         }
 
         if (improve_flag) {
-            neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
+            neighbd_list = {
+                Operator::SWAP, 
+                Operator::TWO_OPT,
+                Operator::REINSERTION, 
+                Operator::OR_OPT_2, 
+                Operator::OR_OPT_3
+            };
         } else {
             neighbd_list.erase(neighbd_list.begin() + index);
         }
@@ -432,8 +448,8 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
         printf("[+] Search %d\n", i+1);
         printf("\t[+] Constructing..\n");	
 
-        solut_crnt.s = construct(alpha, info);
-        subseq_load(solut_crnt, data);
+        solut_crnt.s = construct(alpha, data);
+        update_subseq_info_matrix(solut_crnt, data);
 
         Solution_cpy(solut_crnt, solut_partial, data);
         printf("\t[+] Looking for the best Neighbor..\n");
@@ -459,7 +475,7 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
         std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
 
         std::cout << "SOLUCAO: ";
-        for(int i = 0; i < solut_best.s.size(); i++){
+        for(size_t i = 0; i < solut_best.s.size(); i++){
             std::cout << solut_best.s[i] << " ";
         }
         std::cout << std::endl;
