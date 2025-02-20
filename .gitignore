@@ -39,3 +39,7 @@ rust/*.pdb
 rust/solve
 
 load
+
+# c++
+cplusplus/solve
+cplusplus/obj

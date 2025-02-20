@@ -14,11 +14,6 @@
 #include "readData.h"
 #include "Data.hpp"
 
-#define REINSERTION 1
-#define OR_OPT_2 	2
-#define OR_OPT_3 	3
-#define SWAP 		4
-#define TWO_OPT		5
 #define TABLE_SZ    26
 #define DBL_SZ      8
 #define INT_SZ      4
@@ -44,6 +39,14 @@ typedef struct seqStruct {
     double C;
     double W;
 } seqStruct;
+
+enum class Neighborhood {
+    REINSERTION = 1,
+    OR_OPT_2,
+    OR_OPT_3,
+    SWAP,
+    TWO_OPT
+};
 
 typedef std::vector<std::vector<seqStruct>> tSubseq;
 
@@ -316,9 +319,15 @@ void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
 
 void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
 
-    alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
+    alignas(alignof(std::vector<Neighborhood>)) std::vector<Neighborhood> neighbd_list = {
+        Neighborhood::SWAP, 
+        Neighborhood::TWO_OPT, 
+        Neighborhood::REINSERTION, 
+        Neighborhood::OR_OPT_2,
+        Neighborhood::OR_OPT_3
+    };
     alignas(INT_SZ) uint index;
-    alignas(INT_SZ) int neighbd;
+    alignas(INT_SZ) Neighborhood neighbd;
     bool improve_flag;
 
     while (!neighbd_list.empty()) {
@@ -329,25 +338,31 @@ void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
         improve = false;
 
         switch(neighbd){
-            case REINSERTION:
-                search_reinsertion(s, seq, REINSERTION);
+            case Neighborhood::REINSERTION:
+                search_reinsertion(s, seq, static_cast<int>(Neighborhood::REINSERTION));
                 break;				
-            case OR_OPT_2:
-                search_reinsertion(s, seq, OR_OPT_2);
+            case Neighborhood::OR_OPT_2:
+                search_reinsertion(s, seq, static_cast<int>(Neighborhood::OR_OPT_2));
                 break;				
-            case OR_OPT_3:
-                search_reinsertion(s, seq, OR_OPT_3);
+            case Neighborhood::OR_OPT_3:
+                search_reinsertion(s, seq, static_cast<int>(Neighborhood::OR_OPT_3));
                 break;				
-            case SWAP:
+            case Neighborhood::SWAP:
                 search_swap(s, seq);
                 break;
-            case TWO_OPT:
+            case Neighborhood::TWO_OPT:
                 search_two_opt(s, seq);
                 break;				
         }
 
         if (improve) {
-            neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
+            neighbd_list = {
+                Neighborhood::SWAP, 
+                Neighborhood::TWO_OPT, 
+                Neighborhood::REINSERTION, 
+                Neighborhood::OR_OPT_2, 
+                Neighborhood::OR_OPT_3
+            };
         } else {
             neighbd_list.erase(neighbd_list.begin() + index);
         }
