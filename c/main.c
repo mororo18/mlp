@@ -129,10 +129,7 @@ void construct(int ** ret, const double alpha, tData * data){
     for (int j = 1; j < data->dimen; ++j) {
         sort(cL, cL_size, r, data);
 
-        int range = ceil(cL_size * alpha);
-        int index = range > 0 ? rand() % range : 0;
-
-        index = data->rnd[data->rnd_index++];
+        int index = info->rnd[info->rnd_index++];
         int c = cL[index];
         s[j] = c;
         r = c;
@@ -397,6 +394,7 @@ void RVND(tSolution * solut, tData * data) {
                 improve_flag = search_two_opt(solut, data);
                 break;				
         }
+      
         if (improve_flag) {
             neighbd_list[0] = SWAP;
             neighbd_list[1] = TWO_OPT;
@@ -408,9 +406,6 @@ void RVND(tSolution * solut, tData * data) {
             memmove(neighbd_list + index, neighbd_list + index+1, sizeof(int)*(nl_size-index-1));
             nl_size--;
         }
-
-
-
     }
 }
 
@@ -423,26 +418,14 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tData * data) {
     int B_start = 1;
     int B_end = 1;
 
-    int size_max = floor((data->dimen+1)/10);
-    size_max = size_max >= 2 ? size_max : 2;
-    int size_min = 2;
     while ((A_start <= B_start && B_start <= A_end) || (B_start <= A_start && A_start <= B_end)) {
-        int max = (data->dimen+1) -2 -size_max;
-        A_start = rand() % max + 1;
-        A_end = A_start + rand() % (size_max - size_min + 1) + size_min;
+        A_start = info->rnd[info->rnd_index++];
+        A_end = A_start + info->rnd[info->rnd_index++];
 
-        B_start = rand() % max + 1;
-        B_end = B_start + rand() % (size_max - size_min + 1) + size_min;
-
-        A_start = data->rnd[data->rnd_index++];
-        
-        A_end = A_start + data->rnd[data->rnd_index++];
-       
-        B_start = data->rnd[data->rnd_index++];
-
-        B_end = B_start + data->rnd[data->rnd_index++];
+        B_start = info->rnd[info->rnd_index++];
+        B_end = B_start + info->rnd[info->rnd_index++];
     }
-
+    
     if (A_start < B_start) {
         reinsert(s, B_start, B_end-1, A_end);
         reinsert(s, A_start, A_end-1, B_end);
@@ -475,6 +458,7 @@ void GILS_RVND(int Imax, int Iils, tData * data) {
         update_subseq_info_matrix(&solut_crnt, data);
 
         Solution_cpy(&solut_crnt, &solut_partial, data);
+
         printf("\t[+] Looking for the best Neighbor..\n");
         printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
 
@@ -488,6 +472,7 @@ void GILS_RVND(int Imax, int Iils, tData * data) {
 
             perturb(&solut_crnt, &solut_partial, data);
             update_subseq_info_matrix(&solut_crnt, data);
+
             iterILS++;
         }
 
@@ -523,6 +508,7 @@ int main(int argc, char **argv){
     srand(clock());
 
     Iils = data.dimen < 100 ? data.dimen : 100;
+
     time_t start = clock();
     GILS_RVND(Imax, Iils, &data);
 
@@ -531,4 +517,3 @@ int main(int argc, char **argv){
 
     return 0;
 }
-

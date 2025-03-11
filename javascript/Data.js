@@ -9,7 +9,7 @@ function matrix_fill(matrix, n) {
 }
 
 module.exports = {
-    info_load: function(c) {
+    data_load: function(c) {
         let index = 0;
         //console.log(file[index]);
 
