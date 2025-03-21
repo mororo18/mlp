@@ -94,6 +94,7 @@ fn construction(rnd: &mut Rnd, data: &Data) -> Vec<usize> {
     }
 
     let mut r: usize = 0;
+
     while c_list.is_empty() == false {
         sort(&mut c_list, r, data);
 

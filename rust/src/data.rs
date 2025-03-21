@@ -4,10 +4,6 @@ use std::io::prelude::*;
 use std::process::exit;
 use std::vec;
 
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
-}
-
 pub fn load(dimension: &mut usize, c: &mut Vec<Vec<f64>>, rnd: &mut Vec<usize>) {
     let filename = "../distance_matrix";
 
