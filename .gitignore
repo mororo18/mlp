@@ -28,3 +28,4 @@ rust/main
 rust/target/
 subprocess
 tempfile
+distance_matrix
