@@ -154,12 +154,10 @@ public:
     bool improve = false;
 
     void search_swap(vector<int> & s, tSubseq & seq) {
-        //inline bool search_swap(vector<int> & s, tSubseq & seq) {
         alignas(DBL_SZ) double cost_new, 
             cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
         alignas(DBL_SZ) double cost_best = DBL_MAX;
         alignas(INT_SZ) int i, j, j_prev, j_next, i_prev, i_next;
-        //alignas(INT_SZ) int dim = dimension - 2;
         alignas(INT_SZ) int I;
         alignas(INT_SZ) int J;
 
@@ -207,18 +205,11 @@ public:
         if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
             swap(s, I, J);
             update_subseq_info_matrix(s, seq, I);
-            if (cost_best != seq[0][dimen].C) {
-                cout << "difere " << endl;
-            }
 
-            //return true;
             improve = true;
         }
-
-        //return false;
     }
 
-    //inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
     void search_two_opt(vector<int> & s, tSubseq & seq) {
         alignas(DBL_SZ) double cost_new, 
             cost_concat_1, cost_concat_2;
@@ -254,22 +245,15 @@ public:
 
         if (cost_best < seq[0][dimen].C - DBL_EPSILON) {
             reverse(s, I, J);
-            update_subseq_info_matrix(s, seq);//, I);  // d olho aq hein
-            if (cost_best != seq[0][dimen].C) {
-                cout << "difere " << endl;
-            }
+            update_subseq_info_matrix(s, seq);
 
-            //return true;
             improve = true;
         }
-
-        //return false;
     }
 
     void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
-        //inline bool search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
         alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
-        alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
+        alignas(DBL_SZ) double cost_best = DBL_MAX;
         alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
         alignas(INT_SZ) int I;
         alignas(INT_SZ) int J;
@@ -326,15 +310,8 @@ public:
             reinsert(s, I, J, POS+1);
             update_subseq_info_matrix(s, seq, I < POS+1 ? I : POS+1);
 
-            if (cost_best != seq[0][dimen].C) {
-                cout << "difere " << endl;
-            }
-
             improve = true;
-            //return true;
         }
-
-        //return false;
     }
 
     void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
@@ -350,7 +327,6 @@ public:
         alignas(alignof(std::vector<int>)) std::vector<int> neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3};
         alignas(INT_SZ) uint index;
         alignas(INT_SZ) int neighbd;
-        //int k = 0;
         bool improve_flag;
 
         while (!neighbd_list.empty()) {
