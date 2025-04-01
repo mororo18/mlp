@@ -1,10 +1,5 @@
 #include "types.h"
 
-/*==========================SET==========================*/
-
-
-/*==========================GET==========================*/
-
 tSolution Solution_init(tData data) {
     tSolution solut;
     solut.size = sizeof(tSolution);
@@ -53,17 +48,7 @@ void tData_free(tData * data) {
 }
 
 void Solution_cpy(tSolution * src, tSolution * tgt, const tData * data) {
-
     memcpy(tgt->s, src->s, sizeof(int)*(data->dimen+1));
     tgt->cost = src->cost;
-
-    /*
-    for (int i = 0; i < info.dimen+1; i++) {
-        for (int j = 0; j < info.dimen+1; j++) {
-            std::copy(src.seq[i][j], src.seq[i][j] + 3, tgt.seq[i][j]);
-        }
-    }
-    */
-
 }
 
