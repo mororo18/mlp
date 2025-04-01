@@ -17,21 +17,17 @@ fn update_subseq_info_matrix(solut: &mut Solution, info: &Data) {
         for j in (i + 1)..=info.dimen {
             let j_prev: usize = j - 1;
 
-            // Cálculo de 't' usando acesso direto à matriz de custos
             let t = info.c[(solut[j_prev], solut[j])] + solut.seq[(i, j_prev)].t;
             solut.seq[(i, j)].t = t;
 
-            // Cálculo de 'c'
             let c = solut.seq[(i, j)].t + solut.seq[(i, j_prev)].c;
             solut.seq[(i, j)].c = c;
 
-            // Cálculo de 'w'
             let w = (j as i32 + k) as f64;
             solut.seq[(i, j)].w = w;
         }
     }
 
-    // Cálculo do custo total diretamente
     solut.cost = solut.seq[(0, info.dimen)].c;
 }
 
@@ -166,7 +162,6 @@ fn search_swap(solut : &mut Solution, info : & Data) -> bool {
 
 
     if cost_best < solut.cost - f64::EPSILON {
-        //println!("swap \n{}", cost_best);
         swap(&mut solut.s, I, J);
         update_subseq_info_matrix(solut, info);
         return true;
@@ -246,12 +241,10 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
         for k in 0..i_prev {
             let k_next: usize = k + 1;
 
-           // Cálculo dos custos concatenados
             cost_concat_1 = solut.seq[(0, k)].t + info.c[(solut[k], solut[i])];
             cost_concat_2 = cost_concat_1 + solut.seq[(i, j)].t + info.c[(solut[j], solut[k_next])];
             cost_concat_3 = cost_concat_2 + solut.seq[(k_next, i_prev)].t + info.c[(solut[i_prev], solut[j_next])];
 
-            // Cálculo do novo custo
             cost_new = solut.seq[(0, k)].c
                 + seq_i_j_w * cost_concat_1
                 + seq_i_j_c
@@ -260,7 +253,6 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
                 + seq_jnext_dimen_w * cost_concat_3
                 + seq_jnext_dimen_c;
 
-            // Verifica se o custo atual é melhor que o melhor encontrado
             if cost_new < cost_best {
                 cost_best = cost_new - f64::EPSILON;
                 I = i;
@@ -273,12 +265,10 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
         for k in (i + opt)..info.dimen {
             let k_next: usize = k + 1;
 
-            // Cálculo dos custos concatenados
             cost_concat_1 = solut.seq[(0, i_prev)].t + info.c[(solut[i_prev], solut[j_next])];
             cost_concat_2 = cost_concat_1 + solut.seq[(j_next, k)].t + info.c[(solut[k], solut[i])];
             cost_concat_3 = cost_concat_2 + solut.seq[(i, j)].t + info.c[(solut[j], solut[k_next])];
 
-            // Cálculo do novo custo
             cost_new = solut.seq[(0, i_prev)].c
                 + solut.seq[(j_next, k)].w * cost_concat_1
                 + solut.seq[(j_next, k)].c
@@ -287,7 +277,6 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
                 + solut.seq[(k_next, info.dimen)].w * cost_concat_3
                 + solut.seq[(k_next, info.dimen)].c;
 
-            // Verifica se o custo atual é melhor que o melhor encontrado
             if cost_new < cost_best {
                 cost_best = cost_new - f64::EPSILON;
                 I = i;
@@ -299,10 +288,8 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
     }
 
     if cost_best < solut.cost - f64::EPSILON {
-        //println!("reinsertion {}   {} {} {}\n{}", opt,I,J, 1+POS, cost_best);
         reinsert(&mut solut.s, I, J, POS+1);
         update_subseq_info_matrix(solut, info);
-        //println!("{}", seq[0][info.dimension][C]);
         return true;
     } else {
         return false;

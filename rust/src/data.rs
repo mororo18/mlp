@@ -32,9 +32,6 @@ pub fn load(filename: &str) -> (usize, CostMatrix, Vec<usize>) {
             n = iter.next();
             j += 1;
         }
-        //print!("\n");
-        //l_i += 1;
-        
     }
 
     line_i += 2;
