@@ -6,9 +6,6 @@ module types
     type tInfo
         integer :: dimen
         real(typeReal), allocatable :: cost (:,:)
-        !integer :: T = 1
-        !integer :: C = 2
-        !integer :: W = 3
         
         integer :: REINSERTION  = 1
         integer :: OR_OPT_2     = 2
@@ -32,7 +29,6 @@ module types
         real(typeReal) :: cost
         integer :: s_size
         integer, allocatable :: s (:)
-        !real(typeReal), allocatable :: seq (:,:,:)
         type(tSeqInfo), allocatable :: seq (:,:)
     end type
 

@@ -178,12 +178,7 @@ function construction(alpha, info) result(ret)
 
     cL_size = info%dimen-1
 
-    ! init cL
     cL = (/ (I, I=2, info%dimen) /)
-    !print *, cl
-   !do i=2, info%dimen
-   !    cL(i-1) = i
-   !end do
 
     s(1) = 1
     r = 1
@@ -372,13 +367,11 @@ subroutine search_swap(solut, info, ret)
     end do
 
     if (cost_best < solut%cost - EPSILON(1.0)) then
-        !print *, solut%cost, EPSILON(1.0)
         call swap(solut%s, I_best, J_best)
         call subseq_load(solut, info)
 #ifdef DEBUG
         fsb = .false.
         call is_feasible(solut, fsb)
-        !print *, cost_best, solut%cost
         ASSERT(fsb, .true.)
         ASSERT(cost_best, solut%cost)
 #endif
@@ -564,7 +557,6 @@ subroutine search_reinsertion(solut, info, opt, ret)
     else
         ret = .false.
     endif
-    !call exit(0)
 
 end subroutine
 
@@ -635,7 +627,6 @@ subroutine RVND(sol, info, it)
             neighbd_list(4) = info%OR_OPT_2
             neighbd_list(5) = info%OR_OPT_3
             nl_size = 5
-            !print *, "IMPROV", sol%cost
             improv(neighbd) = improv(neighbd) + 1
             yes = .true.
 
@@ -644,7 +635,6 @@ subroutine RVND(sol, info, it)
             nl_size = nl_size-1
             total = total + 1
         endif
-        !print *, nl_size
 
         it = it + 1
         
@@ -662,7 +652,6 @@ subroutine perturb(solut_crnt, solut_part, info)! result(ret)
 
     type(tSolution) :: ret
 
-    !integer, dimension(info%dimen+1) :: s
     integer :: A_start, A_end
     integer :: B_start, B_end
     integer :: size_max
@@ -714,7 +703,6 @@ subroutine solut_init(solut, info)
     allocate(solut%s(info%dimen+1))
     allocate(solut%seq(info%dimen+1, info%dimen+1))
     solut%s_size = info%dimen+1
-    !allocate(solut%seq(3, info%dimen+1, info%dimen+1))
 
 end subroutine
 
@@ -820,7 +808,6 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     end do
 
     print *, sol_best%s
-    !print *, "RVND it", Tit
 
     ret = sol_best
 
