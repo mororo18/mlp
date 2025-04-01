@@ -4,7 +4,6 @@ import time
 from read import *
 import math
 import sys
-#import matplotlib.pyplot as plt 
 from typing import List, NoReturn
 
 Matrix = List[List[float]]
@@ -115,15 +114,11 @@ def update_subseq_info_matrix(solut : tSolution, info : tInfo) -> None:
         solut.seq[i][i][W] = float(int(not (i == 0)))
 
         for j in range(i+1, dimen+1):
-        #while j < d:
-            #print(i, j)
             j_prev : int = j - 1
 
             solut.seq[i][j][T] = cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][T]
             solut.seq[i][j][C] = solut.seq[i][j][T] + solut.seq[i][j_prev][C]
             solut.seq[i][j][W] = float(j + k)
-
-        #exit(0)
 
     solut.cost = solut.seq[0][dimen][C] - info.EPSILON
 
@@ -178,7 +173,6 @@ def search_swap(solut : tSolution, info : tInfo) -> bool:
             cost_best = cost_new - info.EPSILON
             I = i
             J = i_next
-            #print(cost_best, I, J)
 
         for j in range(i_next+1, (dimen)):
             j_next : int = j + 1
@@ -199,21 +193,11 @@ def search_swap(solut : tSolution, info : tInfo) -> bool:
                 cost_best = cost_new - info.EPSILON
                 I = i
                 J = j
-                #print(cost_best, I, J)
 
-    #print(cost_best, solut.cost, I, J)
     if cost_best < solut.cost - info.EPSILON:
         swap(solut.s, I, J)
         update_subseq_info_matrix(solut, info)
         return True
-    #print(seq[C][0][n])
-        #if cost_best != seq[C][0][n]:
-        #   print("ERRR")
-       #global improv_flag
-       #global improv_swap
-       #print("\nswap")
-       #print(cost_best)
-       #print(solut.cost)
 
     return False
 
@@ -250,63 +234,20 @@ def search_two_opt(solut : tSolution, info : tInfo) -> bool:
                     seq[i][j][W] * cost_concat_1 + reverse_cost             + \
                     seq[j_next][dimen][W] * (cost_concat_2) + seq[j_next][dimen][C]
 
-            #print(cost, i, "        ", j)
-            #print(seq[C][0][i_prev], seq[W][i][j] * cost_concat_1,seq[W][j_next][n] * (cost_concat_2), seq[C][j_next][n] )
             if cost_new < cost_best:
                 cost_best = cost_new - info.EPSILON
                 I = i
                 J = j
 
-            #if i == 2 and j == 10:
-                #print ("opaa")
-
     if cost_best < solut.cost - info.EPSILON:
-        #print(cost_best)
-        #print(I, J)
         reverse(solut.s, I, J)
         update_subseq_info_matrix(solut, info)
-#       global improv_flag
-#       global improv_two_opt
-#       improv_flag = True
-#       improv_two_opt += 1
-       #print("\ntwo_opt")
-       #print(cost_best)
-       #print(solut.cost)
         return True
 
     return False
 
-"""
-Movimento avalido me maneira incorreta (nesse caso). Os que presenciei aparentavam realizar a avaliacao de maneira correta
-[0, 7, 8, 10, 12, 6, 5, 4, 1, 2, 3, 11, 13, 9, 0]
-[0, 7, 8, 10, 12, 6, 11, 5, 4, 1, 2, 3, 13, 9, 0]
-
-reinsertion 1
-15752.0
-24694.0
-11 11 5
-"""
-
-# TODO (EUEU) testar acessando as infos das estruturas pelo 1o indice do array3D. Ex: seq[C][...
-
-#def search_reinsertion(solut , info , opt , seq ) :
 def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[List[List[float]]]) -> bool:
-    """
-    cost_concat_1 : float
-    cost_concat_2 : float
-    cost_concat_3 : float
-    cost_new : float
-    """
-
     cost_best : float = float('inf')
-    #cost_best : float = float('inf')
-
-    """
-    I : int 
-    J : int 
-    POS : int
-    MAX : int = info.dimen - opt 
-    """
     I = -1
     J  = -1 
     POS  = -1
@@ -319,23 +260,14 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
     C = info.C
     W = info.W
 
-
-
-    #seq = solut.seq
-
     for i in range(1, MAX + 1):
         j  = opt + i - 1
-        #j : int = opt + i - 1
 
         j_next  = j+1
         i_prev  = i-1
-       #j_next : int = j+1
-       #i_prev : int = i-1
 
         for k in range(0, i_prev):
             k_next  = k+1
-            #k_next : int = k+1
-
 
             cost_concat_1 =                 seq[0]     [k]     [T] + cost[s[k]]     [s[i]]
             cost_concat_2 = cost_concat_1 + seq[i]     [j]     [T] + cost[s[j]]     [s[k_next]]
@@ -352,13 +284,9 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
                 I = i
                 J = j
                 POS = k
-            #if i == 11 and k == 5:
-                #print ("opa")
-
 
         for k in range(i+opt, dimen):
             k_next = k+1
-            #k_next : int = k+1
 
             cost_concat_1 =                 seq[0]     [i_prev][T] + cost[s[i_prev]][s[j_next]]
             cost_concat_2 = cost_concat_1 + seq[j_next][k]     [T] + cost[s[k]]     [s[i]]
@@ -376,39 +304,16 @@ def search_reinsertion(solut : tSolution, info : tInfo, opt : int, seq : List[Li
                 J = j
                 POS = k
 
-    #if COST_arr[BEST] < seq[C][0][n] - EPSILON:
     if cost_best < solut.cost - info.EPSILON:
-        #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
-        #print(solut.s)
         reinsert(solut.s, I, J, POS+1)
-        #print(solut.s)
         update_subseq_info_matrix(solut, info)
-        """
-        print("\nreinsertion", opt)
-        print(cost_best)
-        print(solut.cost)
-        """
-
-       #if(cost_best != solut.cost):
-       #    print(I, J, POS)
-       #    exit(0)
         return True
 
     return False
 
 def RVND(solut : tSolution, info : tInfo) -> None:
 
-   #global t_reinsertion
-   #global t_or_opt2 
-   #global t_or_opt3 
-   #global t_swap 
-   #global t_two_opt 
-
-   #global improv_flag
-    #neighbd_list = [ TWO_OPT]
     neighbd_list : List[int] = [info.SWAP, info.TWO_OPT, info.REINSERTION, info.OR_OPT_2, info.OR_OPT_3]
-
-    #print(solut.s)
 
     while len(neighbd_list) > 0:
         i = info.rnd[info.rnd_index]

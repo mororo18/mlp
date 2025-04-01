@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-
 def matrix_fill(n:int):
     matrix = []
     for i in range(n):
@@ -18,8 +17,6 @@ def get_instance_info(f_name='../distance_matrix'):
     cost = []
 
     i = -1  
-    #dimension = None
-
     dimension = int(f.readline())
     cost = matrix_fill(dimension)
 
