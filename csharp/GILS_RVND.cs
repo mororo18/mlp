@@ -116,16 +116,13 @@ namespace MLP {
         }
 
         private void swap(List<int> s, int i, int j){
-            //Console.WriteLine(string.Format("Swap: ({0}, {1}).", i, j));
             int tmp = s[i];
             s[i] = s[j];
             s[j] = tmp;
-            //Console.WriteLine(string.Format("Swap: ({0}).", string.Join(", ", s)));
         }
 
         private void reverse(List<int> s, int i, int j){
             s.Reverse(i, j-i+1);
-            //Console.WriteLine(string.Format("Reverse: ({0}).", string.Join(", ", s)));
         }
 
         private void reinsert(List<int> s, int i, int j, int pos){
@@ -137,7 +134,6 @@ namespace MLP {
                 s.InsertRange(pos, s.GetRange(i, sz));
                 s.RemoveRange(i+sz, sz);
             }
-            //Console.WriteLine(string.Format("Reinsert: ({0}).", string.Join(", ", s)));
         }
 
         private bool search_swap(tSolution solut){
@@ -192,9 +188,6 @@ namespace MLP {
             }
 
             if(cost_best < solut.GetCost() - EPSILON){
-              //if (I == -1 && J == -1) {
-              //    Console.WriteLine(string.Format("Swap: ({0}, {1}, {2}).", cost_best, solut.GetCost(), -cost_best+solut.GetCost()));
-              //}
                 swap(solutSolut, I, J);
                 update_subseq_info_matrix(solut);
                 return true;
@@ -221,7 +214,6 @@ namespace MLP {
 
                 for(int j = i+2; j < dimen; j++){
                     int j_next = j+1;
-                    //int j_prev = j-1;
 
                     rev_seq_cost += data.GetCost(solutSolut[j-1], solutSolut[j]) * (solut.GetSeq(i,  j, tInfoIndex.W)-1.0);
 
@@ -238,7 +230,6 @@ namespace MLP {
                         J = j;
                     }
 
-                    //Environment.Exit(0);
                 }
             }
 
@@ -310,11 +301,8 @@ namespace MLP {
             }
 
             if(cost_best < solut.GetCost() - EPSILON){
-                //Console.WriteLine("Reinsertion");
-                //Console.WriteLine(cost_best);
                 reinsert(solutSolut, I, J, POS+1);
                 update_subseq_info_matrix(solut);
-                //Console.WriteLine(seq[0, dimension, C]);
                 return true;
             }
 

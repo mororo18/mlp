@@ -21,7 +21,6 @@ namespace MLP {
             matrix = new double [dimension, dimension];
 
             for(int i = 1; i < dimension; i++){
-                //Console.WriteLine(file[i]);
                 file_line++;
                 int j = i;
                 while(file[i].IndexOf(" ") != -1){
@@ -30,7 +29,6 @@ namespace MLP {
                     matrix[j, i-1] = matrix[i-1, j];
                     matrix[i-1, i-1] = 0.0;
                     file[i] = file[i].Substring(index+1);
-                    //Console.WriteLine(matrix[i-1, j]);
                     j++;
                 }
             }
@@ -68,8 +66,6 @@ namespace MLP {
 
         public int GetDimen() {return dimension;}
         public double GetCost(int i, int j) {
-            //var f = ref c[0];
-            //double ret = Unsafe.Add(ref c[0], to_1D(i, j));
             return c[to_1D(i,j)];
         }
         
