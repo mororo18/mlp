@@ -154,12 +154,10 @@ public:
     bool improve = false;
 
     void search_swap(vector<int> & s, tSubseq & seq) {
-        //inline bool search_swap(vector<int> & s, tSubseq & seq) {
         alignas(DBL_SZ) double cost_new, 
             cost_concat_1, cost_concat_2, cost_concat_3, cost_concat_4;
         alignas(DBL_SZ) double cost_best = DBL_MAX;
         alignas(INT_SZ) int i, j, j_prev, j_next, i_prev, i_next;
-        //alignas(INT_SZ) int dim = dimension - 2;
         alignas(INT_SZ) int I;
         alignas(INT_SZ) int J;
 
@@ -211,14 +209,11 @@ public:
                 cout << "difere " << endl;
             }
 
-            //return true;
             improve = true;
         }
 
-        //return false;
     }
 
-    //inline bool search_two_opt(vector<int> & s, tSubseq & seq) {
     void search_two_opt(vector<int> & s, tSubseq & seq) {
         alignas(DBL_SZ) double cost_new, 
             cost_concat_1, cost_concat_2;
@@ -259,15 +254,12 @@ public:
                 cout << "difere " << endl;
             }
 
-            //return true;
             improve = true;
         }
 
-        //return false;
     }
 
     void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
-        //inline bool search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
         alignas(DBL_SZ) double cost_new, cost_concat_1, cost_concat_2, cost_concat_3;
         alignas(DBL_SZ) double cost_best = DBL_MAX;//, cost_l1, cost_l2, cost_l3;
         alignas(INT_SZ) int i, j, k, k_next, i_prev, j_next;
@@ -331,10 +323,8 @@ public:
             }
 
             improve = true;
-            //return true;
         }
 
-        //return false;
     }
 
     void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {
