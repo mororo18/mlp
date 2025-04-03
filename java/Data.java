@@ -17,7 +17,6 @@ class Data{
     public int []   getRnd()                    {return rnd;}
     public int      getRndSize()                {return rnd_size;}
     
-    //programacao orientada a spaghetti
     public void loadData(){
         String file_name = "../distance_matrix";
         try{
@@ -30,7 +29,6 @@ class Data{
             matrix = new double [dimension][dimension];
             for(int k = 0; k < dimension; k++) matrix[k][k] = 0.0;
 
-            //while(f_reader.hasNextLine()){
             for (int i = 0; i < dimension; i++) {
                 line = f_reader.nextLine();
 
@@ -43,9 +41,7 @@ class Data{
                     matrix[i][j] = cost_value;
                     matrix[j][i] = matrix[i][j];
                     j++;
-                    //System.out.print(cost + " ");
                 }
-                //System.out.println(); 
             }
 
 
@@ -53,7 +49,6 @@ class Data{
             line = f_reader.nextLine();
             line = f_reader.nextLine();
 
-            //System.out.println(line); 
             rnd_size = Integer.parseInt(line);
             rnd = new int[rnd_size];
 

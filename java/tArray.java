@@ -59,7 +59,6 @@ class tArray {
 
     public tArray getArrayCopy() {
         return new tArray(this.arr.clone());
-        //return arr.clone();
     }
 
     public void assign(int []arr) {
@@ -110,13 +109,6 @@ class tArray {
             shift(j+1, i, sz);
             System.arraycopy(this.arrBuffer, 0, arr, i+sz, this.sizeBuffer);
         }
-        
-        /*
-        if (feasibility() != true) {
-            System.out.println(String.format("infisibu %d %d", i, j));
-            printPretty();
-            System.exit(0);
-        }*/
     }
 
     public void remove(int index) {
@@ -148,7 +140,6 @@ class tArray {
         }
 
         for (int i = 0; i < check.length; i++) {
-            //System.out.println(String.format("%d %b", i, check[i]));
             if (!check[i]) return false;
         }
          return true;

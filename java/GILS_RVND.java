@@ -363,8 +363,6 @@ class GILS_RVND {
             solut_crnt.storeSolut(construction(alpha, info));
             subseq_load(solut_crnt, info); 
 
-            //System.out.println(solut_crnt.getCost());
-
             
             solut_partial.storeSolut(solut_crnt.getSolutCpy()); 
             solut_partial.setCost(solut_crnt.getCost());
