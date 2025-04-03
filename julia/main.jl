@@ -271,7 +271,6 @@ function search_reinsertion(solut::tSolution, data::tData, opt::Int)::Bool
                 cost_concat_2 = cost_concat_1 + solut.seq[data.T, k, j_next]   + data.cost[solut.s[k], solut.s[i]]
                 cost_concat_3 = cost_concat_2 + solut.seq[data.T, j, i]        + data.cost[solut.s[j], solut.s[k_next]]
 
-                #println(i_prev, "  ", solut.seq[i_prev, 1].C)
                 cost_new = solut.seq[data.C, i_prev, 1]                                                        +   #       1st subseq
                 solut.seq[data.W, k, j_next]           * cost_concat_1 + solut.seq[data.C, k, j_next]             +   # concat 2nd subseq
                 solut.seq[data.W, j, i]                * cost_concat_2 + solut.seq[data.C, j, i]                  +   # concat 3rd subseq (reinserted seq)
@@ -299,13 +298,6 @@ end
 
 function RVND(solut::tSolution, data::tData)
     neighbd_list = [data.SWAP, data.TWO_OPT, data.REINSERTION, data.OR_OPT2, data.OR_OPT3]
-    """
-    t_reinsertion_local = 0
-    t_or_opt2_local = 0
-    t_or_opt3_local = 0
-    t_two_opt_local = 0
-    t_swap_local = 0
-    """
 
     while length(neighbd_list) > 0
         
