@@ -6,14 +6,6 @@ var to_1D = function (x, y, z, n) {
 
 function subseq_fill(dimension) {
     seq = Array((dimension+1)*(dimension+1)*3);
-    //seq = [(dimension+1)*(dimension+1)*3];
-    for (var i = 0; i < dimension+1; i++) {
-        //seq[i] = Array(dimension+1);
-        for (var j = 0; j < dimension+1; j++) {
-            //seq[i][j] = Array(3);
-        }
-    }
-
     return seq;
 }
 
@@ -158,16 +150,7 @@ function search_swap(s, seq, info) {
 
     if(cost_best < seq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON){
         swap(s, I, J);
-        /*
-        console.log("swap");
-        console.log(cost_best);
-        */
         subseq_load(s, seq, info);
-        /*
-        console.log(seq[0][info.dimension][info.C]);
-        console.log();
-        */
-
         return true;
     }
 
@@ -209,16 +192,7 @@ function search_two_opt(s, seq, info) {
 
     if(cost_best < seq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON){
         reverse(s, I, J);
-        /*
-        console.log("two opt");
-        console.log(cost_best);
-        */
         subseq_load(s, seq, info);
-        /*
-        console.log(seq[0][info.dimension][info.C]);
-        console.log();
-        */
-
         return true;
     }
     return false;

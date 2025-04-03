@@ -11,7 +11,6 @@ function matrix_fill(matrix, n) {
 module.exports = {
     info_load: function(c) {
         let index = 0;
-        //console.log(file[index]);
 
         let dimension = parseInt(file[index++]);
         matrix_fill(c, dimension);
@@ -29,7 +28,6 @@ module.exports = {
 
         index++;
         index++;
-        //console.log(file[index]);
         let rnd_size = parseInt(file[index++]);
         var rnd = new Array(rnd_size);
 
@@ -37,35 +35,6 @@ module.exports = {
             rnd[i] = parseInt(file[index++]);
         }
 
-        //console.log(rnd);
-
-        /*
-        for (var i = -1; i+1 < file.length; i++) {
-            //console.log(file[i+1]);
-            let l = i+1;
-            if (i == -1) {
-                var dimension = parseInt(file[l]);
-                matrix_fill(c, dimension);
-                continue;
-            }
-
-            if (file[l] == "EOF") {
-                break;
-            }
-
-            let j = i + 1;
-            cost = file[l].split(" ");
-            c[i][i] = 0.0;
-            for (k in cost) {
-                if (j >= dimension)
-                    break;
-                c[i][j] = parseFloat(cost[k]);
-                c[j][i] = parseFloat(cost[k]);
-                j++;
-            }
-        }
-        c[dimension-1][dimension-1] = 0.0;
-        */
         return {
             dimension: dimension, 
             rnd : rnd
