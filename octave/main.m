@@ -75,11 +75,9 @@ function [arr, pivotIndex] = partition(arr, left, right, r)
     for j = left:right - 1
         if cost(r, arr(j)) < cost(r, pivotValue)
             i = i + 1;
-            % Troca arr(i) e arr(j)
             [arr(i), arr(j)] = deal(arr(j), arr(i));
         end
     end
-    % Troca o pivô
     [arr(i + 1), arr(right)] = deal(arr(right), arr(i + 1));
     pivotIndex = i + 1;
 end
@@ -207,10 +205,8 @@ function [solut_new, seq_new, ret] = search_swap(s, seq)
     end
 
     if (cost_best < seq(1, dimen+1, C) - eps)
-        %cost_best
         s = swap(s, I_best, J_best);
         seq = update_subseq_info_matrix(s);
-        %solut.cost
         solut_new = s;
         seq_new = seq;
         ret = true;
@@ -261,10 +257,8 @@ function [solut_new, seq_new, ret] = search_two_opt(s, seq)
     end
 
     if (cost_best < seq(1, dimen+1, C) - eps)
-        %cost_best
         s = reverse(s, I_best, J_best);
         seq = update_subseq_info_matrix(s);
-        %solut.cost
         solut_new = s;
         seq_new = seq;
         ret = true;
@@ -340,11 +334,8 @@ function [solut_new, seq_new, ret] = search_reinsertion(s, seq, opt)
     end
 
     if (cost_best < seq(1, dimen+1, C))
-        %cost_best
         s = reinsert(s, I_best, J_best, POS_best+1);
         seq = update_subseq_info_matrix(s);
-        %solut.cost
-
         solut_new = s;
         seq_new = seq;
         ret = true;
