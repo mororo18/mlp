@@ -18,7 +18,6 @@ namespace MLP {
             matrix = new double [dimension, dimension];
 
             for(int i = 1; i < dimension; i++){
-                //Console.WriteLine(file[i]);
                 file_line++;
                 int j = i;
                 while(file[i].IndexOf(" ") != -1){
@@ -27,7 +26,6 @@ namespace MLP {
                     matrix[j, i-1] = matrix[i-1, j];
                     matrix[i-1, i-1] = 0.0;
                     file[i] = file[i].Substring(index+1);
-                    //Console.WriteLine(matrix[i-1, j]);
                     j++;
                 }
             }
@@ -42,14 +40,6 @@ namespace MLP {
             for (int i = 0; i < rnd_size; i++) {
                 rnd[i] = Int32.Parse(file[file_line++]);
             }
-            /*
-            for(int i = 0; i < dimension; i++){
-                for(int j = i+1; j < dimension; j++){
-                    Console.Write(matrix[i, j] + " ");
-                }
-                Console.WriteLine();
-            }
-            */
         }
 
         public double getDistance(int i, int j) {
