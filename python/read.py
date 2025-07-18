@@ -18,7 +18,6 @@ def get_instance_info(f_name='../distance_matrix'):
     cost = []
 
     i = -1  
-    #dimension = None
 
     dimension = int(f.readline())
     cost = matrix_fill(dimension)

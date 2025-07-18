@@ -194,11 +194,8 @@ fn search_swap(
     }
 
     if cost_best < seq[0][dimen].C - f64::EPSILON {
-        //println!("swap \n{}", cost_best);
         swap(s, I, J);
         update_subseq_info_matrix(s, seq, c, dimen);
-        //update_subseq_info_matrix(s, info);
-        //println!("{}", seq[0][info.dimension][C]);
         return true;
     } else {
         return false;
@@ -223,7 +220,6 @@ fn search_two_opt(
     for i in 1..dimen - 1 {
         let i_prev: usize = i - 1;
         let mut rev_seq_cost: f64 = seq[i][i + 1].T;
-        //let mut rev_seq_cost : f64 = solut.seq.get_unchecked(i).get_unchecked( i+1).T;
 
         for j in i + 2..dimen {
             let j_next = j + 1;
@@ -248,11 +244,8 @@ fn search_two_opt(
     }
 
     if cost_best < seq[0][dimen].C - f64::EPSILON {
-        //println!("two_opt \n{}", cost_best);
         reverse(s, I, J);
         update_subseq_info_matrix(s, seq, c, dimen);
-        //update_subseq_info_matrix(s, seq, info);
-        //println!("{}", seq[0][info.dimension][C]);
         return true;
     } else {
         return false;
@@ -323,10 +316,8 @@ fn search_reinsertion(
     }
 
     if cost_best < seq[0][dimen].C - f64::EPSILON {
-        //println!("reinsertion {}   {} {} {}\n{}", opt,I,J, 1+POS, cost_best);
         reinsert(s, I, J, POS + 1);
         update_subseq_info_matrix(s, seq, c, dimen);
-        //println!("{}", seq[0][info.dimension][C]);
         return true;
     } else {
         return false;

@@ -208,6 +208,7 @@ public:
 
             improve = true;
         }
+
     }
 
     void search_two_opt(vector<int> & s, tSubseq & seq) {
@@ -249,6 +250,7 @@ public:
 
             improve = true;
         }
+      
     }
 
     void search_reinsertion(vector<int> & s, tSubseq & seq, const int opt) {
@@ -312,6 +314,7 @@ public:
 
             improve = true;
         }
+
     }
 
     void RVND(vector<int> & s, tSubseq & seq, tRnd & rnd) {

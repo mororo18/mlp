@@ -51,19 +51,6 @@ def subseq_info_fill(n):
         matrix.append([])
         for j in range(n+1):
             matrix[i].append(tSubseq(0.0, 0.0, 0.0))
-            #matrix[i].append([0.0, 0.0, 0.0])
-
-    '''
-    for i in range(n+1):
-        matrix[W].append([])
-        matrix[T].append([])
-        matrix[C].append([])
-        for j in range(n+1):
-            matrix[W][i].append(0.0)
-            matrix[T][i].append(0.0)
-            matrix[C][i].append(0.0)
-            '''
-
     return matrix
 
 def quicksort(arr, left, right, r):
@@ -175,14 +162,6 @@ def search_swap(s):
             cost_concat_3 = cost_concat_2 + subseq[i_next][j_prev].T + m[s[j_prev]][s[i]]
             cost_concat_4 = cost_concat_3 + m[s[i]][s[j_next]]
 
-            """
-            cost = 1st subseq                       +
-                    concat 2nd subseq (sigle node)  + 
-                    concat 3rd subseq               +
-                    concat 4th subseq (single node) +
-                    concat 5th subseq
-            """
-
             cost = subseq[0][i_prev].C                                                + \
                     cost_concat_1                                                   + \
                     subseq[i_next][j_prev].W * cost_concat_2 + subseq[i_next][j_prev].C + \
@@ -195,10 +174,8 @@ def search_swap(s):
                 J = j
 
     if cost_best < subseq[0][n].C  - EPSILON:
-        #print(cost_best, I, J)
         swap(s, I, J)
         update_subseq_info_matrix(s)
-        #print(seq[C][0][n])
         global improv_flag
         improv_flag = True
 
@@ -219,26 +196,16 @@ def search_two_opt(s):
             cost_concat_1 = subseq[0][i_prev].T  + m[s[j]][s[i_prev]]
             cost_concat_2 = cost_concat_1 + subseq[i][j].T + m[s[j_next]][s[i]]
 
-            """
-            cost = 1st subseq                           +
-                    concat 2nd subseq (reversed seq)    + 
-                    concat 3rd subseq               
-            """
-
             cost = subseq[0][i_prev].C                                        + \
                     subseq[i][j].W * cost_concat_1 + reverse_cost             + \
                     subseq[j_next][n].W  * (cost_concat_2) + subseq[j_next][n].C 
 
-            #print(cost, i, "        ", j)
-            #print(seq[C][0][i_prev], seq[W][i][j] * cost_concat_1,seq[W][j_next][n] * (cost_concat_2), seq[C][j_next][n] )
             if cost < cost_best:
                 cost_best = cost - EPSILON
                 I = i
                 J = j
 
     if cost_best < subseq[0][n].C  - EPSILON:
-        #print(cost_best)
-        #print(I, J)
         reverse(s, I, J)
         update_subseq_info_matrix(s)
         global improv_flag
@@ -254,15 +221,6 @@ def search_reinsertion(s, OPT):
     opt = OPT - 1 
     MAX = n - opt 
 
-    '''
-    #branchless approach
-    BEST = 1
-    J_arr = [None, None]
-    I_arr = [None, None]
-    POS_arr = [None, None]
-    COST_arr=[None, cost_best]
-    '''
-
     for i in range(1, MAX + 1):
         j = opt + i - 1
 
@@ -276,13 +234,6 @@ def search_reinsertion(s, OPT):
             cost_concat_2 = cost_concat_1 + subseq[i][j].T  + m[s[j]][s[k_next]]
             cost_concat_3 = cost_concat_2 + subseq[k_next][i_prev].T  + m[s[i_prev]][s[j_next]]
 
-            """
-            cost = 1st subseq                           +
-                    concat 2nd subseq (reinserted seq)  + 
-                    concat 3rd subseq                   +
-                    concat 4th subseq  
-            """
-
             cost = subseq[0][k].C                                                          + \
                     subseq[i][j].W             * cost_concat_1 + subseq[i][j].C               + \
                     subseq[k_next][i_prev].W   * cost_concat_2 + subseq[k_next][i_prev].C     + \
@@ -293,15 +244,6 @@ def search_reinsertion(s, OPT):
                 I = i
                 J = j
                 POS = k
-            '''
-            #branchless approach
-            if_state = int(cost < COST_arr[BEST])
-            COST_arr[if_state] = cost - EPSILON
-            I_arr[if_state] = i
-            J_arr[if_state] = j
-            POS_arr[if_state] = k
-            '''
-
 
         for k in range(i+opt, n):
             k_next = k+1
@@ -309,13 +251,6 @@ def search_reinsertion(s, OPT):
             cost_concat_1 = subseq[0][i_prev].T  + m[s[i_prev]][s[j_next]]
             cost_concat_2 = cost_concat_1 + subseq[j_next][k].T  + m[s[k]][s[i]]
             cost_concat_3 = cost_concat_2 + subseq[i][j].T  + m[s[j]][s[k_next]]
-
-            """
-            cost = 1st subseq                           +
-                    concat 2nd subseq                   + 
-                    concat 3rd subseq  (reinserted seq) +
-                    concat 4th subseq  
-            """
 
             cost = subseq[0][i_prev].C                                         + \
                     subseq[j_next][k].W    * cost_concat_1 + subseq[j_next][k].C  + \
@@ -327,18 +262,8 @@ def search_reinsertion(s, OPT):
                 I = i
                 J = j
                 POS = k
-            '''
-            #branchless approach
-            if_state = int(cost < COST_arr[BEST])
-            COST_arr[if_state] = cost - EPSILON
-            I_arr[if_state] = i
-            J_arr[if_state] = j
-            POS_arr[if_state] = k
-            '''
 
-    #if COST_arr[BEST] < seq[C][0][n] - EPSILON:
     if cost_best < subseq[0][n].C  - EPSILON:
-        #reinsert(s, I_arr[BEST], J_arr[BEST], POS_arr[BEST]+1)
         reinsert(s, I, J, POS+1)
         update_subseq_info_matrix(s)
         global improv_flag

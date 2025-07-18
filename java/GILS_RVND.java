@@ -49,9 +49,7 @@ class GILS_RVND {
             for(int j = i; j < dimension; j++){
                 c[i][j] = data.getDistance(i, j);
                 c[j][i] = data.getDistance(i, j);
-                //System.out.print(Double.toString(c[i][j])+ " ");
             }
-            //System.out.println(i);
         }
         System.out.println(Integer.toString(data.getRndSize()));
         rnd = data.getRnd();
@@ -62,7 +60,6 @@ class GILS_RVND {
     }
 
     private void subseq_load(ArrayList<Integer> s, double [][][] seq){
-        //t_subseq -= System.nanoTime();
         for(int i = 0; i < dimension+1; i++){
             int k = 1 - i - (i != 0 ? 0 : 1);
 
@@ -153,8 +150,6 @@ class GILS_RVND {
             s.addAll(pos, s.subList(i, j+1));
             s.subList(i, j+1).clear();
         }
-
-        //System.out.println(s);
     }
 
     private void search_swap(ArrayList<Integer> s, double [][][] seq){
