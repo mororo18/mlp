@@ -41,7 +41,7 @@ rand: $(BIN_NAME)
 
 clean:
 	@echo "\033[31mcleaning obj directory \033[0m"
-	@rm $(OBJDIR)/* $(BIN_NAME)
+	@rm -f $(OBJDIR)/* $(BIN_NAME)
 
 rebuild: clean $(BIN_NAME)
 
