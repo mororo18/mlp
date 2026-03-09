@@ -12,13 +12,13 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 ---
 
-## P1 - Critical Cleanup
+## P1
 
 Remove local `loader/` directory (deprecated, relevant loader is in `mlp-instances/loader/`)
 
 ---
 
-## P2 - Test Consolidation
+## P2
 
 Create centralized `tests/` directory
 
@@ -26,16 +26,26 @@ Remove per-language `test/` subdirectories (POC tests)
 
 ---
 
-## P3 - Standardization
+## P3
 
 Ensure every language dir has `build.sh` and `run_*.sh`
 
 ---
 
-## P4 - File Cleanup
+## P4
 
 Review multiple main variants in `lua/`, `python/` - keep canonical version
 
 Remove profiler output files (`.txt`, `.log`, `MyProfilingReport.txt`)
 
 Remove compiled binaries from repo
+
+---
+
+## P5
+
+Create `benchmarks/` directory for storing metrics
+
+Create `parse_callgrind.py` tool to extract relevant metrics from Callgrind output
+
+Create proof of concept small benchmark (if not existent) that shows the change is really relevant
