@@ -28,6 +28,8 @@ Add progress output flag to all language implementations (default: false)
 
 **Note:** Before starting work on each language, verify the implementation builds and runs successfully.
 
+**Additional Task:** Add verbose option to all run_*.sh scripts
+
 - java [DONE]
 - rust [DONE]
 - python [DONE]
