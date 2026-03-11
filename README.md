@@ -41,3 +41,25 @@ cd ../java
 | rust | ✓ | ✓ run_rust.sh |
 
 **Note:** Interpreted languages (javascript, julia, lua, octave, python) don't require build.sh.
+
+## Tool Versions
+
+| Tool | Version |
+|------|---------|
+| gcc | 14.2.0 |
+| g++ | 14.2.0 |
+| gfortran | 14.2.0 |
+| go | 1.22.2 |
+| rust | 1.66.1 (via rust-toolchain) |
+| java (OpenJDK) | 21 |
+| node | 20.16.0 |
+| julia | 1.12 (via juliaup) |
+| python3 | 3.12.7 |
+| pypy3 | 7.3.15 |
+| lua5.3 | 5.3.6 |
+| luajit | 2.1.1703358377 |
+| octave | 8.4.0 |
+| dotnet | 8.0.125 |
+| valgrind | 3.23.0 |
+
+**Note:** Run `./setup.sh` to install all required tools.
