@@ -16,6 +16,8 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 **Completion:** When a task is finished, remove it from the TODO file rather than marking it as done.
 
+**Commits:** Do not automatically commit and push changes after completing a task. Ask for approval before committing.
+
 ---
 
 ## P2
