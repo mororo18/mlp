@@ -34,6 +34,8 @@ Remove per-language `test/` subdirectories (POC tests)
 
 Ensure every language dir has `build.sh` and `run_*.sh`
 
+Add progress output flag to all language implementations (default: false)
+
 ---
 
 ## P4
