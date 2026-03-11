@@ -632,7 +632,7 @@ std::vector<int> perturb(tSolution * solut, tData & data) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tData & data) {
+void GILS_RVND(int Imax, int Iils, tData & data, bool verbose) {
 
     tSolution solut_partial = Solution_init(data);
     tSolution solut_crnt = Solution_init(data);
@@ -643,16 +643,20 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
 
         double alpha = R_table(aux);
 
-        printf("[+] Search %d\n", i+1);
-        printf("\t[+] Constructing..\n");	
+        if (verbose) {
+            printf("[+] Search %d\n", i+1);
+            printf("\t[+] Constructing..\n");	
+        }
 
 
         solut_crnt.s = construct(alpha, data);
         update_subseq_info_matrix(solut_crnt, data);
 
         Solution_cpy(solut_crnt, solut_partial, data);
-        printf("\t[+] Looking for the best Neighbor..\n");
-        printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
+        if (verbose) {
+            printf("\t[+] Looking for the best Neighbor..\n");
+            printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
+        }
 
         int iterILS = 0;
         while (iterILS < Iils) {
@@ -671,13 +675,15 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
             Solution_cpy(solut_partial, solut_best, data);
         }
 
-        std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
+        if (verbose) {
+            std::cout << "\tCurrent best cost: "<< solut_best.cost << std::endl;
 
-        std::cout << "SOLUCAO: ";
-        for(int i = 0; i < solut_best.s.size(); i++){
-            std::cout << solut_best.s[i] << " ";
+            std::cout << "SOLUCAO: ";
+            for(int i = 0; i < solut_best.s.size(); i++){
+                std::cout << solut_best.s[i] << " ";
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
 
     }
     printf("COST: %.2lf\n", solut_best.cost);
@@ -686,6 +692,13 @@ void GILS_RVND(int Imax, int Iils, tData & data) {
 int main(int argc, char **argv){
     int Imax = 10;
     int Iils;
+    bool verbose = false;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
+            verbose = true;
+        }
+    }
 
     tData data = {
     };
@@ -704,7 +717,7 @@ int main(int argc, char **argv){
     Iils = data.dimen < 100 ? data.dimen : 100;
     auto t1 = steady_clock::now();
     size_t start = clock();
-    GILS_RVND(Imax, Iils, data);
+    GILS_RVND(Imax, Iils, data, verbose);
     double cpu_time = (double)(clock() - start) / CLOCKS_PER_SEC ;
     auto t2 = steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();

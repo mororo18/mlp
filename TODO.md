@@ -32,7 +32,8 @@ Add progress output flag to all language implementations (default: false)
 - rust [DONE]
 - python [DONE]
 - c [DONE]
-- cplusplus
+- cplusplus [DONE]
+- fortran
 - python
 - c
 - cplusplus
