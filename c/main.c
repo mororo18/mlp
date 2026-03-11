@@ -427,7 +427,7 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tData * data) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tData * data) {
+void GILS_RVND(int Imax, int Iils, tData * data, int verbose) {
 
     tSolution solut_partial = Solution_init(*data);
     tSolution solut_crnt = Solution_init(*data);
@@ -447,18 +447,24 @@ void GILS_RVND(int Imax, int Iils, tData * data) {
 
         Real alpha = R_table(aux);
 
-        printf("[+] Search %d\n", i+1);
-        printf("\t[+] Constructing..\n");	
+        if (verbose) {
+            printf("[+] Search %d\n", i+1);
+            printf("\t[+] Constructing..\n");	
+        }
 
 
         construct(solut_crnt.s, alpha, data);
         assert(feasible(solut_crnt.s, data->dimen));
-        print_s(solut_crnt.s, data->dimen+1);
+        if (verbose) {
+            print_s(solut_crnt.s, data->dimen+1);
+        }
         update_subseq_info_matrix(&solut_crnt, data);
 
         Solution_cpy(&solut_crnt, &solut_partial, data);
-        printf("\t[+] Looking for the best Neighbor..\n");
-        printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
+        if (verbose) {
+            printf("\t[+] Looking for the best Neighbor..\n");
+            printf("\t    Construction Cost: %.3lf\n", solut_partial.cost);	
+        }
 
         int iterILS = 0;
         while (iterILS < Iils) {
@@ -479,13 +485,15 @@ void GILS_RVND(int Imax, int Iils, tData * data) {
             Solution_cpy(&solut_partial, &solut_best, data);
         }
 
-        printf("\tCurrent best cost: %.2lf\n", solut_best.cost);
+        if (verbose) {
+            printf("\tCurrent best cost: %.2lf\n", solut_best.cost);
 
-        printf("SOLUCAO: ");
-        for(int i = 0; i < data->dimen+1; i++){
-            printf("%d ", solut_best.s[i]);
+            printf("SOLUCAO: ");
+            for(int i = 0; i < data->dimen+1; i++){
+                printf("%d ", solut_best.s[i]);
+            }
+            printf("\n");
         }
-        printf("\n");
 
     }
     printf("COST: %.2lf\n", solut_best.cost);
@@ -498,6 +506,13 @@ void GILS_RVND(int Imax, int Iils, tData * data) {
 int main(int argc, char **argv){
     int Imax = 10;
     int Iils;
+    int verbose = 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
+            verbose = 1;
+        }
+    }
 
     tData data = {0};
 
@@ -509,7 +524,7 @@ int main(int argc, char **argv){
 
     Iils = data.dimen < 100 ? data.dimen : 100;
     time_t start = clock();
-    GILS_RVND(Imax, Iils, &data);
+    GILS_RVND(Imax, Iils, &data, verbose);
 
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
     printf("TIME: %.6lf\n", res);
