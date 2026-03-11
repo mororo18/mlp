@@ -16,7 +16,6 @@ sudo apt install -y \
     gfortran \
     make \
     golang \
-    julia \
     lua5.3 \
     luajit \
     octave \
@@ -24,6 +23,14 @@ sudo apt install -y \
     valgrind \
     openjdk-21-jdk \
     nodejs
+
+# Julia (via juliaup)
+if ! command -v juliaup &> /dev/null; then
+    curl -fsSL https://install.julialang.org | sh -s -- -y
+    source ~/.bashrc
+fi
+~/.juliaup/bin/juliaup add 1.12
+~/.juliaup/bin/juliaup default 1.12
 
 # .NET SDK (for csharp)
 sudo apt install -y dotnet-sdk-8.0
