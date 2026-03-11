@@ -14,11 +14,7 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 **Planning:** Always make a plan before trying to do a task and ask for approval before executing it.
 
----
-
-## P1
-
-Remove local `loader/` directory (deprecated, relevant loader is in `mlp-instances/loader/`)
+**Completion:** When a task is finished, remove it from the TODO file rather than marking it as done.
 
 ---
 
