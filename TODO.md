@@ -10,6 +10,8 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 **Current task:** first item or group in the highest-priority non-empty section.
 
+**Multi-language tasks:** When a task applies to every language implementation, track which languages have been completed directly in the TODO file. Apply the tracking immediately as each language is completed, not after finishing all languages.
+
 ---
 
 ## P1
