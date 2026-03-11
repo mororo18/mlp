@@ -18,19 +18,7 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 **Commits:** Do not automatically commit and push changes after completing a task. Ask for approval before committing.
 
----
-
-## P2
-
-Create centralized `tests/` directory
-
-Remove per-language `test/` subdirectories (POC tests)
-
----
-
 ## P3
-
-Ensure every language dir has `build.sh` and `run_*.sh`
 
 Add progress output flag to all language implementations (default: false)
 
