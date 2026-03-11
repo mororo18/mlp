@@ -30,7 +30,8 @@ Add progress output flag to all language implementations (default: false)
 
 - java [DONE]
 - rust [DONE]
-- python
+- python [DONE]
+- c
 - python
 - c
 - cplusplus
