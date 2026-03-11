@@ -26,8 +26,11 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 Add progress output flag to all language implementations (default: false)
 
+**Note:** Before starting work on each language, verify the implementation builds and runs successfully.
+
 - java [DONE]
-- rust
+- rust [DONE]
+- python
 - python
 - c
 - cplusplus

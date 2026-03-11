@@ -1,14 +1,12 @@
-use std::fs;
 use crate::subseq::CostMatrix;
+use std::fs;
 
 pub fn load(filename: &str) -> (usize, CostMatrix, Vec<usize>) {
-
-    let contents = fs::read_to_string(filename)
-        .expect("Something went wrong reading the file");
+    let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
     let mut line_i = 0;
 
-    let mut lines : Vec<String> = vec![];
+    let mut lines: Vec<String> = vec![];
     for l in contents.lines() {
         lines.push(l.to_string());
     }

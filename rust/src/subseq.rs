@@ -11,39 +11,41 @@ pub enum Operator {
 
 #[derive(Debug, Copy, Clone)]
 pub struct SubseqInfo {
-   pub  t : f64,
-   pub  c : f64,
-   pub  w : f64,
+    pub t: f64,
+    pub c: f64,
+    pub w: f64,
 }
 
 impl SubseqInfo {
     #[inline]
-    fn zeored () -> Self {
-        Self { t: 0.0, c: 0.0, w: 0.0 }
+    fn zeored() -> Self {
+        Self {
+            t: 0.0,
+            c: 0.0,
+            w: 0.0,
+        }
     }
 }
 
 #[derive(Debug, Clone)]
-pub
-struct SubseqMatrix {
-#[cfg(feature="flat")]
+pub struct SubseqMatrix {
+    #[cfg(feature = "flat")]
     row_size: usize,
-#[cfg(feature="flat")]
+    #[cfg(feature = "flat")]
     data: Vec<SubseqInfo>,
-#[cfg(not(feature="flat"))]
-    data:  Vec<Vec<SubseqInfo>>,
+    #[cfg(not(feature = "flat"))]
+    data: Vec<Vec<SubseqInfo>>,
 }
 
 impl SubseqMatrix {
-    pub
-    fn new (n: usize) -> Self {
-        Self { 
-#[cfg(feature="flat")]
-            row_size: n+1,
-#[cfg(feature="flat")]
-            data: vec![SubseqInfo::zeored(); (n+1) * (n+1)],
-#[cfg(not(feature="flat"))]
-            data: vec![ vec![ SubseqInfo::zeored(); n+1]; n+1],
+    pub fn new(n: usize) -> Self {
+        Self {
+            #[cfg(feature = "flat")]
+            row_size: n + 1,
+            #[cfg(feature = "flat")]
+            data: vec![SubseqInfo::zeored(); (n + 1) * (n + 1)],
+            #[cfg(not(feature = "flat"))]
+            data: vec![vec![SubseqInfo::zeored(); n + 1]; n + 1],
         }
     }
 }
@@ -51,7 +53,7 @@ impl SubseqMatrix {
 impl Index<(usize, usize)> for SubseqMatrix {
     type Output = SubseqInfo;
     #[inline]
-    fn index(&self,  index: (usize, usize)) -> &Self::Output {
+    fn index(&self, index: (usize, usize)) -> &Self::Output {
         let (row, col) = index;
         unsafe {
             #[cfg(feature = "flat")]
@@ -85,27 +87,25 @@ impl IndexMut<(usize, usize)> for SubseqMatrix {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct CostMatrix {
-#[cfg(feature="flat")]
+    #[cfg(feature = "flat")]
     row_size: usize,
-#[cfg(feature="flat")]
-    data:     Vec<f64>,
-#[cfg(not(feature="flat"))]
-    data:     Vec< Vec<f64> >,
+    #[cfg(feature = "flat")]
+    data: Vec<f64>,
+    #[cfg(not(feature = "flat"))]
+    data: Vec<Vec<f64>>,
 }
 
 impl CostMatrix {
-    pub
-    fn new(n: usize) -> CostMatrix {
+    pub fn new(n: usize) -> CostMatrix {
         Self {
-#[cfg(feature="flat")]
+            #[cfg(feature = "flat")]
             row_size: n,
-#[cfg(feature="flat")]
-            data: vec![0.0; n*n],
-#[cfg(not(feature="flat"))]
-            data: vec![ vec![0.0; n]; n],
+            #[cfg(feature = "flat")]
+            data: vec![0.0; n * n],
+            #[cfg(not(feature = "flat"))]
+            data: vec![vec![0.0; n]; n],
         }
     }
 }
@@ -114,7 +114,7 @@ impl Index<(usize, usize)> for CostMatrix {
     type Output = f64;
 
     #[inline]
-    fn index (& self,  index: (usize, usize)) -> &Self::Output {
+    fn index(&self, index: (usize, usize)) -> &Self::Output {
         let (row, col) = index;
         unsafe {
             #[cfg(feature = "flat")]
@@ -150,17 +150,17 @@ impl IndexMut<(usize, usize)> for CostMatrix {
 
 #[derive(Debug, Clone)]
 pub struct Data {
-    pub c : CostMatrix,
-    pub dimen : usize,
-    pub rnd : Vec<usize>,
-    pub rnd_index : usize,
+    pub c: CostMatrix,
+    pub dimen: usize,
+    pub rnd: Vec<usize>,
+    pub rnd_index: usize,
 }
 
 #[derive(Debug, Clone)]
 pub struct Solution {
-    pub seq : SubseqMatrix,
-    pub s : Vec<usize>,
-    pub cost : f64,
+    pub seq: SubseqMatrix,
+    pub s: Vec<usize>,
+    pub cost: f64,
 }
 
 impl Index<usize> for Solution {
@@ -171,4 +171,3 @@ impl Index<usize> for Solution {
         unsafe { self.s.get_unchecked(index) }
     }
 }
-

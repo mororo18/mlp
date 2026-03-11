@@ -1,10 +1,10 @@
-mod subseq;
 mod data;
+mod subseq;
 
 use subseq::*;
 
-use std::time::Duration;
 use cpu_time::ProcessTime;
+use std::time::Duration;
 
 fn update_subseq_info_matrix(solut: &mut Solution, info: &Data) {
     for i in 0..=info.dimen {
@@ -31,7 +31,6 @@ fn update_subseq_info_matrix(solut: &mut Solution, info: &Data) {
     solut.cost = solut.seq[(0, info.dimen)].c;
 }
 
-
 fn sort(arr: &mut Vec<usize>, r: usize, info: &Data) {
     quicksort(arr, 0, arr.len() as isize - 1, info, r);
 }
@@ -57,7 +56,7 @@ fn partition(arr: &mut Vec<usize>, left: isize, right: isize, info: &Data, r: us
     i + 1
 }
 
-fn construction(alpha : f64, info : &mut Data) -> Vec<usize> {
+fn construction(alpha: f64, info: &mut Data) -> Vec<usize> {
     let mut s = vec![0; 1];
 
     let mut c_list = vec![];
@@ -65,9 +64,9 @@ fn construction(alpha : f64, info : &mut Data) -> Vec<usize> {
         c_list.push(i);
     }
 
-    let mut r : usize = 0;
+    let mut r: usize = 0;
     while !c_list.is_empty() {
-        sort(&mut c_list, r, & info);
+        sort(&mut c_list, r, &info);
 
         let index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
@@ -82,15 +81,15 @@ fn construction(alpha : f64, info : &mut Data) -> Vec<usize> {
     return s;
 }
 
-fn swap(s : &mut Vec<usize>, i : usize, j : usize){
+fn swap(s: &mut Vec<usize>, i: usize, j: usize) {
     s.swap(i, j);
 }
 
-fn reverse(s : &mut Vec<usize>, i : usize, j : usize){
+fn reverse(s: &mut Vec<usize>, i: usize, j: usize) {
     s[i..=j].reverse();
 }
 
-fn reinsert(s : &mut Vec<usize>, i : usize, j : usize, pos : usize){
+fn reinsert(s: &mut Vec<usize>, i: usize, j: usize, pos: usize) {
     if i < pos {
         for _k in i..=j {
             s.insert(pos, s[i]);
@@ -105,23 +104,24 @@ fn reinsert(s : &mut Vec<usize>, i : usize, j : usize, pos : usize){
     }
 }
 
-fn search_swap(solut : &mut Solution, info : & Data) -> bool {
-    let mut cost_concat_1 : f64;
-    let mut cost_concat_2 : f64;
-    let mut cost_concat_3 : f64;
-    let mut cost_concat_4 : f64;
+fn search_swap(solut: &mut Solution, info: &Data) -> bool {
+    let mut cost_concat_1: f64;
+    let mut cost_concat_2: f64;
+    let mut cost_concat_3: f64;
+    let mut cost_concat_4: f64;
 
-    let mut cost_best : f64 = f64::MAX;
-    let mut cost_new : f64;
-    let mut I : usize = 0;
-    let mut J : usize = 0;
+    let mut cost_best: f64 = f64::MAX;
+    let mut cost_new: f64;
+    let mut I: usize = 0;
+    let mut J: usize = 0;
 
     for i in 1..info.dimen - 1 {
         let i_prev: usize = i - 1;
         let i_next: usize = i + 1;
 
         cost_concat_1 = solut.seq[(0, i_prev)].t + info.c[(solut[i_prev], solut[i_next])];
-        cost_concat_2 = cost_concat_1 + solut.seq[(i, i_next)].t + info.c[(solut[i], solut[i_next + 1])];
+        cost_concat_2 =
+            cost_concat_1 + solut.seq[(i, i_next)].t + info.c[(solut[i], solut[i_next + 1])];
 
         cost_new = solut.seq[(0, i_prev)].c
             + solut.seq[(i, i_next)].w * cost_concat_1
@@ -141,7 +141,8 @@ fn search_swap(solut : &mut Solution, info : & Data) -> bool {
 
             cost_concat_1 = solut.seq[(0, i_prev)].t + info.c[(solut[i_prev], solut[j])];
             cost_concat_2 = cost_concat_1 + info.c[(solut[j], solut[i_next])];
-            cost_concat_3 = cost_concat_2 + solut.seq[(i_next, j_prev)].t + info.c[(solut[j_prev], solut[i])];
+            cost_concat_3 =
+                cost_concat_2 + solut.seq[(i_next, j_prev)].t + info.c[(solut[j_prev], solut[i])];
             cost_concat_4 = cost_concat_3 + info.c[(solut[i], solut[j_next])];
 
             cost_new = solut.seq[(0, i_prev)].c
@@ -160,7 +161,6 @@ fn search_swap(solut : &mut Solution, info : & Data) -> bool {
         }
     }
 
-
     if cost_best < solut.cost - f64::EPSILON {
         swap(&mut solut.s, I, J);
         update_subseq_info_matrix(solut, info);
@@ -170,15 +170,15 @@ fn search_swap(solut : &mut Solution, info : & Data) -> bool {
     }
 }
 
-fn search_two_opt(solut: &mut Solution, info: & Data) -> bool {
-    let mut cost_new : f64;
-    let mut cost_best : f64 = f64::MAX;
+fn search_two_opt(solut: &mut Solution, info: &Data) -> bool {
+    let mut cost_new: f64;
+    let mut cost_best: f64 = f64::MAX;
 
-    let mut cost_concat_1 : f64;
-    let mut cost_concat_2 : f64;
+    let mut cost_concat_1: f64;
+    let mut cost_concat_2: f64;
 
-    let mut I : usize = 0;
-    let mut J : usize = 0;
+    let mut I: usize = 0;
+    let mut J: usize = 0;
 
     for i in 1..info.dimen - 1 {
         let i_prev: usize = i - 1;
@@ -206,7 +206,6 @@ fn search_two_opt(solut: &mut Solution, info: & Data) -> bool {
         }
     }
 
-
     if cost_best < solut.cost - f64::EPSILON {
         reverse(&mut solut.s, I, J);
         update_subseq_info_matrix(solut, info);
@@ -216,22 +215,22 @@ fn search_two_opt(solut: &mut Solution, info: & Data) -> bool {
     }
 }
 
-fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
-    let mut cost_best : f64 = f64::MAX;
-    let mut cost_new : f64;
+fn search_reinsertion(solut: &mut Solution, opt: usize, info: &Data) -> bool {
+    let mut cost_best: f64 = f64::MAX;
+    let mut cost_new: f64;
 
-    let mut cost_concat_1 : f64;
-    let mut cost_concat_2 : f64;
-    let mut cost_concat_3 : f64;
+    let mut cost_concat_1: f64;
+    let mut cost_concat_2: f64;
+    let mut cost_concat_3: f64;
 
-    let mut I : usize = 0;
-    let mut J : usize = 0;
-    let mut POS : usize = 0;
+    let mut I: usize = 0;
+    let mut J: usize = 0;
+    let mut POS: usize = 0;
 
-    for i in 1..info.dimen-opt+1 {
-        let j : usize = opt+i-1;
-        let i_prev : usize = i-1;
-        let j_next : usize = j+1;
+    for i in 1..info.dimen - opt + 1 {
+        let j: usize = opt + i - 1;
+        let i_prev: usize = i - 1;
+        let j_next: usize = j + 1;
 
         let seq_i_j_w = solut.seq[(i, j)].w;
         let seq_i_j_c = solut.seq[(i, j)].c;
@@ -243,7 +242,9 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
 
             cost_concat_1 = solut.seq[(0, k)].t + info.c[(solut[k], solut[i])];
             cost_concat_2 = cost_concat_1 + solut.seq[(i, j)].t + info.c[(solut[j], solut[k_next])];
-            cost_concat_3 = cost_concat_2 + solut.seq[(k_next, i_prev)].t + info.c[(solut[i_prev], solut[j_next])];
+            cost_concat_3 = cost_concat_2
+                + solut.seq[(k_next, i_prev)].t
+                + info.c[(solut[i_prev], solut[j_next])];
 
             cost_new = solut.seq[(0, k)].c
                 + seq_i_j_w * cost_concat_1
@@ -260,7 +261,6 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
                 POS = k;
             }
         }
-
 
         for k in (i + opt)..info.dimen {
             let k_next: usize = k + 1;
@@ -284,11 +284,10 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
                 POS = k;
             }
         }
-
     }
 
     if cost_best < solut.cost - f64::EPSILON {
-        reinsert(&mut solut.s, I, J, POS+1);
+        reinsert(&mut solut.s, I, J, POS + 1);
         update_subseq_info_matrix(solut, info);
         return true;
     } else {
@@ -297,7 +296,6 @@ fn search_reinsertion(solut : &mut Solution, opt: usize, info: & Data) -> bool {
 }
 
 fn rvnd(solut: &mut Solution, info: &mut Data) {
-
     let mut neighbd_list = vec![
         Operator::Swap,
         Operator::TwoOpt,
@@ -306,22 +304,21 @@ fn rvnd(solut: &mut Solution, info: &mut Data) {
         Operator::OrOpt3,
     ];
 
-
     while neighbd_list.is_empty() == false {
-
         let index = info.rnd[info.rnd_index];
         info.rnd_index += 1;
 
         let neighbd = neighbd_list[index];
 
         let improv_flag = match neighbd {
-            Operator::Swap          => search_swap(solut, info),
-            Operator::TwoOpt        => search_two_opt(solut, info),
-            Operator::Reinsertion   => search_reinsertion(solut, Operator::Reinsertion as usize, info),
-            Operator::OrOpt2        => search_reinsertion(solut, Operator::OrOpt2 as usize, info),
-            Operator::OrOpt3        => search_reinsertion(solut, Operator::OrOpt3 as usize, info),
+            Operator::Swap => search_swap(solut, info),
+            Operator::TwoOpt => search_two_opt(solut, info),
+            Operator::Reinsertion => {
+                search_reinsertion(solut, Operator::Reinsertion as usize, info)
+            }
+            Operator::OrOpt2 => search_reinsertion(solut, Operator::OrOpt2 as usize, info),
+            Operator::OrOpt3 => search_reinsertion(solut, Operator::OrOpt3 as usize, info),
         };
-
 
         if improv_flag {
             neighbd_list.resize(5, Operator::Swap);
@@ -332,23 +329,20 @@ fn rvnd(solut: &mut Solution, info: &mut Data) {
                 Operator::OrOpt2,
                 Operator::OrOpt3,
             ]);
-
         } else {
             neighbd_list.remove(index);
         }
-
     }
 }
 
-fn perturb(sl: & Vec<usize>, info: &mut Data) -> Vec<usize> {
+fn perturb(sl: &Vec<usize>, info: &mut Data) -> Vec<usize> {
     let mut s = sl.clone();
-    let mut a_start : usize = 1;
-    let mut a_end : usize = 1;
-    let mut b_start : usize = 1;
-    let mut b_end : usize = 1;
+    let mut a_start: usize = 1;
+    let mut a_end: usize = 1;
+    let mut b_start: usize = 1;
+    let mut b_end: usize = 1;
 
-    while (a_start <= b_start &&  b_start <= a_end) || (b_start <= a_start && a_start <= b_end) {
-
+    while (a_start <= b_start && b_start <= a_end) || (b_start <= a_start && a_start <= b_end) {
         a_start = info.rnd[info.rnd_index];
         info.rnd_index += 1;
         a_end = a_start + info.rnd[info.rnd_index];
@@ -358,65 +352,68 @@ fn perturb(sl: & Vec<usize>, info: &mut Data) -> Vec<usize> {
         info.rnd_index += 1;
         b_end = b_start + info.rnd[info.rnd_index];
         info.rnd_index += 1;
-
     }
 
     if a_start < b_start {
-        reinsert(&mut s, b_start, b_end-1, a_end);
-        reinsert(&mut s, a_start, a_end-1, b_end);
+        reinsert(&mut s, b_start, b_end - 1, a_end);
+        reinsert(&mut s, a_start, a_end - 1, b_end);
     } else {
-        reinsert(&mut s, a_start, a_end-1, b_end);
-        reinsert(&mut s, b_start, b_end-1, a_end);
+        reinsert(&mut s, a_start, a_end - 1, b_end);
+        reinsert(&mut s, b_start, b_end - 1, a_end);
     }
 
     return s;
 }
 
-fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Data) {
-
+fn gils_rvnd(imax: usize, iils: usize, r: [f64; 26], info: &mut Data, verbose: bool) {
     let mut solut_best = Solution {
-        seq : SubseqMatrix::new(info.dimen),
-        s : vec![0; info.dimen],
-        cost : f64::MAX,
+        seq: SubseqMatrix::new(info.dimen),
+        s: vec![0; info.dimen],
+        cost: f64::MAX,
     };
 
     let mut solut_partial = Solution {
-        seq : SubseqMatrix::new(info.dimen),
-        s : vec![0; info.dimen],
-        cost : 0.0,
+        seq: SubseqMatrix::new(info.dimen),
+        s: vec![0; info.dimen],
+        cost: 0.0,
     };
 
     let mut solut_crnt = Solution {
-        seq : SubseqMatrix::new(info.dimen),
-        s : vec![0; info.dimen],
-        cost : 0.0,
+        seq: SubseqMatrix::new(info.dimen),
+        s: vec![0; info.dimen],
+        cost: 0.0,
     };
 
-
     for _i in 0..imax {
-
         let r_value = info.rnd[info.rnd_index];
         info.rnd_index += 1;
         let alpha = r[r_value];
 
-        println!("[+] Local Search {}", _i);
+        if verbose {
+            println!("[+] Local Search {}", _i);
+        }
         solut_crnt.s = construction(alpha, info);
-        println!("{:?}", solut_crnt.s);
+        if verbose {
+            println!("{:?}", solut_crnt.s);
+        }
 
         update_subseq_info_matrix(&mut solut_crnt, info);
-        println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
+        if verbose {
+            println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
+        }
         solut_partial.s = solut_crnt.s.clone();
         solut_partial.cost = solut_crnt.cost;
 
-        println!("\t[+] Looking for the best Neighbor..");
-        let mut iter_ils : usize = 0;
+        if verbose {
+            println!("\t[+] Looking for the best Neighbor..");
+        }
+        let mut iter_ils: usize = 0;
         while iter_ils < iils {
             rvnd(&mut solut_crnt, info);
             if solut_crnt.cost < solut_partial.cost {
                 solut_partial.s = solut_crnt.s.clone();
                 solut_partial.cost = solut_crnt.cost;
                 iter_ils = 0;
-
             }
 
             solut_crnt.s = perturb(&solut_partial.s, info);
@@ -429,9 +426,10 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Data) {
             solut_best.cost = solut_partial.cost;
         }
 
-        println!("\tCurrent Best Cost {}", solut_best.cost);
+        if verbose {
+            println!("\tCurrent Best Cost {}", solut_best.cost);
+        }
     }
-
 
     println!("{:?}", solut_best.s);
     println!("COST: {}", solut_best.cost);
@@ -441,26 +439,30 @@ fn gils_rvnd(imax : usize, iils : usize, r : [f64; 26], info: &mut Data) {
 fn main() {
     let filename = "../distance_matrix";
 
+    let args: Vec<String> = std::env::args().collect();
+    let verbose = args.iter().any(|arg| arg == "-v" || arg == "--verbose");
+
     let (dimension, c, rnd) = data::load(filename);
 
     let mut info = Data {
-        dimen : dimension,
+        dimen: dimension,
         c,
         rnd,
-        rnd_index : 0,
+        rnd_index: 0,
     };
 
     let imax = 10;
-    let iils = if dimension < 100 {dimension} else {100};
+    let iils = if dimension < 100 { dimension } else { 100 };
 
-    let r = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
-            0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25];
+    let r = [
+        0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14,
+        0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25,
+    ];
 
     let start = ProcessTime::try_now().expect("Getting process time failed");
 
-    gils_rvnd(imax, iils, r, &mut info);
+    gils_rvnd(imax, iils, r, &mut info, verbose);
 
     let cpu_time: Duration = start.try_elapsed().expect("Getting process time failed");
     println!("TIME: {:?}", cpu_time.as_secs_f64());
-
 }
