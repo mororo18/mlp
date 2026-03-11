@@ -14,6 +14,8 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 **Planning:** Always make a plan before trying to do a task and ask for approval before executing it.
 
+**Findings:** Add relevant findings discovered when working on a task to the TODO file.
+
 **Completion:** When a task is finished, remove it from the TODO file rather than marking it as done.
 
 **Commits:** Do not automatically commit and push changes after completing a task. Ask for approval before committing.
@@ -23,6 +25,21 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 ## P2
 
 Add progress output flag to all language implementations (default: false)
+
+- java [DONE]
+- rust
+- python
+- c
+- cplusplus
+- fortran
+- go
+- javascript
+- julia
+- lua
+- octave
+- csharp
+- c_asm
+- cppOOP
 
 ---
 

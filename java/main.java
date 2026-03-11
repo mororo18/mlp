@@ -1,10 +1,16 @@
 class Main {
     public static void main(String args[]){
-        read();
+        boolean verbose = false;
+        for (String arg : args) {
+            if (arg.equals("-v") || arg.equals("--verbose")) {
+                verbose = true;
+            }
+        }
+        read(verbose);
     }
 
-    private static void read(){
-        GILS_RVND tsp = new GILS_RVND();
+    private static void read(boolean verbose){
+        GILS_RVND tsp = new GILS_RVND(verbose);
         long time = - System.nanoTime();
         tsp.solve();
         time += System.nanoTime();
