@@ -15,6 +15,7 @@ python/__pycache__/
 *.prof
 *.o
 *.d
+.venv/
 
 # dotnet 
 csharp/bin/

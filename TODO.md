@@ -18,13 +18,47 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 **Commits:** Do not automatically commit and push changes after completing a task. Ask for approval before committing.
 
-## P3
+---
+
+## P1
+
+Set up development environment - install all required compilers and interpreters
+
+Create Python virtual environment with required packages
+
+### Environment Setup Notes
+
+**Installed:**
+- ✓ Python venv created at `.venv/`
+- ✓ pandas, psutil installed in .venv
+
+**Needs manual installation (requires sudo):**
+- go
+- julia
+- lua5.3
+- luajit
+- octave
+- dotnet
+- pypy3
+- valgrind (for profiling)
+
+**Already available:**
+- gcc, g++, gfortran
+- rustc, cargo
+- javac, java
+- node
+- python3
+- mcs
+
+---
+
+## P2
 
 Add progress output flag to all language implementations (default: false)
 
 ---
 
-## P4
+## P3
 
 Review multiple main variants in `lua/`, `python/` - keep canonical version
 
@@ -34,7 +68,7 @@ Remove compiled binaries from repo
 
 ---
 
-## P5
+## P4
 
 Create `benchmarks/` directory for storing metrics
 
