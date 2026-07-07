@@ -22,35 +22,6 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 ---
 
-## P2
-
-Add progress output flag to all language implementations (default: false)
-
-**Note:** Before starting work on each language, verify the implementation builds and runs successfully.
-
-**Additional Task:** Add verbose option to all run_*.sh scripts
-
-- java [DONE]
-- rust [DONE]
-- python [DONE]
-- c [DONE]
-- cplusplus [DONE]
-- fortran
-- python
-- c
-- cplusplus
-- fortran
-- go
-- javascript
-- julia
-- lua
-- octave
-- csharp
-- c_asm
-- cppOOP
-
----
-
 ## P3
 
 Review multiple main variants in `lua/`, `python/` - keep canonical version
