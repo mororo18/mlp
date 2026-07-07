@@ -369,6 +369,12 @@ fn RVND(solut: &mut tSolution, rnd: &mut Rnd, data: &Data) {
 }
 
 fn perturb(sl: &Vec<usize>, rnd: &mut Rnd) -> Vec<usize> {
+    let mut s = sl.clone();
+    let mut A_start: usize = 1;
+    let mut A_end: usize = 1;
+    let mut B_start: usize = 1;
+    let mut B_end: usize = 1;
+
     let mut rng = rand::thread_rng();
 
     let size_max = if (s.len() as f64 / 10.0) as usize >= 2 {
@@ -413,7 +419,7 @@ fn perturb(sl: &Vec<usize>, rnd: &mut Rnd) -> Vec<usize> {
     return s;
 }
 
-fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data) {
+fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data, verbose: bool) {
     let mut solut_best = tSolution {
         seq: vec![vec![[0.0; 3]; data.dimen + 1]; data.dimen + 1],
         s: vec![0; data.dimen],
@@ -437,15 +443,23 @@ fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data)
         rnd.rnd_index += 1;
         let alpha = R[r_value];
 
-        println!("[+] Local Search {}", _i);
+        if verbose {
+            println!("[+] Local Search {}", _i);
+        }
         solut_crnt.s = construction(alpha, rnd, data);
-        println!("{:?}", solut_crnt.s);
+        if verbose {
+            println!("{:?}", solut_crnt.s);
+        }
         update_subseq_info_matrix(&mut solut_crnt, data);
-        println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
+        if verbose {
+            println!("\t[+] Constructing Inital Solution.. {}", solut_crnt.cost);
+        }
         solut_partial.s = solut_crnt.s.clone();
         solut_partial.cost = solut_crnt.cost;
 
-        println!("\t[+] Looking for the best Neighbor..");
+        if verbose {
+            println!("\t[+] Looking for the best Neighbor..");
+        }
         let mut iterILS: usize = 0;
         while iterILS < Iils {
             RVND(&mut solut_crnt, rnd, data);
@@ -467,7 +481,9 @@ fn GILS_RVND(Imax: usize, Iils: usize, R: [f64; 26], rnd: &mut Rnd, data: &Data)
             solut_best.cost = solut_partial.cost;
         }
 
-        println!("\tCurrent Best Cost {}", solut_best.cost);
+        if verbose {
+            println!("\tCurrent Best Cost {}", solut_best.cost);
+        }
     }
 
     println!("{:?}", solut_best.s);
@@ -479,6 +495,9 @@ fn print_type_of<T>(_: &T) {
 }
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let verbose = args.iter().any(|a| a == "-v" || a == "--verbose");
+
     let mut dimension: usize = 0;
     let mut c: Vec<Vec<f64>> = vec![]; //vec![0.0; 0]];
 
@@ -533,7 +552,9 @@ fn main() {
     //exit(0);
     */
 
-    println!("TEST");
+    if verbose {
+        println!("TEST");
+    }
 
     let Imax = 10;
     let Iils = if dimension < 100 { dimension } else { 100 };
@@ -546,7 +567,7 @@ fn main() {
     let now = Instant::now();
 
     //test!();
-    GILS_RVND(Imax, Iils, R, &mut rnd, &data);
+    GILS_RVND(Imax, Iils, R, &mut rnd, &data, verbose);
 
     let new_now = Instant::now();
     println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
