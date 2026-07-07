@@ -22,7 +22,20 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 ---
 
-## P3
+## P2
+
+Fix `lua/run_lua.sh` and `lua/run_luajit.sh`: they invoke `main.canc.lua.lua`,
+which crashes under both `lua5.3` (`table.remove` out of bounds in `RVND`,
+main.canc.lua.lua:343) and `luajit` (`attempt to index a nil value` in
+`sort`, main.canc.lua.lua:91) — reproduced on a clean checkout, unrelated to
+any pending change. Several near-duplicate files in the same directory
+(`main.lua`, `main_lua.lua`, `main_luajit.canc`, `main_luajit.canc.lua`) run
+correctly to completion under `luajit`, but weren't verified under `lua5.3`.
+Needs a decision on which file is canonical (ties into the item below) before
+`run_lua.sh`/`run_luajit.sh` can be fixed to point at a working entry point.
+
+Blocks: the lua leg of the cross-branch progress-flag rollout
+(`tcc/TODO.md` P2) — skipped for now pending this fix.
 
 Review multiple main variants in `lua/`, `python/` - keep canonical version
 
