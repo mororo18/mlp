@@ -439,7 +439,7 @@ func perturb(s_crnt []int, s_partial []int, rnd *tRnd) {
     copy(s_crnt, s)
 }
 
-func GILS_RVND(rnd tRnd) {
+func GILS_RVND(rnd tRnd, verbose bool) {
     Imax := 10
     Iils := ternary(dimension < 100, dimension, 100)
     _ = Iils
@@ -465,8 +465,10 @@ func GILS_RVND(rnd tRnd) {
         var r_index = rnd.index; rnd.index++
         var index = rnd.rnd[r_index]
         var alpha = R[index]
-        fmt.Printf("[+] Search %d\n", i+1)
-        fmt.Printf("\t[+] Constructing..\n");	
+        if verbose {
+            fmt.Printf("[+] Search %d\n", i+1)
+            fmt.Printf("\t[+] Constructing..\n")
+        }
 
         construct(alpha, s_crnt, &rnd)
 
@@ -495,8 +497,10 @@ func GILS_RVND(rnd tRnd) {
             cost_best = cost_partial
         }
 
-        fmt.Println("Current best cost: ", cost_best)
-        fmt.Println(s_best)
+        if verbose {
+            fmt.Println("Current best cost: ", cost_best)
+            fmt.Println(s_best)
+        }
     }
 
     fmt.Println("COST: ", cost_best)
@@ -504,6 +508,13 @@ func GILS_RVND(rnd tRnd) {
 }
 
 func main() {
+    verbose := false
+    for _, arg := range os.Args[1:] {
+        if arg == "-v" || arg == "--verbose" {
+            verbose = true
+        }
+    }
+
     var rnd tRnd
     dimension, cost, rnd.rnd = loadData()
     _ = dimension
@@ -512,7 +523,7 @@ func main() {
 
 
     start := time.Now()
-    GILS_RVND(rnd)
+    GILS_RVND(rnd, verbose)
     elapsed := time.Since(start).Seconds()
 
     fmt.Println("TIME: ", elapsed)
