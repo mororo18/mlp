@@ -450,7 +450,7 @@ void perturb(int * s_crnt, int * s_partial, tRnd * rnd) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
+void GILS_RVND(int Imax, int Iils, tRnd * rnd, int verbose) {
 
     int s_partial[dimen+1];
     int s_crnt[dimen+1];
@@ -472,18 +472,24 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
 
         double alpha = R_table(aux);
 
-        printf("[+] Search %d\n", i+1);
-        printf("\t[+] Constructing..\n");	
+        if (verbose) {
+            printf("[+] Search %d\n", i+1);
+            printf("\t[+] Constructing..\n");
+        }
 
         construct(s_crnt, alpha, rnd);
-        print_s(s_crnt, dimen+1);
+        if (verbose) {
+            print_s(s_crnt, dimen+1);
+        }
         cost_crnt = update_subseq_info_matrix(s_crnt, seq);
 
         cpy(s_crnt, s_partial, (dimen+1));
         cost_partial = cost_crnt;
 
-        printf("\t[+] Looking for the best Neighbor..\n");
-        printf("\t    Construction Cost: %.3lf\n", cost_partial);	
+        if (verbose) {
+            printf("\t[+] Looking for the best Neighbor..\n");
+            printf("\t    Construction Cost: %.3lf\n", cost_partial);
+        }
 
         int iterILS = 0;
         while (iterILS < Iils) {
@@ -505,12 +511,14 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
             cost_best = cost_partial;
         }
 
-        printf("\tCurrent best cost: %.2lf\n", cost_best);
-        printf("SOLUCAO: ");
-        for(int i = 0; i < dimen+1; i++){
-            printf("%d ", s_best[i]);
+        if (verbose) {
+            printf("\tCurrent best cost: %.2lf\n", cost_best);
+            printf("SOLUCAO: ");
+            for(int i = 0; i < dimen+1; i++){
+                printf("%d ", s_best[i]);
+            }
+            printf("\n");
         }
-        printf("\n");
 
     }
     printf("COST: %.2lf\n", cost_best);
@@ -519,6 +527,13 @@ void GILS_RVND(int Imax, int Iils, tRnd * rnd) {
 int main(int argc, char **argv){
     int Imax = 10;
     int Iils;
+    int verbose = 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
+            verbose = 1;
+        }
+    }
 
     tRnd rnd = {0};
 
@@ -532,7 +547,7 @@ int main(int argc, char **argv){
 
     Iils = dimen < 100 ? dimen : 100;
     time_t start = clock();
-    GILS_RVND(Imax, Iils, &rnd);
+    GILS_RVND(Imax, Iils, &rnd, verbose);
 
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
     printf("TIME: %.6lf\n", res);
