@@ -391,7 +391,7 @@ class GILS_RVND {
         return sl_cpy;
     }
 
-    public void solve(){
+    public void solve(boolean verbose){
         tSolution solut_best = new tSolution(info.getDimen(), Double.MAX_VALUE);
         tSolution solut_crnt = new tSolution(info.getDimen(), 0);
         tSolution solut_partial = new tSolution(info.getDimen(), 0);
@@ -400,19 +400,23 @@ class GILS_RVND {
             int index = info.rndCrnt();
             double alpha = R[index];
 
-            System.out.print("[+] Local Search ");
-            System.out.println(i+1);
-            System.out.println("\t[+] Constructing Inital Solution..");
+            if (verbose) {
+                System.out.print("[+] Local Search ");
+                System.out.println(i+1);
+                System.out.println("\t[+] Constructing Inital Solution..");
+            }
 
             solut_crnt.storeSolut(construction(alpha, info));
-            subseq_load(solut_crnt, info); 
+            subseq_load(solut_crnt, info);
 
-            
-            solut_partial.storeSolut(solut_crnt.getSolutCpy()); 
+
+            solut_partial.storeSolut(solut_crnt.getSolutCpy());
             solut_partial.setCost(solut_crnt.getCost());
 
             int iterILS = 0;
-            System.out.println("\t[+] Looking for the best Neighbor..");
+            if (verbose) {
+                System.out.println("\t[+] Looking for the best Neighbor..");
+            }
             while(iterILS < Iils){
                 RVND(solut_crnt, info);
                 //System.exit(1);
@@ -432,8 +436,10 @@ class GILS_RVND {
                 solut_best.setCost(solut_partial.getCost());
             }
 
-            System.out.print("\tCurrent best solution cost: ");
-            System.out.println(solut_best.getCost());
+            if (verbose) {
+                System.out.print("\tCurrent best solution cost: ");
+                System.out.println(solut_best.getCost());
+            }
         }
 
         System.out.print("COST: ");

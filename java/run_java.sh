@@ -1,3 +1,3 @@
 #! /bin/bash
-java Main
+java Main "$@"
 # rm *.class
