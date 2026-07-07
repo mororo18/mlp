@@ -784,7 +784,7 @@ function perturb(sl, dimen, rnd) result(ret)
 
 end function
 
-subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
+subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret, verbose)
     use data_types
 
     implicit none
@@ -796,6 +796,7 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
     integer :: dimen
     real(8), allocatable :: cost (:,:)
     type(tRnd) :: rnd
+    logical :: verbose
 
     integer, allocatable, intent(out) :: ret(:)
 
@@ -852,7 +853,9 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
         rnd%rnd_index = rnd%rnd_index + 1
 
         alpha = R(index_)
-        print *, "[+] Local Search ", i
+        if (verbose) then
+            print *, "[+] Local Search ", i
+        endif
         sol_crnt = construction(alpha, dimen, cost, rnd)
         sol_partial = sol_crnt
 
@@ -860,8 +863,10 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
         cost_crnt = seq(1, dimen+1, C)
         cost_partial = cost_crnt
 
-        print *, "        [+] Constructing Inital Solution..", cost_crnt
-        print *, "        [+] Looking for the best Neighbor.."
+        if (verbose) then
+            print *, "        [+] Constructing Inital Solution..", cost_crnt
+            print *, "        [+] Looking for the best Neighbor.."
+        endif
 
         iterILS = 0
 
@@ -886,11 +891,15 @@ subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
             cost_best = cost_partial
         endif
 
-        print *, "        Current best solution cost:", cost_best
-    
+        if (verbose) then
+            print *, "        Current best solution cost:", cost_best
+        endif
+
     end do
 
-    print *, sol_best
+    if (verbose) then
+        print *, sol_best
+    endif
     print *, "COST: ", cost_best
 
     ret = sol_best(:)
@@ -913,6 +922,8 @@ program main
     integer :: dimen
     real(8), allocatable :: cost (:,:)
     integer, allocatable :: sol(:)
+    logical :: verbose
+    character(len=32) :: arg
 
     INTEGER :: begin, end_, rate
 
@@ -926,7 +937,7 @@ program main
             real(8), dimension(dimen, dimen) :: cost 
             integer, dimension(dimen+1) :: ret 
         end function
-        subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret)
+        subroutine GILS_RVND(Imax, Iils, R, dimen, cost, rnd, ret, verbose)
             use data_types
 
             implicit none
@@ -938,6 +949,7 @@ program main
             integer :: dimen
             real(8), allocatable :: cost (:,:)
             type(tRnd) :: rnd
+            logical :: verbose
             integer, allocatable, intent(out) :: ret(:)
         end subroutine
         subroutine print_matrix(c)
@@ -952,6 +964,14 @@ program main
 
     end interface
 
+    verbose = .false.
+    do i=1, command_argument_count()
+        call get_command_argument(i, arg)
+        if (trim(arg) == "-v" .or. trim(arg) == "--verbose") then
+            verbose = .true.
+        endif
+    end do
+
     call load_matrix(cost, rnd%rnd, dimen)
     rnd%rnd_index = 1
 
@@ -961,7 +981,7 @@ program main
     Iils = min(100, dimen)
     Imax = 10
     CALL SYSTEM_CLOCK(begin, rate)
-    call GILS_RVND(Imax, Iils, R, dimen, cost, rnd, sol)
+    call GILS_RVND(Imax, Iils, R, dimen, cost, rnd, sol, verbose)
     CALL SYSTEM_CLOCK(end_)
 
     print *, "TIME: ", real(end_ - begin) / real(rate)
