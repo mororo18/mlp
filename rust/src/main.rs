@@ -405,6 +405,7 @@ fn GILS_RVND(
     c: &Vec<Vec<f64>>,
     dimen: usize,
     rnd: &mut tRnd,
+    verbose: bool,
 ) {
     let mut seq: Vec<Vec<tSeqInfo>> = vec![
         vec![
@@ -431,17 +432,23 @@ fn GILS_RVND(
         rnd.rnd_index += 1;
         let alpha = R[r_value];
 
-        println!("[+] Local Search {}", _i);
+        if verbose {
+            println!("[+] Local Search {}", _i);
+        }
         solut_crnt = construction(alpha, &c, dimen, rnd);
         update_subseq_info_matrix(&solut_crnt, &mut seq, &c, dimen);
         cost_crnt = seq[0][dimen].C;
-        println!("{:?}", solut_crnt);
+        if verbose {
+            println!("{:?}", solut_crnt);
 
-        println!("\t[+] Constructing Inital Solution.. {}", cost_crnt);
+            println!("\t[+] Constructing Inital Solution.. {}", cost_crnt);
+        }
         solut_partial = solut_crnt.clone();
         cost_partial = cost_crnt;
 
-        println!("\t[+] Looking for the best Neighbor..");
+        if verbose {
+            println!("\t[+] Looking for the best Neighbor..");
+        }
         let mut iterILS: usize = 0;
         while iterILS < Iils {
             RVND(&mut solut_crnt, &mut seq, &c, dimen, rnd);
@@ -462,7 +469,9 @@ fn GILS_RVND(
             cost_best = cost_partial;
         }
 
-        println!("\tCurrent Best Cost {}", cost_best);
+        if verbose {
+            println!("\tCurrent Best Cost {}", cost_best);
+        }
     }
 
     println!("{:?}", solut_best);
@@ -474,6 +483,9 @@ fn print_type_of<T>(_: &T) {
 }
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let verbose = args.iter().any(|a| a == "-v" || a == "--verbose");
+
     let mut dimension: usize = 0;
     let mut c: Vec<Vec<f64>> = vec![vec![]; 0];
 
@@ -496,7 +508,7 @@ fn main() {
 
     let now = Instant::now();
 
-    GILS_RVND(Imax, Iils, R, &c, dimension, &mut rnd);
+    GILS_RVND(Imax, Iils, R, &c, dimension, &mut rnd, verbose);
 
     let new_now = Instant::now();
     println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
