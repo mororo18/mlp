@@ -1,2 +1,2 @@
 #! /bin/bash
-octave main.m
+octave main.m "$@"
