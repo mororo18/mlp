@@ -37,6 +37,32 @@ Needs a decision on which file is canonical (ties into the item below) before
 Blocks: the lua leg of the cross-branch progress-flag rollout
 (`tcc/TODO.md` P2) — skipped for now pending this fix.
 
+Fix `octave/main.m` and `octave/Data.m`: never actually runs to completion
+on a clean checkout, two independent pre-existing bugs found while trying
+to verify it before adding the progress flag:
+1. `main.m` calls `mainn()` on line 2, before the `mainn` function is
+   defined further down in the same script file — Octave errors
+   `'mainn' undefined` immediately. Local functions in an Octave script
+   must be defined before they're invoked at the top level; the call
+   needs to move to the end of the file, after all function definitions.
+2. Once that's fixed, `octave/Data.m:9` does
+   `str2double(lines{index}(:))` — the `(:)` reshapes the dimension
+   string (e.g. `"48"`) into a column vector of individual characters,
+   so `str2double` parses each digit separately (`[4;8]`) instead of the
+   whole number, corrupting `dimension` (`NaN`) for any instance with a
+   2+ digit dimension — i.e. any real instance. Needs a proper
+   string-to-number parse (e.g. plain `str2double(lines{index})` without
+   the `(:)`).
+   Also worth a look: `main.m`'s local `sort` function shadows Octave's
+   builtin `sort`, which broke a builtin-internal call
+   (`ismember`/`​__unimplemented__`) once `mainn` was reachable — renaming
+   the local helper (e.g. to `local_sort`) avoids the collision.
+
+Blocks: the octave leg of the cross-branch progress-flag rollout
+(`tcc/TODO.md` P2) — skipped for now pending this fix. `run_matlab.sh`
+uses the same `main.m`, so is presumably affected too, but couldn't be
+verified (`matlab` unavailable in this environment).
+
 Review multiple main variants in `lua/`, `python/` - keep canonical version
 
 Remove profiler output files (`.txt`, `.log`, `MyProfilingReport.txt`)
