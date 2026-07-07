@@ -407,7 +407,7 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
 
     return s
 
-def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn:
+def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo, verbose : bool = False) -> NoReturn:
 
     solut_partial : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
     solut_crnt : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
@@ -420,15 +420,17 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
 
         alpha : float = R[r_value]
 
-        print("[+] Local Search {}".format(i+1))
+        if verbose:
+            print("[+] Local Search {}".format(i+1))
         solut_crnt.s = construction(alpha, info)
         subseq_load(solut_crnt, info)
 
         solut_partial.s = solut_crnt.s.copy()
         solut_partial.cost = solut_crnt.cost
-        print("\t[+] Constructing Inital Solution..", solut_crnt.cost)
+        if verbose:
+            print("\t[+] Constructing Inital Solution..", solut_crnt.cost)
 
-        print("\t[+] Looking for the best Neighbor..")
+            print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
             RVND(solut_crnt, info)
@@ -450,7 +452,8 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
             solut_best.s = solut_partial.s.copy()
             solut_best.cost = solut_partial.cost
 
-        print("\tCurrent best solution cost: {}".format(solut_best.cost))
+        if verbose:
+            print("\tCurrent best solution cost: {}".format(solut_best.cost))
 
     print("COST: {}".format (solut_best.cost))
     print("SOLUTION: {}".format(solut_best.s))
@@ -468,9 +471,10 @@ def main() -> NoReturn:
 
     info = tInfo(dimension, cost, rnd)
 
+    verbose = "-v" in sys.argv or "--verbose" in sys.argv
 
     start = time.time()
-    GILS_RVND(Imax, Iils, R, info)
+    GILS_RVND(Imax, Iils, R, info, verbose)
     print("TIME: %s " % (time.time() - start))
 
     print("ITERACOES: ", info.IT)
