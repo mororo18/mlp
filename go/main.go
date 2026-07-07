@@ -36,7 +36,7 @@ const (
 	TWO_OPT     = 4
 )
 
-func read_data() (int, [][]float64, []int) {
+func read_data(verbose bool) (int, [][]float64, []int) {
 	var (
 		cost     [][]float64
 		dimen    int
@@ -52,7 +52,9 @@ func read_data() (int, [][]float64, []int) {
 
 	fmt.Fscanf(file, "%d", &dimen)
 
-	fmt.Println(dimen)
+	if verbose {
+		fmt.Println(dimen)
+	}
 
 	cost = make([][]float64, dimen)
 
@@ -62,12 +64,16 @@ func read_data() (int, [][]float64, []int) {
 			fmt.Fscanf(file, "%d", &c)
 
 			cost[i][j] = float64(c)
-			fmt.Printf("%f ", cost[i][j])
+			if verbose {
+				fmt.Printf("%f ", cost[i][j])
+			}
 
 		}
 		// o ultimo valor da linha é lido duas vezes para que a função inicie a leitura da próxima linha do arquivo.
 		fmt.Fscanf(file, "%d", &c)
-		fmt.Println()
+		if verbose {
+			fmt.Println()
+		}
 	}
 
 	for i := 0; i < dimen; i++ {
@@ -80,9 +86,13 @@ func read_data() (int, [][]float64, []int) {
 	fmt.Fscanf(file, "%s\n", &buff)
 	fmt.Fscanf(file, "%s\n", &buff)
 	fmt.Fscanf(file, "%s\n", &buff)
-	fmt.Println(buff)
+	if verbose {
+		fmt.Println(buff)
+	}
 	fmt.Fscanf(file, "%d", &rnd_size)
-	fmt.Println(rnd_size)
+	if verbose {
+		fmt.Println(rnd_size)
+	}
 
 	rnd := make([]int, rnd_size)
 
@@ -522,7 +532,7 @@ func perturb(sl []int, data *tData) []int {
 	return s
 }
 
-func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
+func GILS_RVND(Imax int, Iils int, R [26]float64, data tData, verbose bool) {
 
 	solut_crnt := NewSolution(data)
 	solut_partial := NewSolution(data)
@@ -531,20 +541,26 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
 
 	for i := 0; i < Imax; i++ {
 
-		fmt.Printf("[+] Local Search %d\n", i)
+		if verbose {
+			fmt.Printf("[+] Local Search %d\n", i)
+		}
 
         index := data.rnd[data.rnd_index]
 		data.rnd_index++
 
 		solut_crnt.s = construction(R[index], &data)
 		update_subseq_info_matrix(&solut_crnt, &data)
-		fmt.Printf("\t[+] Constructing Inital Solution.. %.2f\n", solut_crnt.cost)
-		fmt.Println("\t", solut_crnt.s)
+		if verbose {
+			fmt.Printf("\t[+] Constructing Inital Solution.. %.2f\n", solut_crnt.cost)
+			fmt.Println("\t", solut_crnt.s)
+		}
 
 		copy(solut_partial.s, solut_crnt.s)
 		solut_partial.cost = solut_crnt.cost
 
-		fmt.Println("\t[+] Looking for the best Neighbor..")
+		if verbose {
+			fmt.Println("\t[+] Looking for the best Neighbor..")
+		}
 		iterILS := 0
 		for iterILS < Iils {
 			RVND(&solut_crnt, &data)
@@ -571,13 +587,22 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData) {
 }
 
 func main() {
-	fmt.Println("Hello Vourld!")
+	verbose := false
+	for _, arg := range os.Args[1:] {
+		if arg == "-v" || arg == "--verbose" {
+			verbose = true
+		}
+	}
+
+	if verbose {
+		fmt.Println("Hello Vourld!")
+	}
 
 	data := tData{
 		rnd_index: 0,
 	}
 
-	data.dimen, data.c, data.rnd = read_data()
+	data.dimen, data.c, data.rnd = read_data(verbose)
 
 	R := [...]float64{0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
@@ -589,7 +614,7 @@ func main() {
 
 	start := time.Now()
 
-	GILS_RVND(Imax, Iils, R, data)
+	GILS_RVND(Imax, Iils, R, data, verbose)
 
 	t := time.Now()
 	elapsed := t.Sub(start)
