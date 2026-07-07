@@ -1,4 +1,4 @@
-mainn()
+1;
 
 function print_s(s)
     sz = size(s);
@@ -33,7 +33,7 @@ function ret = subseq_load (sol, info)
     ret = sol;
 end
 
-function arr = sort(arr, r, info)
+function arr = local_sort(arr, r, info)
     sz = size(arr);
     sz = sz(2);
     arr = quicksort(arr, 1, sz, r, info);
@@ -72,7 +72,7 @@ function [ret, index_new] = construction(alpha, info)
     size_cL  = size(cL);
     size_cL = size_cL(2);
     while (size_cL > 0) 
-        cL = sort(cL, r, info);
+        cL = local_sort(cL, r, info);
 
         
         index = info.rnd(info.rnd_index) + 1;
@@ -376,7 +376,7 @@ function ret = solut_init(info)
     ret = s;
 end
 
-function ret = GILS_RVND(Imax, Iils, R, info)
+function ret = GILS_RVND(Imax, Iils, R, info, verbose)
     solut_crnt = solut_init(info);
     solut_partial = solut_init(info);
     solut_best = solut_init(info);
@@ -386,15 +386,19 @@ function ret = GILS_RVND(Imax, Iils, R, info)
         info.rnd_index = info.rnd_index + 1;
         alpha = R(index);
 
-        fprintf("[+] Search %d\n", i)
-        fprintf("\t[+] Constructing..\n");
+        if (verbose)
+            fprintf("[+] Search %d\n", i)
+            fprintf("\t[+] Constructing..\n");
+        end
 
         [solut_crnt.s, info.rnd_index] = construction(alpha, info);
         solut_crnt = subseq_load(solut_crnt, info);
 
         solut_partial = solut_crnt;
-        fprintf("\t[+] Looking for the best Neighbor..\n")
-        fprintf("\t    Construction Cost: %.2f\n", solut_partial.cost)
+        if (verbose)
+            fprintf("\t[+] Looking for the best Neighbor..\n")
+            fprintf("\t    Construction Cost: %.2f\n", solut_partial.cost)
+        end
 
         iterILS = 0;
         while (iterILS < Iils)
@@ -415,9 +419,11 @@ function ret = GILS_RVND(Imax, Iils, R, info)
             solut_best = solut_partial;
         end
 
-        fprintf("\tCurrent best cost: %.2f\n", solut_best.cost)
-        fprintf('SOLUCAO: ')
-        print_s(solut_best.s)
+        if (verbose)
+            fprintf("\tCurrent best cost: %.2f\n", solut_best.cost)
+            fprintf('SOLUCAO: ')
+            print_s(solut_best.s)
+        end
     end
 
     fprintf('COST: %.2f\n', solut_best.cost)
@@ -446,10 +452,13 @@ function mainn
     end
 
     R = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26];
+    verbose = any(strcmp(argv(), "-v")) || any(strcmp(argv(), "--verbose"));
     t0 = clock ();
-    s = GILS_RVND(Imax, Iils, R, info);
+    s = GILS_RVND(Imax, Iils, R, info, verbose);
     elapsed_time = etime (clock (), t0);
     fprintf('TIME: %.4f\n', elapsed_time)
     s.s;
     exit
 end
+
+mainn()

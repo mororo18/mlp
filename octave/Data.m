@@ -7,8 +7,7 @@ function [dim, cost, ret_rnd] = Data
     i = 0;
 
     index = 1;
-    dimension = mat2str(str2double(lines{index}(:)));
-    dimension = str2double(dimension);
+    dimension = str2double(lines{index});
     %dimension = str2double(strrep(substr(dimension, 2, numel(dimension)-2), ';', ''));
 
     index = index + 1;
@@ -50,19 +49,12 @@ function [dim, cost, ret_rnd] = Data
     end
     
     index = index + 2;
-    rnd_size = str2double(mat2str(str2double(lines{index}(:))));
+    rnd_size = str2double(lines{index});
     %rnd_size = str2double(strrep(substr(rnd_size, 2, numel(rnd_size)-2), ';', ''));
 
     rnd = [];
     for i = 1:rnd_size
-        v = mat2str(str2double(lines{index + i}(:)));
-        lines{index + i};
-        class(v);
-        %if (numel(v) > 1)
-        %    v = str2double(strrep(substr(v, 2, numel(v)-2), ';', ''));
-        %else 
-            v = str2double(v);
-        %end
+        v = str2double(lines{index + i});
         rnd(i) = v;
     end
     
