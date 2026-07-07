@@ -1,2 +1,2 @@
 # !/bin/bash
-luajit main.lua
+luajit main.lua "$@"

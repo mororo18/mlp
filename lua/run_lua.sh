@@ -1,2 +1,2 @@
 # /bin/bash
-lua main.lua
+lua main.lua "$@"

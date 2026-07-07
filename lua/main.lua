@@ -416,7 +416,7 @@ function perturb(sl, rnd)
     return s
 end
 
-function GILS_RVND(Imax, Iils, R, rnd)
+function GILS_RVND(Imax, Iils, R, rnd, verbose)
 
     local solut_partial = {};
     local solut_crnt = {};
@@ -436,18 +436,24 @@ function GILS_RVND(Imax, Iils, R, rnd)
         local alpha = R[rnd.rnd[rnd.rnd_index] + 1]
         rnd.rnd_index = rnd.rnd_index + 1
 
-        print("[+] Local Search", i)
-        print("\t[+] Constructing Inital Solution..")
+        if verbose then
+            print("[+] Local Search", i)
+            print("\t[+] Constructing Inital Solution..")
+        end
         solut_crnt = construction(alpha, rnd)
 
         subseq_load(solut_crnt, seq)
         cost_crnt = seq[1][dimension+1][C]
-        s_print(solut_crnt)
-        print("\tConstruction cost  ", cost_crnt)
+        if verbose then
+            s_print(solut_crnt)
+            print("\tConstruction cost  ", cost_crnt)
+        end
         cost_partial = cost_crnt
         solut_partial = table.clone(solut_crnt)
 
-        print("\t[+] Looking for the best Neighbor..")
+        if verbose then
+            print("\t[+] Looking for the best Neighbor..")
+        end
         local iterILS = 0
         while iterILS < Iils do
             RVND(solut_crnt, seq, rnd)
@@ -469,7 +475,9 @@ function GILS_RVND(Imax, Iils, R, rnd)
             solut_best = table.clone(solut_partial)
             cost_best = cost_partial
         end
-        print("\tCurrent best solution cost: ", cost_best)
+        if verbose then
+            print("\tCurrent best solution cost: ", cost_best)
+        end
     end
 
     print("COST: ", cost_best)
@@ -508,8 +516,15 @@ function main()
     local R = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
+    local verbose = false
+    for i = 1, #arg do
+        if arg[i] == "-v" or arg[i] == "--verbose" then
+            verbose = true
+        end
+    end
+
     local start = os.clock()
-    GILS_RVND(Imax, Iils, R, rnd)
+    GILS_RVND(Imax, Iils, R, rnd, verbose)
 
     print("TIME: ", os.clock()-start)
 end
