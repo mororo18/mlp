@@ -11,6 +11,7 @@ python/__pycache__/
 *.o
 *.mod
 solve
+.venv/
 
 csharp/obj/
 csharp/bin/
