@@ -395,7 +395,7 @@ public:
     }
 
 
-    void GILS_RVND(int Imax, int Iils, tRnd & rnd) {
+    void GILS_RVND(int Imax, int Iils, tRnd & rnd, bool verbose) {
 
         vector<int> solut_partial (dimen+1);
         vector<int> solut_crnt (dimen+1);
@@ -411,8 +411,10 @@ public:
 
             double alpha = R_table(aux);
 
-            printf("[+] Search %d\n", i+1);
-            printf("\t[+] Constructing..\n");	
+            if (verbose) {
+                printf("[+] Search %d\n", i+1);
+                printf("\t[+] Constructing..\n");
+            }
 
 
             solut_crnt = construct(alpha, rnd);
@@ -422,8 +424,10 @@ public:
             cost_crnt = seq[0][dimen].C;
             cost_partial = seq[0][dimen].C;
 
-            printf("\t[+] Looking for the best Neighbor..\n");
-            printf("\t    Construction Cost: %.3lf\n", cost_partial);	
+            if (verbose) {
+                printf("\t[+] Looking for the best Neighbor..\n");
+                printf("\t    Construction Cost: %.3lf\n", cost_partial);
+            }
 
             int iterILS = 0;
             while (iterILS < Iils) {
@@ -448,13 +452,15 @@ public:
                 cost_best = cost_partial;
             }
 
-            std::cout << "\tCurrent best cost: "<< cost_best << std::endl;
+            if (verbose) {
+                std::cout << "\tCurrent best cost: "<< cost_best << std::endl;
 
-            std::cout << "SOLUCAO: ";
-            for(int i = 0; i < solut_best.size(); i++){
-                std::cout << solut_best[i] << " ";
+                std::cout << "SOLUCAO: ";
+                for(int i = 0; i < solut_best.size(); i++){
+                    std::cout << solut_best[i] << " ";
+                }
+                std::cout << std::endl;
             }
-            std::cout << std::endl;
 
         }
         printf("COST: %.2lf\n", cost_best);
@@ -468,13 +474,13 @@ public:
         rnd.rnd_index = 0;
     }
 
-    void solve() {
+    void solve(bool verbose) {
         int Imax = 10;
         int Iils;
 
         Iils = dimen < 100 ? dimen : 100;
         auto t1 = high_resolution_clock::now();
-        GILS_RVND(Imax, Iils, rnd);
+        GILS_RVND(Imax, Iils, rnd, verbose);
         auto t2 = high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 
@@ -487,8 +493,15 @@ public:
 };
 
 int main(int argc, char **argv){
+    bool verbose = false;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
+            verbose = true;
+        }
+    }
+
     MLP mlp;
-    mlp.solve();
+    mlp.solve(verbose);
     return 0;
 }
 
