@@ -409,23 +409,27 @@ class GILS_RVND {
         return sl_cpy;
     }
 
-    public void solve(){
+    public void solve(boolean verbose){
         double cost_best = Double.MAX_VALUE;
         ArrayList<Integer> s_best = new ArrayList<>();
         for(int i = 0; i < Imax; i++){
             double alpha = R[rnd[rnd_index++]];
 
-            System.out.print("[+] Local Search ");
-            System.out.println(i+1);
-            System.out.println("\t[+] Constructing Inital Solution..");
+            if (verbose) {
+                System.out.print("[+] Local Search ");
+                System.out.println(i+1);
+                System.out.println("\t[+] Constructing Inital Solution..");
+            }
             ArrayList<Integer> s = construction(alpha);
-            ArrayList<Integer> sl = new ArrayList<>(s); 
-            subseq_load(s, subseq); 
+            ArrayList<Integer> sl = new ArrayList<>(s);
+            subseq_load(s, subseq);
             double rvnd_cost_best = subseq[0][dimension][C] - EPSILON;
             double rvnd_cost_crnt;
 
             int iterILS = 0;
-            System.out.println("\t[+] Looking for the best Neighbor..");
+            if (verbose) {
+                System.out.println("\t[+] Looking for the best Neighbor..");
+            }
             while(iterILS < Iils){
                 RVND(s, subseq);
                 rvnd_cost_crnt = subseq[0][dimension][C] - EPSILON; 
@@ -447,8 +451,10 @@ class GILS_RVND {
                 s_best = new ArrayList<>(sl);
             }
 
-            System.out.print("\tCurrent best solution cost: ");
-            System.out.println(cost_best);
+            if (verbose) {
+                System.out.print("\tCurrent best solution cost: ");
+                System.out.println(cost_best);
+            }
         }
 
         System.out.print("COST: ");
