@@ -23,24 +23,37 @@ cd ../java
 
 ## Build & Run Scripts Status
 
-| Language | build.sh | run_*.sh |
-|----------|----------|----------|
-| c | ✓ | ✓ run_c.sh |
-| c_asm | ✓ | ✓ run_c.sh |
-| cplusplus | ✓ | ✓ run_cpp.sh |
-| cppOOP | ✓ | ✓ run_cpp-OOP.sh |
-| csharp | ✓ | ✓ run_dotnet.sh, run_mcs.sh |
-| fortran | ✓ | ✓ run_fortran.sh |
-| go | ✓ | ✓ run_golang.sh |
-| java | ✓ | ✓ run_java.sh |
-| javascript | ✗ | ✓ run_node.sh |
-| julia | ✗ | ✓ run_julia.sh |
-| lua | ✗ | ✓ run_lua.sh, run_luajit.sh |
-| octave | ✗ | ✓ run_octave.sh, run_matlab.sh |
-| python | ✗ | ✓ run_python3.sh, run_pypy.sh |
-| rust | ✓ | ✓ run_rust.sh |
+| Language | build.sh | run_*.sh | `-v`/`--verbose` |
+|----------|----------|----------|------------------|
+| c | ✓ | ✓ run_c.sh | ✓ |
+| c_asm | ✓ | ✓ run_c.sh | — (not planned) |
+| cplusplus | ✓ | ✓ run_cpp.sh | ✓ |
+| cppOOP | ✓ | ✓ run_cpp-OOP.sh | ✓ |
+| csharp | ✓ | ✓ run_dotnet.sh, run_mcs.sh | ✓ (via `run_dotnet.sh`; `run_mcs.sh`'s mono build is currently broken, see `TODO.md`) |
+| fortran | ✓ | ✓ run_fortran.sh | ✓ |
+| go | ✓ | ✓ run_golang.sh | ✓ |
+| java | ✓ | ✓ run_java.sh | ✓ |
+| javascript | ✗ | ✓ run_node.sh | ✓ |
+| julia | ✗ | ✓ run_julia.sh | ✓ |
+| lua | ✗ | ✓ run_lua.sh, run_luajit.sh | ✗ blocked, run scripts point to a broken entry point (see `TODO.md`) |
+| octave | ✗ | ✓ run_octave.sh, run_matlab.sh | ✗ blocked, implementation never runs to completion (see `TODO.md`) |
+| python | ✗ | ✓ run_python3.sh, run_pypy.sh | ✓ |
+| rust | ✓ | ✓ run_rust.sh | ✓ |
 
 **Note:** Interpreted languages (javascript, julia, lua, octave, python) don't require build.sh.
+
+## Progress output (`-v`/`--verbose`)
+
+Every solver accepts an optional `-v`/`--verbose` flag (default off) that
+prints per-iteration GILS-RVND progress (construction cost, best-so-far
+cost, current solution). Without it, only the final `COST`/`TIME` (and
+similar per-language final metrics) are printed. See the table above for
+per-language status.
+
+```
+cd c
+./run_c.sh --verbose
+```
 
 ## Tool Versions
 
