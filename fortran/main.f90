@@ -706,7 +706,7 @@ subroutine solut_init(solut, info)
 
 end subroutine
 
-function GILS_RVND(Imax, Iils, R, info) result(ret)
+function GILS_RVND(Imax, Iils, R, info, verbose) result(ret)
 #ifdef DEBUG
     use assertion
 #endif
@@ -719,6 +719,7 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
     integer :: Iils
     real(typeReal), dimension(26) :: R
     type(tInfo) :: info
+    logical :: verbose
     type(tSolution) :: ret
 
     !! solutions
@@ -760,7 +761,9 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
         info%rnd_index = info%rnd_index + 1
 
         alpha = R(index_)
-        print *, "[+] Local Search ", i
+        if (verbose) then
+            print *, "[+] Local Search ", i
+        endif
         sol_crnt%s = construction(alpha, info)
 
 #ifdef DEBUG
@@ -772,9 +775,10 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
 
         call subseq_load(sol_crnt, info)
         sol_partial = sol_crnt
-        print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
-
-        print *, "        [+] Looking for the best Neighbor.."
+        if (verbose) then
+            print *, "        [+] Constructing Inital Solution..", sol_crnt%cost
+            print *, "        [+] Looking for the best Neighbor.."
+        endif
         iterILS = 0
         it = 0
 
@@ -803,11 +807,15 @@ function GILS_RVND(Imax, Iils, R, info) result(ret)
             sol_best = sol_partial
         endif
 
-        print *, "        Current best solution cost:", sol_best%cost
-    
+        if (verbose) then
+            print *, "        Current best solution cost:", sol_best%cost
+        endif
+
     end do
 
-    print *, sol_best%s
+    if (verbose) then
+        print *, sol_best%s
+    endif
 
     ret = sol_best
 
@@ -833,6 +841,8 @@ program main
     real(typeReal) :: opa
 
     logical :: viabilidade
+    logical :: verbose
+    character(len=32) :: arg
 
     INTEGER :: begin, end_, rate
 
@@ -844,16 +854,17 @@ program main
             type(tInfo) :: info
             integer, dimension(info%dimen+1) :: ret 
         end function
-        function GILS_RVND(Imax, Iils, R, info) result(ret)
+        function GILS_RVND(Imax, Iils, R, info, verbose) result(ret)
             use types
 
             implicit none
 
             !! parameters
-            integer :: Imax 
+            integer :: Imax
             integer :: Iils
             real(typeReal), dimension(26) :: R
             type(tInfo) :: info
+            logical :: verbose
             type(tSolution) :: ret
         end function
         subroutine print_matrix(c)
@@ -868,6 +879,14 @@ program main
 
     end interface
 
+    verbose = .false.
+    do i=1, command_argument_count()
+        call get_command_argument(i, arg)
+        if (trim(arg) == "-v" .or. trim(arg) == "--verbose") then
+            verbose = .true.
+        endif
+    end do
+
     call load_matrix(info%cost, info%rnd)
 
     dimensions = shape(info%cost(:,:))
@@ -879,7 +898,7 @@ program main
     Imax = 10
 
     CALL SYSTEM_CLOCK(begin, rate)
-    sol = GILS_RVND(Imax, Iils, R, info)
+    sol = GILS_RVND(Imax, Iils, R, info, verbose)
     CALL SYSTEM_CLOCK(end_)
     print *, "COST: ", sol%cost
     print *, "TIME: ", real(end_ - begin) / real(rate)
