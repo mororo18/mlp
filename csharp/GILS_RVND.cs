@@ -387,7 +387,7 @@ namespace MLP {
         }
 
 
-        public void solve(){
+        public void solve(bool verbose){
 
             double cost_best = Double.MaxValue;
             var s_best = new List<int>();
@@ -396,8 +396,10 @@ namespace MLP {
                 int index = rnd[rnd_index++];
                 double alpha = R[index];
 
-                Console.WriteLine("[+] Local Search " + (i+1));
-                Console.WriteLine("\t[+] Constructing Inital Solution..");
+                if (verbose) {
+                    Console.WriteLine("[+] Local Search " + (i+1));
+                    Console.WriteLine("\t[+] Constructing Inital Solution..");
+                }
 
                 var s = construction(alpha);
 
@@ -408,7 +410,9 @@ namespace MLP {
                 double rvnd_cost_best = subseq[0][ dimension][ C] - EPSILON;
                 double rvnd_cost_crnt;
 
-                Console.WriteLine("\t[+] Looking for the best Neighbor..");
+                if (verbose) {
+                    Console.WriteLine("\t[+] Looking for the best Neighbor..");
+                }
                 int iterILS = 0;
                 while(iterILS < Iils){
                     RVND(s, subseq);
@@ -430,7 +434,9 @@ namespace MLP {
                     cost_best = sl_cost;
                     s_best = new List<int>(sl);
                 }
-                Console.WriteLine("\tCurrent best solution cost: "+cost_best);
+                if (verbose) {
+                    Console.WriteLine("\tCurrent best solution cost: "+cost_best);
+                }
             }
             Console.WriteLine(string.Format("SOLUTION: ({0}).", string.Join(", ", s_best)));
             Console.WriteLine("COST: " + cost_best);
