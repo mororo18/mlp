@@ -98,17 +98,13 @@ function swap(s::Array{Int64,1}, i::Int64, j::Int64)
 end
 
 function reinsert(s::Array{Int64,1}, i::Int64, j::Int64, pos::Int64)
-    # func from https://github.com/JuliaLang/julia/blob/master/base/array.jl
-    _deleteat!(a::Vector, i::Integer, delta::Integer) =
-        ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
-
     sz = j - i + 1
     if i < pos
-        splice!(s, pos:pos-1, s[i:j]) 
-        _deleteat!(s, i, sz)
+        splice!(s, pos:pos-1, s[i:j])
+        deleteat!(s, i:i+sz-1)
     else
-        splice!(s, pos:pos-1, s[i:j]) 
-        _deleteat!(s, i+sz, sz)
+        splice!(s, pos:pos-1, s[i:j])
+        deleteat!(s, i+sz:i+2*sz-1)
     end
 end
 
@@ -340,7 +336,7 @@ function perturb(sl::Array{Int64, 1}, rnd::tRnd)
     return s
 end
 
-function GILS_RVND(Imax::Int64, Iils::Int64, R, rnd::tRnd)
+function GILS_RVND(Imax::Int64, Iils::Int64, R, rnd::tRnd, verbose::Bool)
     cost_best = Inf
     s_best = []
 
@@ -352,15 +348,19 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R, rnd::tRnd)
         rnd.rnd_index += 1
 
         alpha = R[index]
-        @printf "[+] Local Search %d\n" i
-        @printf "\t[+] Constructing Inital Solution..\n"
+        if verbose
+            @printf "[+] Local Search %d\n" i
+            @printf "\t[+] Constructing Inital Solution..\n"
+        end
         s = construction(alpha, rnd)
         sl = copy(s)
         subseq_load(s, subseq)
 
         rvnd_cost_best = subseq[1,dimension+1,C] - EPSILON
 
-        @printf "\t[+] Looking for the best Neighbor..\n"
+        if verbose
+            @printf "\t[+] Looking for the best Neighbor..\n"
+        end
         iterILS = 0
         while iterILS < Iils
             RVND(s, subseq, rnd)
@@ -385,7 +385,9 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R, rnd::tRnd)
             cost_best = sl_cost
         end
 
-        @printf "\tCurrent best solution cost: %.2lf\n" cost_best
+        if verbose
+            @printf "\tCurrent best solution cost: %.2lf\n" cost_best
+        end
     end
     @printf "COST: %.2lf\n" cost_best
     print("SOLUTION: ")
@@ -393,13 +395,15 @@ function GILS_RVND(Imax::Int64, Iils::Int64, R, rnd::tRnd)
 end
 
 function main(rnd::Array{Int, 1})
-    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
-         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
-    
+    verbose = "-v" in ARGS || "--verbose" in ARGS
+
+    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
+         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
+
     Imax = 10
     Iils = min(dimension, 100)
 
-    time = @elapsed GILS_RVND(Imax, Iils, R, tRnd(rnd, 1))
+    time = @elapsed GILS_RVND(Imax, Iils, R, tRnd(rnd, 1), verbose)
 
     @printf "TIME: %.6lf\n" time
 
