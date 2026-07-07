@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-julia --check-bounds=no --math-mode=fast main.jl
+julia --check-bounds=no --math-mode=fast main.jl "$@"

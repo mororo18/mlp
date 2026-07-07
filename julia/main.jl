@@ -106,18 +106,14 @@ function swap(s::Array{Int,1}, i::Int, j::Int)
     s[i], s[j] = s[j], s[i]
 end
 
-# func from https://github.com/JuliaLang/julia/blob/master/base/array.jl
-_deleteat!(a::Vector, i::Integer, delta::Integer) =
-    ccall(:jl_array_del_at, Cvoid, (Any, Int, UInt), a, i - 1, delta)
-
 function reinsert(s::Array{Int,1}, i::Int, j::Int, pos::Int)
     sz = j - i + 1
     if i < pos
-        splice!(s, pos:pos-1, s[i:j]) 
-        _deleteat!(s, i, sz) # substituir por splice
+        splice!(s, pos:pos-1, s[i:j])
+        deleteat!(s, i:i+sz-1)
     else
-        splice!(s, pos:pos-1, s[i:j]) 
-        _deleteat!(s, i+sz, sz)
+        splice!(s, pos:pos-1, s[i:j])
+        deleteat!(s, i+sz:i+2*sz-1)
     end
 end
 
@@ -363,7 +359,7 @@ function perturb(solut_partial::tSolution, info::tInfo)::tSolution
     return solut
 end
 
-function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
+function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo, verbose::Bool)
 
     solut_best::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), Inf)
     solut_partial::tSolution = tSolution(zeros(Int, info.dimen+1), zeros(info.dimen+1, info.dimen+1, 3), 0)
@@ -375,15 +371,23 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
 
         alpha = R[r_value]
 
-        @printf "[+] Local Search %d\n" i
+        if verbose
+            @printf "[+] Local Search %d\n" i
+        end
         solut_crnt.s = construction(alpha, info)
-        println(solut_crnt.s)
+        if verbose
+            println(solut_crnt.s)
+        end
         subseq_load(solut_crnt, info)
-        @printf "\t[+] Constructing Inital Solution.. %.2lf\n" solut_crnt.cost
+        if verbose
+            @printf "\t[+] Constructing Inital Solution.. %.2lf\n" solut_crnt.cost
+        end
 
         solut_partial = deepcopy(solut_crnt)
 
-        @printf "\t[+] Looking for the best Neighbor..\n"
+        if verbose
+            @printf "\t[+] Looking for the best Neighbor..\n"
+        end
         iterILS = 0
         while iterILS < Iils
             RVND(solut_crnt, info)
@@ -406,7 +410,9 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, info::tInfo)
             solut_best = deepcopy(solut_partial)
         end
 
-        @printf "\tCurrent best solution cost: %.2lf\n" solut_best.cost
+        if verbose
+            @printf "\tCurrent best solution cost: %.2lf\n" solut_best.cost
+        end
     end
     @printf "COST: %.2lf\n" solut_best.cost
     print("SOLUTION: ")
@@ -415,17 +421,19 @@ end
 
 function main()
 
+    verbose = "-v" in ARGS || "--verbose" in ARGS
+
     dimension, cost, rand_values = get_instance_info()
 
-    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
-         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
+    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
+         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
 
     Imax = 10
     Iils = min(dimension, 100)
 
     info::tInfo = tInfo(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, 1e-15, 0, rand_values, 1)
 
-    time = @elapsed GILS_RVND(Imax, Iils, R, info)
+    time = @elapsed GILS_RVND(Imax, Iils, R, info, verbose)
 
     @printf "TIME: %.6lf\n" time
     println("reinsertion calls ", info.reinsert_count)
