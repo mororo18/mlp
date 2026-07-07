@@ -373,7 +373,7 @@ function seq_init(seq::Array{tSeqInfo, 2}, data::tData)
     end
 end
 
-function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData)
+function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData, verbose::Bool)
 
     solut_best::tSolution = tSolution(zeros(Int, data.dimen+1), Array{Float64, 3}(undef, 3, data.dimen+1, data.dimen+1), Inf)
     solut_partial::tSolution = tSolution(zeros(Int, data.dimen+1), Array{Float64, 3}(undef, 3, data.dimen+1, data.dimen+1), 0)
@@ -385,15 +385,21 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData)
 
         alpha = R[r_value]
 
-        @printf "[+] Local Search %d\n" i
+        if verbose
+            @printf "[+] Local Search %d\n" i
+        end
         solut_crnt.s = construction(alpha, data)
         update_subseq_info_matrix(solut_crnt, data)
-        @printf "\t[+] Constructing Inital Solution.. %.2lf\n" solut_crnt.cost
+        if verbose
+            @printf "\t[+] Constructing Inital Solution.. %.2lf\n" solut_crnt.cost
+        end
 
         solut_partial.cost = solut_crnt.cost
         solut_partial.s = copy(solut_crnt.s)
 
-        @printf "\t[+] Looking for the best Neighbor..\n"
+        if verbose
+            @printf "\t[+] Looking for the best Neighbor..\n"
+        end
         iterILS = 0
         while iterILS < Iils
             RVND(solut_crnt, data)
@@ -416,7 +422,9 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData)
             solut_best.s = copy(solut_partial.s)
         end
 
-        @printf "\tCurrent best solution cost: %.2lf\n" solut_best.cost
+        if verbose
+            @printf "\tCurrent best solution cost: %.2lf\n" solut_best.cost
+        end
     end
     @printf "COST: %.2lf\n" solut_best.cost
     print("SOLUTION: ")
@@ -425,18 +433,20 @@ end
 
 function main()
 
+    verbose = "-v" in ARGS || "--verbose" in ARGS
+
     dimension, cost, rand_values = get_instance_info()
 
 
-    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
-         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25] 
+    R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12,
+         0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
 
     Imax = 10
     Iils = min(dimension, 100)
 
     data::tData = tData(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, eps(Float64), 0, rand_values, 1)
 
-    time = @elapsed GILS_RVND(Imax, Iils, R, data)
+    time = @elapsed GILS_RVND(Imax, Iils, R, data, verbose)
 
     @printf "TIME: %.6lf\n" time
     println("reinsertion calls ", data.reinsert_count)
