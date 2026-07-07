@@ -32,11 +32,11 @@ private:
     bool search_reinsertion(tSolution & solut, tData & data, const int opt);
     void RVND(tSolution & solut, tData & data);
     std::vector<int> perturb(tSolution * solut, tData & data);
-    void GILS_RVND(int Imax, int Iils, tData & data);
+    void GILS_RVND(int Imax, int Iils, tData & data, bool verbose);
 
 public:
     MLP(tData & data);
-    void solve();
+    void solve(bool verbose = false);
 
 };
 

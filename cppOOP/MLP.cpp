@@ -7,7 +7,7 @@ MLP::MLP(tData & data) {
     this->data = data;
 }
 
-void MLP::solve() {
+void MLP::solve(bool verbose) {
     tSolution solut(data);
 
     int Imax = 10;
@@ -15,7 +15,7 @@ void MLP::solve() {
     Iils = data.getDimen() < 100 ? data.getDimen() : 100;
 
     size_t start = clock();
-    GILS_RVND(Imax, Iils, data);
+    GILS_RVND(Imax, Iils, data, verbose);
     double cpu_time = (double)(clock() - start) / CLOCKS_PER_SEC ;
 
     std::cout << "TIME: " << cpu_time << std::endl;
@@ -391,7 +391,7 @@ std::vector<int> MLP::perturb(tSolution * solut, tData & data) {
 }
 
 
-void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
+void MLP::GILS_RVND(int Imax, int Iils, tData & data, bool verbose) {
 
     tSolution solut_partial(data);
     tSolution solut_crnt(data);
@@ -402,8 +402,10 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
 
         double alpha = R_table(aux);
 
-        printf("[+] Search %d\n", i+1);
-        printf("\t[+] Constructing..\n");	
+        if (verbose) {
+            printf("[+] Search %d\n", i+1);
+            printf("\t[+] Constructing..\n");
+        }
 
         solut_crnt.setSolutVec(
             construct(alpha, data)
@@ -412,11 +414,13 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
         update_subseq_info_matrix(solut_crnt, data);
 
         solut_partial.copy(solut_crnt);
-        printf("\t[+] Looking for the best Neighbor..\n");
-        printf("\t    Construction Cost: %.3lf\n", solut_partial.getCost());	
+        if (verbose) {
+            printf("\t[+] Looking for the best Neighbor..\n");
+            printf("\t    Construction Cost: %.3lf\n", solut_partial.getCost());
 
-        std::cout << "Solucao inicial ";
-        solut_partial.print();
+            std::cout << "Solucao inicial ";
+            solut_partial.print();
+        }
 
         int iterILS = 0;
         while (iterILS < Iils) {
@@ -437,13 +441,15 @@ void MLP::GILS_RVND(int Imax, int Iils, tData & data) {
             solut_best.copy(solut_partial);
         }
 
-        std::cout << "\tCurrent best cost: "<< solut_best.getCost() << std::endl;
+        if (verbose) {
+            std::cout << "\tCurrent best cost: "<< solut_best.getCost() << std::endl;
 
-        std::cout << "SOLUCAO: ";
-        for(int i = 0; i < solut_best.getSolutVec().size(); i++){
-            std::cout << solut_best.getPos(i) << " ";
+            std::cout << "SOLUCAO: ";
+            for(int i = 0; i < solut_best.getSolutVec().size(); i++){
+                std::cout << solut_best.getPos(i) << " ";
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
 
     }
     printf("COST: %.2lf\n", solut_best.getCost());
