@@ -1,2 +1,2 @@
 # !/bin/bash
-node main.js
+node main.js "$@"

@@ -364,7 +364,7 @@ function perturb(sl, data) {
 
 }
 
-function GILS_RVND(Iils, Imax, R, info, data) {
+function GILS_RVND(Iils, Imax, R, info, data, verbose) {
 
     seq_a = subseq_fill(data.dimension);
     seq_b = subseq_fill(data.dimension);
@@ -387,18 +387,24 @@ function GILS_RVND(Iils, Imax, R, info, data) {
 
     for (var i = 0; i < Imax; i++) {
         var alpha = R[data.rnd[data.rnd_index++]];
-        console.log("[+] Local Search ", i+1);
-        console.log("\t[+] Constructing Inital Solution..");
+        if (verbose) {
+            console.log("[+] Local Search ", i+1);
+            console.log("\t[+] Constructing Inital Solution..");
+        }
         solut_crnt.s = construction(alpha, data);
         update_subseq_info_matrix(solut_crnt, info, data);
 
         solut_partial.s = [...solut_crnt.s];
         solut_partial.cost = solut_crnt.cost;
-      
-        console.log("Construction cost", solut_partial.cost);
+
+        if (verbose) {
+            console.log("Construction cost", solut_partial.cost);
+        }
         var iterILS = 0;
 
-        console.log("\t[+] Looking for the best Neighbor..");
+        if (verbose) {
+            console.log("\t[+] Looking for the best Neighbor..");
+        }
         while (iterILS < Iils) {
             RVND(solut_crnt, info, data);
 
@@ -418,14 +424,18 @@ function GILS_RVND(Iils, Imax, R, info, data) {
             solut_best.cost = solut_partial.cost;
         }
 
-        console.log("\tcurrent best solution cost",  solut_best.cost);
-        console.log();
+        if (verbose) {
+            console.log("\tcurrent best solution cost",  solut_best.cost);
+            console.log();
+        }
     }
 
     console.log("COST: ", solut_best.cost);
 }
 
 function main() {
+    var verbose = process.argv.includes("-v") || process.argv.includes("--verbose");
+
     var dimension;
     var c = [];
     var rnd = [];
@@ -453,7 +463,7 @@ function main() {
     };
 
     var start = new Date();
-    GILS_RVND(Iils, Imax, R, info, data);
+    GILS_RVND(Iils, Imax, R, info, data, verbose);
     var end = new Date();
 
     console.log("TIME: ", (end-start)/1000);
