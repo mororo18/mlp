@@ -360,7 +360,7 @@ namespace MLP {
         }
 
 
-        public void solve(){
+        public void solve(bool verbose){
             var solut_best = new tSolution(data.GetDimen(), Double.MaxValue);
             var solut_crnt = new tSolution(data.GetDimen(), 0.0);
             var solut_partial = new tSolution(data.GetDimen(), 0.0);
@@ -369,8 +369,10 @@ namespace MLP {
                 int index = data.GetRndCrnt();
                 double alpha = R[index];
 
-                Console.WriteLine("[+] Local Search " + (i+1));
-                Console.WriteLine("\t[+] Constructing Inital Solution..");
+                if (verbose) {
+                    Console.WriteLine("[+] Local Search " + (i+1));
+                    Console.WriteLine("\t[+] Constructing Inital Solution..");
+                }
 
                 solut_crnt.StoreSolut(construction(alpha));
 
@@ -379,7 +381,9 @@ namespace MLP {
                 solut_partial.StoreSolut(solut_crnt.GetSolutCpy());
                 solut_partial.SetCost(solut_crnt.GetCost());
 
-                Console.WriteLine("\t[+] Looking for the best Neighbor..");
+                if (verbose) {
+                    Console.WriteLine("\t[+] Looking for the best Neighbor..");
+                }
                 int iterILS = 0;
                 while(iterILS < Iils){
                     RVND(solut_crnt);
@@ -400,7 +404,9 @@ namespace MLP {
                     solut_best.SetCost(solut_partial.GetCost());
                 }
 
-                Console.WriteLine("\tCurrent best solution cost: "+solut_best.GetCost());
+                if (verbose) {
+                    Console.WriteLine("\tCurrent best solution cost: "+solut_best.GetCost());
+                }
             }
             Console.WriteLine(string.Format("SOLUTION: ({0}).", string.Join(", ", solut_best.GetSolut())));
             Console.WriteLine("COST: " + solut_best.GetCost());

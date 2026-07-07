@@ -1,3 +1,3 @@
 #! /usr/bin/bash
-./solve
+./solve "$@"
 #rm *.exe
