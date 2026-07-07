@@ -338,7 +338,7 @@ function perturb(sl, info) {
 
 }
 
-function GILS_RVND(Iils, Imax, R, info) {
+function GILS_RVND(Iils, Imax, R, info, verbose) {
 
     subseq = subseq_fill(info.dimension);
     var s_best = [];
@@ -346,17 +346,23 @@ function GILS_RVND(Iils, Imax, R, info) {
 
     for (var i = 0; i < Imax; i++) {
         var alpha = R[info.rnd[info.rnd_index++]];
-        console.log("[+] Local Search ", i+1);
-        console.log("\t[+] Constructing Inital Solution..");
+        if (verbose) {
+            console.log("[+] Local Search ", i+1);
+            console.log("\t[+] Constructing Inital Solution..");
+        }
         var s = construction(alpha, info);
         var sl = [...s];
 
         subseq_load(s, subseq, info);
         var rvnd_cost_best = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
-        console.log("Construction cost", rvnd_cost_best);
+        if (verbose) {
+            console.log("Construction cost", rvnd_cost_best);
+        }
         var iterILS = 0;
 
-        console.log("\t[+] Looking for the best Neighbor..");
+        if (verbose) {
+            console.log("\t[+] Looking for the best Neighbor..");
+        }
         while (iterILS < Iils) {
             RVND(s, subseq, info);
             var rvnd_cost_crnt = subseq[to_1D(0, info.dimension, info.C, info.dimension)] - Number.EPSILON;
@@ -379,8 +385,10 @@ function GILS_RVND(Iils, Imax, R, info) {
             s_best = sl;
             cost_best = sl_cost;
         }
-        console.log("\tcurrent best solution cost",  cost_best);
-        console.log();
+        if (verbose) {
+            console.log("\tcurrent best solution cost",  cost_best);
+            console.log();
+        }
     }
 
     console.log(s_best);
@@ -388,10 +396,12 @@ function GILS_RVND(Iils, Imax, R, info) {
 }
 
 function main() {
+    var verbose = process.argv.includes("-v") || process.argv.includes("--verbose");
+
     var dimension;
     var c = [];
     var rnd = [];
-    var Data = require("./Data"); 
+    var Data = require("./Data");
 
     var t = Data.info_load(c);
     dimension = t.dimension;
@@ -413,7 +423,7 @@ function main() {
 
 
     var start = new Date();
-    GILS_RVND(Iils, Imax, R, info);
+    GILS_RVND(Iils, Imax, R, info, verbose);
     var end = new Date();
 
     console.log("TIME: ", (end-start)/1000);
