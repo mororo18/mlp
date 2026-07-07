@@ -63,6 +63,21 @@ Blocks: the octave leg of the cross-branch progress-flag rollout
 uses the same `main.m`, so is presumably affected too, but couldn't be
 verified (`matlab` unavailable in this environment).
 
+Fix `csharp` mono build path: `mcs -debug -optimize+ -out:solve_mcs *.cs`
+(used by `build.sh`/`run_mcs.sh`) fails with
+`GILS_RVND.cs(87,13): error CS0131` — this Mono compiler (6.12.0.199)
+doesn't support the C# 7 tuple-deconstruction assignment syntax
+(`(arr[i + 1], arr[right]) = (arr[right], arr[i + 1]);`) used in
+`Partition`. Reproduced on a clean checkout, unrelated to any pending
+change. The `dotnet build` path works fine and was used to verify the
+progress-flag addition. Separately, running the built `net6.0` binary
+directly (`./bin/Debug/net6.0/csharp`, what `run_dotnet.sh` calls) fails
+in this environment with a missing-framework error since only the 8.0
+runtime is installed side-by-side; `DOTNET_ROLL_FORWARD=LatestMajor`
+works around it here, but the underlying net6.0-target-vs-8.0-installed
+mismatch (see `SETUP.md`'s Tool Versions table) may need a decision
+(retarget the csproj to net8.0, or install net6.0 runtime).
+
 Review multiple main variants in `lua/`, `python/` - keep canonical version
 
 Remove profiler output files (`.txt`, `.log`, `MyProfilingReport.txt`)
