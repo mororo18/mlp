@@ -1,2 +1,2 @@
 #! /bin/bash
-pypy3 main.py
+pypy3 main.py "$@"

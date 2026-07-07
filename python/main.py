@@ -327,7 +327,7 @@ def perturb(sl, rnd):
 
     return s
 
-def GILS_RVND(Imax, Iils, R, rnd):
+def GILS_RVND(Imax, Iils, R, rnd, verbose=False):
 
     global subseq
 
@@ -344,16 +344,18 @@ def GILS_RVND(Imax, Iils, R, rnd):
 
         alpha = R[index]
 
-        print("[+] Local Search {}".format(i+1))
-        print("\t[+] Constructing Inital Solution..")
+        if verbose:
+            print("[+] Local Search {}".format(i+1))
+            print("\t[+] Constructing Inital Solution..")
         s = construction(alpha, rnd)
         update_subseq_info_matrix(s)
         sl = s[:]
         rvnd_cost_best = subseq[0][n].C  - EPSILON
 
-        print(rvnd_cost_best)
+        if verbose:
+            print(rvnd_cost_best)
 
-        print("\t[+] Looking for the best Neighbor..")
+            print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
             RVND(s, rnd)
@@ -374,20 +376,22 @@ def GILS_RVND(Imax, Iils, R, rnd):
             s_best = sl[:]
             cost_best = sl_cost
 
-        print("\tCurrent best solution cost: {}".format(cost_best))
+        if verbose:
+            print("\tCurrent best solution cost: {}".format(cost_best))
 
     print("COST: {}".format (cost_best))
     print("SOLUTION: {}".format( s_best))
 
 
 def main(rnd):
+    verbose = "-v" in sys.argv or "--verbose" in sys.argv
 
     R = [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
 
     Imax = 10
     Iils = min(n, 100)
 
-    GILS_RVND(Imax, Iils, R, tRnd(rnd))
+    GILS_RVND(Imax, Iils, R, tRnd(rnd), verbose)
 
 start = time.time()
 main(rnd)
