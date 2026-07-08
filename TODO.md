@@ -24,15 +24,27 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 ## P2
 
-Fix `lua/run_lua.sh` and `lua/run_luajit.sh`: they invoke `main.canc.lua.lua`,
-which crashes under both `lua5.3` (`table.remove` out of bounds in `RVND`,
-main.canc.lua.lua:343) and `luajit` (`attempt to index a nil value` in
-`sort`, main.canc.lua.lua:91) — reproduced on a clean checkout, unrelated to
-any pending change. Several near-duplicate files in the same directory
-(`main.lua`, `main_lua.lua`, `main_luajit.canc`, `main_luajit.canc.lua`) run
-correctly to completion under `luajit`, but weren't verified under `lua5.3`.
-Needs a decision on which file is canonical (ties into the item below) before
-`run_lua.sh`/`run_luajit.sh` can be fixed to point at a working entry point.
+`lua/`'s dependency on the abandoned `canc` preprocessor has been removed.
+`main.canc.lua` was canc-syntax source (a single `#define("to_1D(x,y,z,d)",
+...)` macro flattening a 3D `seq` index into 1D); `main.canc.lua.lua` was
+the canc-compiled output actually wired into `run_lua.sh`/`run_luajit.sh`,
+and `main_luajit.canc`/`main_luajit.canc.lua` were byte-identical
+duplicates of that same compiled output. `test.lua`/`test.lua.lua` were a
+standalone canc-syntax scratch benchmark (function-call vs macro indexing),
+unused by any run script. Hand-expanded every `to_1D(...)` call in
+`main.canc.lua` to the literal arithmetic (cross-checked against
+`main.canc.lua.lua`'s already-expanded output to confirm correctness),
+removed the `#define` line, and deleted the other four now-redundant
+files. `run_lua.sh`/`run_luajit.sh` now point at `main.canc.lua` directly
+— no external tool needed to run it anymore.
+
+That said, `main.canc.lua` still doesn't run to completion: same
+pre-existing bug as before (`table.remove` position out of bounds in
+`RVND` under `lua5.3`; reaches further under `luajit` but hasn't been
+confirmed to finish either), confirmed unrelated to the canc removal
+(reproduces identically, and the correct intermediate cost — 209320 — was
+observed before the crash). Fixing this is a separate task from the canc
+cleanup.
 
 Blocks: the lua leg of the cross-branch progress-flag rollout
 (`tcc/TODO.md` P2) — skipped for now pending this fix.
@@ -78,7 +90,10 @@ works around it here, but the underlying net6.0-target-vs-8.0-installed
 mismatch (see `SETUP.md`'s Tool Versions table) may need a decision
 (retarget the csproj to net8.0, or install net6.0 runtime).
 
-Review multiple main variants in `lua/`, `python/` - keep canonical version
+Review multiple main variants in `lua/`, `python/` - keep canonical version.
+For `lua/`: canc cleanup already cut this from 8 files down to 3 candidates
+(`main.canc.lua`, `main.lua`, `main_lua.lua`) — still need to pick one and
+delete the other two.
 
 Remove profiler output files (`.txt`, `.log`, `MyProfilingReport.txt`)
 

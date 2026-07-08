@@ -37,7 +37,7 @@ function seq_print(solut, info)
     for i=1,info.dimension+1 do
         for j=i,info.dimension+1 do
             for k=1,3 do
-                io.write(solut.seq[to_1D(i, j, k, info.dimension+1)] , " ") --= {0, 0, 0}
+                io.write(solut.seq[(3 * ((info.dimension+1) * (i - 1) + (j - 1)) + k)] , " ") --= {0, 0, 0}
             end
             io.write("| ")
         end
@@ -68,13 +68,12 @@ function solut_clone(src, dest)
     return dest
 end
 
-#define("to_1D(x, y, z, d)", "(3*((d)*(x-1) + (y-1)) + z)")
 
 function subseq_fill(seq, info)
     for i=1,info.dimension+1 do
         for j=i,info.dimension+1 do
             for k=1,3 do
-                seq[to_1D(i, j, k, info.dimension+1)] = 0.0
+                seq[(3 * ((info.dimension+1) * (i - 1) + (j - 1)) + k)] = 0.0
             end
         end
     end
@@ -97,9 +96,9 @@ function subseq_load(solut, info)
     for i=1,s_size do
         local k = 1 - i - (i ~= 1 and 0 or 1)
 
-        seq[to_1D(i, i, T, s_size)] = 0.0
-        seq[to_1D(i, i, C, s_size)] = 0.0
-        seq[to_1D(i, i, W, s_size)] = (i ~= 1 and 1 or 0)
+        seq[(3 * ((s_size) * (i - 1) + (i - 1)) + T)] = 0.0
+        seq[(3 * ((s_size) * (i - 1) + (i - 1)) + C)] = 0.0
+        seq[(3 * ((s_size) * (i - 1) + (i - 1)) + W)] = (i ~= 1 and 1 or 0)
 
         local some_T = 0.0
         local some_C = 0.0
@@ -113,14 +112,14 @@ function subseq_load(solut, info)
 
             -- set T
             local cost_T= c[s_j_prev][s_j] + some_T
-            seq[to_1D(i, j, T, s_size)] = cost_T
+            seq[(3 * ((s_size) * (i - 1) + (j - 1)) + T)] = cost_T
 
             -- set C
             local cost_C = cost_T + some_C
-            seq[to_1D(i, j, C, s_size)]  = cost_C
+            seq[(3 * ((s_size) * (i - 1) + (j - 1)) + C)]  = cost_C
 
             -- set W
-            seq[to_1D(i, j, W, s_size)] = j + k
+            seq[(3 * ((s_size) * (i - 1) + (j - 1)) + W)] = j + k
 
 
             s_j_prev = s_j
@@ -129,7 +128,7 @@ function subseq_load(solut, info)
         end
     end
 
-    solut.cost = seq[to_1D(1, dimen+1, C, dimen+1)] - info.EPSILON
+    solut.cost = seq[(3 * ((dimen+1) * (1 - 1) + (dimen+1 - 1)) + C)] - info.EPSILON
     --print(solut.cost)
 end
 
@@ -239,12 +238,12 @@ function search_swap(solut, info)
         local s_i = s[i]
         local s_i_next = s[i_next]
 
-        cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)] + c[s[i_prev]][s_i_next]
-        cost_concat_2 = cost_concat_1 + seq[to_1D(i, i_next, T, s_size)] + c[s_i][     s[i_next+1]]
+        cost_concat_1 =                 seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + T)] + c[s[i_prev]][s_i_next]
+        cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (i - 1) + (i_next - 1)) + T)] + c[s_i][     s[i_next+1]]
 
-        cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                    +           --       1st subseq
-        seq[to_1D(i, i_next, W, s_size)]               * (cost_concat_1) + c[s_i_next][s_i]  +           -- concat 2nd subseq
-        seq[to_1D(i_next+1, s_size, W, s_size)]   * (cost_concat_2) + seq[to_1D(i_next+1, s_size, C, s_size)]   -- concat 3rd subseq
+        cost_new = seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + C)]                                                    +           --       1st subseq
+        seq[(3 * ((s_size) * (i - 1) + (i_next - 1)) + W)]               * (cost_concat_1) + c[s_i_next][s_i]  +           -- concat 2nd subseq
+        seq[(3 * ((s_size) * (i_next+1 - 1) + (s_size - 1)) + W)]   * (cost_concat_2) + seq[(3 * ((s_size) * (i_next+1 - 1) + (s_size - 1)) + C)]   -- concat 3rd subseq
 
         if cost_new < cost_best then
             cost_best = cost_new - EP
@@ -258,17 +257,17 @@ function search_swap(solut, info)
             local s_j = s[j]
 
 
-            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]       + c[s[i_prev]][s_j]
+            cost_concat_1 =                 seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + T)]       + c[s[i_prev]][s_j]
             cost_concat_2 = cost_concat_1                     + c[s_j][s_i_next]
-            cost_concat_3 = cost_concat_2 + seq[to_1D(i_next, j_prev, T, s_size)]  + c[s[j_prev]][s_i]
+            cost_concat_3 = cost_concat_2 + seq[(3 * ((s_size) * (i_next - 1) + (j_prev - 1)) + T)]  + c[s[j_prev]][s_i]
             cost_concat_4 = cost_concat_3                           + c[s_i][s[j_next]]
 
 
-            cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                 +      -- 1st subseq
+            cost_new = seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + C)]                                                 +      -- 1st subseq
             cost_concat_1 +                                                             -- concat 2nd subseq (single node)
-            seq[to_1D(i_next, j_prev, W, s_size)]      * cost_concat_2 + seq[to_1D(i_next, j_prev, C, s_size)] +      -- concat 3rd subseq
+            seq[(3 * ((s_size) * (i_next - 1) + (j_prev - 1)) + W)]      * cost_concat_2 + seq[(3 * ((s_size) * (i_next - 1) + (j_prev - 1)) + C)] +      -- concat 3rd subseq
             cost_concat_3 +                                                             -- concat 4th subseq (single node)
-            seq[to_1D(j_next, s_size, W, s_size)] * cost_concat_4 + seq[to_1D(j_next, s_size, C, s_size)]   -- concat 5th subseq
+            seq[(3 * ((s_size) * (j_next - 1) + (s_size - 1)) + W)] * cost_concat_4 + seq[(3 * ((s_size) * (j_next - 1) + (s_size - 1)) + C)]   -- concat 5th subseq
 
             if(cost_new < cost_best) then
                 cost_best = cost_new - EP
@@ -279,7 +278,7 @@ function search_swap(solut, info)
         end
     end
 
-    if cost_best < solut.seq[to_1D(1, s_size, info.C, s_size)] - info.EPSILON then
+    if cost_best < solut.seq[(3 * ((s_size) * (1 - 1) + (s_size - 1)) + info.C)] - info.EPSILON then
         --print("swap")
         --print(cost_best)
         swap(solut.s, I, J)
@@ -315,7 +314,7 @@ function search_two_opt(solut, info)
 
     for i = 2,dimen-1 do
         local i_prev = i - 1
-        local rev_seq_cost = seq[to_1D(i, i+1, T, s_size)]
+        local rev_seq_cost = seq[(3 * ((s_size) * (i - 1) + (i+1 - 1)) + T)]
 
         local s_j_prev = s[i+1]
 
@@ -323,14 +322,14 @@ function search_two_opt(solut, info)
             local j_next = j+1
             local s_j = s[j]
 
-            rev_seq_cost = rev_seq_cost + c[s_j_prev][s_j] * (seq[to_1D(i, j, W, s_size)]-1.0)
+            rev_seq_cost = rev_seq_cost + c[s_j_prev][s_j] * (seq[(3 * ((s_size) * (i - 1) + (j - 1)) + W)]-1.0)
 
-            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]   + c[s_j][     s[i_prev]]
-            cost_concat_2 = cost_concat_1 + seq[to_1D(i, j, T, s_size)]        + c[s[j_next]][s[i]]
+            cost_concat_1 =                 seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + T)]   + c[s_j][     s[i_prev]]
+            cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (i - 1) + (j - 1)) + T)]        + c[s[j_next]][s[i]]
 
-            cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                        +   --   1st subseq
-                    seq[to_1D(i, j, W, s_size)]                * cost_concat_1 + rev_seq_cost                  +   -- concat 2nd subseq (reversed seq)
-                    seq[to_1D(j_next, s_size, W, s_size)] * cost_concat_2 + seq[to_1D(j_next, s_size, C, s_size)]       -- concat 3rd subseq
+            cost_new = seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + C)]                                                        +   --   1st subseq
+                    seq[(3 * ((s_size) * (i - 1) + (j - 1)) + W)]                * cost_concat_1 + rev_seq_cost                  +   -- concat 2nd subseq (reversed seq)
+                    seq[(3 * ((s_size) * (j_next - 1) + (s_size - 1)) + W)] * cost_concat_2 + seq[(3 * ((s_size) * (j_next - 1) + (s_size - 1)) + C)]       -- concat 3rd subseq
 
             if cost_new < cost_best then
                 cost_best = cost_new - EP
@@ -342,7 +341,7 @@ function search_two_opt(solut, info)
         end
     end
 
-    if cost_best < solut.seq[to_1D(1, s_size, C, s_size)] - EP then
+    if cost_best < solut.seq[(3 * ((s_size) * (1 - 1) + (s_size - 1)) + C)] - EP then
         reverse(solut.s, I, J)
         subseq_load(solut, info)
         return true
@@ -388,14 +387,14 @@ function search_reinsertion(solut, info, opt)
         for k = 1, i_prev-1 do
             local k_next = k+1
 
-            cost_concat_1 =                 seq[to_1D(1, k, T, s_size)]            + c[s[k]][s_i];
-            cost_concat_2 = cost_concat_1 + seq[to_1D(i, j, T, s_size)]            + c[s_j][s[k_next]];
-            cost_concat_3 = cost_concat_2 + seq[to_1D(k_next, i_prev, T, s_size)]  + c[s_i_prev][s_j_next];
+            cost_concat_1 =                 seq[(3 * ((s_size) * (1 - 1) + (k - 1)) + T)]            + c[s[k]][s_i];
+            cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (i - 1) + (j - 1)) + T)]            + c[s_j][s[k_next]];
+            cost_concat_3 = cost_concat_2 + seq[(3 * ((s_size) * (k_next - 1) + (i_prev - 1)) + T)]  + c[s_i_prev][s_j_next];
 
-            cost_new = seq[to_1D(1, k, C, s_size)]                                                             +   --       1st subseq
-            seq[to_1D(i, j, W, s_size)]                * cost_concat_1 + seq[to_1D(i, j, C, s_size)]                  +   -- concat 2nd subseq (reinserted seq)
-            seq[to_1D(k_next, i_prev,  W, s_size)]      * cost_concat_2 + seq[to_1D(k_next, i_prev,  C, s_size)]        +   -- concat 3rd subseq
-            seq[to_1D(j_next, s_size, W, s_size)] * cost_concat_3     + seq[to_1D(j_next, s_size, C, s_size)];       -- concat 4th subseq
+            cost_new = seq[(3 * ((s_size) * (1 - 1) + (k - 1)) + C)]                                                             +   --       1st subseq
+            seq[(3 * ((s_size) * (i - 1) + (j - 1)) + W)]                * cost_concat_1 + seq[(3 * ((s_size) * (i - 1) + (j - 1)) + C)]                  +   -- concat 2nd subseq (reinserted seq)
+            seq[(3 * ((s_size) * (k_next - 1) + (i_prev - 1)) + W)]      * cost_concat_2 + seq[(3 * ((s_size) * (k_next - 1) + (i_prev - 1)) + C)]        +   -- concat 3rd subseq
+            seq[(3 * ((s_size) * (j_next - 1) + (s_size - 1)) + W)] * cost_concat_3     + seq[(3 * ((s_size) * (j_next - 1) + (s_size - 1)) + C)];       -- concat 4th subseq
 
             if cost_new < cost_best then
                 cost_best = cost_new - EP
@@ -409,14 +408,14 @@ function search_reinsertion(solut, info, opt)
         for k = i+opt,dimen do
             local k_next = k+1
 
-            cost_concat_1 =                 seq[to_1D(1, i_prev, T, s_size)]   + c[s_i_prev][s_j_next];
-            cost_concat_2 = cost_concat_1 + seq[to_1D(j_next, k, T, s_size)]   + c[s[k]][     s_i];
-            cost_concat_3 = cost_concat_2 + seq[to_1D(i, j, T, s_size)]        + c[s_j][     s[k_next]];
+            cost_concat_1 =                 seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + T)]   + c[s_i_prev][s_j_next];
+            cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (j_next - 1) + (k - 1)) + T)]   + c[s[k]][     s_i];
+            cost_concat_3 = cost_concat_2 + seq[(3 * ((s_size) * (i - 1) + (j - 1)) + T)]        + c[s_j][     s[k_next]];
 
-            cost_new = seq[to_1D(1, i_prev, C, s_size)]                                                        +   --       1st subseq
-                    seq[to_1D(j_next, k, W, s_size)]           * cost_concat_1 + seq[to_1D(j_next, k, C, s_size)]             +   -- concat 2nd subseq
-                    seq[to_1D(i, j, W, s_size)]                * cost_concat_2 + seq[to_1D(i, j,      C, s_size)]                  +   -- concat 3rd subseq (reinserted seq)
-                    seq[to_1D(k_next, s_size, W, s_size)] * cost_concat_3     + seq[to_1D(k_next, s_size, C, s_size)];       -- concat 4th subseq
+            cost_new = seq[(3 * ((s_size) * (1 - 1) + (i_prev - 1)) + C)]                                                        +   --       1st subseq
+                    seq[(3 * ((s_size) * (j_next - 1) + (k - 1)) + W)]           * cost_concat_1 + seq[(3 * ((s_size) * (j_next - 1) + (k - 1)) + C)]             +   -- concat 2nd subseq
+                    seq[(3 * ((s_size) * (i - 1) + (j - 1)) + W)]                * cost_concat_2 + seq[(3 * ((s_size) * (i - 1) + (j - 1)) + C)]                  +   -- concat 3rd subseq (reinserted seq)
+                    seq[(3 * ((s_size) * (k_next - 1) + (s_size - 1)) + W)] * cost_concat_3     + seq[(3 * ((s_size) * (k_next - 1) + (s_size - 1)) + C)];       -- concat 4th subseq
 
             if cost_new < cost_best then
                 cost_best = cost_new - EP
@@ -590,7 +589,7 @@ function GILS_RVND(Imax, Iils, R, info)
         s_print(solut_crnt)
         print("\tConstruction cost  ", solut_crnt.cost)
 
-      --print(solut_crnt.seq[to_1D(1, info.dimension+1, info.C, info.dimension+1)])
+      --print(solut_crnt.seq[(3 * ((info.dimension+1) * (1 - 1) + (info.dimension+1 - 1)) + info.C)])
 
       --seq_print(solut_crnt, info)
       --os.exit()
