@@ -1,10 +1,12 @@
-# Table-layout microbenchmarks
+# Table/overhead microbenchmarks
 
-Standalone Lua scripts used to investigate how Lua/LuaJIT actually store
-`seq`-like flattened arrays internally (array part vs hash part of a
-table), and whether alternative data-structure shapes would be faster for
-the access patterns the GILS-RVND hot loop actually uses. Not part of the
-solver — run directly with `lua5.3`/`luajit`, no dependencies.
+Standalone Lua scripts used to investigate (a) how Lua/LuaJIT actually
+store `seq`-like flattened arrays internally (array part vs hash part of
+a table), whether alternative data-structure shapes would be faster for
+the access patterns the GILS-RVND hot loop actually uses, and (b) other
+non-obvious runtime overheads (JIT compilation gaps, stdlib calls that
+don't get inlined). Not part of the solver — run directly with
+`lua5.3`/`luajit`, no dependencies.
 
 Results and conclusions are written up in `../IMPLEMENTATION.md`. Kept
 here (not in `/tmp`) so the investigation is reproducible and part of the
@@ -32,6 +34,11 @@ repo history, not just a conversation transcript.
   {interleaved, struct-of-arrays} x {square, packed} — the flat survivors
   from bench_03 — under both full-random and windowed/neighborhood access
   (the latter mimicking `search_reinsertion`'s actual access shape).
+- **`bench_05_table_insert_vs_manual.lua`** — `table.insert`/`table.remove`
+  vs hand-written equivalents (`t[#t+1]=x`, manual shift-remove). Follows
+  up on a `luajit -jv` finding: these two stdlib calls trigger trace
+  "stitch" events (not inlined by the JIT) at their real call sites in
+  `main.canc.lua` (`construction()` and RVND's `neighbd_list` handling).
 
 Run with e.g.:
 ```bash

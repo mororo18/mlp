@@ -146,11 +146,87 @@ clearly justified by this data for luajit. The current flat/interleaved
 layout is already a reasonable choice. Not pursuing further changes to
 `seq`'s shape based on this investigation.
 
-## Open follow-up (not started)
+## Non-obvious overhead investigation (2026-07-09)
 
-Registered in root `TODO.md`: investigate other non-obvious overhead
-sources in this implementation beyond table layout (function-call/
-closure overhead, `table.remove`/`table.insert` cost inside RVND,
-`--` string comparisons, GC pauses, etc.) — this investigation only
-looked at `seq`'s data-structure shape, not the broader hot-loop cost
-breakdown implied by the 19%+60% profiler split above.
+Follow-up to the table-layout work above: what else, beyond `seq`'s data-
+structure shape, might be costing real time in this implementation
+without showing up as an obvious line in the `-jp=a` output? Method: run
+LuaJIT's own compilation log (`luajit -jv`) against the real
+`main.canc.lua` solving `rat99`, which shows every trace compiled, every
+trace *abort* (falls back to slow interpretation entirely) and every
+trace *stitch* (bails out to run one uncompiled operation via the
+interpreter, then resumes — LuaJIT 2.1's mitigation for NYI/"not yet
+implemented" stdlib functions, cheaper than an abort but not free).
+
+```bash
+luajit -jv main.canc.lua > /dev/null 2> jv.log
+grep -c abort jv.log     # 0
+grep -c stitch jv.log    # 22
+grep stitch jv.log | grep -oE "stitch [a-zA-Z_.]+" | sort | uniq -c
+#   7 stitch table.insert
+#   4 stitch string.gmatch_aux
+#   1 stitch string.gmatch
+```
+
+### 1. Zero trace aborts — no hidden "falls back to slow interpreter" disaster
+
+Good news, worth stating explicitly rather than assuming: every hot loop
+(`search_reinsertion`, `subseq_load`, `search_swap`, `search_two_opt`)
+compiles to native code with no full abort. Nothing here is silently
+running fully interpreted.
+
+### 2. `table.insert`/`table.remove` are not JIT-inlined — confirmed at their real call sites
+
+7 of the 22 stitch events are `table.insert`; these trace back to
+`construction()` (lines 186-220) and RVND's `neighbd_list` handling
+(line 512, `table.remove(neighbd_list, index)`). Corroborated externally:
+LuaJIT 2.1 added trace stitching specifically to handle NYI stdlib calls
+like these without a full abort ([LuaJIT NYI
+list](https://github.com/tarantool/tarantool/wiki/LuaJIT-Not-Yet-Implemented),
+[Percona: The Anatomy of LuaJIT
+Tables](https://percona.community/blog/2020/04/29/the-anatomy-of-luajit-tables-and-whats-special-about-them/)) —
+expected LuaJIT behavior, not a peculiarity of this environment.
+
+Validated the fix empirically (`bench_05_table_insert_vs_manual.lua`):
+hand-written equivalents are consistently faster in both interpreters,
+though the margin is modest, not dramatic:
+
+| operação | lua5.3 | luajit |
+|---|---|---|
+| `table.insert(t,x)` | 0.362s | 0.0138s |
+| manual `t[#t+1]=x` | 0.283s (-22%) | 0.0124s (-10%) |
+| `table.remove(list,3)` | 0.138s | 0.0475s |
+| manual shift-remove | 0.100s (-27%) | 0.0440s (-7%) |
+
+**Practical takeaway**: replacing `table.insert`/`table.remove` with
+hand-written equivalents in `construction()` and RVND's `neighbd_list`
+handling is a validated, low-risk, modest-magnitude optimization
+candidate — this is Optimize-phase work, not yet applied, needs
+permission per the workflow in `code_optimization.md`.
+
+### 3. `string.gmatch` stitches are confined to one-time file parsing — not a hot-loop concern
+
+The other 5 stitch events (`string.gmatch`/`string.gmatch_aux`) trace to
+`Data.lua`'s instance-file parsing, which runs once at startup. Per the
+general LuaJIT guidance found alongside the NYI docs above: avoiding NYI
+calls only matters for code that runs enough times for the JIT to want to
+compile it — a one-shot initialization routine is never a target for
+compilation regardless, so this is correctly not a concern.
+
+### 4. No closures in the hot path
+
+Checked directly (`grep "function("` across `main.canc.lua`): the only
+anonymous function in the file is inside `protect()`, which is dead code
+(its one call site is commented out, line 704). No closure-allocation
+overhead exists in the current hot loop.
+
+### 5. Not yet investigated — GC pressure (open)
+
+`neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}` (line
+509) allocates a fresh 5-element table every time RVND finds an improving
+move — a plausible, not-yet-quantified source of GC churn given how often
+that path is likely hit across an ILS run. This investigation stopped at
+identifying the `-jv` findings above; quantifying actual GC pause impact
+(e.g. via `collectgarbage("count")` deltas or LuaJIT's GC64 stats across
+a full `rat99` solve) is registered as a follow-up in the root `TODO.md`,
+not done here.
