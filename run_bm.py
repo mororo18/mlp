@@ -42,9 +42,6 @@ def get_mem_avg(pid):
     count = 0
     while True:
     #while count < 50:
-        # time.sleep(0.1)
-        #time.sleep(gap)
-
         # funciona durante 10s
         #print(time.time() - interval)
         #if time.time() - interval >= 10:
@@ -71,8 +68,10 @@ def get_mem_avg(pid):
 
             mem_avg += mem_total
         count += 1
+        time.sleep(0.05)
 
-    mem_avg /= count
+    mem_avg = mem_avg / count if count else float('nan')
+    mem_max = mem_max if count else float('nan')
 
     return {"mem_avg" : mem_avg, "mem_max" : mem_max, "mem_lookups" : count}
 
