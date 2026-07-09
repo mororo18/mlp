@@ -20,6 +20,46 @@ trajectory is stable after the earlier sort-bug fix.
 luajit's advantage grows with instance size, consistent with the JIT
 compiling the hot loops that dominate at larger sizes.
 
+## Why is lua5.3 so much slower than luajit? (2026-07-09)
+
+Decomposed empirically rather than assumed. LuaJIT has a `-joff` flag
+that disables the JIT compiler entirely, leaving only its bytecode
+interpreter running — comparing that against normal luajit isolates "the
+interpreter is better" from "the JIT compiler helps", and comparing it
+against lua5.3 isolates interpreter-vs-interpreter architecture from
+compilation. Same `att48` instance, three configurations:
+
+```bash
+lua5.3 main.canc.lua        # 18.54s -- PUC-Lua's C-switch interpreter
+luajit -joff main.canc.lua  #  6.37s -- LuaJIT's interpreter, JIT disabled
+luajit main.canc.lua        #  0.53s -- LuaJIT's interpreter + JIT compiler
+```
+
+Two independent, multiplicative factors, not one:
+
+1. **~2.9x from the interpreter alone** (18.54s → 6.37s), with *zero*
+   compilation happening. LuaJIT's interpreter is hand-written in
+   assembly (per-architecture, via DynAsm) with a tight dispatch loop,
+   vs lua5.3's portable-C switch-based interpreter — plus LuaJIT uses
+   NaN-tagged 8-byte values (numbers/bools/pointers unboxed into the
+   unused bits of a NaN double) vs Lua 5.3's larger tagged-union
+   `TValue`, meaning less memory traffic per operation even before any
+   JIT is involved. External corroboration: "LuaJIT's hand-coded-in-
+   assembly interpreter... running almost 3x the speed" of PUC-Lua's —
+   matches the measured 2.9x almost exactly. ([Building the fastest Lua
+   interpreter, automatically!](https://sillycross.github.io/2022/11/22/2022-11-22/))
+2. **~12x more from the JIT compiler** (6.37s → 0.53s) — the tracing
+   compiler identifies the hot loop (`search_reinsertion` etc., see
+   Profiling above), specializes it for the types actually observed, and
+   emits native machine code, skipping bytecode dispatch entirely for
+   those loops.
+
+Total: ~35x (18.54s / 0.53s), decomposed as 2.9x × 12x ≈ 35x. Neither
+factor alone explains the gap — an interpreter-only comparison
+(lua5.3 vs `luajit -joff`) would undersell the JIT's contribution, and
+citing "LuaJIT has a JIT compiler" alone ignores that its interpreter is
+already ~3x faster before compilation ever kicks in.
+
 ## Profiling (2026-07-08)
 
 Tool: `luajit -jp=a` (see `code_optimization.md` "Lua" section for why
@@ -220,13 +260,27 @@ anonymous function in the file is inside `protect()`, which is dead code
 (its one call site is commented out, line 704). No closure-allocation
 overhead exists in the current hot loop.
 
-### 5. Not yet investigated — GC pressure (open)
+### 5. GC pressure — investigated and ruled out (`bench_06`, 2026-07-09)
 
 `neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}` (line
 509) allocates a fresh 5-element table every time RVND finds an improving
-move — a plausible, not-yet-quantified source of GC churn given how often
-that path is likely hit across an ILS run. This investigation stopped at
-identifying the `-jv` findings above; quantifying actual GC pause impact
-(e.g. via `collectgarbage("count")` deltas or LuaJIT's GC64 stats across
-a full `rat99` solve) is registered as a follow-up in the root `TODO.md`,
-not done here.
+move — flagged as a plausible GC churn source, now quantified. Method:
+run the real `main.canc.lua` solve with `collectgarbage("stop")`
+beforehand, so nothing gets freed — the heap growth then equals total
+bytes *allocated* (garbage + live), not just what's currently live.
+
+| instância | interpretador | tempo | total alocado (GC desligado) |
+|---|---|---|---|
+| att48 (48) | lua5.3 | 18.0s | 2.7 MB |
+| att48 (48) | luajit | 0.50s | 2.0 MB |
+| rat99 (99) | luajit | 13.0s | 8.2 MB |
+
+**Conclusion**: ruled out. Going from `att48` to `rat99`, allocation
+volume grows ~4x (2.0→8.2 MB) while runtime grows ~26x (0.5s→13.0s) —
+allocation does not scale anywhere close to proportionally with runtime,
+so it cannot be what dominates the cost at larger instance sizes. A few
+MB of total garbage over a multi-second run is trivial for any GC to
+collect (low milliseconds at most) — nowhere near enough to explain a
+meaningful fraction of the measured time. `neighbd_list` and friends are
+not a genuine optimization target. This closes the item registered in
+root `TODO.md`.

@@ -39,6 +39,14 @@ repo history, not just a conversation transcript.
   up on a `luajit -jv` finding: these two stdlib calls trigger trace
   "stitch" events (not inlined by the JIT) at their real call sites in
   `main.canc.lua` (`construction()` and RVND's `neighbd_list` handling).
+- **`bench_06_gc_pressure.lua`** — quantifies total allocation volume of a
+  real solve (not a synthetic case) by running `main.canc.lua` itself
+  with `collectgarbage("stop")`, so nothing gets freed and the heap
+  growth equals total bytes allocated. Must run from this `lua/`
+  directory (`main.canc.lua` resolves its own `dofile`/`io.open` paths
+  relative to cwd). Answers whether `neighbd_list`'s per-improvement
+  table literal (or any other per-iteration allocation) is a meaningful
+  GC pressure source.
 
 Run with e.g.:
 ```bash
