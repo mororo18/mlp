@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-luajit main.canc.lua "$@"
+luajit main.lua "$@"

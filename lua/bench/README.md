@@ -38,15 +38,33 @@ repo history, not just a conversation transcript.
   vs hand-written equivalents (`t[#t+1]=x`, manual shift-remove). Follows
   up on a `luajit -jv` finding: these two stdlib calls trigger trace
   "stitch" events (not inlined by the JIT) at their real call sites in
-  `main.canc.lua` (`construction()` and RVND's `neighbd_list` handling).
+  `main.lua` (`construction()` and RVND's `neighbd_list` handling).
 - **`bench_06_gc_pressure.lua`** — quantifies total allocation volume of a
-  real solve (not a synthetic case) by running `main.canc.lua` itself
+  real solve (not a synthetic case) by running `main.lua` itself
   with `collectgarbage("stop")`, so nothing gets freed and the heap
   growth equals total bytes allocated. Must run from this `lua/`
-  directory (`main.canc.lua` resolves its own `dofile`/`io.open` paths
+  directory (`main.lua` resolves its own `dofile`/`io.open` paths
   relative to cwd). Answers whether `neighbd_list`'s per-improvement
   table literal (or any other per-iteration allocation) is a meaningful
   GC pressure source.
+- **`bench_07_global_vs_local_stdlib.lua`** — global `math.floor`/
+  `math.huge` access (as used throughout `main.lua`, never localized) vs
+  `local floor = math.floor` hoisted once. Follows the LuaJIT Numerical
+  Computing Performance Guide's advice to cache stdlib functions in
+  upvalues.
+- **`bench_08_ffi_vs_table.lua`** — LuaJIT-only (`ffi`, not available in
+  lua5.3): flat `double[]` FFI array vs our current Lua-table layout, same
+  DIM=1500 scale and access patterns as bench_04, to check whether the
+  literature's often-cited large FFI speedups hold up against a layout
+  that's already been optimized (they don't, at least not dramatically —
+  see `IMPLEMENTATION.md`).
+- **`bench_09_ffi_conditional_pattern.lua`** — validates the actual
+  integration pattern for adopting FFI without a parallel luajit-only
+  file: a single factory function branches on `pcall(require, "ffi")`,
+  returning either an `ffi.new("double[?]", n+1)` array or a plain table;
+  every other function keeps using `arr[idx]`/`t[idx]` unchanged since
+  `[]` indexing is syntactically identical for both. Runs correctly on
+  both lua5.3 (falls back to table) and luajit (uses FFI).
 
 Run with e.g.:
 ```bash

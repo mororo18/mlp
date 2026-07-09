@@ -65,10 +65,13 @@ works around it here, but the underlying net6.0-target-vs-8.0-installed
 mismatch (see `SETUP.md`'s Tool Versions table) may need a decision
 (retarget the csproj to net8.0, or install net6.0 runtime).
 
-Review multiple main variants in `lua/`, `python/` - keep canonical version.
-For `lua/`: canc cleanup already cut this from 8 files down to 3 candidates
-(`main.canc.lua`, `main.lua`, `main_lua.lua`) — still need to pick one and
-delete the other two.
+Review multiple main variants in `python/` - keep canonical version.
+For `lua/`: resolved (2026-07-09) — `main.canc.lua` was the actively
+maintained/validated one (verbose flag, RVND fix, table-layout and
+overhead investigation all happened against it), renamed to `main.lua`;
+`main_lua.lua` (old candidate, referenced the unrelated `candran`
+transpiler) and the unused `ProFi.lua` (superseded by `profiler.lua`,
+never `require`d anywhere) deleted. `run_lua.sh`/`run_luajit.sh` updated.
 
 Remove profiler output files (`.txt`, `.log`, `MyProfilingReport.txt`)
 

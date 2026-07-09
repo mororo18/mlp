@@ -30,9 +30,9 @@ against lua5.3 isolates interpreter-vs-interpreter architecture from
 compilation. Same `att48` instance, three configurations:
 
 ```bash
-lua5.3 main.canc.lua        # 18.54s -- PUC-Lua's C-switch interpreter
-luajit -joff main.canc.lua  #  6.37s -- LuaJIT's interpreter, JIT disabled
-luajit main.canc.lua        #  0.53s -- LuaJIT's interpreter + JIT compiler
+lua5.3 main.lua        # 18.54s -- PUC-Lua's C-switch interpreter
+luajit -joff main.lua  #  6.37s -- LuaJIT's interpreter, JIT disabled
+luajit main.lua        #  0.53s -- LuaJIT's interpreter + JIT compiler
 ```
 
 Two independent, multiplicative factors, not one:
@@ -192,14 +192,14 @@ Follow-up to the table-layout work above: what else, beyond `seq`'s data-
 structure shape, might be costing real time in this implementation
 without showing up as an obvious line in the `-jp=a` output? Method: run
 LuaJIT's own compilation log (`luajit -jv`) against the real
-`main.canc.lua` solving `rat99`, which shows every trace compiled, every
+`main.lua` solving `rat99`, which shows every trace compiled, every
 trace *abort* (falls back to slow interpretation entirely) and every
 trace *stitch* (bails out to run one uncompiled operation via the
 interpreter, then resumes — LuaJIT 2.1's mitigation for NYI/"not yet
 implemented" stdlib functions, cheaper than an abort but not free).
 
 ```bash
-luajit -jv main.canc.lua > /dev/null 2> jv.log
+luajit -jv main.lua > /dev/null 2> jv.log
 grep -c abort jv.log     # 0
 grep -c stitch jv.log    # 22
 grep stitch jv.log | grep -oE "stitch [a-zA-Z_.]+" | sort | uniq -c
@@ -255,7 +255,7 @@ compilation regardless, so this is correctly not a concern.
 
 ### 4. No closures in the hot path
 
-Checked directly (`grep "function("` across `main.canc.lua`): the only
+Checked directly (`grep "function("` across `main.lua`): the only
 anonymous function in the file is inside `protect()`, which is dead code
 (its one call site is commented out, line 704). No closure-allocation
 overhead exists in the current hot loop.
@@ -265,7 +265,7 @@ overhead exists in the current hot loop.
 `neighbd_list = {SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}` (line
 509) allocates a fresh 5-element table every time RVND finds an improving
 move — flagged as a plausible GC churn source, now quantified. Method:
-run the real `main.canc.lua` solve with `collectgarbage("stop")`
+run the real `main.lua` solve with `collectgarbage("stop")`
 beforehand, so nothing gets freed — the heap growth then equals total
 bytes *allocated* (garbage + live), not just what's currently live.
 
@@ -284,3 +284,124 @@ collect (low milliseconds at most) — nowhere near enough to explain a
 meaningful fraction of the measured time. `neighbd_list` and friends are
 not a genuine optimization target. This closes the item registered in
 root `TODO.md`.
+
+## Literature-driven candidates (2026-07-09)
+
+Searched for LuaJIT-specific optimization guidance beyond what profiling
+and the `-jv` trace log surfaced directly, then checked applicability
+against the real code and validated empirically before proposing
+anything — per the [LuaJIT Numerical Computing Performance
+Guide](https://github.com/tarantool/tarantool/wiki/Numerical-Computing-Performance-Guide/Old-LuaJIT-Wiki)
+(canonical source, `wiki.luajit.org` itself has a cert issue in this
+environment, used the tarantool GitHub mirror instead) and general search
+corroboration.
+
+### 1. Localize stdlib functions (`bench_07`) — validated win, no downside
+
+`main.lua` never localizes `math.floor`/`math.random`/`math.huge`/
+`os.clock` — every call goes through the global `math`/`os` table,
+including inside `search_reinsertion`/`search_swap`/`search_two_opt`
+(each starts with `local cost_best = math.huge`, called thousands of
+times). The performance guide explicitly recommends caching stdlib
+functions in upvalues (`local sin = math.sin`).
+
+| | lua5.3 | luajit |
+|---|---|---|
+| global `math.floor` | 0.270s | 0.0059s |
+| local `floor` | 0.203s (**-25%**) | 0.0061s (≈) |
+| global `math.huge` | 0.176s | 0.0061s |
+| local `HUGE` | 0.115s (**-35%**) | 0.0059s (≈) |
+
+**Practical takeaway**: real, consistent win for lua5.3 (~25-35%, pure
+interpreter pays the global-table lookup every time), genuinely no cost
+or benefit for luajit (the JIT already optimizes the lookup away during
+trace compilation — confirms it's not just "no measured win", the
+compiled code is equivalent either way). Since it helps one interpreter
+and costs nothing on the other, this is a clean win — single file, no
+branching, low risk. Candidate for the Optimize phase whenever pursued.
+
+### 2. FFI arrays for `seq`/`c` (`bench_08`) — real but modest win, meaningful complexity cost
+
+The performance guide and general literature cite large speedups for FFI
+numeric arrays vs Lua tables (one external example: 20x speed, 35x less
+memory) — but that comparison was against an unspecified/likely-naive
+table structure. Tested against our *own* already-flattened layout
+(interleaved+square, the survivor of the earlier table-layout
+investigation), same DIM=1500 scale and access patterns as `bench_04`:
+
+| | Lua table (current) | FFI `double[]` |
+|---|---|---|
+| memory (54 MB of data) | 65.5 MB | 52.7 MB (**-20%**, and outside the GC heap entirely) |
+| full random access | 0.384s | 0.259s (**-33%**) |
+| windowed access (realistic pattern) | 0.0107s | 0.0099s (**-7%**, marginal) |
+| build time | 0.042s | 0.025s (**-40%**) |
+
+**Practical takeaway**: FFI is consistently faster, never slower, but the
+margin (7-33% depending on access pattern) is far short of the ~20x cited
+in generic comparisons — because our table layout is already decent, not
+a naive nested structure.
+
+**Correction (2026-07-09, same day)**: initially overstated the
+complexity cost here — assumed FFI would need a separate luajit-specific
+file. It doesn't. `[]` indexing has identical syntax for a Lua table and
+an FFI `cdata` array, so the branching can be isolated to a single
+factory function; every other function (`subseq_fill`, `subseq_load`,
+`search_*`) stays untouched and works against either. Validated this
+pattern runs correctly on both interpreters (`bench_09`):
+
+```lua
+local ffi_ok, ffi = pcall(require, "ffi")
+
+-- n+1 so index 0 exists-but-unused, keeping every existing 1-based
+-- index formula in the codebase unchanged (no -1 rewrites needed).
+local function new_numeric_array(n)
+    if ffi_ok then
+        return ffi.new("double[?]", n + 1) -- ffi.new zero-initializes
+    else
+        local t = {}
+        for i = 1, n do t[i] = 0.0 end
+        return t
+    end
+end
+
+-- at construction time, replacing today's `solut.seq = {}`:
+local n = 3 * (info.dimension + 1) * (info.dimension + 1)
+solut.seq = new_numeric_array(n)
+-- subseq_fill/subseq_load/search_* need zero changes: seq[idx] read and
+-- write work identically whether seq ends up a table or a cdata array.
+```
+
+One real constraint: `seq` must never use `#seq`/`table.insert`/
+`table.remove` in this branch (FFI arrays are fixed-size, no length
+operator or resize). Already true today — those operations are only used
+on `s` (the tour/solution sequence), a separate structure that would stay
+a plain Lua table regardless (it's resized via construction/perturb, not
+a fit for FFI's fixed-size arrays anyway).
+
+The performance guide's caching/aliasing pitfalls still apply if this is
+pursued: don't cache partial FFI references (e.g. a row pointer) across
+loop iterations unless truly long-lived, and watch multi-array aliasing
+when `seq` and `c` (distance matrix) are both FFI and touched in the same
+loop.
+
+**Revised recommendation**: complexity cost is lower than first assessed
+(one factory function, not a parallel file), which changes the trade-off
+— worth applying alongside item 1 rather than deferring, given the
+combined win (localized stdlib + FFI) and low integration risk. Still not
+applied in this pass (Optimize phase needs explicit permission per
+`code_optimization.md`); flagged as ready to implement, not just an open
+question.
+
+### Checked and not pursued further
+
+From the same performance guide, checked against the real code:
+- **Loop structure** (`for i = start, stop, step do`) — already matches
+  the recommended plain form throughout.
+- **Inner loops with <10 iterations** (flagged as an anti-pattern) — the
+  old `k=1,3` (T/C/W) loop was already hand-unrolled away when the
+  `to_1D` macro was expanded (separate `seq[...+1]`/`+2`/`+3` lines, not
+  a loop) — no small-loop anti-pattern found in the hot path.
+- **Unpredictable branches** — `if cost_new < cost_best then` and similar
+  are inherent to the search algorithm's logic (data-dependent by
+  design); not something to branch-eliminate without changing the
+  algorithm itself, out of scope here.
