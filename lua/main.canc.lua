@@ -710,12 +710,22 @@ end
 
 -- jit.off(table.clone)
 
-local profiler = require("profiler")
-profiler.start()
--- Code block and/or called functions to profile --
-main()
-profiler.stop()
-profiler.report("profiler.log")
+local do_profile = false
+for i = 1, #arg do
+    if arg[i] == "--profile" then
+        do_profile = true
+    end
+end
+
+if do_profile then
+    local profiler = require("profiler")
+    profiler.start()
+    main()
+    profiler.stop()
+    profiler.report("profiler.log")
+else
+    main()
+end
 
 --[[
 collectgarbage("stop")
