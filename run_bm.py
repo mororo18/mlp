@@ -18,7 +18,7 @@ def get_branch():
             branch = b.replace('*', '').replace(' ', '')
             return branch
 
-def ds_open(lang_name):
+def ds_open(lang_name, data_dir):
     ds_path = os.path.join(data_dir, lang_name + ".csv")
 
     if os.path.isfile(ds_path):
@@ -197,7 +197,7 @@ def main():
         os.chdir("../")
 
         for lang in sources:
-            ds = ds_open(lang_dir[lang])
+            ds = ds_open(lang_dir[lang], data_dir)
             
             os.chdir(lang_dir[lang])
             print(os.getcwd())
