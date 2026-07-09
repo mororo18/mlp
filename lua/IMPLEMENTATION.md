@@ -503,3 +503,38 @@ Not yet collected: an idle-gated N=10 "after" baseline comparable to the
 that's one rep, not a basis for a real comparison — the whole point of
 the idle-gated methodology above was avoiding exactly this kind of
 anecdotal read).
+
+## Idle-gated "after" baseline and comparison (2026-07-09)
+
+Collected the same way as "before" (machine was already idle — loadavg
+0.45 — right after the previous run finished, so no wait needed this
+time, just the same idle-check-first discipline). COST matched the
+expected value for all 3 instances on both interpreters across the full
+N=10 sweep (not just the earlier single-run spot check), confirming
+correctness held up at scale, not just anecdotally.
+
+| interpretador | instância | mediana antes | mediana depois | speedup |
+|---|---|---|---|---|
+| lua5.3 | burma14 | 0.1276s | 0.1341s | 0.95x (ruído) |
+| lua5.3 | att48 | 16.2013s | 15.3178s | 1.06x |
+| lua5.3 | rat99 | 342.41s | 322.74s | 1.06x |
+| luajit | burma14 | 0.0112s | 0.0091s | 1.23x |
+| luajit | att48 | 0.4808s | 0.3026s | 1.59x |
+| luajit | rat99 | 12.353s | 7.292s | 1.69x |
+
+**Conclusion**: matches the expectation set by the isolated
+microbenchmarks, and for luajit the real end-to-end gain came out even
+larger than the isolated `bench_08` comparison (7-33%) predicted —
+23-69% faster across the 3 instances. Plausible reason: `seq` no longer
+being a Lua table may help the JIT compile the *whole* enclosing function
+more effectively (fewer type guards/tag checks to trace through), an
+effect the narrower microbenchmark wouldn't fully capture. lua5.3 shows
+no clear change beyond noise (~6%, within `std`) — expected, since it
+gets none of the FFI benefit (no `ffi` in lua5.3) and the stdlib-
+localization win, real in isolation, is too small a fraction of the
+real workload's dominant cost (array access in `search_reinsertion`/
+`subseq_load`, ~99% of profiled time) to surface above the run-to-run
+noise floor. No regression on either interpreter.
+
+This closes the loop from the original profiling → literature search →
+validated candidates → idle-gated before/after comparison.
