@@ -558,7 +558,7 @@ function perturb(solut, info)
     return s
 end
 
-function GILS_RVND(Imax, Iils, R, info)
+function GILS_RVND(Imax, Iils, R, info, verbose)
 
     local solut_partial = {
         s = {},
@@ -597,12 +597,16 @@ function GILS_RVND(Imax, Iils, R, info)
         info.rnd_index = info.rnd_index + 1
 
 
-        print("[+] Local Search", i)
-        print("\t[+] Constructing Inital Solution..")
+        if verbose then
+            print("[+] Local Search", i)
+            print("\t[+] Constructing Inital Solution..")
+        end
         solut_crnt.s = construction(alpha, info)
         subseq_load(solut_crnt, info)
-        s_print(solut_crnt)
-        print("\tConstruction cost  ", solut_crnt.cost)
+        if verbose then
+            s_print(solut_crnt)
+            print("\tConstruction cost  ", solut_crnt.cost)
+        end
 
       --print(solut_crnt.seq[(3 * ((info.dimension+1) * (1 - 1) + (info.dimension+1 - 1)) + info.C)])
 
@@ -615,7 +619,9 @@ function GILS_RVND(Imax, Iils, R, info)
         --seq_print(solut_crnt)
         --local rnvd_cost_best = solut_crnt.seq[1][info.dimension+1][info.C]
 
-        print("\t[+] Looking for the best Neighbor..")
+        if verbose then
+            print("\t[+] Looking for the best Neighbor..")
+        end
         local iterILS = 0
         while iterILS < Iils do
             RVND(solut_crnt, info)
@@ -648,7 +654,9 @@ function GILS_RVND(Imax, Iils, R, info)
             solut_clone(solut_partial, solut_best)
             --solut_best = solut_clone(solut_partial)
         end
-        print("\tCurrent best solution cost: ", solut_best.cost)
+        if verbose then
+            print("\tCurrent best solution cost: ", solut_best.cost)
+        end
     end
 
     print("COST: ", solut_best.cost)
@@ -686,9 +694,16 @@ function main()
                0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
 
+    local verbose = false
+    for i = 1, #arg do
+        if arg[i] == "-v" or arg[i] == "--verbose" then
+            verbose = true
+        end
+    end
+
     --info.c = protect(info.c)
     local start = os.clock()
-    GILS_RVND(Imax, Iils, R, info)
+    GILS_RVND(Imax, Iils, R, info, verbose)
 
     print("TIME: ", os.clock()-start)
 end
