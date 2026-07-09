@@ -405,3 +405,64 @@ From the same performance guide, checked against the real code:
   are inherent to the search algorithm's logic (data-dependent by
   design); not something to branch-eliminate without changing the
   algorithm itself, out of scope here.
+
+## Idle-gated baseline methodology (2026-07-09)
+
+Before applying items 1 and 2 above, established a baseline collection
+method resistant to concurrent heavy CPU usage on this (shared,
+non-dedicated) machine — motivated by observing `loadavg 16.0` on an
+8-core machine (an unrelated tournament simulation running ~15 parallel
+processes) right when this was requested.
+
+**Method**: background job that (1) waits until a target time, (2) then
+polls `/proc/loadavg` every 30 min until the 1-min load average drops
+below 1.5 (comfortably idle on 8 cores), (3) only then runs the N=10
+`run_bm.py` sweep, recording loadavg/timestamp/git commit alongside.
+Actually ran: reached target time at `05:16`, loadavg was already `0.26`
+(idle immediately, the tournament had finished), ran for ~1h and stayed
+under the threshold throughout (ended at `1.17`).
+
+**Bug found along the way**: `run_bm.py`'s `--out` flag was silently
+ignored — parsed into `args.out` but every actual use (`ds_open`, the
+output-dir creation check, the final `to_csv`) read the module-level
+`data_dir` global directly, never `args.out`. Result: the idle-gated run
+landed in the same shared `../mlp_testao/lua.csv` as an earlier,
+*not* idle-gated, exploratory run from earlier in this session, instead
+of the intended separate `../mlp_testao_baseline_before/`. Fixed in all
+3 branches (`ds_open` now takes `data_dir` as a parameter; `main()`
+assigns `global data_dir; data_dir = args.out` right after parsing, with
+`global` needed to avoid a `data_dir` scoping trap — a bare local
+reassignment would make the earlier `default=data_dir` argparse line
+raise `UnboundLocalError`, since Python treats a name as local to the
+whole function once it's assigned anywhere in it). Verified with a
+one-off `--out /tmp/...` run before trusting it. The two runs' data were
+then separated after the fact (by row order — 60 old, 60 new, no
+timestamp column to key on directly, a gap worth fixing if this format
+is reused going forward) into `mlp_testao/lua.csv` (kept as the earlier
+exploratory baseline, already cited elsewhere in this file) and
+`mlp_testao_baseline_before/lua.csv` (the clean idle-gated one, used
+below).
+
+**Idle-gated baseline for `main.lua`, pre-optimization** (median across
+N=10, more outlier-resistant than mean; both `run_bm.py`'s own memory
+busy-loop fix and this idle-gating apply, so this should be the cleanest
+timing data collected so far this session):
+
+| source | instance | median | mean | std | min | max |
+|---|---|---|---|---|---|---|
+| lua | burma14 | 0.1276 | 0.1278 | 0.0025 | 0.1233 | 0.1323 |
+| lua | att48 | 16.2013 | 16.2143 | 1.1185 | 15.0231 | 17.5773 |
+| lua | rat99 | 342.4128 | 338.8040 | 13.0466 | 316.0974 | 356.2290 |
+| luajit | burma14 | 0.0112 | 0.0112 | 0.0002 | 0.0108 | 0.0115 |
+| luajit | att48 | 0.4808 | 0.6276 | 0.2227 | 0.4712 | 1.0217 |
+| luajit | rat99 | 12.3531 | 11.9069 | 1.0161 | 9.8977 | 12.4897 |
+
+Note luajit/att48's mean (0.628) sitting well above its median (0.481)
+and min (0.471) — a couple of slow outlier reps (max 1.022) pull the mean
+up despite an idle machine; the median is the more representative number
+here, and the general argument for preferring it over the mean for this
+kind of data.
+
+Next: apply items 1 and 2 (localized stdlib, FFI array), verify
+correctness, then collect an equally idle-gated "after" baseline the same
+way for a fair comparison.
