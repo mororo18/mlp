@@ -24,31 +24,6 @@ Sometimes within a section, tasks may be grouped (extra newline separating them 
 
 ## P2
 
-`lua/`'s dependency on the abandoned `canc` preprocessor has been removed.
-`main.canc.lua` was canc-syntax source (a single `#define("to_1D(x,y,z,d)",
-...)` macro flattening a 3D `seq` index into 1D); `main.canc.lua.lua` was
-the canc-compiled output actually wired into `run_lua.sh`/`run_luajit.sh`,
-and `main_luajit.canc`/`main_luajit.canc.lua` were byte-identical
-duplicates of that same compiled output. `test.lua`/`test.lua.lua` were a
-standalone canc-syntax scratch benchmark (function-call vs macro indexing),
-unused by any run script. Hand-expanded every `to_1D(...)` call in
-`main.canc.lua` to the literal arithmetic (cross-checked against
-`main.canc.lua.lua`'s already-expanded output to confirm correctness),
-removed the `#define` line, and deleted the other four now-redundant
-files. `run_lua.sh`/`run_luajit.sh` now point at `main.canc.lua` directly
-— no external tool needed to run it anymore.
-
-That said, `main.canc.lua` still doesn't run to completion: same
-pre-existing bug as before (`table.remove` position out of bounds in
-`RVND` under `lua5.3`; reaches further under `luajit` but hasn't been
-confirmed to finish either), confirmed unrelated to the canc removal
-(reproduces identically, and the correct intermediate cost — 209320 — was
-observed before the crash). Fixing this is a separate task from the canc
-cleanup.
-
-Blocks: the lua leg of the cross-branch progress-flag rollout
-(`tcc/TODO.md` P2) — skipped for now pending this fix.
-
 Fix `octave/main.m` and `octave/Data.m`: never actually runs to completion
 on a clean checkout, two independent pre-existing bugs found while trying
 to verify it before adding the progress flag:
