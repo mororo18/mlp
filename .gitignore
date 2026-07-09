@@ -16,6 +16,7 @@ python/__pycache__/
 *.o
 *.d
 .venv/
+venv/
 
 # dotnet 
 csharp/bin/
