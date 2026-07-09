@@ -18,7 +18,7 @@ def get_branch():
             branch = b.replace('*', '').replace(' ', '')
             return branch
 
-def ds_open(lang_name):
+def ds_open(lang_name, data_dir):
     ds_path = os.path.join(data_dir, lang_name + ".csv")
 
     if os.path.isfile(ds_path):
@@ -125,6 +125,7 @@ def get_info(lang):
     f.close()
 
 def main():
+    global data_dir
 
     parser = argparse.ArgumentParser(description='Run Benchmark')
     parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required= not ('--instances-list' in sys.argv or '-I' in sys.argv ))
@@ -133,6 +134,7 @@ def main():
     parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')    
     parser.add_argument('--out' ,  default=data_dir,  help='Output dir')
     args = parser.parse_args()
+    data_dir = args.out
 
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cppOOP",
             "fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab", "golang"]
@@ -191,7 +193,7 @@ def main():
         os.chdir("../")
 
         for lang in sources:
-            ds = ds_open(lang_dir[lang])
+            ds = ds_open(lang_dir[lang], data_dir)
             
             os.chdir(lang_dir[lang])
             print(os.getcwd())
