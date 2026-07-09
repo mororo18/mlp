@@ -466,3 +466,40 @@ kind of data.
 Next: apply items 1 and 2 (localized stdlib, FFI array), verify
 correctness, then collect an equally idle-gated "after" baseline the same
 way for a fair comparison.
+
+## Optimizations applied (2026-07-09)
+
+Applied both literature-driven candidates from the section above to
+`main.lua`:
+
+1. **Localized stdlib**: `local floor/random/randomseed/huge/min/clock`
+   at the top of the file (upvalues, visible to every function defined
+   later in the same chunk), replacing every `math.floor`/`math.random`/
+   `math.randomseed`/`math.huge`/`math.min`/`os.clock` call site.
+2. **FFI array for `seq`**: `new_numeric_array(n)` factory (the exact
+   pattern validated in `bench_09`) used at all 3 allocation sites in
+   `GILS_RVND` (`solut_partial`/`solut_crnt`/`solut_best`.seq). No other
+   function needed changes — `subseq_fill`/`subseq_load`/`search_*` still
+   read/write `seq[idx]` exactly as before.
+
+**Pitfall hit and fixed**: the mechanical `sed` used to replace
+`math.floor` → `floor` etc. across the file also rewrote the localization
+block's own right-hand sides (`local floor = math.floor` became
+`local floor = floor`, a self-reference to a not-yet-defined local,
+silently evaluating to `nil` — every localized name would have been
+`nil`). Caught by inspecting the diff before testing, not by the test
+run itself; fixed by hand-restoring the 6 `local x = math.y`/`os.clock`
+lines, then re-verified with `loadfile()` (syntax-only load, both
+interpreters) before running anything.
+
+**Correctness verified**: COST matches the expected value for all 3
+instances on both interpreters after the change (burma14: 20315, att48:
+209320, rat99: 57986) — lua5.3 exercises the table fallback path, luajit
+exercises the real FFI path. `--verbose` still works.
+
+Not yet collected: an idle-gated N=10 "after" baseline comparable to the
+"before" one above (single-run spot checks during verification showed
+`rat99`/luajit dropping from a baseline median of 12.35s to 8.39s, but
+that's one rep, not a basis for a real comparison — the whole point of
+the idle-gated methodology above was avoiding exactly this kind of
+anecdotal read).

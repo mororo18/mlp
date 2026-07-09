@@ -1,5 +1,39 @@
 dofile("Data.lua")
 
+-- Localized stdlib references: avoids a global-table lookup on every
+-- call in the hot loop (search_reinsertion et al.). Real, validated win
+-- in lua5.3 (~25-35%, pure interpreter pays the lookup every time);
+-- neutral in luajit (the JIT already optimizes the lookup away during
+-- trace compilation) -- see lua/IMPLEMENTATION.md and
+-- lua/bench/bench_07_global_vs_local_stdlib.lua.
+local floor = math.floor
+local random = math.random
+local randomseed = math.randomseed
+local huge = math.huge
+local min = math.min
+local clock = os.clock
+
+-- FFI array for seq (LuaJIT only; falls back to a plain Lua table on
+-- lua5.3, where `ffi` doesn't exist). `[]` indexing is syntactically
+-- identical for a Lua table and an FFI cdata array, so every function
+-- that reads/writes seq[idx] (subseq_fill, subseq_load, search_*) needs
+-- no changes -- only this factory branches. n+1 keeps index 0 unused but
+-- present, so every existing 1-based index formula stays unchanged. See
+-- lua/IMPLEMENTATION.md and lua/bench/bench_08_ffi_vs_table.lua,
+-- lua/bench/bench_09_ffi_conditional_pattern.lua.
+local ffi_ok, ffi = pcall(require, "ffi")
+local function new_numeric_array(n)
+    if ffi_ok then
+        return ffi.new("double[?]", n + 1)
+    else
+        local t = {}
+        for i = 1, n do
+            t[i] = 0.0
+        end
+        return t
+    end
+end
+
 function s_print(solut)
     for i=1,#solut.s do
         io.write(solut.s[i], " ")
@@ -178,8 +212,8 @@ function construction(alpha, info)
         sort(cList, r, info)
 
         --print(alpha)
-        local range = math.floor(#cList * alpha) + 1
-        local i = math.random(1, range)
+        local range = floor(#cList * alpha) + 1
+        local i = random(1, range)
         i = info.rnd[info.rnd_index] + 1
         info.rnd_index = info.rnd_index + 1
 
@@ -199,7 +233,7 @@ end
 
 function reverse(s, i, j)
     local l = j
-    for k = i,math.floor((j+i)/2) do
+    for k = i,floor((j+i)/2) do
         --print(k, l)
         swap(s, k, l)
         l = l - 1
@@ -223,7 +257,7 @@ function reinsert(s, i, j, pos)
 end
 
 function search_swap(solut, info)
-    local cost_best = math.huge
+    local cost_best = huge
     local I = -1
     local J = -1
     local dimen = info.dimension
@@ -306,7 +340,7 @@ function search_swap(solut, info)
 end
 
 function search_two_opt(solut, info)
-    local cost_best = math.huge
+    local cost_best = huge
     local I = -1
     local J = -1
     local dimen = info.dimension
@@ -366,7 +400,7 @@ function search_two_opt(solut, info)
 end
 
 function search_reinsertion(solut, info, opt)
-    local cost_best = math.huge
+    local cost_best = huge
     local I = -1
     local J = -1
     local POS = -1
@@ -478,7 +512,7 @@ function RVND(solut, info)
     --os.exit()
 
     while #neighbd_list > 0 do
-        local index = math.random(1, #neighbd_list)
+        local index = random(1, #neighbd_list)
 
         index = info.rnd[info.rnd_index] + 1
         info.rnd_index = info.rnd_index + 1
@@ -524,16 +558,16 @@ function perturb(solut, info)
     local B_start = 1
     local B_end = 1
 
-    local size_max = math.floor(#s/10)
+    local size_max = floor(#s/10)
     size_max = size_max >= 2 and size_max or 2
     local size_min = 2
 
     while (A_start <= B_start and B_start <= A_end) or (B_start <= A_start and A_start <= B_end) do
-        A_start = math.random(2, #s-1-size_max)
-        A_end = A_start + math.random(size_min, size_max)
+        A_start = random(2, #s-1-size_max)
+        A_end = A_start + random(size_min, size_max)
 
-        B_start = math.random(2, #s-1-size_max)
-        B_end = B_start + math.random(size_min, size_max)
+        B_start = random(2, #s-1-size_max)
+        B_end = B_start + random(size_min, size_max)
 
 
         A_start = info.rnd[info.rnd_index] + 1
@@ -560,19 +594,21 @@ end
 
 function GILS_RVND(Imax, Iils, R, info, verbose)
 
+    local seq_n = 3 * (info.dimension + 1) * (info.dimension + 1)
+
     local solut_partial = {
         s = {},
-        seq = {}, 
+        seq = new_numeric_array(seq_n),
     }
 
     local solut_crnt = {
         s = {},
-        seq = {}, 
+        seq = new_numeric_array(seq_n),
     }
 
     local solut_best = {
         s = {},
-        seq = {}, 
+        seq = new_numeric_array(seq_n),
     }
 
     subseq_fill(solut_partial.seq, info)
@@ -587,11 +623,11 @@ function GILS_RVND(Imax, Iils, R, info, verbose)
     --local solut_crnt = solut_clone(solut_partial)
     --local solut_best = solut_clone(solut_crnt)
 
-    solut_best.cost = math.huge
+    solut_best.cost = huge
 
     for i=1,Imax do
         local Rsz = #R
-        local alpha = R[math.random(1, Rsz)]
+        local alpha = R[random(1, Rsz)]
         alpha = R[info.rnd[info.rnd_index] + 1]
         --print(info.rnd[info.rnd_index] + 1)
         info.rnd_index = info.rnd_index + 1
@@ -686,10 +722,10 @@ function main()
     local a =0;
     info.dimension, a = readData(info.c, info.rnd)
     print(info.rnd[a])
-    math.randomseed(os.time()) 
+    randomseed(os.time()) 
 
     local Imax = 10
-    local Iils = math.min(100, info.dimension)
+    local Iils = min(100, info.dimension)
     local R = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 
                0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25}
 
@@ -702,10 +738,10 @@ function main()
     end
 
     --info.c = protect(info.c)
-    local start = os.clock()
+    local start = clock()
     GILS_RVND(Imax, Iils, R, info, verbose)
 
-    print("TIME: ", os.clock()-start)
+    print("TIME: ", clock()-start)
 end
 
 -- jit.off(table.clone)
