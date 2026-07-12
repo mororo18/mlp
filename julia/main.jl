@@ -2,6 +2,19 @@
 using Printf
 include("Data.jl")
 
+struct Timeval
+    sec::Int64
+    usec::Int64
+end
+
+function _cputime()
+    buf = zeros(UInt8, 144)
+    ccall(:getrusage, Cint, (Cint, Ptr{UInt8}), 0, buf)
+    utime = reinterpret(Timeval, buf[1:16])[1]
+    stime = reinterpret(Timeval, buf[17:32])[1]
+    return (utime.sec + utime.usec/1e6) + (stime.sec + stime.usec/1e6)
+end
+
 mutable struct tInfo
     cost::Matrix{Float64}
     dimen::Int
@@ -433,9 +446,12 @@ function main()
 
     info::tInfo = tInfo(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, 1e-15, 0, rand_values, 1)
 
+    _cpu0 = _cputime()
     time = @elapsed GILS_RVND(Imax, Iils, R, info, verbose)
+    cpu_time = _cputime() - _cpu0
 
-    @printf "TIME: %.6lf\n" time
+    @printf "TIME: %.6lf\n" cpu_time
+    @printf "wall clock (s): %.6lf\n" time
     println("reinsertion calls ", info.reinsert_count)
     
 end

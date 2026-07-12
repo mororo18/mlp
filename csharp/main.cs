@@ -11,18 +11,20 @@ namespace MLP {
             }
             GILS_RVND tsp = new GILS_RVND();
 
-            long s = Stopwatch.GetTimestamp();
+            Process proc = Process.GetCurrentProcess();
+            TimeSpan cpuStart = proc.TotalProcessorTime;
 
             DateTime start = DateTime.Now;
             tsp.solve(verbose);
             DateTime end = DateTime.Now;
 
-            long e = Stopwatch.GetTimestamp();
+            proc.Refresh();
+            TimeSpan cpuTime = proc.TotalProcessorTime - cpuStart;
 
             TimeSpan ts = (end - start);
-            Console.WriteLine("TIME: "+ ts.TotalMilliseconds/10e2);
+            Console.WriteLine("TIME: "+ cpuTime.TotalSeconds);
 
-            //Console.WriteLine("Elapsed Time is {0} ticks", (e - s)/10e6);
+            Console.WriteLine("wall clock (s): "+ ts.TotalSeconds);
         }
     }
 }

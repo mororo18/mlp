@@ -3,23 +3,12 @@ name = "main"
 version = "0.1.0"
 edition = "2018"
 
-[profile.dev]
-
-opt-level = 3
-lto = "fat"
-codegen-units = 1
-debug = 1
-
-[profile.release]
-
-opt-level = 3
-lto = "fat"
-codegen-units = 1
-debug = 1
-
-panic = "abort" 
+# G1 puro: sem overrides de profile — usa os defaults do Cargo pro
+# perfil release (opt-level = 3, sem LTO, sem codegen-units=1, sem
+# panic=abort). Ver doc/tcc/EXPERIMENTO.md secao 6d.
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rand = "0.8.0"
+cpu-time = "1.0.0"

@@ -2,6 +2,7 @@ mod data;
 
 use rand::Rng;
 use std::time::Instant;
+use cpu_time::ProcessTime;
 
 #[derive(Debug, Clone)]
 enum Info {
@@ -565,12 +566,15 @@ fn main() {
     ];
 
     let now = Instant::now();
+    let cpu_now = ProcessTime::try_now().expect("Getting process time failed");
 
     //test!();
     GILS_RVND(Imax, Iils, R, &mut rnd, &data, verbose);
 
+    let cpu_time = cpu_now.try_elapsed().expect("Getting process time failed");
     let new_now = Instant::now();
-    println!("TIME: {}", new_now.duration_since(now).as_secs_f64());
+    println!("TIME: {}", cpu_time.as_secs_f64());
+    println!("wall clock (s): {}", new_now.duration_since(now).as_secs_f64());
 
     /*
     for i in 0..dimension {

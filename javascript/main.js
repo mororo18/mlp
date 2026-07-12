@@ -462,11 +462,14 @@ function main() {
         W : 2, 
     };
 
+    var cpuStart = process.cpuUsage();
     var start = new Date();
     GILS_RVND(Iils, Imax, R, info, data, verbose);
     var end = new Date();
+    var cpuUsage = process.cpuUsage(cpuStart);
 
-    console.log("TIME: ", (end-start)/1000);
+    console.log("TIME: ", (cpuUsage.user + cpuUsage.system) / 1e6);
+    console.log("wall clock (s): ", (end-start)/1000);
 }
 
 main();

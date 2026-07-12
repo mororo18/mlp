@@ -8,8 +8,10 @@ import concurrent.futures
 import psutil as pU
 import time
 
-data_dir = "../mlp_testao_mid"
+data_dir = "../mlp_testao"
 ###data_dir = "../mlp_tudao"
+
+DEFAULT_TIMEOUT = 900  # segundos por execucao individual; ver doc/tcc/EXPERIMENTO.md secao 4
 
 def get_branch():
     out = subprocess.check_output(['git', 'branch']).decode('utf-8').split('\n')
@@ -29,23 +31,27 @@ def ds_open(lang_name, data_dir):
 
     return df
 
-def get_mem_avg(pid):
+def get_mem_avg(pid, timeout):
 
     p = pU.Process(pid=pid)
-    interval = time.time()
+    start = time.time()
     MB = 1024**2
 
     gap = 1e-10
-    
+
     mem_max = -99999
     mem_avg = 0
     count = 0
+    timed_out = False
     while True:
-    #while count < 50:
-        # funciona durante 10s
-        #print(time.time() - interval)
-        #if time.time() - interval >= 10:
-            #break
+        if time.time() - start >= timeout:
+            timed_out = True
+            print("[timeout] estourou {}s, matando processo".format(timeout))
+            try:
+                p.kill()
+            except pU.NoSuchProcess:
+                pass
+            break
 
         with p.oneshot():
             #if p.status() != pU.STATUS_RUNNING:
@@ -73,7 +79,7 @@ def get_mem_avg(pid):
     mem_avg = mem_avg / count if count else float('nan')
     mem_max = mem_max if count else float('nan')
 
-    return {"mem_avg" : mem_avg, "mem_max" : mem_max, "mem_lookups" : count}
+    return {"mem_avg" : mem_avg, "mem_max" : mem_max, "mem_lookups" : count, "timed_out" : timed_out}
 
 def get_COST(_str):
     lines = _str.split("\n")
@@ -98,37 +104,38 @@ def get_TIME(_str):
             return val
     return
 
-def get_info(lang):
+def get_info(lang, timeout):
     f = open('run_' + lang + '.sh', 'r')
     #print(f.readline())
     f.readline()
     cmd_line = f.readline().replace('\n', '').split(' ')
     print(cmd_line)
+    f.close()
 
     with tempfile.TemporaryFile() as tempf:
         proc = subprocess.Popen(cmd_line, stdout=tempf)
         pid = proc.pid
 
-        info = get_mem_avg(pid)
+        info = get_mem_avg(pid, timeout)
 
         proc.wait()
         tempf.seek(0)
         output = str(tempf.read().decode("utf-8"))
-        
-        COST = get_COST(output)
-        TIME = get_TIME(output)
+
+        if info["timed_out"]:
+            # saida pode estar incompleta/vazia - nao confiar em COST/TIME parciais
+            COST = None
+            TIME = None
+        else:
+            COST = get_COST(output)
+            TIME = get_TIME(output)
         info.update({"COST" : [COST], "TIME" : [TIME]})
         print(info)
 
         return info
 
-    f.close()
-
 def main():
-
-    print("oi")
-
-    data_dir = "../mlp_testao"
+    global data_dir
 
     parser = argparse.ArgumentParser(description='Run Benchmark')
     parser.add_argument('-i' ,'--instance', help='Path to the instance file.', required= not ('--instances-list' in sys.argv or '-I' in sys.argv ))
@@ -136,7 +143,13 @@ def main():
     parser.add_argument('-n' , default=1, type=int, help='Number of times each language will run opa opa opa')
     parser.add_argument('--lang' , nargs='+', required=True, help='Sources: python3, java, mcs, dotnet, julia, cpp, lua, javascript, matlab, golang')    
     parser.add_argument('--out' ,  default=data_dir,  help='Output dir')
+    parser.add_argument('--timeout', default=DEFAULT_TIMEOUT, type=int,
+            help='Timeout em segundos por execucao individual; ao estourar, pula as '
+                 'repeticoes restantes e as instancias maiores dessa linguagem nesta sessao '
+                 '(assume inst-list ordenada por tamanho crescente)')
     args = parser.parse_args()
+    data_dir = args.out
+    timeout = args.timeout
 
     sources = ["java", "dotnet", "mcs", "python3", "pypy", "julia", "cpp", "cppOOP",
             "fortran", "node", "lua", "luajit", "rust", "octave", "c", "matlab", "golang"]
@@ -148,12 +161,12 @@ def main():
 
     sources = args.lang[:]
     instance = args.instance
-    data_dir = args.out
     instances = []
     if args.instance != None:
         instances.append(args.instance)
     else:
-        instances = open(args.instances_list, 'r')
+        with open(args.instances_list, 'r') as f:
+            instances = [line.strip() for line in f if line.strip()]
 
     n = args.n
 
@@ -187,18 +200,24 @@ def main():
     if not os.path.isdir(data_dir):
         os.mkdir(data_dir)
     
-    print("data_dir", data_dir)
     os.chdir("mlp-instances/loader")
     os.system("make")
     os.chdir("../../")
+
+    timed_out_langs = set()
+
     for inst in instances:
         os.chdir("mlp-instances/")
         os.system("./load " + inst)
         os.chdir("../")
 
         for lang in sources:
+            if lang in timed_out_langs:
+                print("[skip-ahead] {} ja estourou timeout numa instancia menor, pulando {}".format(lang, inst))
+                continue
+
             ds = ds_open(lang_dir[lang], data_dir)
-            
+
             os.chdir(lang_dir[lang])
             print(os.getcwd())
 
@@ -211,16 +230,20 @@ def main():
                 if lang == 'rust':
                     os.system("./build.sh")
 
-                info = get_info(lang)
+                info = get_info(lang, timeout)
                 info.update({"source" : lang, "instance" : inst, "branch" : get_branch()})
 
                 ds = pd.concat([ds, pd.DataFrame(info)], ignore_index=True)
 
                 print(ds)
 
+                if info["timed_out"]:
+                    timed_out_langs.add(lang)
+                    print("[timeout] {} estourou {}s em {} - pulando repeticoes restantes e instancias maiores".format(lang, timeout, inst))
+                    break
+
             ds.to_csv(os.path.join('..', data_dir,  lang_dir[lang] + '.csv'), index=False)
 
             os.chdir("..")
 
-print("opa")
 main()
