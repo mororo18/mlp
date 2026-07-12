@@ -845,6 +845,7 @@ program main
     character(len=32) :: arg
 
     INTEGER :: begin, end_, rate
+    real :: cpu_begin, cpu_end
 
     interface
         function construction(alpha, info) result (ret)
@@ -898,8 +899,11 @@ program main
     Imax = 10
 
     CALL SYSTEM_CLOCK(begin, rate)
+    CALL CPU_TIME(cpu_begin)
     sol = GILS_RVND(Imax, Iils, R, info, verbose)
+    CALL CPU_TIME(cpu_end)
     CALL SYSTEM_CLOCK(end_)
     print *, "COST: ", sol%cost
-    print *, "TIME: ", real(end_ - begin) / real(rate)
+    print *, "TIME: ", cpu_end - cpu_begin
+    print *, "wall clock (s): ", real(end_ - begin) / real(rate)
 end program

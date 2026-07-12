@@ -7,7 +7,16 @@ import (
 	"log"
 	"math"
 	"os"
+	"syscall"
 )
+
+func cputime() float64 {
+	var r syscall.Rusage
+	syscall.Getrusage(syscall.RUSAGE_SELF, &r)
+	u := float64(r.Utime.Sec) + float64(r.Utime.Usec)/1e6
+	s := float64(r.Stime.Sec) + float64(r.Stime.Usec)/1e6
+	return u + s
+}
 
 type tSubseq struct {
 	T float64
@@ -612,11 +621,14 @@ func main() {
 		Iils = data.dimen
 	}
 
+	cpuStart := cputime()
 	start := time.Now()
 
 	GILS_RVND(Imax, Iils, R, data, verbose)
 
+	cpuElapsed := cputime() - cpuStart
 	t := time.Now()
 	elapsed := t.Sub(start)
-	fmt.Println("TIME:", elapsed.Seconds())
+	fmt.Println("TIME:", cpuElapsed)
+	fmt.Println("wall clock (s):", elapsed.Seconds())
 }

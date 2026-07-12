@@ -723,8 +723,8 @@ int main(int argc, char **argv){
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 
     double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
-    std::cout << "time clock(): " << cpu_time << std::endl;
+    std::cout << "TIME: " << cpu_time << std::endl;
+    std::cout << "wall clock (s): " << res << std::endl;
 
     std::cout << "Tamanho RND " << rnd.size() << std::endl;
 
