@@ -1,7 +1,7 @@
 CC = gcc
 BIN_NAME = solve
 
-MACRO = -DMATRIX -DNDEBUG
+MACRO = -DFLAT -DNDEBUG
 
 COPT = -std=c99 $(MACRO) $(Wno) $(W) -g -Ofast
 W = -Winline
@@ -30,11 +30,14 @@ $(OBJDIR)/%.o: %.c
 	@sed -e 's|.*:|$(basename $@).o:|' < $(basename $@).d.tmp > $(basename $@).d
 	@rm -f $(basename $@).d.tmp
 
-debug: MACRO = -DMATRIX 
+debug: MACRO = -DFLAT
 debug: $(BIN_NAME)
 
-flat: MACRO = -DFLAT -DNDEBUG 
+flat: MACRO = -DFLAT -DNDEBUG
 flat: $(BIN_NAME)
+
+matrix: MACRO = -DMATRIX -DNDEBUG
+matrix: $(BIN_NAME)
 
 rand: MACRO = -DMATRIX -DRANDOM 
 rand: $(BIN_NAME)

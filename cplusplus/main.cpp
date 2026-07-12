@@ -18,7 +18,7 @@
 #define DBL_SZ      8
 #define INT_SZ      4
 
-#define MATRIX
+#define FLAT
 
 using std::chrono::steady_clock;
 
