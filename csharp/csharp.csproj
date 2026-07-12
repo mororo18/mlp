@@ -8,7 +8,7 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <TargetFramework>netcoreapp6.0</TargetFramework>
     -->
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <StartupObject>MLP.main</StartupObject>
     <Optimize>true</Optimize>
   </PropertyGroup>
