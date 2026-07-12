@@ -182,9 +182,66 @@ inteiros do CPython). Vale registrar isso explicitamente na tabela de
 metodologia como "verificado, sem alteração" em vez de deixar como
 item em aberto.
 
-## Item não investigado nesta sessão
+## Diferença de API do main_pypy.py: revisado e confirmado inócuo
 
-`main_pypy.py` tem uma diferença de API (não aceita flag `verbose`,
-sempre imprime progresso) e bastante código morto comentado — cosmético,
-não afeta corretude nem performance. Não mexido, fora do escopo desta
-investigação (que era sobre estrutura de dados).
+Nota original desta seção dizia isso como algo não verificado ("cosmético,
+não afeta corretude nem performance"). Revisão pedida — em vez de só
+reformular o texto, refiz a checagem com o mesmo rigor do resto deste
+documento (não aceitar nada como garantido sem validar).
+
+**Diferença de API**: `main_pypy.py` não aceita a flag `verbose` que
+`main.py` aceita (`grep` por `verbose|'-v'|sys.argv` não encontra nenhum
+tratamento de argumento de linha de comando no arquivo) e sempre imprime
+progresso de forma incondicional dentro de `GILS_RVND` — 4 prints por
+iteração de `Imax` (10 iterações) mais 2 no final (`COST`, `SOLUTION`),
+totalizando ~42 chamadas a `print()` por execução.
+
+**Por que isso não afeta o harness**: `run_bm.py` nunca passa `-v`/
+`--verbose` a nenhuma linguagem (`grep -n "verbose" run_bm.py` sem
+match) e `run_pypy.sh` chama `pypy3 main_pypy.py` sem argumentos — logo
+a ausência da flag é irrelevante na prática: o harness nunca exercita
+modo verbose em nenhuma linguagem. O parsing de `get_COST`/`get_TIME`
+usa `l.find("COST")`/`l.find("TIME")` (case-sensitive, primeira linha
+que casa) — o único print de `main_pypy.py` fora do padrão oficial que
+se aproxima é `"\tCurrent best solution cost: {}"`, com "cost" em
+minúsculo, que não colide com a busca por `"COST"`. Não há colisão de
+substring com nenhum dos ~42 prints ativos.
+
+**Por que os prints incondicionais não são um viés de medição**: como
+esses prints ficam dentro de `GILS_RVND`, que é a região cronometrada
+(`start = time.time()` antes da chamada, `time.time() - start` depois),
+uma hipótese razoável era que eles inflassem o `TIME:` reportado do
+PyPy de forma sistemática (viés de metodologia, não só estética) — vale
+medir em vez de assumir. Isolei o custo real dos ~42 `print()`/`format()`
+idênticos aos do arquivo, com saída redirecionada a arquivo (mesmo
+padrão de `subprocess.Popen(..., stdout=tempf)` que `run_bm.py` usa),
+em duas escalas:
+
+| Tamanho de `SOLUTION` | Overhead medido (5x pypy3) |
+|---|---|
+| 300 elementos (~pr299) | 0.0025 – 0.0029 s |
+| 18512 elementos (maior instância do dataset, d18512) | 0.0031 – 0.0032 s |
+
+Overhead de ~2.5-3.2 milissegundos por execução, independente da escala
+da instância (dominado pelo custo fixo das ~42 chamadas, não pelo
+tamanho da lista impressa). Comparado a runtimes reais medidos nesta
+sessão (~1.2-1.6s em att48/48 nós, ~422s em pr299/299 nós), isso é
+<0.25% mesmo no caso mais rápido — na prática desprezível, não um viés
+que mude conclusões de desempenho. **Tentativa inicial de medir isso via
+comparação end-to-end (N=8 em pr299, com/sem prints) foi abandonada por
+ser desproporcional**: uma única execução em pr299 sob PyPy leva ~7 min,
+tornando N=16 execuções (~112 min) caro demais pra uma pergunta que a
+medição isolada acima já resolve com muito mais precisão e em segundos.
+
+**Código morto**: os blocos de `print()` "ativos" à primeira vista nas
+linhas ~354-356 (dentro de `search_reinsertion`) e ~539-545 (fim do
+arquivo, prints de `t_swap`/`t_reinsertion`/`t_or_opt2`/`t_or_opt3`/
+`t_two_opt`/`t_seq`) estão de fato dentro de blocos `"""..."""`
+(string literal solta, não docstring formal) — ou seja, são
+comprovadamente inertes (nunca executados), não apenas comentados
+visualmente com `#`. Confirmado lendo o código-fonte diretamente.
+
+**Conclusão**: a caracterização original ("cosmético, não afeta
+corretude nem performance") estava correta, mas não tinha sido validada
+— agora está, com números. Nenhuma mudança de código é necessária em
+`main_pypy.py`.
