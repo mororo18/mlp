@@ -2,6 +2,19 @@
 using Printf
 include("Data.jl")
 
+struct Timeval
+    sec::Int64
+    usec::Int64
+end
+
+function _cputime()
+    buf = zeros(UInt8, 144)
+    ccall(:getrusage, Cint, (Cint, Ptr{UInt8}), 0, buf)
+    utime = reinterpret(Timeval, buf[1:16])[1]
+    stime = reinterpret(Timeval, buf[17:32])[1]
+    return (utime.sec + utime.usec/1e6) + (stime.sec + stime.usec/1e6)
+end
+
 mutable struct tRnd
     rnd::Array{Int, 1}
     rnd_index::Int
@@ -403,9 +416,12 @@ function main(rnd::Array{Int, 1})
     Imax = 10
     Iils = min(dimension, 100)
 
+    _cpu0 = _cputime()
     time = @elapsed GILS_RVND(Imax, Iils, R, tRnd(rnd, 1), verbose)
+    cpu_time = _cputime() - _cpu0
 
-    @printf "TIME: %.6lf\n" time
+    @printf "TIME: %.6lf\n" cpu_time
+    @printf "wall clock (s): %.6lf\n" time
 
 end
 

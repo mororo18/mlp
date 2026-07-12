@@ -4,6 +4,7 @@
 #include <cfloat>
 #include <new>
 #include <chrono>
+#include <time.h>
 #include <fstream>
 #include <stdio.h>
 #include <algorithm>
@@ -490,12 +491,15 @@ int main(int argc, char **argv){
 
     Iils = dimen < 100 ? dimen : 100;
     auto t1 = high_resolution_clock::now();
+    clock_t cpu_start = clock();
     GILS_RVND(Imax, Iils, rnd, verbose);
+    double cpu_time = (double)(clock() - cpu_start) / CLOCKS_PER_SEC;
     auto t2 = high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 
     double res = (double)duration / 10e2;
-    std::cout << "TIME: " << res << std::endl;
+    std::cout << "TIME: " << cpu_time << std::endl;
+    std::cout << "wall clock (s): " << res << std::endl;
 
     std::cout << "Tamanho RND " << rnd.rnd.size() << std::endl;
 

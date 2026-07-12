@@ -8,7 +8,16 @@ import (
     "log"
     "bufio"
     "strings"
+    "syscall"
 )
+
+func cputime() float64 {
+	var r syscall.Rusage
+	syscall.Getrusage(syscall.RUSAGE_SELF, &r)
+	u := float64(r.Utime.Sec) + float64(r.Utime.Usec)/1e6
+	s := float64(r.Stime.Sec) + float64(r.Stime.Usec)/1e6
+	return u + s
+}
 
 type tSeqInfo struct {
     T, W, C float64
@@ -522,9 +531,12 @@ func main() {
     _ = rnd
 
 
+    cpuStart := cputime()
     start := time.Now()
     GILS_RVND(rnd, verbose)
+    cpuElapsed := cputime() - cpuStart
     elapsed := time.Since(start).Seconds()
 
-    fmt.Println("TIME: ", elapsed)
+    fmt.Println("TIME: ", cpuElapsed)
+    fmt.Println("wall clock (s): ", elapsed)
 }
