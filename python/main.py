@@ -393,6 +393,6 @@ def main(rnd):
 
     GILS_RVND(Imax, Iils, R, tRnd(rnd), verbose)
 
-start = time.time()
+start = time.process_time()
 main(rnd)
-print("TIME: %s " % (time.time() - start))
+print("TIME: %s " % (time.process_time() - start))
