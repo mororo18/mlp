@@ -473,9 +473,9 @@ def main() -> NoReturn:
 
     verbose = "-v" in sys.argv or "--verbose" in sys.argv
 
-    start = time.time()
+    start = time.process_time()
     GILS_RVND(Imax, Iils, R, info, verbose)
-    print("TIME: %s " % (time.time() - start))
+    print("TIME: %s " % (time.process_time() - start))
 
     print("ITERACOES: ", info.IT)
 
