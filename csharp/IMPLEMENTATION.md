@@ -54,6 +54,17 @@ build via `dotnet build -p:DefineConstants=UNSAFE_SEQ`.
   Sinal forte, não é ruído.
 - **Corretude**: `COST: 6556628` idêntico nas duas variantes, todas as
   16 execuções.
+- **Reprodução independente** (2026-07-14, mesmo dia, suspeita de que a
+  1ª medição tivesse CPU concorrente elevada): repetido do zero — build
+  limpo, `distance_matrix` de `pr299` regerado, CPU confirmada ociosa
+  antes de começar (`uptime`/`top`), load average logado antes de cada
+  execução individual (ficou entre 0.8 e 4.0 durante o teste, sempre
+  bem abaixo dos 8 cores da máquina). Resultado: checked **202.07s ±
+  8.80s**, unsafe **396.52s ± 19.53s** — **1.96x mais lento**, ainda
+  mais forte que a primeira medição, distribuições de novo sem
+  sobreposição (checked máx. 213.13s, unsafe mín. 371.19s). `COST`
+  idêntico nas 16 execuções. Descarta a hipótese de artefato de
+  contenção de CPU — o achado é real e reproduzível.
 
 ### Por que piorou (hipótese, não medida separadamente)
 
