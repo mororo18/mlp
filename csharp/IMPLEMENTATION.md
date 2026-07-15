@@ -106,3 +106,45 @@ Relevante pra RQ3 (as técnicas de otimização transferem entre
 linguagens?) e pro ponto (a) da tese (a melhora de técnicas não-óbvias
 vale "na medida que a linguagem permite" — aqui a linguagem *permite*
 mecanicamente, mas o mecanismo específico não compensa).
+
+## Contiguidade de `seq`: jagged → flat — adotado (2026-07-15)
+
+### Contexto
+
+`tSolution.seq` era `double[][]` (jagged) — cada linha (`seq[i]`) uma
+alocação separada no heap, cada linha internamente achatada
+(`j*3+k`). Categoria "parcial" em `TECNICAS_G1_G2.md` §1: contíguo
+*dentro* da linha, não *entre* linhas — diferente de um array 1D
+verdadeiro pra toda a estrutura.
+
+### O que foi testado
+
+`seq` trocado pra `double[]` único, tamanho `(dimen+1)*(dimen+1)*3`,
+indexado via `i*(d+1)*3 + j*3 + k` — muda só `GetSeq`/`SetSeq` (a
+camada de getter/setter já existente absorve a mudança, sem precisar
+tocar nos ~40+ call sites em `GILS_RVND.cs`, ao contrário do Go).
+
+### Microbenchmark (leve + intensiva)
+
+- **Leve** (`burma14`): tempos de processo/JIT dominam, não medido
+  separadamente (mesmo padrão de todos os outros testes desta sessão).
+- **Intensiva** (`pr299`, N=5): **200.83s ± 12.78** (jagged) vs.
+  **180.89s ± 13.22** (flat) — flat 9.9% mais rápido em média,
+  distribuições com sobreposição leve (jagged mín. 192.99s, flat máx.
+  203.33s) — sinal mais forte que o do Go, mas ainda não
+  estatisticamente limpo (sem sobreposição) no N testado.
+- **Corretude**: `COST: 6556628` idêntico nas duas variantes, e
+  `COST: 20315` confirmado em `burma14` após aplicar em `main`.
+
+### Decisão
+
+**Adotado mesmo com sinal não-decisivo** — mesma decisão do Go (autor,
+2026-07-15): aceitar o resultado direcionalmente favorável (~9.9%) sem
+estender pra N=15. `tSolution.cs` de `main` simplificado pra usar só a
+versão flat (sem manter a variante jagged condicional — decisão já
+tomada, não vale manter os dois caminhos no código de produção).
+
+**Consequência pro TCC**: os dados já coletados na campanha `main`
+completa (90 linhas de C#, `mlp_testao/csharp.csv`) refletem a versão
+*jagged* antiga — precisam ser recoletados pra refletir o código atual
+(ver `CRONOGRAMA.md`).
