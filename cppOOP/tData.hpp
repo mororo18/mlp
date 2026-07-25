@@ -19,6 +19,6 @@ public:
 
     inline int getRndCrnt()                    {return this->rnd[this->rnd_index++];}
     inline int getDimen()                      {return this->dimension;}
-    inline int getCost(int i, int j)           {return this->cost[i][j];}
+    inline double getCost(int i, int j)           {return this->cost[i][j];}
 };
 #endif
