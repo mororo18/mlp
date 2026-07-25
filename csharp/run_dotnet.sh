@@ -1,3 +1,3 @@
 #! /usr/bin/bash
-./bin/Debug/net8.0/csharp "$@"
+./bin/Release/net8.0/csharp "$@"
 #dotnet run
