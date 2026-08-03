@@ -107,6 +107,164 @@ linguagens?) e pro ponto (a) da tese (a melhora de técnicas não-óbvias
 vale "na medida que a linguagem permite" — aqui a linguagem *permite*
 mecanicamente, mas o mecanismo específico não compensa).
 
+### Validação da hipótese de pinning (2026-08-02)
+
+A hipótese acima ("overhead de pinning por chamada domina a economia do
+bounds-check") estava marcada como não medida isoladamente. Validada com
+dois experimentos fora do solver real, pro artigo companion
+(`doc/artigo-linguagens/main.tex`, §5.3):
+
+**Microbenchmark isolado** (`net8.0`, Release, array de 1M `double`,
+4M índices "aleatórios" reciclados 25x, N=10 processos por variante,
+CPU com ruído de fundo mas sinal limpo — distribuições sem sobreposição
+entre percall e as outras duas):
+
+| variante | ns/acesso (média ± dp) | vs. checked |
+|---|---|---|
+| indexador gerenciado (checked) | 11,09 ± 1,63 | 1,00x |
+| `unsafe`/`fixed` por chamada | 26,97 ± 2,65 | **2,43x** |
+| `unsafe`, pin único fora do laço | 9,91 ± 1,94 | 0,89x |
+
+Confirma a hipótese: pin único (fora do laço quente) é estatisticamente
+igual ou mais rápido que o indexador checked; o problema é
+especificamente re-pinar a cada chamada, não o acesso via ponteiro em
+si. Ordem de grandeza consistente com o 1,83x–1,96x medido no solver
+real (a diferença absoluta é esperada — o microbenchmark isola só o
+acesso, sem o resto do trabalho do GILS-RVND diluindo o overhead).
+
+**Assembly gerado** (Godbolt, compilador `dotnet80csharpcoreclr`,
+Release/FullOpts, mesmos dois métodos `GetChecked`/`GetUnsafePerCall`
+do microbenchmark acima) — mostra o mecanismo exato:
+
+```asm
+; GetChecked — indexador gerenciado (7 instruções)
+cmp    esi, dword ptr [rdi+0x08]      ; index < length?
+jae    SHORT RNGCHKFAIL               ; 1 branch previsível
+mov    eax, esi
+vmovsd xmm0, qword ptr [rdi+8*rax+0x10]
+ret
+RNGCHKFAIL: call CORINFO_HELP_RNGCHKFAIL; int3
+
+; GetUnsafePerCall — fixed por chamada (~17 instruções)
+push   rbp
+sub    rsp, 16
+lea    rbp, [rsp+0x10]
+mov    gword ptr [rbp-0x08], rdi
+test   rdi, rdi                       ; null-check do array
+je     SHORT ...
+mov    rax, gword ptr [rbp-0x08]
+cmp    dword ptr [rax+0x08], 0        ; length == 0 ?
+jne    SHORT ...
+...                                    ; (branch de array vazio → ptr null)
+mov    rax, gword ptr [rbp-0x08]
+cmp    dword ptr [rax+0x08], 0
+jbe    SHORT RNGCHKFAIL
+mov    rax, gword ptr [rbp-0x08]
+add    rax, 16                        ; pula header p/ 1o elemento
+movsxd rcx, esi
+vmovsd xmm0, qword ptr [rax+8*rcx]    ; load — sem bounds check aqui
+add    rsp, 16
+pop    rbp
+ret
+```
+
+O bounds check em si é 1 `cmp`+`jae` (branch previsível, quase de
+graça). O `fixed` por chamada, pra materializar o ponteiro pinado
+segundo a semântica do C# (`fixed` sobre array precisa retornar
+`null` se o array for `null` ou vazio, daí os dois checks extras),
+monta um frame de pilha e faz 2 branches adicionais mais aritmética de
+ponteiro — mais caro que o único check que substitui, e isso é só o
+custo determinístico por instrução. A interação com o GC (pin bloqueia
+compactação, custo de bookkeeping se uma coleta ocorrer durante a
+janela pinada) é um custo probabilístico *adicional* em cima desse,
+consistente com a doc oficial do .NET sobre bounds-check elimination
+no JIT e sobre custo de pinning, mas não a causa dominante — a
+dominante é o overhead determinístico de instruções visível acima.
+
+Scripts/fontes do microbenchmark e do assembly não commitados (mesma
+convenção do teste original acima — resultado documentado aqui, código
+de teste descartado).
+
+**Confirmação de que o assembly acima é build otimizado** (pergunta do
+autor, 2026-08-02): o dump do JIT do CoreCLR rotula os dois métodos
+`(FullOpts)` (ex.: `Bench:GetChecked(double[],int):double (FullOpts):`)
+— tag que o próprio JIT usa quando aplica otimização completa,
+oposto de `MinOpts` (o que sairia em Debug, mesmo problema descoberto
+antes nesta sessão pro build do solver via `dotnet build -c Release`).
+Adicionalmente, o backend de C#/.NET do Compiler Explorer roda com
+`buildConfig=Release` e desliga tiered compilation
+(`DOTNET_TieredCompilation=0`), forçando o JIT a compilar já na tier
+otimizada, sem passar por Tier0/QuickJit. Não usa `dotnet build -c
+Release` por trás (invoca `csc.dll` direto, sem MSBuild), mas o efeito
+relevante pra comparação — otimização completa aplicada, sem o
+throttling que `-c Debug` causaria — está confirmado pela tag
+`(FullOpts)` do próprio JIT, que é a evidência mais direta possível.
+
+**Validação cruzada local com BenchmarkDotNet** (mesma dúvida,
+2026-08-02): pra ter uma garantia mais forte e citável que "li o
+source do Compiler Explorer no GitHub", reproduzido o mesmo par de
+métodos (`GetChecked`/`GetUnsafePerCall`) com BenchmarkDotNet 0.15.8
+(`dotnet run -c Release`, `.NET 8.0.25`, `RyuJIT`) usando
+`[DisassemblyDiagnoser]`. Confirmado empiricamente que o
+BenchmarkDotNet recusa rodar em build não-otimizado: `dotnet run -c
+Debug` no mesmo projeto falha com "Benchmark was built without
+optimization enabled (most probably a DEBUG configuration). Please,
+build it in RELEASE." — validação automática embutida na ferramenta,
+não depende de inspecionar config de terceiro.
+
+Resultado (`BenchmarkDotNet.Artifacts/results/Bench-asm.md`):
+
+```asm
+; Bench.GetChecked()  — 33 bytes
+push   rax
+mov    rax,[rdi+8]        ; this.arr
+mov    ecx,[rdi+10]       ; this.idx
+cmp    ecx,[rax+8]
+jae    short RNGCHKFAIL
+vmovsd xmm0,qword ptr [rax+rcx*8+10]
+ret
+RNGCHKFAIL: call CORINFO_HELP_RNGCHKFAIL; int 3
+
+; Bench.GetUnsafePerCall()  — 79 bytes
+push   rbp
+sub    rsp,10
+lea    rbp,[rsp+10]
+mov    rax,[rdi+8]        ; this.arr
+mov    [rbp-8],rax
+test   rax,rax            ; null-check
+je     L01
+cmp    dword ptr [rax+8],0 ; zero-length check
+je     L01
+cmp    dword ptr [rax+8],0
+jbe    RNGCHKFAIL
+add    rax,10             ; pula header
+L00: movsxd rcx,dword ptr [rdi+10]  ; this.idx
+     vmovsd xmm0,qword ptr [rax+rcx*8]
+     ret
+L01: xor eax,eax; jmp L00
+RNGCHKFAIL: call CORINFO_HELP_RNGCHKFAIL; int 3
+```
+
+Estruturalmente idêntico ao assembly do Godbolt (mesmo `cmp`+`jae`
+único no checked; mesmo null-check + zero-length-check duplicado +
+aritmética de ponteiro no `fixed`) — as únicas diferenças são 2 `mov`
+extras pra carregar campos de instância (`this.arr`/`this.idx`), porque
+aqui os métodos são de instância (exigência do BenchmarkDotNet),
+enquanto no Godbolt eram estáticos com array/índice como parâmetro.
+Cross-validação confirma que os dois resultados (Godbolt e local) são
+consistentes. Artigo companion passou a citar o BenchmarkDotNet como
+fonte primária (validação de Release embutida e verificável) e o
+Godbolt como cross-check secundário.
+
+Timing do próprio BenchmarkDotNet (chamada isolada, array pequeno,
+não é o cenário de acesso não-sequencial em array grande do
+microbenchmark isolado acima, só complementa o assembly): `GetChecked`
+1.57ns, `GetUnsafePerCall` 2.13ns (1.36x) — ordem de grandeza menor
+que os outros dois experimentos porque aqui não há pressão de cache
+(array de 1024 doubles, cabe em L1) nem chamadas repetidas
+amplificando o custo de pin/unpin; o objetivo desse experimento
+específico era o assembly, não reproduzir a magnitude da regressão.
+
 ## Contiguidade de `seq`: jagged → flat — adotado (2026-07-15)
 
 ### Contexto
@@ -148,3 +306,109 @@ tomada, não vale manter os dois caminhos no código de produção).
 completa (90 linhas de C#, `mlp_testao/csharp.csv`) refletem a versão
 *jagged* antiga — precisam ser recoletados pra refletir o código atual
 (ver `CRONOGRAMA.md`).
+
+## Pin único de `seq` via `GCHandle` — adotado (2026-08-03)
+
+### Contexto
+
+Motivado pela seção de bounds-checking do artigo companion
+(`doc/artigo-linguagens/main.tex`, §5.3): o teste original de
+bounds-check-off (`unsafe`/`fixed` por chamada, seção acima) mostrou
+regressão, com a hipótese de que o overhead de pin/unpin por chamada
+dominava a economia do bounds-check. Dois microbenchmarks isolados
+(fora do solver real) validaram essa hipótese: pin único fora do laço
+performa igual ou melhor que o indexador checked, só o pin por chamada
+perde. `seq` desde 2026-07-15 é um array 1D flat único (não mais
+jagged) — diferente da época do teste original, pinar `seq` inteiro
+uma única vez agora cobre a estrutura toda, não só uma linha.
+
+### O que foi testado
+
+`GetSeq`/`SetSeq` trocados de indexador gerenciado pra ponteiro obtido
+via `GCHandle.Alloc(seq, GCHandleType.Pinned)` **uma única vez**, no
+construtor de `tSolution` — sem `fixed` nenhum, sem tocar nos ~40+ call
+sites em `GILS_RVND.cs`. `solve()` cria só 3 instâncias de `tSolution`,
+uma vez, reaproveitadas pro programa inteiro, então "pin único" aqui
+significa pin pelo tempo de vida do processo (GCHandle não é liberado
+explicitamente — só 3 objetos pinados, sem custo relevante).
+
+```csharp
+private GCHandle seqHandle;
+private unsafe double* seqPtr;
+
+public unsafe tSolution(int dimen, double c) {
+    seq = new double [(dimen+1)*(dimen+1)*3];
+    seqHandle = GCHandle.Alloc(seq, GCHandleType.Pinned);
+    seqPtr = (double*)seqHandle.AddrOfPinnedObject();
+    d = dimen; cost = c;
+}
+
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+public unsafe double GetSeq(int i, int j, int k) {
+    return seqPtr[i*(d+1)*3 + j*3 + k];
+}
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+public unsafe void SetSeq(int i, int j, int k, double v) { seqPtr[i*(d+1)*3 + j*3 + k] = v; }
+```
+
+`<AllowUnsafeBlocks>true</AllowUnsafeBlocks>` adicionado ao `.csproj`.
+
+### Microbenchmark isolado (fora do solver, aproximando o cenário real)
+
+Array flat `(d+1)*(d+1)*3` com `d=299` (mesma instância do teste
+abaixo), indexação idêntica à de `GetSeq`/`SetSeq`, stream de acesso
+`(i,j,k)` uniformemente aleatório com ~15% de escritas (aproximando
+leitura dominante na avaliação de vizinhança + escrita ocasional na
+aplicação de movimento — não é um replay real do GILS-RVND). N=10,
+`sink` idêntico em todas as execuções (correção confirmada):
+
+| variante | ns/op (média ± dp) | vs. checked |
+|---|---|---|
+| checked (indexador gerenciado) | 18,24 ± 2,72 | 1,00x |
+| unsafe/fixed por chamada | 24,15 ± 3,95 | 1,32x mais lento |
+| unsafe, fixed no escopo do bench inteiro | 14,75 ± 2,93 | 0,81x (mais rápido) |
+
+Margem menor que o teste isolado anterior (array totalmente aleatório,
+sem escritas: 2,43x/0,89x) — provavelmente por causa do array menor
+(~2,16MB, cabe melhor em cache) e da mistura de escritas.
+
+### Microbenchmark no solver real (`pr299`, N=5 cada variante)
+
+Mesma metodologia dos testes anteriores desta seção. CPU com ruído de
+fundo (load average ~4 durante o teste, mesma máquina de sempre).
+`COST: 6556628` idêntico nas 10 execuções (5 pinned + 5 baseline) —
+corretude confirmada. `COST: 20315` confirmado em `burma14` antes do
+teste intensivo.
+
+| variante | n | média ± dp | min–max |
+|---|---|---|---|
+| pinned (GCHandle único) | 5 | 214,27s ± 14,66 | 201,95–239,42 |
+| baseline (checked) | 5 | 223,25s ± 7,09 | 216,81–232,36 |
+
+Pinned ~4,2% mais rápido em média, mas sinal fraco: a faixa do pinned
+contém inteiramente a faixa do baseline (sem separação nenhuma entre
+as distribuições) — mais fraco que o sinal da mudança jagged→flat
+acima (9,9%, sobreposição leve) e muito mais fraco que a regressão
+original do bounds-check-off por chamada (1,83x–1,96x, sem
+sobreposição). Direção bate com os dois microbenchmarks isolados
+(pin único ajuda), mas não é estatisticamente limpo nesse N.
+
+### Decisão
+
+**Adotado mesmo com sinal fraco** (autor, 2026-08-03) — mesmo
+precedente da mudança jagged→flat: aceitar o resultado direcionalmente
+favorável sem estender N. `tSolution.cs` de `main` passa a usar
+ponteiro pinado único em vez do indexador gerenciado.
+
+**Consequência pro TCC**: mais uma mudança em `tSolution.cs` desde a
+última coleta completa da campanha de C# — dados de
+`mlp_testao/csharp.csv` (`main`) precisam de recoleta por esse motivo
+também, além do bug de Debug/Release já registrado (ver `TODO.md` da
+raiz). Não afeta `standard` (só `main` é otimizada).
+
+**Consequência pro artigo companion**: fortalece a explicação da
+seção de bounds-checking — a hipótese de que o overhead é
+especificamente o *pin por chamada*, não o `unsafe` em si, agora tem
+validação em três níveis (assembly gerado, microbenchmark isolado, e
+o solver real), embora o último com sinal mais fraco que os dois
+primeiros.
