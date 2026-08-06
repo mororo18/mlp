@@ -4,7 +4,7 @@ mod subseq;
 use subseq::*;
 
 use cpu_time::ProcessTime;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 fn update_subseq_info_matrix(solut: &mut Solution, info: &Data) {
     for i in 0..=info.dimen {
@@ -460,9 +460,11 @@ fn main() {
     ];
 
     let start = ProcessTime::try_now().expect("Getting process time failed");
+    let wall_start = Instant::now();
 
     gils_rvnd(imax, iils, r, &mut info, verbose);
 
     let cpu_time: Duration = start.try_elapsed().expect("Getting process time failed");
     println!("TIME: {:?}", cpu_time.as_secs_f64());
+    println!("wall clock (s): {:?}", wall_start.elapsed().as_secs_f64());
 }

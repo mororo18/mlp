@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 199309L
 #include <stdio.h>
 #include <float.h>
 #include <time.h>
@@ -524,10 +525,18 @@ int main(int argc, char **argv){
 
     Iils = data.dimen < 100 ? data.dimen : 100;
     time_t start = clock();
+    struct timespec wall_start;
+    clock_gettime(CLOCK_MONOTONIC, &wall_start);
+
     GILS_RVND(Imax, Iils, &data, verbose);
 
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
     printf("TIME: %.6lf\n", res);
+
+    struct timespec wall_end;
+    clock_gettime(CLOCK_MONOTONIC, &wall_end);
+    double wall_res = (wall_end.tv_sec - wall_start.tv_sec) + (wall_end.tv_nsec - wall_start.tv_nsec) / 1e9;
+    printf("wall clock (s): %.6lf\n", wall_res);
 
     tData_free(&data);
 

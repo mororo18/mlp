@@ -34,6 +34,25 @@ local function new_numeric_array(n)
     end
 end
 
+-- Monotonic wall clock via FFI's clock_gettime (LuaJIT only; os.clock()
+-- is CPU time, not wall time, and vanilla Lua 5.3 has no standard
+-- monotonic timer of sufficient resolution -- wall_clock() returns nil
+-- there, and the caller skips printing "wall clock (s):" in that case.
+local wall_clock
+if ffi_ok then
+    ffi.cdef[[
+        typedef struct { long tv_sec; long tv_nsec; } wc_timespec;
+        int clock_gettime(int clk_id, wc_timespec *tp);
+    ]]
+    local ts = ffi.new("wc_timespec")
+    wall_clock = function()
+        ffi.C.clock_gettime(1, ts) -- 1 = CLOCK_MONOTONIC on Linux
+        return tonumber(ts.tv_sec) + tonumber(ts.tv_nsec) / 1e9
+    end
+else
+    wall_clock = function() return nil end
+end
+
 function s_print(solut)
     for i=1,#solut.s do
         io.write(solut.s[i], " ")
@@ -739,9 +758,13 @@ function main()
 
     --info.c = protect(info.c)
     local start = clock()
+    local wall_start = wall_clock()
     GILS_RVND(Imax, Iils, R, info, verbose)
 
     print("TIME: ", clock()-start)
+    if wall_start then
+        print("wall clock (s): ", wall_clock()-wall_start)
+    end
 end
 
 -- jit.off(table.clone)

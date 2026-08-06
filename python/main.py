@@ -435,8 +435,10 @@ def main() -> None:
     info = tInfo(dimension, cost, rnd)
 
     start = time.process_time()
+    wall_start = time.perf_counter()
     GILS_RVND(Imax, Iils, R, info, verbose)
     print("TIME: %s " % (time.process_time() - start))
+    print("wall clock (s): %s " % (time.perf_counter() - wall_start))
 
     print("ITERACOES: ", info.IT)
 
