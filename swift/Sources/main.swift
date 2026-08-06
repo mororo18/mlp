@@ -10,3 +10,4 @@ let time = clock.measure {
 let timeInSeconds = Double(time.components.seconds) + Double(time.components.attoseconds) / 1e18
 
 print("TIME:", String(format: "%.6f", timeInSeconds))
+print("wall clock (s):", String(format: "%.6f", timeInSeconds))

@@ -104,6 +104,23 @@ def get_TIME(_str):
             return val
     return
 
+def get_WALL_TIME(_str):
+    # CPU-time de processo (TIME) soma o trabalho de todas as threads,
+    # nao so a principal -- inconsistente entre linguagens com GC/JIT
+    # concorrente (achado 2026-08-06, ver TECNICAS_G1_G2.md secao 9).
+    # wall clock e a metrica recomendada pela literatura de benchmarking
+    # pra medir programa inteiro. Pode ser None se a linguagem nao
+    # imprimir "wall clock (s):" (ex.: Lua 5.3 vanilla, sem timer
+    # monotonico portavel na stdlib).
+    lines = _str.split("\n")
+
+    for l in lines :
+        if l.find("wall clock") != -1:
+            i = l.find(":")
+            val = float(l[i+1:].replace(',', '.'))
+            return val
+    return
+
 def get_info(lang, timeout):
     f = open('run_' + lang + '.sh', 'r')
     #print(f.readline())
@@ -126,10 +143,12 @@ def get_info(lang, timeout):
             # saida pode estar incompleta/vazia - nao confiar em COST/TIME parciais
             COST = None
             TIME = None
+            WALL_TIME = None
         else:
             COST = get_COST(output)
             TIME = get_TIME(output)
-        info.update({"COST" : [COST], "TIME" : [TIME]})
+            WALL_TIME = get_WALL_TIME(output)
+        info.update({"COST" : [COST], "TIME" : [TIME], "WALL_TIME" : [WALL_TIME]})
         print(info)
 
         return info

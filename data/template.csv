@@ -1,1 +1,1 @@
-branch,source,instance,COST,TIME,mem_avg,mem_max,mem_lookups,timed_out
+branch,source,instance,COST,TIME,WALL_TIME,mem_avg,mem_max,mem_lookups,timed_out
