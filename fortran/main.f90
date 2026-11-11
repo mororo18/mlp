@@ -333,7 +333,7 @@ subroutine search_swap(solut, info, ret)
                 solut%seq( info%dimen+1,i_next+1)%W  * (cost_concat_2) + solut%seq( info%dimen+1,i_next+1)%C 
 
         if (cost_new < cost_best) then
-            cost_best = cost_new 
+            cost_best = cost_new - epsilon(cost_new)
             I_best = i
             J_best = i_next
         endif
@@ -357,7 +357,7 @@ subroutine search_swap(solut, info, ret)
                     solut%seq( info%dimen+1,j_next)%W * cost_concat_4 + solut%seq( info%dimen+1,j_next)%C   ! concat 5th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new 
+                cost_best = cost_new - epsilon(cost_new)
                 I_best = i
                 J_best = j
             endif
@@ -432,7 +432,7 @@ subroutine search_two_opt(solut, info, ret)
                     solut%seq( info%dimen+1,j_next)%W * cost_concat_2 + solut%seq( info%dimen+1,j_next)%C       ! concat 3rd subseq
 
             if (cost_new < cost_best ) then
-                cost_best = cost_new 
+                cost_best = cost_new - epsilon(cost_new)
                 I_best = i
                 J_best = j
             endif
@@ -514,7 +514,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
                     solut%seq( info%dimen+1,j_next)%W * cost_concat_3 + solut%seq( info%dimen+1,j_next)%C      ! concat 4th subseq
 
             if (cost_new .lt. cost_best ) then
-                cost_best = cost_new
+                cost_best = cost_new - epsilon(cost_new)
                 I_best = i
                 J_best = j
                 POS_best = k
@@ -535,7 +535,7 @@ subroutine search_reinsertion(solut, info, opt, ret)
                     solut%seq( info%dimen+1,k_next)%W * cost_concat_3 + solut%seq( info%dimen+1,k_next)%C      ! concat 4th subseq
 
             if (cost_new < cost_best) then
-                cost_best = cost_new 
+                cost_best = cost_new - epsilon(cost_new)
                 I_best = i
                 J_best = j
                 POS_best = k

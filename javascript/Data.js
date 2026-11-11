@@ -4,7 +4,7 @@ var file = text.split("\n");
 
 function matrix_fill(matrix, n) {
     for (var i = 0; i < n; i++) {
-        matrix[i] = new Array(n);
+        matrix[i] = new Float64Array(n);
     }
 }
 

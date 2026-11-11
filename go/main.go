@@ -119,26 +119,6 @@ func read_data(verbose bool) (int, [][]float64, []int) {
 
 }
 
-func feasible_(s []int, data tData) bool {
-	is := make([]bool, data.dimen)
-
-	for i := 0; i < data.dimen; i++ {
-		is[i] = false
-	}
-
-	for i := 0; i < data.dimen; i++ {
-		is[s[i]] = true
-	}
-
-	for i := 0; i < data.dimen; i++ {
-		if is[i] == false {
-			return false
-		}
-	}
-
-	return true
-}
-
 func remove(arr []int, i int) []int {
 	return append(arr[:i], arr[i+1:]...)
 }
@@ -524,10 +504,6 @@ func perturb(sl []int, data *tData) []int {
 		} else {
 			copy((*s_)[i:i+pos-j], (*s_)[j+1:pos])
 			copy((*s_)[pos-(j-i+1):pos], sub)
-		}
-
-		if feasible_(*s_, *data) == false {
-			os.Exit(0)
 		}
 
 	}

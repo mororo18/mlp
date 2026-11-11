@@ -232,6 +232,7 @@ func searchOrOpt(s: inout Solution, blockSize: Int, data: Data) -> Bool {
 
     var costBest = Double.infinity;
 	var bestI = -1
+	var bestJ = -1
 	var bestPos = -1
 
 	for i in 1...data.dimension-blockSize {
@@ -260,6 +261,7 @@ func searchOrOpt(s: inout Solution, blockSize: Int, data: Data) -> Bool {
             if(costNew < costBest){
                 costBest = costNew - EPSILON
                 bestI = i
+                bestJ = j
                 bestPos = k
             }
         }
@@ -281,12 +283,14 @@ func searchOrOpt(s: inout Solution, blockSize: Int, data: Data) -> Bool {
             if costNew < costBest {
                 costBest = costNew - EPSILON
                 bestI = i
+                bestJ = j
                 bestPos = k
             }
         }
     }
 
     if costBest < s.cost {
+        assert(bestJ == bestI + blockSize - 1)
         s.sequence.reinsert(blockStart: bestI, blockSize: blockSize, at: bestPos)
         s.updateSubseqMatrix(data: data)
         return true

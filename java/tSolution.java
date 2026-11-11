@@ -5,7 +5,8 @@ class tSolution {
     private tArray s;
 
     private double [][][] seq3d;
-    private double [][] seq2d;
+    private double [] seq2d;
+    private int n1;
 
     private double cost;
     private static int Z = 3;
@@ -13,9 +14,10 @@ class tSolution {
 
     tSolution(int dimen, double c) {
 if (TEST)   
-        seq2d = new double [dimen+1][(dimen+1)*Z];
+        seq2d = new double [(dimen+1)*(dimen+1)*Z];
 else        
         seq3d = new double [dimen+1][dimen+1][Z];
+        n1 = dimen+1;
         cost = c;
     }
 
@@ -23,14 +25,14 @@ else
 
     public double getSeq(int i, int j, int k) {
 if (TEST)   
-        return seq2d[i][j*Z + k];
+        return seq2d[(i*n1 + j)*Z + k];
 else        
         return seq3d[i][j][k];
     }
 
     public void setSeq(int i, int j, int k, double value) {
 if (TEST)   
-        seq2d[i][j*Z + k] = value; 
+        seq2d[(i*n1 + j)*Z + k] = value; 
 else        
         seq3d[i][j][k] = value;
     }
