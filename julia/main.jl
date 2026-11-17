@@ -139,7 +139,6 @@ function search_swap(solut::tSolution, data::tData)::Bool
     cost_best = Inf
     I = -1
     J = -1
-    nimp = 0
 
     cost_concat_1 = 0.0
     cost_concat_2 = 0.0
@@ -162,7 +161,6 @@ function search_swap(solut::tSolution, data::tData)::Bool
                 cost_best = cost_new - data.EPSILON
                 I = i
                 J = i_next
-                nimp += 1
             end
 
             for j in i_next+1:data.dimen
@@ -186,13 +184,12 @@ function search_swap(solut::tSolution, data::tData)::Bool
                     cost_best = cost_new - data.EPSILON;
                     I = i;
                     J = j;
-                    nimp += 1
                 end
 
         end
     end
 
-    if nimp > 0 && cost_best < solut.cost - data.EPSILON
+    if cost_best < solut.cost - data.EPSILON
         swap(solut.s, I, J)
         update_subseq_info_matrix(solut, data)
         return true
@@ -205,7 +202,6 @@ function search_two_opt(solut::tSolution, data::tData)::Bool
     cost_best = Inf
     I = -1
     J = -1
-    nimp = 0
 
     cost_concat_1 = 0.0
     cost_concat_2 = 0.0
@@ -230,12 +226,11 @@ function search_two_opt(solut::tSolution, data::tData)::Bool
                 cost_best = cost_new - data.EPSILON
                 I = i
                 J = j
-                nimp += 1
             end
         end
     end
 
-    if nimp > 0 && cost_best < solut.cost - data.EPSILON
+    if cost_best < solut.cost - data.EPSILON
         reverse!(solut.s, I, J)
         update_subseq_info_matrix(solut, data)
         return true
