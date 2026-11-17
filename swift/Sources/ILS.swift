@@ -141,7 +141,7 @@ func searchSwap(s: inout Solution, data: Data) -> Bool {
 					+ s.getSeq(i, iNext).w                * costConcat1 + data.getDistance(sINext, sI)
 					+ s.getSeq(iNext+1, data.dimension).w * costConcat2 + s.getSeq(iNext+1, data.dimension).c
 
-		if _slowPath(costNew < costBest) {
+		if costNew < costBest {
 			costBest = costNew - EPSILON
 			bestI = i
 			bestJ = iNext
@@ -165,7 +165,7 @@ func searchSwap(s: inout Solution, data: Data) -> Bool {
 						+ costConcat3
 						+ s.getSeq(jNext, data.dimension).w * costConcat4 + s.getSeq(jNext, data.dimension).c
 
-			if _slowPath(costNew < costBest) {
+			if costNew < costBest {
 				costBest = costNew - EPSILON
 				bestI = i
 				bestJ = j
@@ -210,7 +210,7 @@ func searchTwoOpt(s: inout Solution, data: Data) -> Bool {
 						+ s.getSeq(i, j).w * costConcat1 + revSeqCost
 						+ s.getSeq(jNext, data.dimension).w * costConcat2 + s.getSeq(jNext, data.dimension).c
 
-			if _slowPath(costNew < costBest) {
+			if costNew < costBest {
 				costBest = costNew - EPSILON
 				bestI = i
 				bestJ = j
@@ -232,6 +232,7 @@ func searchOrOpt(s: inout Solution, blockSize: Int, data: Data) -> Bool {
 
     var costBest = Double.infinity;
 	var bestI = -1
+	var bestJ = -1
 	var bestPos = -1
 
 	for i in 1...data.dimension-blockSize {
@@ -257,9 +258,10 @@ func searchOrOpt(s: inout Solution, blockSize: Int, data: Data) -> Bool {
                          + s.getSeq(kNext, iPrev).w          * costConcat2 + s.getSeq(kNext, iPrev).c
                          + s.getSeq(jNext, data.dimension).w * costConcat3 + s.getSeq(jNext, data.dimension).c
 
-            if _slowPath(costNew < costBest) {
+            if(costNew < costBest){
                 costBest = costNew - EPSILON
                 bestI = i
+                bestJ = j
                 bestPos = k
             }
         }
@@ -278,16 +280,17 @@ func searchOrOpt(s: inout Solution, blockSize: Int, data: Data) -> Bool {
                     + s.getSeq(i, j).w                  * costConcat2 + s.getSeq(i, j).c
                     + s.getSeq(kNext, data.dimension).w * costConcat3 + s.getSeq(kNext, data.dimension).c
 
-            if _slowPath(costNew < costBest) {
+            if costNew < costBest {
                 costBest = costNew - EPSILON
                 bestI = i
+                bestJ = j
                 bestPos = k
             }
         }
     }
 
     if costBest < s.cost {
-        s.sequence.reinsert(blockStart: bestI, blockSize: blockSize, at: bestPos)
+        s.sequence.reinsert(blockStart: bestI, blockSize: bestJ - bestI + 1, at: bestPos)
         s.updateSubseqMatrix(data: data)
         return true
     }
