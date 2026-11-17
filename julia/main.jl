@@ -439,9 +439,12 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData, verbos
             @printf "\tCurrent best solution cost: %.2lf\n" solut_best.cost
         end
     end
-    @printf "COST: %.2lf\n" solut_best.cost
-    print("SOLUTION: ")
-    println(solut_best.s)
+
+    if verbose
+        @printf "COST: %.2lf\n" solut_best.cost
+        print("SOLUTION: ")
+        println(solut_best.s)
+    end
 end
 
 function main()
