@@ -6,6 +6,10 @@ use subseq::*;
 use cpu_time::ProcessTime;
 use std::time::{Duration, Instant};
 
+#[cold]
+#[inline(never)]
+fn cold() {}
+
 fn update_subseq_info_matrix(solut: &mut Solution, info: &Data) {
     for i in 0..=info.dimen {
         let k: i32 = 1 - (i as i32) - if i == 0 { 1 } else { 0 };
@@ -130,6 +134,8 @@ fn search_swap(solut: &mut Solution, info: &Data) -> bool {
             + solut.seq[(i_next + 1, info.dimen)].c;
 
         if cost_new < cost_best {
+
+            cold();
             cost_best = cost_new - f64::EPSILON;
             I = i;
             J = i_next;
@@ -154,6 +160,8 @@ fn search_swap(solut: &mut Solution, info: &Data) -> bool {
                 + solut.seq[(j_next, info.dimen)].c;
 
             if cost_new < cost_best {
+
+                cold();
                 cost_best = cost_new - f64::EPSILON;
                 I = i;
                 J = j;
@@ -199,6 +207,8 @@ fn search_two_opt(solut: &mut Solution, info: &Data) -> bool {
                 + solut.seq[(j_next, info.dimen)].c;
 
             if cost_new < cost_best {
+
+                cold();
                 cost_best = cost_new - f64::EPSILON;
                 I = i;
                 J = j;
@@ -255,6 +265,8 @@ fn search_reinsertion(solut: &mut Solution, opt: usize, info: &Data) -> bool {
                 + seq_jnext_dimen_c;
 
             if cost_new < cost_best {
+
+                cold();
                 cost_best = cost_new - f64::EPSILON;
                 I = i;
                 J = j;
@@ -278,6 +290,8 @@ fn search_reinsertion(solut: &mut Solution, opt: usize, info: &Data) -> bool {
                 + solut.seq[(k_next, info.dimen)].c;
 
             if cost_new < cost_best {
+
+                cold();
                 cost_best = cost_new - f64::EPSILON;
                 I = i;
                 J = j;
