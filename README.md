@@ -63,7 +63,7 @@ cd c
 | g++ | 14.2.0 |
 | gfortran | 14.2.0 |
 | go | 1.22.2 |
-| rust | 1.66.1 (via rust-toolchain) |
+| rust | 1.100.0 (mínimo 1.95, por causa do `std::hint::cold_path`) |
 | java (OpenJDK) | 21 |
 | node | 20.16.0 |
 | julia | 1.12 (via juliaup) |

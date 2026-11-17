@@ -3,7 +3,7 @@
 Decision log for `mlp-main/rust`. Format per `code_optimization.md` step 7.
 Só `main` é otimizada (ver `CLAUDE.md`).
 
-## `#[cold]` na atualização do melhor movimento (2026-11-17)
+## `cold_path` na atualização do melhor movimento (2026-11-17)
 
 ### Problema
 
@@ -20,39 +20,37 @@ com branch.
 
 ### Mudança
 
-Uma função vazia marcada como fria, chamada dentro dos 5 `if` de melhoria:
+`std::hint::cold_path()` no início dos 5 `if` de melhoria. Ele marca o
+caminho como improvável, e o LLVM mantém o branch.
 
-```rust
-#[cold]
-#[inline(never)]
-fn cold() {}
-```
+`cold_path` é estável desde o Rust 1.95, por isso o `Cargo.toml` declara
+`rust-version = "1.95"`, e o toolchain foi atualizado de 1.93.0 para
+1.100.0. A primeira versão desta mudança (7dfcaf1), ainda no 1.93, chamava
+uma função vazia marcada com `#[cold] #[inline(never)]`, que tem o mesmo
+efeito.
 
-A chamada não pode ser executada especulativamente, então o LLVM mantém o
-branch, e o `#[cold]` marca o caminho como improvável. O `std::hint::cold_path`
-faria o mesmo, mas ainda é instável no Rust 1.93.
+### Verificação (rustc 1.100.0, `cargo build --release --features flat`)
 
-### Verificação (rustc 1.93.0, `cargo build --release --features flat`)
+`cmov` que dependem da comparação de custo, contados com `objdump`:
 
-`cmov` contados com `objdump`:
+| Versão                 | swap | 2-opt |
+|------------------------|-----:|------:|
+| sem hint               |    4 |     2 |
+| `cold_path`            |    0 |     0 |
 
-| Função                | Antes | Depois |
-|-----------------------|------:|-------:|
-| `main` (swap, 2-opt)  |    11 |      5 |
-| `search_reinsertion`  |     0 |      0 |
+Os `cmov` que sobram em `main` ficam fora das buscas (leitura da entrada,
+`core::str` e o laço do RVND).
 
-Os 5 `cmov` que sobram em `main` ficam fora das buscas (leitura da entrada e
-`core::str`).
+Custo final idêntico em bier127 e gr202. `perf stat`, `taskset -c 7`,
+mediana de 5 execuções, em relação ao 1.100.0 sem hint:
 
-Custo final idêntico em berlin52, bier127 e gr202. `perf stat`, `taskset -c 3`,
-melhor de 3 execuções:
+| Variante                  | Instância | Instruções | Ciclos | Tempo           |
+|---------------------------|-----------|-----------:|-------:|----------------:|
+| 1.100.0 + `cold_path`     | bier127   |      −6,6% |  −4,8% | 4,00 → 3,76 s   |
+| 1.100.0 + `cold_path`     | gr202     |      −6,7% |  −6,7% | 21,8 → 20,1 s   |
+| 1.93.0 + `#[cold]` (7dfcaf1) | bier127 |     +17,7% |  +2,7% | 4,00 → 4,55 s   |
+| 1.93.0 + `#[cold]` (7dfcaf1) | gr202   |     +18,0% |  +3,6% | 21,8 → 23,4 s   |
 
-| Instância | Instruções | Ciclos | Tempo        |
-|-----------|-----------:|-------:|-------------:|
-| bier127   |      −5,3% |  −6,2% | 5,32 → 4,97 s |
-| gr202     |      −5,3% |  −7,1% | 26,5 → 24,4 s |
-
-A máquina tinha outros processos disputando o mesmo núcleo, por isso o
-melhor de 3 em vez da mediana. A contagem de instruções é determinística e
-bate com a medição anterior (investigação de 2026-11-16: −7,3% e −4,1% de
-ciclos em bier127 e gr202).
+O hint dá de 5% a 8% no 1.100, como dava no 1.93. A troca de compilador
+também pesa: mesmo sem hint, o 1.100 executa cerca de 15% menos instruções
+que o 1.93 com hint.
