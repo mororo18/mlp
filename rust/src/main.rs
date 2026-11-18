@@ -365,7 +365,7 @@ fn perturb(sl: &Vec<usize>, info: &mut Data) -> Vec<usize> {
     return s;
 }
 
-fn gils_rvnd(imax: usize, iils: usize, r: [f64; 26], info: &mut Data, verbose: bool) {
+fn gils_rvnd(imax: usize, iils: usize, r: [f64; 26], info: &mut Data, verbose: bool) -> f64 {
     let mut solut_best = Solution {
         seq: SubseqMatrix::new(info.dimen),
         s: vec![0; info.dimen],
@@ -431,8 +431,11 @@ fn gils_rvnd(imax: usize, iils: usize, r: [f64; 26], info: &mut Data, verbose: b
         }
     }
 
-    println!("{:?}", solut_best.s);
-    println!("COST: {}", solut_best.cost);
+    if verbose {
+        println!("{:?}", solut_best.s);
+    }
+
+    solut_best.cost
 }
 
 #[allow(non_snake_case)]
@@ -462,9 +465,11 @@ fn main() {
     let start = ProcessTime::try_now().expect("Getting process time failed");
     let wall_start = Instant::now();
 
-    gils_rvnd(imax, iils, r, &mut info, verbose);
+    let cost = gils_rvnd(imax, iils, r, &mut info, verbose);
 
     let cpu_time: Duration = start.try_elapsed().expect("Getting process time failed");
+    let wall_time = wall_start.elapsed();
+    println!("COST: {}", cost);
     println!("TIME: {:?}", cpu_time.as_secs_f64());
-    println!("wall clock (s): {:?}", wall_start.elapsed().as_secs_f64());
+    println!("wall clock (s): {:?}", wall_time.as_secs_f64());
 }

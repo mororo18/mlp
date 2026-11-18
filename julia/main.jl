@@ -441,10 +441,11 @@ function GILS_RVND(Imax::Int, Iils::Int, R::Vector{Float64}, data::tData, verbos
     end
 
     if verbose
-        @printf "COST: %.2lf\n" solut_best.cost
         print("SOLUTION: ")
         println(solut_best.s)
     end
+
+    return solut_best.cost
 end
 
 function main()
@@ -463,9 +464,11 @@ function main()
     data::tData = tData(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, eps(Float64), 0, rand_values, 1)
 
     _cpu0 = _cputime()
-    time = @elapsed GILS_RVND(Imax, Iils, R, data, verbose)
+    cost = 0.0
+    time = @elapsed (cost = GILS_RVND(Imax, Iils, R, data, verbose))
     cpu_time = _cputime() - _cpu0
 
+    @printf "COST: %.2lf\n" cost
     @printf "TIME: %.6lf\n" cpu_time
     @printf "wall clock (s): %.6lf\n" time
     println("reinsertion calls ", data.reinsert_count)

@@ -632,7 +632,7 @@ std::vector<int> perturb(tSolution * solut, tData & data) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tData & data, bool verbose) {
+double GILS_RVND(int Imax, int Iils, tData & data, bool verbose) {
 
     tSolution solut_partial = Solution_init(data);
     tSolution solut_crnt = Solution_init(data);
@@ -686,7 +686,7 @@ void GILS_RVND(int Imax, int Iils, tData & data, bool verbose) {
         }
 
     }
-    printf("COST: %.2lf\n", solut_best.cost);
+    return solut_best.cost;
 }
 
 int main(int argc, char **argv){
@@ -717,12 +717,13 @@ int main(int argc, char **argv){
     Iils = data.dimen < 100 ? data.dimen : 100;
     auto t1 = steady_clock::now();
     size_t start = clock();
-    GILS_RVND(Imax, Iils, data, verbose);
+    double cost = GILS_RVND(Imax, Iils, data, verbose);
     double cpu_time = (double)(clock() - start) / CLOCKS_PER_SEC ;
     auto t2 = steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 
     double res = (double)duration / 10e2;
+    printf("COST: %.2lf\n", cost);
     std::cout << "TIME: " << cpu_time << std::endl;
     std::cout << "wall clock (s): " << res << std::endl;
 

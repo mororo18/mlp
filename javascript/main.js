@@ -391,8 +391,11 @@ function GILS_RVND(Iils, Imax, R, info, verbose) {
         }
     }
 
-    console.log(s_best);
-    console.log("COST: ", cost_best);
+    if (verbose) {
+        console.log(s_best);
+    }
+
+    return cost_best;
 }
 
 function main() {
@@ -424,10 +427,11 @@ function main() {
 
     var cpuStart = process.cpuUsage();
     var start = new Date();
-    GILS_RVND(Iils, Imax, R, info, verbose);
+    var cost = GILS_RVND(Iils, Imax, R, info, verbose);
     var end = new Date();
     var cpuUsage = process.cpuUsage(cpuStart);
 
+    console.log("COST: ", cost);
     console.log("TIME: ", (cpuUsage.user + cpuUsage.system) / 1e6);
     console.log("wall clock (s): ", (end-start)/1000);
 }

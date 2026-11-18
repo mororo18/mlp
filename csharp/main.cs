@@ -15,13 +15,14 @@ namespace MLP {
             TimeSpan cpuStart = proc.TotalProcessorTime;
 
             DateTime start = DateTime.Now;
-            tsp.solve(verbose);
+            double cost = tsp.solve(verbose);
             DateTime end = DateTime.Now;
 
             proc.Refresh();
             TimeSpan cpuTime = proc.TotalProcessorTime - cpuStart;
 
             TimeSpan ts = (end - start);
+            Console.WriteLine("COST: " + cost);
             Console.WriteLine("TIME: "+ cpuTime.TotalSeconds);
 
             Console.WriteLine("wall clock (s): "+ ts.TotalSeconds);

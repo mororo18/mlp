@@ -447,7 +447,7 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
 
     return s
 
-def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn:
+def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo, verbose : bool = False) -> float:
 
     solut_partial : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
     solut_crnt : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
@@ -455,20 +455,24 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
 
     for i in range(Imax):
         r_value = info.rnd[info.rnd_index]
-        print(r_value)
+        if verbose:
+            print(r_value)
         info.rnd_index += 1
 
         alpha : float = R[r_value]
 
-        print("[+] Local Search {}".format(i+1))
+        if verbose:
+            print("[+] Local Search {}".format(i+1))
         solut_crnt.s = construction(alpha, info)
         subseq_load(solut_crnt, info)
 
         solut_partial.s = solut_crnt.s.copy()
         solut_partial.cost = solut_crnt.cost
-        print("\t[+] Constructing Inital Solution..", solut_crnt.cost)
+        if verbose:
+            print("\t[+] Constructing Inital Solution..", solut_crnt.cost)
 
-        print("\t[+] Looking for the best Neighbor..")
+        if verbose:
+            print("\t[+] Looking for the best Neighbor..")
         iterILS = 0
         while iterILS < Iils:
             #print("ILS")
@@ -491,10 +495,13 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
             solut_best.s = solut_partial.s.copy()
             solut_best.cost = solut_partial.cost
 
-        print("\tCurrent best solution cost: {}".format(solut_best.cost))
+        if verbose:
+            print("\tCurrent best solution cost: {}".format(solut_best.cost))
 
-    print("COST: {}".format (solut_best.cost))
-    print("SOLUTION: {}".format(solut_best.s))
+    if verbose:
+        print("SOLUTION: {}".format(solut_best.s))
+
+    return solut_best.cost
    #print("Total Iterations RVND {}".format(IT))
    #print("swap", improv_swap)
    #print("two_opt", improv_two_opt)
@@ -505,6 +512,8 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo) -> NoReturn
 def main() -> NoReturn:
     dimension :int
     cost : Matrix
+
+    verbose = "-v" in sys.argv or "--verbose" in sys.argv
 
     dimension , cost, rnd  = get_instance_info()
 
@@ -530,8 +539,10 @@ def main() -> NoReturn:
 """
 
     start = time.time()
-    GILS_RVND(Imax, Iils, R, info)
-    print("TIME: %s " % (time.time() - start))
+    cost = GILS_RVND(Imax, Iils, R, info, verbose)
+    elapsed = time.time() - start
+    print("COST: {}".format(cost))
+    print("TIME: %s " % elapsed)
 
     print("ITERACOES: ", info.IT)
 

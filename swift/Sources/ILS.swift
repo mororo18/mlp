@@ -321,21 +321,25 @@ func rvnd(s: inout Solution, data: inout Data) {
 	}
 }
 
-func gils_rvnd(iMax: Int, iIls: Int, data: inout Data) {
+func gils_rvnd(iMax: Int, iIls: Int, data: inout Data, verbose: Bool) -> Double {
 	var bestOfAll = Solution()
 	bestOfAll.cost = Double.infinity
 
 	for i in 0..<iMax {
-		print("[+] Local Search", i);
+		if verbose {
+			print("[+] Local Search", i);
+		}
 
 		var localBest = construction(data: &data)
 		var current = localBest
 
-		print("\t[+] Constructing Initial Solution.. ");
-		print("\t\tSequence:", current.sequence)
-		print("\t\tCost:", current.cost)
+		if verbose {
+			print("\t[+] Constructing Initial Solution.. ");
+			print("\t\tSequence:", current.sequence)
+			print("\t\tCost:", current.cost)
 
-		print("\t[+] Looking for the best Neighbor..")
+			print("\t[+] Looking for the best Neighbor..")
+		}
 		var iterIls = 0
 		while iterIls < iIls {
 
@@ -354,8 +358,10 @@ func gils_rvnd(iMax: Int, iIls: Int, data: inout Data) {
 		if localBest.cost < bestOfAll.cost {
 			bestOfAll = localBest
 		}
-		print("\tCurrent Best Cost", bestOfAll.cost)
+		if verbose {
+			print("\tCurrent Best Cost", bestOfAll.cost)
+		}
 	}
 
-	print("COST:", bestOfAll.cost)
+	return bestOfAll.cost
 }

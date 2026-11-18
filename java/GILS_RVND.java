@@ -349,7 +349,7 @@ class GILS_RVND {
         return sl_cpy;
     }
 
-    public void solve(){
+    public double solve(){
         tSolution solut_best = new tSolution(info.getDimen(), Double.MAX_VALUE);
         tSolution solut_crnt = new tSolution(info.getDimen(), 0);
         tSolution solut_partial = new tSolution(info.getDimen(), 0);
@@ -400,9 +400,11 @@ class GILS_RVND {
             }
         }
 
-        System.out.print("COST: ");
-        System.out.println(solut_best.getCost());
-        System.out.print("SOLUTION: ");
-        solut_best.getSolut().printPretty();
+        if (verbose) {
+            System.out.print("SOLUTION: ");
+            solut_best.getSolut().printPretty();
+        }
+
+        return solut_best.getCost();
     }
 }

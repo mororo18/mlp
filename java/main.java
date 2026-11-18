@@ -17,10 +17,12 @@ class Main {
         OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         long cpuTime = - osBean.getProcessCpuTime();
         long time = - System.nanoTime();
-        tsp.solve();
+        double cost = tsp.solve();
         time += System.nanoTime();
         cpuTime += osBean.getProcessCpuTime();
 
+        System.out.print("COST: ");
+        System.out.println(cost);
         System.out.print("TIME: ");
         System.out.println(cpuTime/10e8);
         System.out.print("wall clock (s): ");

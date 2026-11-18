@@ -384,7 +384,7 @@ namespace MLP {
         }
 
 
-        public void solve(bool verbose){
+        public double solve(bool verbose){
             var solut_best = new tSolution(data.GetDimen(), Double.MaxValue);
             var solut_crnt = new tSolution(data.GetDimen(), 0.0);
             var solut_partial = new tSolution(data.GetDimen(), 0.0);
@@ -433,8 +433,11 @@ namespace MLP {
                     Console.WriteLine("\tCurrent best solution cost: "+solut_best.GetCost());
                 }
             }
-            Console.WriteLine(string.Format("SOLUTION: ({0}).", string.Join(", ", solut_best.GetSolut())));
-            Console.WriteLine("COST: " + solut_best.GetCost());
+            if (verbose) {
+                Console.WriteLine(string.Format("SOLUTION: ({0}).", string.Join(", ", solut_best.GetSolut())));
+            }
+
+            return solut_best.GetCost();
         }
     }
 }

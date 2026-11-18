@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-.build/release/solve
+.build/release/solve "$@"

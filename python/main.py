@@ -370,7 +370,7 @@ def perturb(sl : List[int], info : tInfo) -> List[int]:
 
     return s
 
-def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo, verbose : bool = False) -> None:
+def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo, verbose : bool = False) -> float:
 
     solut_partial : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
     solut_crnt : tSolution = tSolution([0 for i in range(info.dimen+1)], subseq_fill(info), 0.0)
@@ -416,8 +416,10 @@ def GILS_RVND(Imax : int, Iils : int, R : List[float], info : tInfo, verbose : b
         if verbose:
             print("\tCurrent best solution cost: {}".format(solut_best.cost))
 
-    print("COST: {}".format (solut_best.cost))
-    print("SOLUTION: {}".format(solut_best.s))
+    if verbose:
+        print("SOLUTION: {}".format(solut_best.s))
+
+    return solut_best.cost
 
 def main() -> None:
     dimension :int
@@ -436,9 +438,12 @@ def main() -> None:
 
     start = time.process_time()
     wall_start = time.perf_counter()
-    GILS_RVND(Imax, Iils, R, info, verbose)
-    print("TIME: %s " % (time.process_time() - start))
-    print("wall clock (s): %s " % (time.perf_counter() - wall_start))
+    cost = GILS_RVND(Imax, Iils, R, info, verbose)
+    cpu_time = time.process_time() - start
+    wall_time = time.perf_counter() - wall_start
+    print("COST: {}".format(cost))
+    print("TIME: %s " % cpu_time)
+    print("wall clock (s): %s " % wall_time)
 
     print("ITERACOES: ", info.IT)
 

@@ -428,19 +428,21 @@ void perturb(tSolution * solut_crnt, tSolution * solut_partial, tData * data) {
 }
 
 
-void GILS_RVND(int Imax, int Iils, tData * data, int verbose) {
+Real GILS_RVND(int Imax, int Iils, tData * data, int verbose) {
 
     tSolution solut_partial = Solution_init(*data);
     tSolution solut_crnt = Solution_init(*data);
     tSolution solut_best = Solution_init(*data);
 
+    if (verbose) {
 #ifdef MATRIX
-    printf("MATRIX\n");
+        printf("MATRIX\n");
 #elif defined(FLAT)
-    printf("FLAT\n");
+        printf("FLAT\n");
 #endif
-    printf("struct tSolution's size: %zu bytes\n", solut_crnt.size);
-    printf("struct tSolution's size: %.4f MB\n", solut_crnt.MBsize);
+        printf("struct tSolution's size: %zu bytes\n", solut_crnt.size);
+        printf("struct tSolution's size: %.4f MB\n", solut_crnt.MBsize);
+    }
 
 
     for(int i = 0; i < Imax; ++i){
@@ -497,11 +499,13 @@ void GILS_RVND(int Imax, int Iils, tData * data, int verbose) {
         }
 
     }
-    printf("COST: %.2lf\n", solut_best.cost);
+    Real cost = solut_best.cost;
 
     Solution_free(&solut_best);
     Solution_free(&solut_crnt);
     Solution_free(&solut_partial);
+
+    return cost;
 }
 
 int main(int argc, char **argv){
@@ -528,14 +532,15 @@ int main(int argc, char **argv){
     struct timespec wall_start;
     clock_gettime(CLOCK_MONOTONIC, &wall_start);
 
-    GILS_RVND(Imax, Iils, &data, verbose);
+    Real cost = GILS_RVND(Imax, Iils, &data, verbose);
 
     double res = (double)(clock() - start) / CLOCKS_PER_SEC;
-    printf("TIME: %.6lf\n", res);
-
     struct timespec wall_end;
     clock_gettime(CLOCK_MONOTONIC, &wall_end);
     double wall_res = (wall_end.tv_sec - wall_start.tv_sec) + (wall_end.tv_nsec - wall_start.tv_nsec) / 1e9;
+
+    printf("COST: %.2lf\n", cost);
+    printf("TIME: %.6lf\n", res);
     printf("wall clock (s): %.6lf\n", wall_res);
 
     tData_free(&data);

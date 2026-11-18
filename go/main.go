@@ -521,7 +521,7 @@ func perturb(sl []int, data *tData) []int {
 	return s
 }
 
-func GILS_RVND(Imax int, Iils int, R [26]float64, data tData, verbose bool) {
+func GILS_RVND(Imax int, Iils int, R [26]float64, data tData, verbose bool) float64 {
 
 	solut_crnt := NewSolution(data)
 	solut_partial := NewSolution(data)
@@ -571,8 +571,11 @@ func GILS_RVND(Imax int, Iils int, R [26]float64, data tData, verbose bool) {
 
 	}
 
-	fmt.Println("COST: ", solut_best.cost)
-	fmt.Println("SOLUTION: ", solut_best.s)
+	if verbose {
+		fmt.Println("SOLUTION: ", solut_best.s)
+	}
+
+	return solut_best.cost
 }
 
 func main() {
@@ -604,11 +607,12 @@ func main() {
 	cpuStart := cputime()
 	start := time.Now()
 
-	GILS_RVND(Imax, Iils, R, data, verbose)
+	cost := GILS_RVND(Imax, Iils, R, data, verbose)
 
 	cpuElapsed := cputime() - cpuStart
 	t := time.Now()
 	elapsed := t.Sub(start)
+	fmt.Println("COST: ", cost)
 	fmt.Println("TIME:", cpuElapsed)
 	fmt.Println("wall clock (s):", elapsed.Seconds())
 }

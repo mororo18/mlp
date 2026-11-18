@@ -714,7 +714,7 @@ function GILS_RVND(Imax, Iils, R, info, verbose)
         end
     end
 
-    print("COST: ", solut_best.cost)
+    return solut_best.cost
 end
 
 function protect(tbl)
@@ -759,11 +759,14 @@ function main()
     --info.c = protect(info.c)
     local start = clock()
     local wall_start = wall_clock()
-    GILS_RVND(Imax, Iils, R, info, verbose)
+    local cost = GILS_RVND(Imax, Iils, R, info, verbose)
+    local cpu_time = clock()-start
+    local wall_time = wall_start and wall_clock()-wall_start
 
-    print("TIME: ", clock()-start)
-    if wall_start then
-        print("wall clock (s): ", wall_clock()-wall_start)
+    print("COST: ", cost)
+    print("TIME: ", cpu_time)
+    if wall_time then
+        print("wall clock (s): ", wall_time)
     end
 end
 
