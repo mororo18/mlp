@@ -50,6 +50,7 @@ if [ -z "${IN_NIX_SHELL:-}" ]; then
     exit 0
 fi
 
+set +o pipefail
 {
     g++ --version | head -1
     gfortran --version | head -1
@@ -57,12 +58,13 @@ fi
     javac -version 2>&1
     java -version 2>&1 | head -1
     node --version
-    swift --version 2>&1 | head -1
+    swift --version 2>&1 | grep -v warning | head -1
     rustc --version
     julia --version
     python3 --version
     echo "affinity: $(python3 -c 'import os; print(sorted(os.sched_getaffinity(0)))')"
-} > "$OUT/versions.txt"
+} > "$OUT/versions.txt" 2>&1
+set -o pipefail
 
 mkdir -p "$REPO/benchmarks"
 cp "$LT/harness/bench.py" "$LT/harness/core.py" "$REPO/benchmarks/"
