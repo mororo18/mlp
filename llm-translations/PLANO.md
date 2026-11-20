@@ -41,9 +41,10 @@ a Figura 7 (sinal oposto, ou gap grande que ela não explica).
 - **ETA:** cerca de 12 a 16 h de trabalho e 4,5 a 5 h de servidor, em 2 a 3
   sessões.
 
-## Escopo inicial (2026-11-20, substituído acima)
+## Escopo inicial (autor, 2026-11-20, substituído acima)
 
-Decisões de escopo (autor, 2026-11-20)
+As decisões abaixo continuam valendo no que não contradiz o escopo atual
+(correções só de medição, patches pelo assistente, local, push antes da Fase 1).
 
 - **Traduções:** todas, nos dois sentidos (12 a partir de C++, mais LuaJIT
   sobre a tradução para Lua, e 11 para C++).
