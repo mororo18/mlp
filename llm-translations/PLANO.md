@@ -1,0 +1,161 @@
+# Plano: nova análise de fatores das traduções por LLM
+
+Registrado em 2026-11-20. Este arquivo é o plano e também o diário do
+experimento: todo problema que aparecer entra na seção "Problemas e soluções",
+com a solução adotada.
+
+## Objetivo
+
+Refazer a análise de fatores das traduções por LLM (Seção 7 do artigo) contra
+as implementações atuais do `mlp-main`, nas traduções dos dois sentidos, e
+reconstruir com ela as tabelas de gaps (hoje Tabelas 8 a 12) e o texto das
+Seções 7.5 e 7.6. A análise antiga foi feita sobre versões anteriores das
+nossas implementações, em outra máquina, sem dados brutos nem scripts
+(`doc/artigo-linguagens/claude/PROBLEMAS_METODOLOGICOS_TRADUCOES.md`, itens 4,
+11, 12, 13, 24 e 26).
+
+## Decisões de escopo (autor, 2026-11-20)
+
+- **Traduções:** todas, nos dois sentidos (12 a partir de C++, mais LuaJIT
+  sobre a tradução para Lua, e 11 para C++).
+- **Gap de base:** a Figura 7 do artigo **não** é medida de novo. O gap de cada
+  tradução é medido dentro deste experimento, nas mesmas instâncias das
+  variantes.
+- **Instâncias das variantes:** berlin52, kroA100, gr202 e lin318 (uma por
+  faixa de tamanho), 10 execuções. Lua e Python interpretados: berlin52 e
+  st70.
+- **Correções nas traduções:** só de medição (relógio de parede em volta da
+  busca, impressão fora do trecho medido), cada uma como patch e declarada no
+  texto. O código da busca não muda.
+- **Sentido das variantes:** a mudança inversa (a nossa escolha na tradução)
+  para todos os fatores. A direta (a escolha da tradução no nosso código) só
+  onde ela confirma um fator ou mede um defeito nosso (por exemplo, o
+  `unsigned` do nosso C++).
+- **Traduções para C++ feitas de fontes antigas** (Fortran, Go, Java,
+  JavaScript, Swift, Julia, e C# antes do `GCHandle`): medidas como estão,
+  contra o nosso C++ atual. O texto diz que partiram de versões anteriores.
+  Retraduzir com a LLM fica fora deste experimento.
+- **Patches:** escritos pelo assistente. O autor revisa a lista de fatores da
+  Fase 2 antes das rodadas.
+- **Local:** esta pasta, no `mlp-main`, que é o repositório público citado pelo
+  artigo. O repositório do artigo recebe só as tabelas geradas
+  (`results/factor_analysis/`), citando o commit deste repositório.
+- **Push do `mlp-main`:** antes da Fase 1, para a rodada citar um commit
+  público (hoje `852fe0c`, local).
+
+## Estrutura desta pasta
+
+```
+llm-translations/
+  PLANO.md               este arquivo (plano e diário)
+  README.md              protocolo, versões e como reproduzir (na Fase 5)
+  translations/<par>/    fontes como a LLM entregou (sem binários), RESULTS.md, CLAUDE.md
+  prompt.txt             prompt inicial das traduções
+  harness/               bench.py e core.py (cópia, com a origem registrada) + catalog.py
+  variants/
+    manifest.csv         uma linha por variante: id, base, patches, nota
+    <par>/measure.patch  só medição
+    <par>/<fator>.patch  mudança inversa (a nossa escolha na tradução)
+    ours/<ling>/<fator>.patch   mudança direta (a escolha da tradução no nosso código)
+  make_variants.py       monta cada variante (base + patches) e o catálogo do bench.py
+  run.sh                 comando exato no servidor + log de carga + versões
+  instances.txt
+  runs/<data>/           CSVs brutos, log de carga, versões dos compiladores
+  analyze.py             tabelas de gaps (CSV e LaTeX) a partir dos CSVs brutos
+```
+
+## Decisões técnicas fixadas
+
+1. **Base das nossas implementações:** as pastas de linguagem deste
+   repositório, no commit da rodada, sem cópia. O `run.sh` grava o hash e se
+   recusa a rodar com mudanças não commitadas nessas pastas.
+2. **Base das traduções:** copiadas uma vez para `translations/`, como
+   entregues (de `claude_new/claude/`). A tradução de base do experimento é a
+   entregue mais o `measure.patch`.
+3. **Variante = base + lista ordenada de patches**, nunca cópia editada à mão.
+   Cada patch faz uma única mudança e é gerado com `diff -u` a partir de uma
+   cópia editada. Variantes combinadas são várias linhas de patch no
+   manifesto, sem arquivo de patch próprio.
+4. **Build e execução:** cada variante herda a configuração da sua base, com as
+   flags do nosso `build.sh`, reaproveitando o catálogo do harness antigo
+   (`benchmark_claude_3instancias.py`: `REFERENCIAS`, `PROJETOS`,
+   `TOOLCHAINS`). Nenhuma variante tem script de build próprio.
+5. **Medição:** todo programa imprime `wall clock (s):` em volta da busca, e o
+   `bench.py` grava esse valor (ele usa o `wall clock` quando existe).
+6. **Correção:** toda execução tem de reproduzir o custo esperado da instância;
+   o `analyze.py` falha se alguma não reproduzir.
+7. **Rodadas:** um `bench.py -t` por lote, com todas as variantes do lote
+   intercaladas por instância (o `bench.py` põe as instâncias no laço de fora),
+   `-n 10 -j 4`, `taskset -c 8,9,10,11` (duas execuções por socket, núcleos
+   físicos distintos), Julia 1.12.6 e as demais toolchains do servidor. Log de
+   carga a cada minuto, como nas rodadas do Julia.
+   - Lote 1: compiladas e JIT, nas quatro instâncias.
+   - Lote 2: Lua e Python interpretados, em berlin52 e st70.
+8. **Análise:** os CSVs brutos nunca são editados. Gap = 100 x (média, nas
+   instâncias, da razão variante / nossa implementação - 1), como nas tabelas
+   atuais; o script também dá o intervalo por instância.
+9. **Nomes:** `<par>.base`, `<par>.<fator>` (inversa) e `ours_<ling>.base`,
+   `ours_<ling>.<fator>` (direta). `<par>` é o nome da pasta da tradução
+   (`cpp_rust`, `julia_cpp`, ...).
+
+## Fases
+
+### Fase 0. Protocolo
+- [ ] Push do `mlp-main` e registro do commit da rodada.
+- [ ] Copiar as traduções (só fontes) para `translations/`, com `RESULTS.md`,
+      `CLAUDE.md` e `prompt.txt`.
+- [ ] Copiar `bench.py` e `core.py` do servidor para `harness/`, registrando a
+      origem (`script.zip` do coautor, sem alterações).
+- [ ] Conferir em cada uma das 24 traduções: relógio usado, o que fica dentro
+      do trecho medido, impressão de `wall clock (s):`. Escrever os
+      `measure.patch` necessários (o do C++ → Julia já existe:
+      `doc/artigo-linguagens/results/julia/cpp_julia-2026-11-20/main.jl.patch`).
+- [ ] Conferir que as nossas implementações imprimem `wall clock (s):` só em
+      volta da busca.
+- [ ] `catalog.py` e `make_variants.py`; teste local de montagem e build de
+      todas as bases.
+
+### Fase 1. Gap de base
+- [ ] Rodar `<par>.base` e as nossas implementações nas instâncias do lote
+      (lotes 1 e 2), no servidor.
+- [ ] Gap de cada tradução; lista dos gaps que ainda existem.
+
+### Fase 2. Mapa das diferenças
+- [ ] Para cada par, listar as diferenças de projeto entre a tradução e a
+      nossa implementação atual (atualiza a Tabela 7 e o mapa do apêndice). As
+      seis linguagens que mudaram precisam ser feitas do zero.
+- [ ] Lista de fatores a testar: Tabela 7, candidatos dos relatórios antigos
+      (`doc/tcc/relatorios-ia/`) e o que aparecer de novo. **Revisão do
+      autor antes da Fase 3.**
+
+### Fase 3. Variantes
+- [ ] Um patch por fator; manifesto; montagem e build de todas as variantes;
+      conferência do custo em uma instância pequena antes de subir para o
+      servidor.
+
+### Fase 4. Rodadas
+- [ ] Lotes 1 e 2 no servidor. Estimativa: umas 60 variantes compiladas ou
+      JIT, de 6 a 8 horas; Lua e Python interpretados, umas 2 horas.
+
+### Fase 5. Análise e texto
+- [ ] `analyze.py`, tabelas em `results/factor_analysis/<data>/` do artigo,
+      texto da 7.5 e da 7.6, `README.md` desta pasta.
+
+## Restrições
+
+- Servidor q-dual (`ssh q-dual`, via `jump`, com fail2ban): logins únicos e
+  cuidadosos. CPUs 0 a 6 e 40 a 46 ocupados por outro usuário.
+- Não alterar o código das nossas implementações neste experimento (só esta
+  pasta). Commits com assunto `<escopo>: <resumo>`, sem corpo, sem push sem
+  pedido do autor.
+- Os testes rodam no servidor, não na máquina local (que só monta e confere).
+
+## Problemas e soluções
+
+Registro de cada problema encontrado no caminho e da solução adotada.
+
+1. **`bench.py` fora do repositório (2026-11-20).** O `bench.py` e o `core.py`
+   usados nas rodadas do Julia estão só no servidor (`~/mlp-test/mlp/benchmarks/`,
+   sem histórico no git); vieram do `script.zip` de um coautor. **Solução
+   planejada:** copiar os dois para `harness/` sem alteração, registrar a
+   origem e o sha256 no `README.md`.
