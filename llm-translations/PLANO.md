@@ -14,7 +14,36 @@ nossas implementações, em outra máquina, sem dados brutos nem scripts
 (`doc/artigo-linguagens/claude/PROBLEMAS_METODOLOGICOS_TRADUCOES.md`, itens 4,
 11, 12, 13, 24 e 26).
 
-## Decisões de escopo (autor, 2026-11-20)
+## Escopo atual (autor, 2026-11-20, substitui o escopo inicial abaixo)
+
+A análise fica restrita aos casos em que a análise antiga não serve. Um par
+entra se (1) a tradução ganha da nossa implementação na Figura 7, (2) a nossa
+implementação mudou depois da análise antiga, ou (3) a análise antiga contradiz
+a Figura 7 (sinal oposto, ou gap grande que ela não explica).
+
+- **Variantes completas (Fases 2 a 4):** C++ → Java, Julia, Swift, Go e
+  Fortran (critério 1; tempos relativos de 0,93 a 0,99), C++ → JavaScript
+  (critério 2; a análise antiga foi feita sobre o nosso JavaScript anterior e
+  não entra nas tabelas) e Rust → C++ (critério 3; 1,104 na Figura 7 contra
+  0,93 na análise antiga).
+- **Só gap de base (Fase 1):** C# → C++ (1,132 contra 1,00 a 1,02), Swift →
+  C++ (1,147 contra 1,02 a 1,03), Fortran → C++ (1,30 contra 1,13 a 1,17) e
+  Go → C++ (1,23 contra 1,11 a 1,15). Se o gap medido no mesmo experimento
+  bater com a explicação antiga, a diferença era da máquina e da medição e
+  eles não precisam de variantes. Se não bater, entram nas Fases 2 a 4.
+- **Fora:** os outros pares, cuja análise antiga continua coerente com a
+  Figura 7.
+- **Sentido das variantes:** para os pares em que a tradução ganha, o sentido
+  principal é o direto (a escolha da tradução no nosso código), e o inverso
+  confirma. Nos outros, como antes.
+- **Instâncias:** as mesmas quatro (berlin52, kroA100, gr202, lin318), 10
+  execuções; não há linguagem interpretada no escopo atual.
+- **ETA:** cerca de 12 a 16 h de trabalho e 4,5 a 5 h de servidor, em 2 a 3
+  sessões.
+
+## Escopo inicial (2026-11-20, substituído acima)
+
+Decisões de escopo (autor, 2026-11-20)
 
 - **Traduções:** todas, nos dois sentidos (12 a partir de C++, mais LuaJIT
   sobre a tradução para Lua, e 11 para C++).
