@@ -1,0 +1,37 @@
+diff -ruN a/go_src/main.go b/go_src/main.go
+--- a/go_src/main.go	2026-11-20 19:25:39.454642820 -0300
++++ b/go_src/main.go	2026-11-20 19:25:39.454826399 -0300
+@@ -435,7 +435,7 @@
+ 	return s
+ }
+ 
+-func GILS_RVND(Imax, Iils int, data *tData, verbose bool) {
++func GILS_RVND(Imax, Iils int, data *tData, verbose bool) float64 {
+ 
+ 	solut_partial := Solution_init(*data)
+ 	solut_crnt := Solution_init(*data)
+@@ -489,7 +489,7 @@
+ 		}
+ 
+ 	}
+-	fmt.Printf("COST: %.2f\n", solut_best.cost)
++	return solut_best.cost
+ }
+ 
+ // fmtDouble reproduces the default formatting of std::ostream for doubles
+@@ -549,12 +549,12 @@
+ 
+ 	t1 := time.Now()
+ 	start := cpuTime()
+-	GILS_RVND(Imax, Iils, &data, verbose)
++	cost_best := GILS_RVND(Imax, Iils, &data, verbose)
+ 	cpu_time := cpuTime() - start
+ 	t2 := time.Now()
+-	duration := t2.Sub(t1).Milliseconds()
++	fmt.Printf("COST: %.2f\n", cost_best)
+ 
+-	res := float64(duration) / 10e2
++	res := t2.Sub(t1).Seconds()
+ 	fmt.Println("TIME: " + fmtDouble(cpu_time))
+ 	fmt.Println("wall clock (s): " + fmtDouble(res))
+ 

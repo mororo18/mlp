@@ -1,0 +1,37 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-20 19:25:39.457216554 -0300
++++ b/main.cpp	2026-11-20 19:25:39.457486033 -0300
+@@ -695,7 +695,7 @@
+     return s;
+ }
+ 
+-static void GILS_RVND(int Imax, int Iils, const std::array<double, 26> &R, tData data, bool verbose) {
++static tSolution GILS_RVND(int Imax, int Iils, const std::array<double, 26> &R, tData data, bool verbose) {
+ 
+     tSolution solut_crnt = NewSolution(data);
+     tSolution solut_partial = NewSolution(data);
+@@ -744,8 +744,7 @@
+         }
+     }
+ 
+-    std::cout << "COST: " << " " << fmt_float(solut_best.cost) << std::endl;
+-    std::cout << "SOLUTION: " << " " << fmt_slice(solut_best.s) << std::endl;
++    return solut_best;
+ }
+ 
+ int main(int argc, char **argv) {
+@@ -778,11 +777,13 @@
+     double cpuStart = cputime();
+     auto start = std::chrono::steady_clock::now();
+ 
+-    GILS_RVND(Imax, Iils, R, data, verbose);
++    tSolution solut_best = GILS_RVND(Imax, Iils, R, data, verbose);
+ 
+     double cpuElapsed = cputime() - cpuStart;
+     auto t = std::chrono::steady_clock::now();
+     double elapsed = std::chrono::duration<double>(t - start).count();
++    std::cout << "COST: " << " " << fmt_float(solut_best.cost) << std::endl;
++    std::cout << "SOLUTION: " << " " << fmt_slice(solut_best.s) << std::endl;
+     std::cout << "TIME: " << fmt_float(cpuElapsed) << std::endl;
+     std::cout << "wall clock (s): " << fmt_float(elapsed) << std::endl;
+ 

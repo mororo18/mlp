@@ -1,0 +1,24 @@
+diff -ruN a/main.jl b/main.jl
+--- a/main.jl	2026-11-20 19:25:39.456259478 -0300
++++ b/main.jl	2026-11-20 19:25:39.456394867 -0300
+@@ -448,8 +448,7 @@
+ 
+     end
+ 
+-    @printf("COST: %.2f\n", solut_best.cost)
+-    return nothing
++    return solut_best.cost
+ end
+ 
+ function main(args::Vector{String})
+@@ -471,8 +470,9 @@
+     Iils = data.dimen < 100 ? data.dimen : 100
+ 
+     t1 = time_ns()
+-    GILS_RVND(Imax, Iils, data, verbose)
++    cost_best = GILS_RVND(Imax, Iils, data, verbose)
+     t2 = time_ns()
++    @printf("COST: %.2f\n", cost_best)
+ 
+     elapsed = (t2 - t1) / 1e9
+     @printf("TIME: %g\n", elapsed)

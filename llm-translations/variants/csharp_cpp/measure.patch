@@ -1,0 +1,63 @@
+diff -ruN a/GILS_RVND.cpp b/GILS_RVND.cpp
+--- a/GILS_RVND.cpp	2026-11-20 19:25:39.458126897 -0300
++++ b/GILS_RVND.cpp	2026-11-20 19:25:39.458307731 -0300
+@@ -365,7 +365,7 @@
+         return s;
+     }
+ 
+-    void GILS_RVND::solve(bool verbose) {
++    tSolution GILS_RVND::solve(bool verbose) {
+         tSolution solut_best(data.GetDimen(), std::numeric_limits<double>::max());
+         tSolution solut_crnt(data.GetDimen(), 0.0);
+         tSolution solut_partial(data.GetDimen(), 0.0);
+@@ -415,15 +415,7 @@
+             }
+         }
+ 
+-        std::cout << "SOLUTION: (";
+-        const std::vector<int> & best = solut_best.GetSolut();
+-        for (size_t k = 0; k < best.size(); k++) {
+-            if (k != 0)
+-                std::cout << ", ";
+-            std::cout << best[k];
+-        }
+-        std::cout << ")." << std::endl;
+-        std::cout << "COST: " << DblToStr(solut_best.GetCost()) << std::endl;
++        return solut_best;
+     }
+ 
+ }
+diff -ruN a/GILS_RVND.hpp b/GILS_RVND.hpp
+--- a/GILS_RVND.hpp	2026-11-20 19:25:39.457771279 -0300
++++ b/GILS_RVND.hpp	2026-11-20 19:25:39.457864541 -0300
+@@ -43,7 +43,7 @@
+     public:
+         GILS_RVND();
+ 
+-        void solve(bool verbose);
++        tSolution solve(bool verbose);
+     };
+ 
+ }
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-20 19:25:39.458539925 -0300
++++ b/main.cpp	2026-11-20 19:25:39.458656555 -0300
+@@ -25,8 +25,17 @@
+     std::clock_t cpuStart = std::clock();
+ 
+     auto start = std::chrono::system_clock::now();
+-    tsp.solve(verbose);
++    tSolution solut_best = tsp.solve(verbose);
+     auto end = std::chrono::system_clock::now();
++    std::cout << "SOLUTION: (";
++    const std::vector<int> & best = solut_best.GetSolut();
++    for (size_t k = 0; k < best.size(); k++) {
++        if (k != 0)
++            std::cout << ", ";
++        std::cout << best[k];
++    }
++    std::cout << ")." << std::endl;
++    std::cout << "COST: " << DblToStr(solut_best.GetCost()) << std::endl;
+ 
+     double cpuTime = (double)(std::clock() - cpuStart) / CLOCKS_PER_SEC;
+ 

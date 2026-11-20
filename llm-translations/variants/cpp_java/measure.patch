@@ -1,0 +1,37 @@
+diff -ruN a/Main.java b/Main.java
+--- a/Main.java	2026-11-20 19:25:39.453523444 -0300
++++ b/Main.java	2026-11-20 19:25:39.453810335 -0300
+@@ -434,7 +434,7 @@
+     }
+ 
+ 
+-    static void GILS_RVND(int Imax, int Iils, tData data, boolean verbose) {
++    static double GILS_RVND(int Imax, int Iils, tData data, boolean verbose) {
+ 
+         tSolution solut_partial = Solution_init(data);
+         tSolution solut_crnt = Solution_init(data);
+@@ -488,7 +488,7 @@
+             }
+ 
+         }
+-        System.out.printf(Locale.ROOT, "COST: %.2f%n", solut_best.cost);
++        return solut_best.cost;
+     }
+ 
+     // mimics the default formatting of std::cout for doubles (6 significant digits)
+@@ -539,12 +539,12 @@
+         long t1 = System.nanoTime();
+         ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+         long start = bean.getCurrentThreadCpuTime();
+-        GILS_RVND(Imax, Iils, data, verbose);
++        double cost_best = GILS_RVND(Imax, Iils, data, verbose);
+         double cpu_time = (double) (bean.getCurrentThreadCpuTime() - start) / 1e9;
+         long t2 = System.nanoTime();
+-        long duration = (t2 - t1) / 1_000_000L;
++        System.out.printf(Locale.ROOT, "COST: %.2f%n", cost_best);
+ 
+-        double res = (double) duration / 10e2;
++        double res = (double) (t2 - t1) / 1e9;
+         System.out.println("TIME: " + fmt(cpu_time));
+         System.out.println("wall clock (s): " + fmt(res));
+ 

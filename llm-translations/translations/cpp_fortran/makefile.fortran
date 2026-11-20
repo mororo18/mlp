@@ -1,0 +1,43 @@
+#detecta se o sistema é de 32 ou 64 bits
+BITS_OPTION = -m64
+
+#### define o compilador
+FC = gfortran
+#############################
+
+#### opcoes de compilacao
+FCOPT = $(BITS_OPTION) -Ofast -fPIC -DNDEBUG -Jobj_f
+#############################
+
+#### diretorio com os objs files
+OBJDIR = obj_f
+#############################
+
+#### lista de todos os srcs e todos os objs (main por ultimo: depende dos modulos)
+SRCS = data_mod.f90 read_data.f90 main.f90
+OBJS = $(patsubst %.f90, $(OBJDIR)/%.o, $(SRCS))
+#############################
+
+#### regra principal, gera o executavel
+solve_f: $(OBJS)
+	@echo  "\033[31m \nLinking all objects files: \033[0m"
+	$(FC) $(BITS_OPTION) $(OBJS) -o $@ $(FCOPT) -g
+############################
+
+#dependencias de modulos
+$(OBJDIR)/main.o: $(OBJDIR)/data_mod.o
+
+#regra para cada arquivo objeto
+$(OBJDIR)/%.o: %.f90 | $(OBJDIR)
+	@echo  "\033[31m \nCompiling $<: \033[0m"
+	$(FC) $(FCOPT) -c $< -o $@ -g
+
+$(OBJDIR):
+	@mkdir -p $(OBJDIR)
+
+#delete objetos e arquivos de modulo
+clean:
+	@echo "\033[31mcleaning obj directory \033[0m"
+	@rm -f solve_f $(OBJDIR)/*.o $(OBJDIR)/*.mod
+
+rebuild: clean solve_f

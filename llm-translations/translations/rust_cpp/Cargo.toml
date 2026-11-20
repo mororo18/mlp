@@ -1,0 +1,18 @@
+[package]
+name = "gils_rvnd"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+debug = 1
+panic = "abort" 
+#lto = "fat"
+
+[dependencies]
+rand = "0.8.0"
+cpu-time = "1.0.0"
+
+[features]
+flat = []

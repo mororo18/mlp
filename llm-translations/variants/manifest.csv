@@ -1,0 +1,12 @@
+id,base,patches,note
+cpp_java.base,cpp_java,cpp_java/measure.patch,translation as delivered + measurement fix
+cpp_julia.base,cpp_julia,cpp_julia/measure.patch,translation as delivered + measurement fix
+cpp_swift.base,cpp_swift,cpp_swift/measure.patch,translation as delivered + measurement fix
+cpp_go.base,cpp_go,cpp_go/measure.patch,translation as delivered + measurement fix
+cpp_fortran.base,cpp_fortran,cpp_fortran/measure.patch,translation as delivered + measurement fix
+cpp_javascript.base,cpp_javascript,cpp_javascript/measure.patch,translation as delivered + measurement fix
+rust_cpp.base,rust_cpp,rust_cpp/measure.patch,translation as delivered + measurement fix
+csharp_cpp.base,csharp_cpp,csharp_cpp/measure.patch,translation as delivered + measurement fix
+swift_cpp.base,swift_cpp,swift_cpp/measure.patch,translation as delivered + measurement fix
+fortran_cpp.base,fortran_cpp,,translation as delivered (no measurement fix needed)
+go_cpp.base,go_cpp,go_cpp/measure.patch,translation as delivered + measurement fix

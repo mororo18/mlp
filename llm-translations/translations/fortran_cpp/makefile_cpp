@@ -1,0 +1,26 @@
+COMP = g++
+BIN_NAME = solve_cpp
+
+PREPROC = -DDOUBLE
+COPT = $(W) -g -Ofast
+W = -Winline
+
+SRCS = main.cpp
+HDRS = preproc.hpp types.hpp data.hpp assert.hpp
+
+$(BIN_NAME): $(SRCS) $(HDRS)
+	@echo  "\033[31m \nCompiling $(SRCS): \033[0m"
+	$(COMP) $(PREPROC) $(COPT) $(SRCS) -o $(BIN_NAME)
+
+debug: PREPROC += -DDEBUG
+debug: COPT += -fsanitize=undefined
+debug: $(BIN_NAME)
+
+clean:
+	@echo "\033[31mcleaning \033[0m"
+	@rm -f $(BIN_NAME)
+
+rebuild: clean $(BIN_NAME)
+
+run: $(BIN_NAME)
+	@./$(BIN_NAME)

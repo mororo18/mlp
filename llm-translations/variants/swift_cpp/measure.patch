@@ -1,0 +1,32 @@
+diff -ruN a/src/main.cpp b/src/main.cpp
+--- a/src/main.cpp	2026-11-20 19:25:39.458915900 -0300
++++ b/src/main.cpp	2026-11-20 19:25:39.459011483 -0300
+@@ -1,6 +1,7 @@
+ #include <chrono>
+ #include <cstdio>
+ #include <iostream>
++#include <sstream>
+ 
+ #include "Data.hpp"
+ #include "ILS.hpp"
+@@ -10,15 +11,20 @@
+ 
+ 	int iIls = data.dimension < 100 ? data.dimension : 100;
+ 
++	std::ostringstream captured;
++	std::streambuf *saved = std::cout.rdbuf(captured.rdbuf());
+ 	auto start = std::chrono::steady_clock::now();
+ 	gils_rvnd(10, iIls, data);
+ 	auto end = std::chrono::steady_clock::now();
++	std::cout.rdbuf(saved);
++	std::cout << captured.str();
+ 
+ 	double timeInSeconds = std::chrono::duration<double>(end - start).count();
+ 
+ 	char buf[64];
+ 	std::snprintf(buf, sizeof(buf), "%.6f", timeInSeconds);
+ 	std::cout << "TIME: " << buf << "\n";
++	std::cout << "wall clock (s): " << buf << "\n";
+ 
+ 	return 0;
+ }

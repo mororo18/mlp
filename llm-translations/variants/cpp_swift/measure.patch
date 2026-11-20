@@ -1,0 +1,37 @@
+diff -ruN a/main.swift b/main.swift
+--- a/main.swift	2026-11-20 19:25:39.454131365 -0300
++++ b/main.swift	2026-11-20 19:25:39.454324256 -0300
+@@ -389,7 +389,7 @@
+     return s
+ }
+ 
+-func gilsRvnd(_ Imax: Int, _ Iils: Int, _ data: inout TData, _ verbose: Bool) {
++func gilsRvnd(_ Imax: Int, _ Iils: Int, _ data: inout TData, _ verbose: Bool) -> Double {
+     var solutPartial = solutionInit(data)
+     var solutCrnt = solutionInit(data)
+     var solutBest = solutionInit(data)
+@@ -441,7 +441,7 @@
+             print(out)
+         }
+     }
+-    print(String(format: "COST: %.2lf", solutBest.cost))
++    return solutBest.cost
+ }
+ 
+ // MARK: - Entry point
+@@ -477,12 +477,12 @@
+ 
+ let t1 = DispatchTime.now()
+ let start = clock()
+-gilsRvnd(Imax, Iils, &data, verbose)
++let costBest = gilsRvnd(Imax, Iils, &data, verbose)
+ let cpuTime = Double(clock() - start) / Double(CLOCKS_PER_SEC)
+ let t2 = DispatchTime.now()
+-let duration = (t2.uptimeNanoseconds - t1.uptimeNanoseconds) / 1_000_000
++print(String(format: "COST: %.2lf", costBest))
+ 
+-let res = Double(duration) / 10e2
++let res = Double(t2.uptimeNanoseconds - t1.uptimeNanoseconds) / 1e9
+ print("TIME: \(cpuTime)")
+ print("wall clock (s): \(res)")
+ 

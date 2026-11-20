@@ -1,0 +1,52 @@
+diff -ruN a/cpp/main.cpp b/cpp/main.cpp
+--- a/cpp/main.cpp	2026-11-20 19:25:39.456720243 -0300
++++ b/cpp/main.cpp	2026-11-20 19:25:39.456952325 -0300
+@@ -5,6 +5,7 @@
+ #include <charconv>
+ #include <cstddef>
+ #include <cstdio>
++#include <chrono>
+ #include <ctime>
+ #include <limits>
+ #include <string>
+@@ -418,7 +419,7 @@
+     return s;
+ }
+ 
+-static void gils_rvnd(std::size_t imax, std::size_t iils, const double r[26],
++static Solution gils_rvnd(std::size_t imax, std::size_t iils, const double r[26],
+                       Data &info, bool verbose) {
+     Solution solut_best{SubseqMatrix(info.dimen),
+                         std::vector<std::size_t>(info.dimen, 0), F64_MAX};
+@@ -478,8 +479,7 @@
+         }
+     }
+ 
+-    std::printf("%s\n", fmt_vec(solut_best.s).c_str());
+-    std::printf("COST: %s\n", fmt_f64(solut_best.cost).c_str());
++    return solut_best;
+ }
+ 
+ int main(int argc, char **argv) {
+@@ -508,15 +508,20 @@
+ 
+     timespec start;
+     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
++    const auto wall_start = std::chrono::steady_clock::now();
+ 
+-    gils_rvnd(imax, iils, r, info, verbose);
++    Solution solut_best = gils_rvnd(imax, iils, r, info, verbose);
+ 
++    const auto wall_end = std::chrono::steady_clock::now();
+     timespec end;
+     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
++    std::printf("%s\n", fmt_vec(solut_best.s).c_str());
++    std::printf("COST: %s\n", fmt_f64(solut_best.cost).c_str());
+     const double cpu_time = static_cast<double>(end.tv_sec - start.tv_sec) +
+                             static_cast<double>(end.tv_nsec - start.tv_nsec) /
+                                 1e9;
+     std::printf("TIME: %s\n", fmt_f64_debug(cpu_time).c_str());
++    std::printf("wall clock (s): %.9f\n", std::chrono::duration<double>(wall_end - wall_start).count());
+ 
+     return 0;
+ }

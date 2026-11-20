@@ -1,0 +1,1 @@
+I need you to translate this Minimum Latency Problem solver implementation in [base] to the [final] language. Keep everything as it is but adapt everything to the new language. Keep the way the input is grabbed the same as well. You can make everything in one file or split in multiples.

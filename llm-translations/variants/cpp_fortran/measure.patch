@@ -1,0 +1,53 @@
+diff -ruN a/main.f90 b/main.f90
+--- a/main.f90	2026-11-20 19:25:39.455093072 -0300
++++ b/main.f90	2026-11-20 19:25:39.455537845 -0300
+@@ -546,10 +546,11 @@
+ 
+     end function perturb
+ 
+-    subroutine GILS_RVND(Imax, Iils, data, verbose)
++    subroutine GILS_RVND(Imax, Iils, data, verbose, cost_best_out)
+         integer, intent(in) :: Imax, Iils
+         type(tData), intent(inout) :: data
+         logical, intent(in) :: verbose
++        real(dp), intent(out) :: cost_best_out
+ 
+         type(tSolution) :: solut_partial, solut_crnt, solut_best
+         integer :: i, aux, iterILS
+@@ -611,7 +612,7 @@
+ 
+         end do
+ 
+-        write(*, '(A,F0.2)') 'COST: ', solut_best%cost
++        cost_best_out = solut_best%cost
+     end subroutine GILS_RVND
+ 
+     ! Formatacao equivalente ao operator<< padrao de C++ para double
+@@ -689,7 +690,7 @@
+     integer, allocatable :: rnd(:)
+     integer :: rnd_count
+ 
+-    real(dp) :: t_start, t_end, cpu_time_used, res
++    real(dp) :: t_start, t_end, cpu_time_used, res, cost_best
+     integer(8) :: c1, c2, crate
+     integer(8) :: duration
+ 
+@@ -718,14 +719,15 @@
+ 
+     call system_clock(c1, crate)
+     call cpu_time(t_start)
+-    call GILS_RVND(Imax, Iils, data, verbose)
++    call GILS_RVND(Imax, Iils, data, verbose, cost_best)
+     call cpu_time(t_end)
+     call system_clock(c2)
++    write(*, '(A,F0.2)') 'COST: ', cost_best
+ 
+     cpu_time_used = t_end - t_start
+-    duration = (c2 - c1) * 1000_8 / crate
++    duration = c2 - c1
+ 
+-    res = real(duration, dp) / 10e2_dp
++    res = real(duration, dp) / real(crate, dp)
+ 
+     write(*, '(A,A)') 'TIME: ', dbl_str(cpu_time_used)
+     write(*, '(A,A)') 'wall clock (s): ', dbl_str(res)

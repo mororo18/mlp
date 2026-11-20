@@ -131,16 +131,16 @@ llm-translations/
 ## Fases
 
 ### Fase 0. Protocolo
-- [ ] Push do `mlp-main` e registro do commit da rodada.
-- [ ] Copiar as traduções (só fontes) para `translations/`, com `RESULTS.md`,
+- [x] Push do `mlp-main` e registro do commit da rodada (`c205463`).
+- [x] Copiar as traduções (só fontes) para `translations/`, com `RESULTS.md`,
       `CLAUDE.md` e `prompt.txt`.
-- [ ] Copiar `bench.py` e `core.py` do servidor para `harness/`, registrando a
+- [x] Copiar `bench.py` e `core.py` do servidor para `harness/`, registrando a
       origem (`script.zip` do coautor, sem alterações).
-- [ ] Conferir em cada uma das 24 traduções: relógio usado, o que fica dentro
+- [x] Conferir em cada uma das traduções do escopo (11): relógio usado, o que fica dentro
       do trecho medido, impressão de `wall clock (s):`. Escrever os
       `measure.patch` necessários (o do C++ → Julia já existe:
       `doc/artigo-linguagens/results/julia/cpp_julia-2026-11-20/main.jl.patch`).
-- [ ] Conferir que as nossas implementações imprimem `wall clock (s):` só em
+- [x] Conferir que as nossas implementações imprimem `wall clock (s):` só em
       volta da busca.
 - [ ] `catalog.py` e `make_variants.py`; teste local de montagem e build de
       todas as bases.
@@ -186,6 +186,48 @@ Registro de cada problema encontrado no caminho e da solução adotada.
 
 1. **`bench.py` fora do repositório (2026-11-20).** O `bench.py` e o `core.py`
    usados nas rodadas do Julia estão só no servidor (`~/mlp-test/mlp/benchmarks/`,
-   sem histórico no git); vieram do `script.zip` de um coautor. **Solução
-   planejada:** copiar os dois para `harness/` sem alteração, registrar a
-   origem e o sha256 no `README.md`.
+   sem histórico no git); vieram do `script.zip` de um coautor. **Solução:**
+   copiados sem alteração para `harness/` (sha256 `5a6447eb…e468` do
+   `bench.py`, `a5ae0445…ac15` do `core.py`). O `core.py` deduz a raiz do
+   repositório pela posição do arquivo, então o `run.sh` copia os dois para
+   `<repo>/benchmarks/` (pasta não versionada) antes de rodar. O catálogo do
+   harness antigo foi copiado sem alteração para `harness/catalog_base.py`
+   (sha256 `2ce5e558…7001`, de
+   `doc/artigo-linguagens/results/translations/claude/benchmark_claude_3instancias.py`).
+2. **Servidor sem as toolchains (2026-11-20).** A conta no q-dual só tem
+   `g++` 11.4, Java 11 sem `javac` e o Julia de `~/opt`; faltam `gfortran`,
+   `go`, `javac`, `node`, `swift`, `cargo`, e não há Nix. O podman (3.4.4,
+   sem root) funciona. **Solução:** rodar tudo num container
+   `docker.io/nixos/nix` (digest `sha256:7462805…d5470`) com
+   `nix develop` do `flake.nix`/`flake.lock` deste repositório, que declara
+   todas as toolchains (as mesmas que o repositório usa); o `/nix` fica num
+   volume (`fa-nix`) para não baixar tudo de novo. O `taskset -c 8,9,10,11` é
+   aplicado ao `podman run`, e o `bench.py` herda essa afinidade (ele fixa
+   cada execução num dos núcleos permitidos). O log de carga roda fora do
+   container. Versões registradas em `runs/<data>/versions.txt`.
+3. **Impressões e relógios das traduções (2026-11-20).** Nove das onze
+   traduções imprimem o custo (e, em algumas, a solução) dentro da função
+   cronometrada; o `swift_cpp` imprime também o progresso em toda iteração de
+   `Imax`; o `rust_cpp` só mede tempo de CPU; o `swift_cpp` só imprime `TIME:`;
+   as traduções para Java, Swift, Go, Fortran e JavaScript medem o tempo de
+   relógio em milissegundos inteiros. **Solução:** um `measure.patch` por
+   tradução (dez ao todo; o `fortran_cpp` não precisa): a função da busca
+   passa a devolver a melhor solução (ou o custo), e o `main` imprime depois
+   de parar o relógio; o tempo de relógio passa a ser calculado em
+   nanossegundos; o `rust_cpp` ganha um `steady_clock` e a linha
+   `wall clock (s):`. No `swift_cpp`, a saída da busca é capturada em
+   memória durante a busca e impressa depois (a formatação dessas linhas, de
+   microssegundos, fica dentro do tempo). Nada no código da busca muda. As
+   onze bases compilaram e reproduziram o custo do berlin52 (143721) na
+   máquina local.
+4. **Go sem `go.mod` (2026-11-20).** A tradução para Go (`cpp_go/go_src`) não
+   é um módulo, e o `go build` atual recusa o pacote. **Solução:** o catálogo
+   gerado pelo `make_variants.py` define `GO111MODULE=off` no ambiente de
+   build.
+5. **Resolução de milissegundos em três implementações nossas (2026-11-20).**
+   O nosso C++ (`duration_cast<milliseconds>`), o nosso JavaScript (`Date`) e
+   o nosso Fortran (`system_clock` com a taxa padrão) medem o tempo de relógio
+   em milissegundos. Este experimento não altera o código das nossas
+   implementações. **Solução:** aceito e registrado; o efeito é de no máximo
+   0,5 ms por execução, perto de 1% só no berlin52 do C++ (cerca de 65 ms);
+   a análise dá também o gap sem o berlin52 para conferir.
