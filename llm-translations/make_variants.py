@@ -40,6 +40,11 @@ def carregar_ambiente():
 PROJETOS = {{
 {entries}
 }}
+
+for _p in PROJETOS.values():
+    _v = _p["traduzida"]
+    if _v["build"] and _v["build"][0] == "cpp" and _v["run"][0].startswith("./"):
+        _v["build"][1]["bin"] = _v["run"][0][2:]
 '''
 
 

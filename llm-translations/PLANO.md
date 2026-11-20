@@ -231,3 +231,17 @@ Registro de cada problema encontrado no caminho e da solução adotada.
    implementações. **Solução:** aceito e registrado; o efeito é de no máximo
    0,5 ms por execução, perto de 1% só no berlin52 do C++ (cerca de 65 ms);
    a análise dá também o gap sem o berlin52 para conferir.
+6. **Teste de build parou sem mensagem (2026-11-20).** No primeiro teste de
+   todas as bases, o `run.sh` parou dentro do container ao gravar as
+   versões: o `swift --version` do flake imprime antes um aviso
+   (`glibc not found for 'x86_64-pc-linux-gnu'`), o `| head -1` fechou o
+   pipe, o `swift` recebeu SIGPIPE e o `set -o pipefail` encerrou o script.
+   O Swift em si funciona (versão 5.10.1, a do `nixpkgs-stable` do flake; o
+   `swift build` do nosso Swift compila). **Solução:** o bloco de versões
+   roda com `pipefail` desligado, e o aviso é filtrado (`2db8ec3`).
+7. **`rust_cpp` sem binário no caminho de execução (2026-11-20).** O catálogo
+   antigo compila a tradução Rust → C++ em `./solve`, mas a executa como
+   `./cpp/solve`; no harness antigo isso só funcionava porque a pasta da
+   tradução guardava um `cpp/solve` compilado antes, que não copiamos por
+   ser binário. **Solução:** o catálogo gerado pelo `make_variants.py` faz o
+   build das traduções em C++ gravar o binário no caminho de execução.
