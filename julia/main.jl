@@ -2,6 +2,10 @@
 using Printf
 include("Data.jl")
 
+const T = 1
+const W = 2
+const C = 3
+
 struct Timeval
     sec::Int64
     usec::Int64
@@ -18,10 +22,6 @@ end
 mutable struct tData
     cost::Matrix{Float64}
     dimen::Int
-
-    T::Int
-    W::Int
-    C::Int
 
     REINSERTION::Int
     OR_OPT2::Int
@@ -53,20 +53,20 @@ function update_subseq_info_matrix(solut::tSolution, data::tData)
     for i in 1:data.dimen+1
         k::Int = 1 - i - (i==1)
 
-         solut.seq[data.T, i, i] = 0.0
-         solut.seq[data.C, i, i] = 0.0
-         solut.seq[data.W, i, i] = i!=1
+         solut.seq[T, i, i] = 0.0
+         solut.seq[C, i, i] = 0.0
+         solut.seq[W, i, i] = i!=1
 
         for j in i+1:data.dimen+1
             j_prev = j-1
 
-            solut.seq[data.T, j, i] = data.cost[solut.s[j_prev], solut.s[j]] + solut.seq[data.T, j_prev, i]
-            solut.seq[data.C, j, i] = solut.seq[data.T, j, i] + solut.seq[data.C, j_prev, i]
-            solut.seq[data.W, j, i] = j + k
+            solut.seq[T, j, i] = data.cost[solut.s[j_prev], solut.s[j]] + solut.seq[T, j_prev, i]
+            solut.seq[C, j, i] = solut.seq[T, j, i] + solut.seq[C, j_prev, i]
+            solut.seq[W, j, i] = j + k
 
         end
     end
-    solut.cost = solut.seq[data.C, data.dimen+1, 1]
+    solut.cost = solut.seq[C, data.dimen+1, 1]
 
     return
 end
@@ -150,12 +150,12 @@ function search_swap(solut::tSolution, data::tData)::Bool
             i_prev::Int = i - 1
             i_next::Int = i + 1
 
-            cost_concat_1 =                 solut.seq[data.T, i_prev, 1] + data.cost[solut.s[i_prev], solut.s[i_next]]
-            cost_concat_2 = cost_concat_1 + solut.seq[data.T, i_next, i] + data.cost[solut.s[i], solut.s[i_next+1]]
+            cost_concat_1 =                 solut.seq[T, i_prev, 1] + data.cost[solut.s[i_prev], solut.s[i_next]]
+            cost_concat_2 = cost_concat_1 + solut.seq[T, i_next, i] + data.cost[solut.s[i], solut.s[i_next+1]]
 
-            cost_new = solut.seq[data.C, i_prev, 1]                                                    +           #       1st subseq
-            solut.seq[data.W, i_next, i]               * (cost_concat_1) + data.cost[solut.s[i_next], solut.s[i]]  +           # concat 2nd subseq
-            solut.seq[data.W, data.dimen+1, i_next+1]   * (cost_concat_2) + solut.seq[data.C, data.dimen+1, i_next+1]   # concat 3rd subseq
+            cost_new = solut.seq[C, i_prev, 1]                                                    +           #       1st subseq
+            solut.seq[W, i_next, i]               * (cost_concat_1) + data.cost[solut.s[i_next], solut.s[i]]  +           # concat 2nd subseq
+            solut.seq[W, data.dimen+1, i_next+1]   * (cost_concat_2) + solut.seq[C, data.dimen+1, i_next+1]   # concat 3rd subseq
 
             if cost_new < cost_best
                 cost_best = cost_new - data.EPSILON
@@ -168,17 +168,17 @@ function search_swap(solut::tSolution, data::tData)::Bool
                 j_next = j+1
 
 
-                cost_concat_1 =                 solut.seq[data.T, i_prev, 1]       + data.cost[solut.s[i_prev], solut.s[j]]
+                cost_concat_1 =                 solut.seq[T, i_prev, 1]       + data.cost[solut.s[i_prev], solut.s[j]]
                 cost_concat_2 = cost_concat_1                           + data.cost[solut.s[j], solut.s[i_next]]
-                cost_concat_3 = cost_concat_2 + solut.seq[data.T, j_prev, i_next]  + data.cost[solut.s[j_prev], solut.s[i]]
+                cost_concat_3 = cost_concat_2 + solut.seq[T, j_prev, i_next]  + data.cost[solut.s[j_prev], solut.s[i]]
                 cost_concat_4 = cost_concat_3                           + data.cost[solut.s[i], solut.s[j_next]]
 
 
-                cost_new = solut.seq[data.C, i_prev, 1]                                                 +      # 1st subseq
+                cost_new = solut.seq[C, i_prev, 1]                                                 +      # 1st subseq
                         cost_concat_1 +                                                             # concat 2nd subseq (single node)
-                        solut.seq[data.W, j_prev, i_next]      * cost_concat_2 + solut.seq[data.C, j_prev, i_next] +      # concat 3rd subseq
+                        solut.seq[W, j_prev, i_next]      * cost_concat_2 + solut.seq[C, j_prev, i_next] +      # concat 3rd subseq
                         cost_concat_3 +                                                             # concat 4th subseq (single node)
-                        solut.seq[data.W, data.dimen+1, j_next] * cost_concat_4 + solut.seq[data.C, data.dimen+1, j_next]   # concat 5th subseq
+                        solut.seq[W, data.dimen+1, j_next] * cost_concat_4 + solut.seq[C, data.dimen+1, j_next]   # concat 5th subseq
 
                 if(cost_new < cost_best)
                     cost_best = cost_new - data.EPSILON;
@@ -209,18 +209,18 @@ function search_two_opt(solut::tSolution, data::tData)::Bool
 
     for i in 2:data.dimen-1
         i_prev = i - 1
-        rev_seq_cost = solut.seq[data.T, i+1, i]
+        rev_seq_cost = solut.seq[T, i+1, i]
         for j in i+2:data.dimen
             j_next = j+1
 
-            rev_seq_cost += data.cost[solut.s[j-1], solut.s[j]] * (solut.seq[data.W, j, i]-1.0)
+            rev_seq_cost += data.cost[solut.s[j-1], solut.s[j]] * (solut.seq[W, j, i]-1.0)
 
-            cost_concat_1 =                 solut.seq[data.T, i_prev, 1]   + data.cost[solut.s[j], solut.s[i_prev]]
-            cost_concat_2 = cost_concat_1 + solut.seq[data.T, j, i]        + data.cost[solut.s[j_next], solut.s[i]]
+            cost_concat_1 =                 solut.seq[T, i_prev, 1]   + data.cost[solut.s[j], solut.s[i_prev]]
+            cost_concat_2 = cost_concat_1 + solut.seq[T, j, i]        + data.cost[solut.s[j_next], solut.s[i]]
 
-            cost_new = solut.seq[data.C, i_prev, 1]                                                        +   #   1st subseq
-                    solut.seq[data.W, j, i]                * cost_concat_1 + rev_seq_cost                  +   # concat 2nd subseq (reversed seq)
-                    solut.seq[data.W, data.dimen+1, j_next] * cost_concat_2 + solut.seq[data.C, data.dimen+1, j_next]       # concat 3rd subseq
+            cost_new = solut.seq[C, i_prev, 1]                                                        +   #   1st subseq
+                    solut.seq[W, j, i]                * cost_concat_1 + rev_seq_cost                  +   # concat 2nd subseq (reversed seq)
+                    solut.seq[W, data.dimen+1, j_next] * cost_concat_2 + solut.seq[C, data.dimen+1, j_next]       # concat 3rd subseq
 
             if cost_new < cost_best
                 cost_best = cost_new - data.EPSILON
@@ -259,14 +259,14 @@ function search_reinsertion(solut::tSolution, data::tData, opt::Int)::Bool
         for k in 1:i_prev-1
                 k_next = k+1
 
-                cost_concat_1 =                 solut.seq[data.T, k, 1]            + data.cost[solut.s[k], solut.s[i]]
-                cost_concat_2 = cost_concat_1 + solut.seq[data.T, j, i]            + data.cost[solut.s[j], solut.s[k_next]]
-                cost_concat_3 = cost_concat_2 + solut.seq[data.T, i_prev, k_next]  + data.cost[solut.s[i_prev], solut.s[j_next]]
+                cost_concat_1 =                 solut.seq[T, k, 1]            + data.cost[solut.s[k], solut.s[i]]
+                cost_concat_2 = cost_concat_1 + solut.seq[T, j, i]            + data.cost[solut.s[j], solut.s[k_next]]
+                cost_concat_3 = cost_concat_2 + solut.seq[T, i_prev, k_next]  + data.cost[solut.s[i_prev], solut.s[j_next]]
 
-                cost_new = solut.seq[data.C, k, 1]                                                             +   #       1st subseq
-                solut.seq[data.W, j, i]                * cost_concat_1 + solut.seq[data.C, j, i]                  +   # concat 2nd subseq (reinserted seq)
-                solut.seq[data.W, i_prev, k_next]      * cost_concat_2 + solut.seq[data.C, i_prev, k_next]        +   # concat 3rd subseq
-                solut.seq[data.W, data.dimen+1, j_next] * cost_concat_3 + solut.seq[data.C, data.dimen+1, j_next]       # concat 4th subseq
+                cost_new = solut.seq[C, k, 1]                                                             +   #       1st subseq
+                solut.seq[W, j, i]                * cost_concat_1 + solut.seq[C, j, i]                  +   # concat 2nd subseq (reinserted seq)
+                solut.seq[W, i_prev, k_next]      * cost_concat_2 + solut.seq[C, i_prev, k_next]        +   # concat 3rd subseq
+                solut.seq[W, data.dimen+1, j_next] * cost_concat_3 + solut.seq[C, data.dimen+1, j_next]       # concat 4th subseq
 
                 if cost_new < cost_best
                     cost_best = cost_new - data.EPSILON
@@ -280,14 +280,14 @@ function search_reinsertion(solut::tSolution, data::tData, opt::Int)::Bool
         for k in i+opt:data.dimen
                 k_next = k+1
 
-                cost_concat_1 =                 solut.seq[data.T, i_prev, 1]   + data.cost[solut.s[i_prev], solut.s[j_next]]
-                cost_concat_2 = cost_concat_1 + solut.seq[data.T, k, j_next]   + data.cost[solut.s[k], solut.s[i]]
-                cost_concat_3 = cost_concat_2 + solut.seq[data.T, j, i]        + data.cost[solut.s[j], solut.s[k_next]]
+                cost_concat_1 =                 solut.seq[T, i_prev, 1]   + data.cost[solut.s[i_prev], solut.s[j_next]]
+                cost_concat_2 = cost_concat_1 + solut.seq[T, k, j_next]   + data.cost[solut.s[k], solut.s[i]]
+                cost_concat_3 = cost_concat_2 + solut.seq[T, j, i]        + data.cost[solut.s[j], solut.s[k_next]]
 
-                cost_new = solut.seq[data.C, i_prev, 1]                                                        +   #       1st subseq
-                solut.seq[data.W, k, j_next]           * cost_concat_1 + solut.seq[data.C, k, j_next]             +   # concat 2nd subseq
-                solut.seq[data.W, j, i]                * cost_concat_2 + solut.seq[data.C, j, i]                  +   # concat 3rd subseq (reinserted seq)
-                solut.seq[data.W, data.dimen+1, k_next] * cost_concat_3 + solut.seq[data.C, data.dimen+1, k_next]       # concat 4th subseq
+                cost_new = solut.seq[C, i_prev, 1]                                                        +   #       1st subseq
+                solut.seq[W, k, j_next]           * cost_concat_1 + solut.seq[C, k, j_next]             +   # concat 2nd subseq
+                solut.seq[W, j, i]                * cost_concat_2 + solut.seq[C, j, i]                  +   # concat 3rd subseq (reinserted seq)
+                solut.seq[W, data.dimen+1, k_next] * cost_concat_3 + solut.seq[C, data.dimen+1, k_next]       # concat 4th subseq
 
                 if cost_new < cost_best
                     cost_best = cost_new - data.EPSILON
@@ -461,7 +461,7 @@ function main()
     Imax = 10
     Iils = min(dimension, 100)
 
-    data::tData = tData(cost, dimension, 1, 2, 3, 1, 2, 3, 4, 5, eps(Float64), 0, rand_values, 1)
+    data::tData = tData(cost, dimension, 1, 2, 3, 4, 5, eps(Float64), 0, rand_values, 1)
 
     _cpu0 = _cputime()
     cost = 0.0
