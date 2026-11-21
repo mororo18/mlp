@@ -517,7 +517,7 @@ possa esperar vai para o fim da lista.
   dois, o patch trunca uma conta feita em `int` (a mesma forma do nosso
   `to_1D`) e ainda custa 13 a 15 pontos no servidor; localmente, o C# → C++
   só perde 3% em ciclos (instruções +11%). Ver a explicação do P4.
-- [ ] **P9. Mesmo caminho de busca nos outros pares.** O vetor `rnd` tem
+- [x] **P9. Mesmo caminho de busca nos outros pares.** O vetor `rnd` tem
   exatamente o número de sorteios do caminho de referência; no Go, o nosso
   e a tradução consomem todos (P3). Conferir os demais da mesma forma (em
   JavaScript, ler além do fim não dá erro, ver P7).
@@ -600,7 +600,10 @@ busca (consumo igual ao tamanho do vetor `rnd`) conferido no Go (berlin52,
 kroA100, gr202; P3), no JavaScript (gr202 e lin318; P7), no Java (kroA100:
 50.313 nos dois) e no Julia (kroA100: 50.313 nos dois). O resto do Java no
 kroA100 (P11) e o gap do Julia em regime (P10) não vêm de caminho
-diferente. Faltam as traduções para C++ e o Swift.
+diferente. Traduções para C++ (kroA100): Rust, C#, Fortran, Go e Swift →
+C++ consomem os 50.313 sorteios. Só o Swift nativo (o nosso e o C++ →
+Swift) ficou sem conferir, por falta do compilador na máquina local; o gap
+dele já está explicado pelo S3.
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
