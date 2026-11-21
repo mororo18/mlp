@@ -146,9 +146,47 @@ llm-translations/
       todas as bases.
 
 ### Fase 1. Gap de base
-- [ ] Rodar `<par>.base` e as nossas implementações nas instâncias do lote
-      (lotes 1 e 2), no servidor.
-- [ ] Gap de cada tradução; lista dos gaps que ainda existem.
+- [x] Rodar `<par>.base` e as nossas implementações nas instâncias do lote,
+      no servidor (`runs/base-20261120/`, commit `9e5c200`).
+- [x] Gap de cada tradução; lista dos gaps que ainda existem (abaixo).
+
+#### Fase 1: resultado (rodada de 2026-11-20, 22:46 a 00:05 UTC)
+
+720 execuções (18 programas x 4 instâncias x 10), nenhum timeout, todos os
+custos iguais aos da nossa implementação. Carga: os 4 processos da rodada e
+os 7 do outro usuário em quase todas as leituras (67 de 80 com 11 processos
+acima de 50%, 6 com 12). cv máximo por instância: 2,8% (Java), demais
+abaixo de 1,1%. Gap = 100 x (média das razões nas 4 instâncias - 1):
+
+| Par | Gap | Razões (berlin52, kroA100, gr202, lin318) | Figura 7 |
+|---|---|---|---|
+| C++ → Fortran | −0,1% | 1,005 0,999 0,994 1,000 | 0,986 |
+| C++ → Go | −2,8% | 0,975 0,969 0,969 0,974 | 0,955 |
+| C++ → Java | −11,1% | 0,872 0,805 0,951 0,930 | 0,928 |
+| C++ → JavaScript | +12,7% | 1,140 1,195 1,184 0,990 | 1,147 |
+| C++ → Julia | −7,7% (−3,4% sem berlin52) | 0,796 0,966 0,961 0,970 | 0,942 |
+| C++ → Swift | −1,4% | 0,991 0,991 0,974 0,989 | 0,950 |
+| Rust → C++ | +8,4% | 1,071 1,089 1,093 1,082 | 1,104 |
+| C# → C++ | +12,3% | 1,140 1,134 1,132 1,087 | 1,132 |
+| Swift → C++ | +12,2% | 1,129 1,133 1,137 1,089 | 1,147 |
+| Fortran → C++ | +33,6% | 1,363 1,346 1,341 1,295 | 1,303 |
+| Go → C++ | +28,8% | 1,257 1,279 1,318 1,299 | 1,232 |
+
+Leitura:
+- **Fortran:** sem gap; sai da análise (F1 e F2 descartados).
+- **Go e Swift (from-C++):** a tradução ainda ganha, por pouco e de forma
+  consistente (cv abaixo de 1%): 3% no Go, 1 a 2,6% no Swift.
+- **Java e Julia:** a tradução ganha. No Julia, a diferença maior está no
+  berlin52 (0,796), o que reforça o L1 (compilação dentro do tempo).
+- **JavaScript:** a tradução perde de 14 a 20% até o gr202 e empata no lin318.
+  No lin318 os dois lados levam cerca de 333 s, 6,5 vezes o gr202 (no C++ a
+  razão é 3,1): um efeito do V8 nessa instância, a investigar.
+- **Rust → C++:** a tradução perde 7 a 9%, como na Figura 7 (1,104), e não
+  ganha como na análise antiga (0,93).
+- **As quatro traduções to-C++ só de base não batem com a explicação
+  antiga:** C# 12% (antes ~0), Swift 12% (antes 2 a 3%, passagem por
+  valor), Fortran 34% e Go 29% (antes 13 a 17% e 11 a 15%, o ε). Pelo
+  critério do escopo, passam a precisar de variantes (decisão do autor).
 
 ### Fase 2. Mapa das diferenças
 - [ ] Para cada par, listar as diferenças de projeto entre a tradução e a
@@ -170,6 +208,104 @@ llm-translations/
 ### Fase 5. Análise e texto
 - [ ] `analyze.py`, tabelas em `results/factor_analysis/<data>/` do artigo,
       texto da 7.5 e da 7.6, `README.md` desta pasta.
+
+## Fase 2: lista de fatores proposta (para revisão do autor)
+
+Diferenças de projeto entre cada tradução e a nossa implementação atual
+(`c205463`), com os candidatos dos relatórios antigos
+(`doc/tcc/relatorios-ia/`). Sentido: **D** = direta (a escolha da tradução no
+nosso código), **I** = inversa (a nossa escolha na tradução). Nos pares em
+que a tradução ganha, a D é a principal. O gap de base de cada par está na
+seção "Fase 1: resultado".
+
+### C++ → Java (`cpp_java`)
+- **J1. Acessores no laço quente.** O nosso Java lê as subsequências por
+  `getSeq(i, j, k)` (com `Z` estático não final), a rota por
+  `getSolut().get(i)` (`tArray`) e a matriz por `getCost(a, b)`; a tradução
+  indexa direto `int[]` e `double[]`. D: acesso direto no nosso. I: os
+  nossos acessores na tradução.
+- **J2. Valores da rota copiados para variáveis locais** (`s_i`, `s_i_next`,
+  ...) no nosso; a tradução não copia. Relatório antigo: tirar a cópia
+  deixou o nosso 7,5% mais rápido; pô-la na tradução, 13 a 16% mais lento.
+  D e I.
+- **J3. Subsequências AoS (nosso) × três vetores SoA (tradução).** Relatório
+  antigo: o AoS é melhor. I (conferência: a tradução ganharia com o AoS).
+- **J4. `tArray` com cópias e deslocamento manual (nosso) × `int[]` com
+  `System.arraycopy` (tradução).** Antigo: 1 a 5%. D.
+
+### C++ → Julia (`cpp_julia`)
+- **L1. Compilação JIT dentro do trecho medido.** O nosso Julia gasta cerca
+  de 0,03 s a mais que a tradução entre 42 e 76 clientes (rodada de 20/11).
+  Teste de medição, sem mudar código: imprimir o tempo de compilação
+  acumulado (`Base.cumulative_compile_time_ns`) antes e depois da busca, nos
+  dois programas.
+- **L2. Campos lidos no laço quente.** O nosso lê `data.dimen` e
+  `data.EPSILON` (campos de `mutable struct`) dentro dos laços; a tradução
+  usa `dimen` local e `DBL_EPSILON` constante. D.
+- **L3. Subsequências em `Array{Float64,3}` indexado `[T, j, i]` (nosso) ×
+  vetor de `struct` imutável com `to_1D` (tradução).** Antigo: sem efeito
+  mensurável. D e I.
+
+### C++ → Swift (`cpp_swift`)
+- **S1. Acessores** `s.getSeq(i, j)` e `data.getDistance(a, b)` (nosso) ×
+  acesso direto `solut.seq[to1D(...)]` e `data.cost[a][b]` (tradução). D.
+- **S2. Valores da rota copiados para locais** (`sIPrev`, `sI`, ...) no
+  nosso. D (em Rust e Java isso piorou o nosso).
+- **S3. Cópia da solução na perturbação** (`var s = s`, que copia `seq`
+  inteira ao escrever). Antigo: 0,5 a 2%. D.
+- **S4. `ContiguousArray` (nosso) × `Array` (tradução); laços `for` (nosso) ×
+  `while` (tradução).** Antigo: `for` deixou o nosso mais rápido. Baixa
+  prioridade.
+- Diagnóstico sem variante: contar `cmov` nas três buscas dos dois binários
+  (efeito de geração de código do LLVM, relatório antigo).
+
+### C++ → Go (`cpp_go`)
+- **G1. ε na atualização do melhor movimento:** o nosso Go não tem (é o único
+  dos nossos sem ε). Antigo: pôr ε no nosso deu −3 a −4%. D.
+- **G2. Acessor `solut.at(i, j)` (método com ponteiro, lê `s.dim`) × índice
+  direto `solut.seq[to_1D(...)]`.** Antigo: −4 a −5% no nosso. D.
+- O relatório antigo atribuiu o gap a ruído de geração de código do
+  compilador Go; se G1 e G2 não confirmarem nos dois sentidos, fica assim.
+
+### C++ → Fortran (`cpp_fortran`)
+- Sem gap na base (−0,1%): fora.
+
+### C++ → JavaScript (`cpp_javascript`)
+- **JS1. Subsequências:** o nosso usa um `Array` comum criado com
+  `Array(n)` (elementos com buracos), intercalado, com os offsets `T`, `C`,
+  `W` lidos de `info` em tempo de execução e a variável `seq` global
+  implícita; a tradução usa três `Float64Array` e constantes. D e I.
+- **JS2. `to_1D` como `var` de função (nosso) × função declarada
+  (tradução).** D.
+- Os dois lados usam linhas `Float64Array` na matriz e ε.
+
+### Rust → C++ (`rust_cpp`)
+- **R1. Tipo do índice:** `size_t` de 64 bits (tradução) × `unsigned` de 32
+  bits (nosso). Antigo: D −4,5 a −6,4%; I +48 a +54%. D e I.
+- **R2. Matriz de distâncias:** vetor plano (tradução) × `double**`
+  (nosso). Antigo: plano custa 4 a 8% no nosso. I.
+- **R3. Rota `vector<size_t>` × `vector<int>`.** Antigo: 1 a 3%. I.
+
+### Traduções to-C++ que eram só de base (se o autor aprovar as variantes)
+Os gaps medidos (12 a 34%) não batem com a explicação antiga. Candidatos,
+todos do relatório `REVERSE_CPP_PERFORMANCE_ANALYSIS.md` e do mapa do artigo;
+sentido I (a nossa escolha na tradução), com D onde o fator é medido no
+nosso C++:
+- **Comuns às quatro:** índice com sinal ou de 64 bits (I, com o nosso
+  `unsigned`; antigo: favorece a tradução em 4 a 5%) e o layout da matriz de
+  distâncias (I, com o nosso `double**`; antigo: plano custa 4 a 8% e
+  aninhado 5 a 7%).
+- **C# → C++:** subsequências em `vector<double>` intercalado com offsets
+  constantes; acessores `GetSeq`/`GetCost` (métodos de classe) no laço
+  quente; `std::find` fora do laço (antigo: sem efeito).
+- **Swift → C++:** passagem da solução por valor na perturbação e
+  `localBest = current` (antigo: 2 a 4%); impressão do progresso em toda
+  iteração (já fora do tempo, capturada em memória).
+- **Fortran → C++:** melhor movimento sem ε (antigo: 13 a 17%); índices a
+  partir de 1 com conversões para `size_t`; subsequências em colunas
+  (column-major).
+- **Go → C++:** melhor movimento sem ε (antigo: 9 a 13%); matriz em
+  `vector<vector<double>>`; ponteiros para a solução e `tData` por valor.
 
 ## Restrições
 
@@ -245,3 +381,15 @@ Registro de cada problema encontrado no caminho e da solução adotada.
    tradução guardava um `cpp/solve` compilado antes, que não copiamos por
    ser binário. **Solução:** o catálogo gerado pelo `make_variants.py` faz o
    build das traduções em C++ gravar o binário no caminho de execução.
+8. **Interrupção pelo limite de uso da API (2026-11-20 a 21).** O subagente
+   parou no meio da Fase 1, enquanto a rodada de base rodava no servidor.
+   **Solução:** a rodada seguiu sozinha (lançada com `nohup`) e terminou
+   inteira (720 execuções, `FIM`); ao retomar, conferi o servidor e o
+   repositório, trouxe os resultados para `runs/base-20261120/` e continuei
+   da Fase 1. Nada foi perdido nem repetido.
+9. **Verificação local do L1 (JIT do Julia) inconclusiva (2026-11-20).** Medir
+   o tempo de compilação por fora (`Base.cumulative_compile_time_ns` em volta
+   de `include`) não isola o trecho cronometrado: inclui o carregamento, e a
+   tradução só executa o `main` quando roda como programa principal.
+   **Solução:** fica pendente, como sonda dentro do trecho cronometrado
+   (variante de medição na Fase 3).
