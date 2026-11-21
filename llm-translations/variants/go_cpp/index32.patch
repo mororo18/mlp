@@ -1,0 +1,12 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-21 11:53:42.214002297 -0300
++++ b/main.cpp	2026-11-21 11:53:42.218000142 -0300
+@@ -194,7 +194,7 @@
+     int dim;
+     double cost;
+ 
+-    tSubseq *at(int i, int j) { return &seq[i * dim + j]; }
++    tSubseq *at(int i, int j) { return &seq[(unsigned)(i * dim + j)]; }
+ };
+ 
+ enum {

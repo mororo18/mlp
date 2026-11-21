@@ -1,0 +1,14 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-17 20:37:09.121648263 -0300
++++ b/main.cpp	2026-11-21 11:53:41.169740839 -0300
+@@ -58,8 +58,8 @@
+     double cost;
+ } tSolution;
+ 
+-inline unsigned to_1D(int x, int y, int size) {
+-    int a = x*(size+1) + y;
++inline std::size_t to_1D(std::size_t x, std::size_t y, std::size_t size) {
++    std::size_t a = x*(size+1) + y;
+ 
+     return a;
+ }

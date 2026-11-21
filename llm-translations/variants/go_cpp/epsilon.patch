@@ -1,0 +1,73 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-21 11:53:42.202625116 -0300
++++ b/main.cpp	2026-11-21 11:53:42.208328363 -0300
+@@ -424,7 +424,7 @@
+                    solut->at(i_next + 1, data->dimen)->W * cost_concat_2 + solut->at(i_next + 1, data->dimen)->C;
+ 
+         if (cost_new < cost_best) {
+-            cost_best = cost_new;
++            cost_best = cost_new - std::numeric_limits<double>::epsilon();
+             I = i;
+             J = i_next;
+         }
+@@ -445,14 +445,14 @@
+                        solut->at(j_next, data->dimen)->W * cost_concat_4 + solut->at(j_next, data->dimen)->C;
+ 
+             if (cost_new < cost_best) {
+-                cost_best = cost_new;
++                cost_best = cost_new - std::numeric_limits<double>::epsilon();
+                 I = i;
+                 J = j;
+             }
+         }
+     }
+ 
+-    if (cost_best < solut->at(0, data->dimen)->C) {
++    if (cost_best < solut->at(0, data->dimen)->C - std::numeric_limits<double>::epsilon()) {
+         swap_(solut, I, J);
+ 
+         update_subseq_info_matrix(solut, data);
+@@ -502,14 +502,14 @@
+                        solut->at(j_next, data->dimen)->W * cost_concat_2 + solut->at(j_next, data->dimen)->C;
+ 
+             if (cost_new < cost_best) {
+-                cost_best = cost_new;
++                cost_best = cost_new - std::numeric_limits<double>::epsilon();
+                 I = i;
+                 J = j;
+             }
+         }
+     }
+ 
+-    if (cost_best < solut->cost) {
++    if (cost_best < solut->cost - std::numeric_limits<double>::epsilon()) {
+         reverse(solut, I, J);
+ 
+         update_subseq_info_matrix(solut, data);
+@@ -566,7 +566,7 @@
+                        solut->at(j_next, data->dimen)->W * cost_concat_3 + solut->at(j_next, data->dimen)->C; /* concat 4th subseq */
+ 
+             if (cost_new < cost_best) {
+-                cost_best = cost_new;
++                cost_best = cost_new - std::numeric_limits<double>::epsilon();
+                 I = i;
+                 J = j;
+                 POS = k;
+@@ -586,7 +586,7 @@
+                        solut->at(k_next, data->dimen)->W * cost_concat_3 + solut->at(k_next, data->dimen)->C; /* concat 4th subseq */
+ 
+             if (cost_new < cost_best) {
+-                cost_best = cost_new;
++                cost_best = cost_new - std::numeric_limits<double>::epsilon();
+                 I = i;
+                 J = j;
+                 POS = k;
+@@ -594,7 +594,7 @@
+         }
+     }
+ 
+-    if (cost_best < solut->cost) {
++    if (cost_best < solut->cost - std::numeric_limits<double>::epsilon()) {
+         reinsert(solut, I, J, POS + 1);
+ 
+         update_subseq_info_matrix(solut, data);

@@ -1,0 +1,11 @@
+diff -ruN a/main.js b/main.js
+--- a/main.js	2026-11-17 20:39:33.099341417 -0300
++++ b/main.js	2026-11-21 11:53:38.873913705 -0300
+@@ -1,6 +1,6 @@
+ #! /usr/bin/node
+ 
+-var to_1D = function (x, y, z, n) {
++function to_1D(x, y, z, n) {
+     return (x*n + y)*3 + z;
+ }
+ 

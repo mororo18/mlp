@@ -1,0 +1,12 @@
+diff -ruN a/cpp/subseq.hpp b/cpp/subseq.hpp
+--- a/cpp/subseq.hpp	2026-07-29 16:23:24.000000000 -0300
++++ b/cpp/subseq.hpp	2026-11-21 11:53:41.207203897 -0300
+@@ -102,7 +102,7 @@
+ 
+ struct Solution {
+     SubseqMatrix seq;
+-    std::vector<std::size_t> s;
++    std::vector<int> s;
+     double cost;
+ 
+     inline std::size_t operator[](std::size_t index) const { return s[index]; }

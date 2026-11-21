@@ -1,0 +1,46 @@
+diff -ruN a/src/Data.cpp b/src/Data.cpp
+--- a/src/Data.cpp	2026-07-29 16:37:17.000000000 -0300
++++ b/src/Data.cpp	2026-11-21 11:53:41.627860490 -0300
+@@ -34,18 +34,20 @@
+ 
+ 	int dimension = std::stoi(lines[0]);
+ 	this->dimension = dimension;
+-	this->matrix = std::vector<double>(dimension * dimension, 0.0);
++	this->matrix = new double *[dimension];
++	for (int r = 0; r < dimension; r++)
++		this->matrix[r] = new double[dimension]();
+ 	for (int i = 0; i <= dimension - 2; i++) {
+ 
+-		this->matrix[i * dimension + i] = 0;
++		this->matrix[i][i] = 0;
+ 		int j = i + 1;
+ 		std::vector<std::string> values = componentsSeparatedBy(lines[i + 1], ' ');
+ 		values.pop_back();
+ 		for (const std::string &value : values) {
+ 
+ 			double converted = std::stod(value);
+-			this->matrix[i * dimension + j] = converted;
+-			this->matrix[j * dimension + i] = converted;
++			this->matrix[i][j] = converted;
++			this->matrix[j][i] = converted;
+ 			j += 1;
+ 		}
+ 	}
+diff -ruN a/src/Data.hpp b/src/Data.hpp
+--- a/src/Data.hpp	2026-07-29 16:37:08.000000000 -0300
++++ b/src/Data.hpp	2026-11-21 11:53:41.627213765 -0300
+@@ -5,12 +5,12 @@
+ // Check if class has better performance over struct
+ struct Data {
+ 	int dimension = 0;
+-	std::vector<double> matrix;
++	double **matrix = nullptr;
+ 	std::vector<int> rnd;
+ 	int rndIdx = 0;
+ 
+ 	double getDistance(int i, int j) const {
+-		return matrix[i * dimension + j];
++		return matrix[i][j];
+ 	}
+ 
+ 	int rndCrnt() {

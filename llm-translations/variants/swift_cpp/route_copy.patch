@@ -1,0 +1,37 @@
+diff -ruN a/src/ILS.cpp b/src/ILS.cpp
+--- a/src/ILS.cpp	2026-07-29 16:38:38.000000000 -0300
++++ b/src/ILS.cpp	2026-11-21 11:53:41.605663598 -0300
+@@ -108,7 +108,8 @@
+ 	return s;
+ }
+ 
+-Solution perturb(Solution s, Data &data) {
++void perturb(const Solution &src, Solution &s, Data &data) {
++	s.sequence = src.sequence;
+ 	int aStart = 1;
+ 	int aEnd = 1;
+ 	int bStart = 1;
+@@ -134,8 +135,6 @@
+ 	reinsert(s.sequence, aStart, aBlockSize, bEnd - 1);
+ 
+ 	s.updateSubseqMatrix(data);
+-
+-	return s;
+ }
+ 
+ bool searchSwap(Solution &s, const Data &data) {
+@@ -356,11 +355,12 @@
+ 			rvnd(current, data);
+ 
+ 			if (current.cost < localBest.cost) {
+-				localBest = current;
++				localBest.sequence = current.sequence;
++				localBest.cost = current.cost;
+ 				iterIls = 0;
+ 			}
+ 
+-			current = perturb(localBest, data);
++			perturb(localBest, current, data);
+ 
+ 			iterIls += 1;
+ 		}

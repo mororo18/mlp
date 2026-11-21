@@ -1,0 +1,43 @@
+diff -ruN a/cpp/subseq.hpp b/cpp/subseq.hpp
+--- a/cpp/subseq.hpp	2026-07-29 16:23:24.000000000 -0300
++++ b/cpp/subseq.hpp	2026-11-21 11:53:41.195239829 -0300
+@@ -58,8 +58,7 @@
+ 
+ class CostMatrix {
+ #ifdef FLAT
+-    std::size_t row_size;
+-    std::vector<double> data;
++    double **data = nullptr;
+ #else
+     std::vector<std::vector<double>> data;
+ #endif
+@@ -69,7 +68,10 @@
+ 
+     explicit CostMatrix(std::size_t n)
+ #ifdef FLAT
+-        : row_size(n), data(n * n, 0.0) {
++    {
++        data = new double *[n];
++        for (std::size_t i = 0; i < n; i++)
++            data[i] = new double[n]();
+     }
+ #else
+         : data(n, std::vector<double>(n, 0.0)) {
+@@ -78,7 +80,7 @@
+ 
+     inline const double &operator()(std::size_t row, std::size_t col) const {
+ #ifdef FLAT
+-        return data[row_size * row + col];
++        return data[row][col];
+ #else
+         return data[row][col];
+ #endif
+@@ -86,7 +88,7 @@
+ 
+     inline double &operator()(std::size_t row, std::size_t col) {
+ #ifdef FLAT
+-        return data[row_size * row + col];
++        return data[row][col];
+ #else
+         return data[row][col];
+ #endif

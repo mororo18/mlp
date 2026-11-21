@@ -1,0 +1,82 @@
+diff -ruN a/main.go b/main.go
+--- a/main.go	2026-11-17 20:37:23.230339779 -0300
++++ b/main.go	2026-11-21 11:53:37.824089957 -0300
+@@ -18,6 +18,8 @@
+ 	return u + s
+ }
+ 
++const dblEpsilon = 2.220446049250313e-16
++
+ type tSubseq struct {
+ 	T float64
+ 	W float64
+@@ -251,7 +253,7 @@
+ 			solut.at(i_next+1, data.dimen).W*cost_concat_2 + solut.at(i_next+1, data.dimen).C
+ 
+ 		if cost_new < cost_best {
+-			cost_best = cost_new
++			cost_best = cost_new - dblEpsilon
+ 			I = i
+ 			J = i_next
+ 		}
+@@ -272,14 +274,14 @@
+ 				solut.at(j_next, data.dimen).W*cost_concat_4 + solut.at(j_next, data.dimen).C
+ 
+ 			if cost_new < cost_best {
+-				cost_best = cost_new
++				cost_best = cost_new - dblEpsilon
+ 				I = i
+ 				J = j
+ 			}
+ 		}
+ 	}
+ 
+-	if cost_best < solut.at(0, data.dimen).C {
++	if cost_best < solut.at(0, data.dimen).C-dblEpsilon {
+ 		swap(solut, I, J)
+ 
+ 		update_subseq_info_matrix(solut, data)
+@@ -329,14 +331,14 @@
+ 				solut.at(j_next, data.dimen).W*cost_concat_2 + solut.at(j_next, data.dimen).C
+ 
+ 			if cost_new < cost_best {
+-				cost_best = cost_new
++				cost_best = cost_new - dblEpsilon
+ 				I = i
+ 				J = j
+ 			}
+ 		}
+ 	}
+ 
+-	if cost_best < solut.cost {
++	if cost_best < solut.cost-dblEpsilon {
+ 		reverse(solut, I, J)
+ 
+ 		update_subseq_info_matrix(solut, data)
+@@ -395,7 +397,7 @@
+ 				solut.at(j_next, data.dimen).W*cost_concat_3 + solut.at(j_next, data.dimen).C /* concat 4th subseq */
+ 
+ 			if cost_new < cost_best {
+-				cost_best = cost_new
++				cost_best = cost_new - dblEpsilon
+ 				I = i
+ 				J = j
+ 				POS = k
+@@ -415,7 +417,7 @@
+ 				solut.at(k_next, data.dimen).W*cost_concat_3 + solut.at(k_next, data.dimen).C /* concat 4th subseq */
+ 
+ 			if cost_new < cost_best {
+-				cost_best = cost_new
++				cost_best = cost_new - dblEpsilon
+ 				I = i
+ 				J = j
+ 				POS = k
+@@ -423,7 +425,7 @@
+ 		}
+ 	}
+ 
+-	if cost_best < solut.cost {
++	if cost_best < solut.cost-dblEpsilon {
+ 		reinsert(solut, I, J, POS+1)
+ 
+ 		update_subseq_info_matrix(solut, data)

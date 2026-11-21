@@ -1,0 +1,39 @@
+diff -ruN a/cpp/subseq.hpp b/cpp/subseq.hpp
+--- a/cpp/subseq.hpp	2026-07-29 16:23:24.000000000 -0300
++++ b/cpp/subseq.hpp	2026-11-21 11:53:41.182057335 -0300
+@@ -41,7 +41,7 @@
+ 
+     inline const SubseqInfo &operator()(std::size_t row, std::size_t col) const {
+ #ifdef FLAT
+-        return data[row_size * row + col];
++        return data[(unsigned)(row_size * row + col)];
+ #else
+         return data[row][col];
+ #endif
+@@ -49,7 +49,7 @@
+ 
+     inline SubseqInfo &operator()(std::size_t row, std::size_t col) {
+ #ifdef FLAT
+-        return data[row_size * row + col];
++        return data[(unsigned)(row_size * row + col)];
+ #else
+         return data[row][col];
+ #endif
+@@ -78,7 +78,7 @@
+ 
+     inline const double &operator()(std::size_t row, std::size_t col) const {
+ #ifdef FLAT
+-        return data[row_size * row + col];
++        return data[(unsigned)(row_size * row + col)];
+ #else
+         return data[row][col];
+ #endif
+@@ -86,7 +86,7 @@
+ 
+     inline double &operator()(std::size_t row, std::size_t col) {
+ #ifdef FLAT
+-        return data[row_size * row + col];
++        return data[(unsigned)(row_size * row + col)];
+ #else
+         return data[row][col];
+ #endif

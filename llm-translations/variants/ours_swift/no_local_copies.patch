@@ -1,0 +1,105 @@
+diff -ruN a/Sources/ILS.swift b/Sources/ILS.swift
+--- a/Sources/ILS.swift	2026-11-17 20:37:56.436552034 -0300
++++ b/Sources/ILS.swift	2026-11-21 11:53:41.293417152 -0300
+@@ -130,15 +130,12 @@
+ 	for i in 1..<data.dimension-1 {
+ 		let iPrev = i-1
+ 		let iNext = i+1
+-		let sIPrev = s.sequence[iPrev]
+-		let sI = s.sequence[i]
+-		let sINext = s.sequence[iNext]
+ 
+-		let costConcat1 =               s.getSeq(0, iPrev).t + data.getDistance(sIPrev, sINext)
+-		let costConcat2 = costConcat1 + s.getSeq(i, iNext).t + data.getDistance(sI, s.sequence[i+2])
++		let costConcat1 =               s.getSeq(0, iPrev).t + data.getDistance(s.sequence[iPrev], s.sequence[iNext])
++		let costConcat2 = costConcat1 + s.getSeq(i, iNext).t + data.getDistance(s.sequence[i], s.sequence[i+2])
+ 
+ 		let costNew = s.getSeq(0, iPrev).c
+-					+ s.getSeq(i, iNext).w                * costConcat1 + data.getDistance(sINext, sI)
++					+ s.getSeq(i, iNext).w                * costConcat1 + data.getDistance(s.sequence[iNext], s.sequence[i])
+ 					+ s.getSeq(iNext+1, data.dimension).w * costConcat2 + s.getSeq(iNext+1, data.dimension).c
+ 
+ 		if costNew < costBest {
+@@ -150,14 +147,11 @@
+ 		for j in iNext+1..<data.dimension {
+ 			let jNext = j+1
+ 			let jPrev = j-1
+-			let sJPrev = s.sequence[jPrev]
+-			let sJ = s.sequence[j]
+-			let sJNext = s.sequence[jNext]
+-
+-			let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(sIPrev, sJ)
+-			let costConcat2 = costConcat1 + data.getDistance(sJ, sINext)
+-			let costConcat3 = costConcat2 + s.getSeq(iNext, jPrev).t + data.getDistance(sJPrev, sI)
+-			let costConcat4 = costConcat3 + data.getDistance(sI, sJNext)
++
++			let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(s.sequence[iPrev], s.sequence[j])
++			let costConcat2 = costConcat1 + data.getDistance(s.sequence[j], s.sequence[iNext])
++			let costConcat3 = costConcat2 + s.getSeq(iNext, jPrev).t + data.getDistance(s.sequence[jPrev], s.sequence[i])
++			let costConcat4 = costConcat3 + data.getDistance(s.sequence[i], s.sequence[jNext])
+ 
+ 			let costNew = s.getSeq(0, iPrev).c
+ 						+ costConcat1
+@@ -191,20 +185,15 @@
+ 
+ 	for i in 1..<data.dimension-1 {
+ 		let iPrev = i-1
+-		let sIPrev = s.sequence[iPrev]
+-		let sI = s.sequence[i]
+ 		var revSeqCost = s.getSeq(i, i+1).t
+ 
+ 		for j in i+2..<data.dimension {
+ 			let jNext = j+1
+-			let sJPrev = s.sequence[j-1]
+-			let sJ = s.sequence[j]
+-			let sJNext = s.sequence[jNext]
+ 
+-			revSeqCost += data.getDistance(sJPrev, sJ) * (s.getSeq(i, j).w - 1.0)
++			revSeqCost += data.getDistance(s.sequence[j-1], s.sequence[j]) * (s.getSeq(i, j).w - 1.0)
+ 
+-			let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(sJ, sIPrev)
+-			let costConcat2 = costConcat1 + s.getSeq(i, j).t + data.getDistance(sJNext, sI)
++			let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(s.sequence[j], s.sequence[iPrev])
++			let costConcat2 = costConcat1 + s.getSeq(i, j).t + data.getDistance(s.sequence[jNext], s.sequence[i])
+ 
+ 			let costNew = s.getSeq(0, iPrev).c
+ 						+ s.getSeq(i, j).w * costConcat1 + revSeqCost
+@@ -239,19 +228,13 @@
+         let j = blockSize + i - 1
+         let iPrev = i-1
+         let jNext = j+1
+-        let sI = s.sequence[i]
+-        let sJ = s.sequence[j]
+-        let sIPrev = s.sequence[iPrev]
+-        let sJNext = s.sequence[jNext]
+ 
+ 		for k in 0..<iPrev {
+             let kNext = k+1
+-            let sK = s.sequence[k]
+-            let sKNext = s.sequence[kNext]
+             
+-            let costConcat1 = s.getSeq(0, k).t + data.getDistance(sK, sI)
+-            let costConcat2 = costConcat1 + s.getSeq(i, j).t + data.getDistance(sJ, sKNext)
+-            let costConcat3 = costConcat2 + s.getSeq(kNext, iPrev).t + data.getDistance(sIPrev, sJNext)
++            let costConcat1 = s.getSeq(0, k).t + data.getDistance(s.sequence[k], s.sequence[i])
++            let costConcat2 = costConcat1 + s.getSeq(i, j).t + data.getDistance(s.sequence[j], s.sequence[kNext])
++            let costConcat3 = costConcat2 + s.getSeq(kNext, iPrev).t + data.getDistance(s.sequence[iPrev], s.sequence[jNext])
+ 
+             let costNew = s.getSeq(0, k).c
+                          + s.getSeq(i, j).w                  * costConcat1 + s.getSeq(i, j).c
+@@ -268,12 +251,10 @@
+ 
+ 		for k in i+blockSize..<data.dimension {
+             let kNext = k+1
+-            let sK = s.sequence[k]
+-            let sKNext = s.sequence[kNext]
+ 
+-            let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(sIPrev, sJNext)
+-            let costConcat2 = costConcat1 + s.getSeq(jNext, k).t + data.getDistance(sK, sI)
+-            let costConcat3 = costConcat2 + s.getSeq(i, j).t + data.getDistance(sJ, sKNext)
++            let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(s.sequence[iPrev], s.sequence[jNext])
++            let costConcat2 = costConcat1 + s.getSeq(jNext, k).t + data.getDistance(s.sequence[k], s.sequence[i])
++            let costConcat3 = costConcat2 + s.getSeq(i, j).t + data.getDistance(s.sequence[j], s.sequence[kNext])
+ 
+             let costNew = s.getSeq(0, iPrev).c
+                     + s.getSeq(jNext, k).w              * costConcat1 + s.getSeq(jNext, k).c

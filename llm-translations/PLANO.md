@@ -354,6 +354,8 @@ novas que aparecerem ao ler o código, mesmo fora da lista da Fase 2.
   mais. Teste possível sem mudar código: contar e cronometrar as
   compilações (`-Xlog:jit+compilation`) nos dois programas, ou medir o
   tempo de cada busca local. Fica para depois das variantes J1 a J4.
+- **H-J6. JIT e acessores:** ver H-J5; as variantes J1 e J1a dizem se o
+  custo é dos acessores em si ou do `Z` lido da memória.
 - **Sem efeito esperado, só registro:** a tradução aloca um vetor novo em
   cada `reinsert` (o nosso usa um buffer fixo), o que joga contra ela; e
   aceita o melhor movimento com `cost_best < cost - DBL_EPSILON` no swap e
@@ -361,6 +363,39 @@ novas que aparecerem ao ler o código, mesmo fora da lista da Fase 2.
   quatro instâncias).
 - O `index` de `update_subseq_info_matrix` na tradução (herdado do nosso
   C++) não muda o laço: a recomputação é completa nos dois lados.
+
+### Swift
+- **H-S3b. Copy-on-write do vetor de subsequências.** No nosso Swift,
+  `localBest = current` e `var s = s` no `perturb` fazem as duas soluções
+  dividirem o mesmo `seq`; a escrita seguinte (`rvnd` ou
+  `updateSubseqMatrix`) copia o vetor inteiro (n² estruturas de 24 bytes)
+  a cada perturbação e a cada melhora. A tradução copia só a rota e o
+  custo (`solutionCpy`). É o S3 da lista, com o mecanismo identificado.
+  Variante `ours_swift.route_copy`. A tradução Swift → C++ faz o mesmo em
+  C++ com cópia profunda (`perturb(Solution s)` por valor e
+  `localBest = current`): variante `swift_cpp.route_copy`.
+- O nosso Swift guarda a matriz de distâncias em `[[Double]]` (linhas
+  separadas); a Swift → C++ guarda em vetor plano (herdado de uma versão
+  anterior do nosso Swift).
+
+### JavaScript
+- **H-JS3. `Array(n)` grande em modo dicionário.** O V8 cria `Array(n)` com
+  elementos esparsos (modo dicionário) quando n passa de um limite
+  (cerca de 100 mil). O `seq` do nosso JavaScript tem 3(n+1)² posições:
+  31 mil no kroA100, 124 mil no gr202 e 305 mil no lin318. Se o array
+  não voltar ao modo rápido ao ser preenchido, os acessos ficam muito
+  mais lentos nas instâncias grandes. A variante `float64array` testa isso
+  junto com o tipo dos elementos. Não explica o lin318 lento nos dois
+  lados (a tradução usa `Float64Array`).
+
+### To-C++
+- **Fortran → C++:** a matriz de distâncias fica em colunas (column-major)
+  e os índices partem de 1, com conversões para `size_t` em cada acesso;
+  além do ε (variantes `epsilon`, `index32`, `row_matrix`).
+- **Go → C++:** a matriz fica em `vector<vector<double>>` e a solução é
+  acessada por ponteiro (`solut->at(i, j)`), sem ε.
+- **C# → C++:** subsequências e matriz em vetores planos com índice `int`
+  calculado em cada acesso (`GetSeq`, `GetCost`).
 
 ## Restrições
 
@@ -448,3 +483,29 @@ Registro de cada problema encontrado no caminho e da solução adotada.
    tradução só executa o `main` quando roda como programa principal.
    **Solução:** fica pendente, como sonda dentro do trecho cronometrado
    (variante de medição na Fase 3).
+10. **Variantes sobre as nossas implementações (2026-11-21).** O
+    `make_variants.py` só copiava traduções. **Solução:** base
+    `ours/<pasta>` no manifesto copia a pasta da nossa implementação (sem
+    binários) e usa o build e a execução de `REFERENCIAS` do catálogo; o
+    `analyze.py` compara `ours_<pasta>.<fator>` com `<pasta>`.
+11. **Patches gerados por script (2026-11-21).** As trocas repetitivas
+    (acessores, cópias locais, índices) foram feitas por expressões
+    regulares sobre uma cópia, e o patch sai do `diff -ruN`. Os scripts
+    ficam em `variants/scripts/` (`WORK=<pasta> python gen_<ling>.py`
+    regenera os patches); cada script confere quantas trocas fez e falha se
+    sobrar um acesso antigo.
+12. **Teste local sem Swift nem Nix (2026-11-21).** Esta máquina não tem
+    Swift nem Nix, e o Python do sistema não tem `pandas`/`psutil` (exigidos
+    pelo `core.py`). **Solução:** venv só com `pandas` e `psutil` no
+    scratchpad para o `bench.py` local (`-n 1`, berlin52); as três
+    variantes do nosso Swift são conferidas no servidor (o build falha antes
+    de qualquer execução se houver erro, e o custo é conferido pelo
+    `analyze.py`).
+13. **R3 descartado (2026-11-21).** Trocar a rota do Rust → C++ para
+    `vector<int>` não compila com uma troca só: o `size_t` aparece nas
+    assinaturas de todas as funções. Efeito antigo de 1 a 3%; fora.
+14. **Patch errado pego no teste (2026-11-21).** No `swift_cpp.route_copy`,
+    a troca que tirava o `return s` do `perturb` casou também com o fim de
+    `construction`, que termina igual; o programa abortou ("stack
+    smashing"). **Solução:** a troca passou a valer só a partir de
+    `void perturb(`; o teste local reproduz o custo.

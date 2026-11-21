@@ -1,0 +1,24 @@
+diff -ruN a/src/Data.hpp b/src/Data.hpp
+--- a/src/Data.hpp	2026-07-29 16:37:08.000000000 -0300
++++ b/src/Data.hpp	2026-11-21 11:53:41.616481623 -0300
+@@ -10,7 +10,7 @@
+ 	int rndIdx = 0;
+ 
+ 	double getDistance(int i, int j) const {
+-		return matrix[i * dimension + j];
++		return matrix[(unsigned)(i * dimension + j)];
+ 	}
+ 
+ 	int rndCrnt() {
+diff -ruN a/src/Solution.hpp b/src/Solution.hpp
+--- a/src/Solution.hpp	2026-07-29 16:37:22.000000000 -0300
++++ b/src/Solution.hpp	2026-11-21 11:53:41.616223184 -0300
+@@ -22,7 +22,7 @@
+ 	// possible variations would be implementing CoW for SubseqInfo
+ 	// or making it a class, benchmark is needed
+ 	const SubseqInfo &getSeq(int i, int j) const {
+-		return seq[i * dimension + j];
++		return seq[(unsigned)(i * dimension + j)];
+ 	}
+ 
+ 	void updateSubseqMatrix(const Data &data);

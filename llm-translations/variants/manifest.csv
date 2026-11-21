@@ -15,3 +15,28 @@ ours_java.direct_access,ours/java,ours_java/direct_access.patch,J1 (D): direct a
 ours_java.no_local_copies,ours/java,ours_java/no_local_copies.patch,J2 (D): route values read in place instead of copied to locals
 ours_java.arraycopy_shift,ours/java,ours_java/arraycopy_shift.patch,J4 (D): tArray.shift with System.arraycopy
 cpp_java.aos,cpp_java,cpp_java/measure.patch cpp_java/aos.patch,J3 (I): subsequences in one interleaved array (our AoS)
+ours_go.epsilon,ours/go,ours_go/epsilon.patch,G1 (D): epsilon in the best-move update and in the acceptance test
+ours_go.direct_index,ours/go,ours_go/direct_index.patch,G2 (D): solut.seq[i*dim+j] instead of the at() method
+ours_swift.direct_access,ours/swift,ours_swift/direct_access.patch,S1 (D): direct seq/matrix access instead of getSeq/getDistance
+ours_swift.no_local_copies,ours/swift,ours_swift/no_local_copies.patch,S2 (D): route values read in place instead of copied to locals
+ours_swift.route_copy,ours/swift,ours_swift/route_copy.patch,S3 (D): perturb into current and copy only route and cost (no copy-on-write of seq)
+ours_julia.hoist_fields,ours/julia,ours_julia/hoist_fields.patch,L2 (D): dimen in a local and epsilon as a constant
+ours_julia.struct_vector,ours/julia,ours_julia/struct_vector.patch,L3 (D): subsequences as a vector of immutable structs
+ours_javascript.float64array,ours/javascript,ours_javascript/float64array.patch,JS1a (D): seq as Float64Array instead of a holey Array
+ours_javascript.const_offsets,ours/javascript,ours_javascript/const_offsets.patch,JS1b (D): T/C/W offsets as literals instead of info fields
+ours_javascript.no_globals,ours/javascript,ours_javascript/no_globals.patch,JS1c (D): seq and subseq declared with var instead of implicit globals
+ours_javascript.function_decl,ours/javascript,ours_javascript/function_decl.patch,JS2 (D): to_1D as a function declaration
+ours_cplusplus.index64,ours/cplusplus,ours_cplusplus/index64.patch,R1 (D): to_1D with 64-bit arithmetic and return type
+rust_cpp.index32,rust_cpp,rust_cpp/measure.patch rust_cpp/index32.patch,R1 (I): 32-bit unsigned index in the matrix accessors
+rust_cpp.row_matrix,rust_cpp,rust_cpp/measure.patch rust_cpp/row_matrix.patch,R2 (I): distance matrix as separately allocated rows (our double**)
+go_cpp.epsilon,go_cpp,go_cpp/measure.patch go_cpp/epsilon.patch,Go->C++ (I): epsilon in the best-move update and acceptance
+go_cpp.index32,go_cpp,go_cpp/measure.patch go_cpp/index32.patch,Go->C++ (I): unsigned subsequence index
+go_cpp.row_matrix,go_cpp,go_cpp/measure.patch go_cpp/row_matrix.patch,Go->C++ (I): distance matrix as double** instead of nested vectors
+fortran_cpp.epsilon,fortran_cpp,fortran_cpp/epsilon.patch,Fortran->C++ (I): epsilon in the best-move update and acceptance
+fortran_cpp.index32,fortran_cpp,fortran_cpp/index32.patch,Fortran->C++ (I): unsigned subsequence index
+fortran_cpp.row_matrix,fortran_cpp,fortran_cpp/row_matrix.patch,Fortran->C++ (I): distance matrix as double** rows
+swift_cpp.route_copy,swift_cpp,swift_cpp/measure.patch swift_cpp/route_copy.patch,Swift->C++ (I): perturb by reference and copy only route and cost
+swift_cpp.index32,swift_cpp,swift_cpp/measure.patch swift_cpp/index32.patch,Swift->C++ (I): unsigned subsequence and matrix index
+swift_cpp.row_matrix,swift_cpp,swift_cpp/measure.patch swift_cpp/row_matrix.patch,Swift->C++ (I): distance matrix as double** rows
+csharp_cpp.index32,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32.patch,C#->C++ (I): unsigned subsequence and matrix index
+csharp_cpp.row_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/row_matrix.patch,C#->C++ (I): distance matrix as double** rows

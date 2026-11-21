@@ -1,0 +1,29 @@
+diff -ruN a/types.hpp b/types.hpp
+--- a/types.hpp	2026-07-29 00:25:05.000000000 -0300
++++ b/types.hpp	2026-11-21 11:53:43.234714292 -0300
+@@ -15,19 +15,21 @@
+ 
+ struct tMatrix {
+     int n = 0;
+-    std::vector<typeReal> data;
++    typeReal **data = nullptr;
+ 
+     void allocate(int dimen) {
+         n = dimen;
+-        data.assign(static_cast<std::size_t>(dimen) * static_cast<std::size_t>(dimen), typeReal(0.0));
++        data = new typeReal *[dimen];
++        for (int i = 0; i < dimen; i++)
++            data[i] = new typeReal[dimen]();
+     }
+ 
+     inline typeReal &operator()(int i, int j) {
+-        return data[static_cast<std::size_t>(j - 1) * static_cast<std::size_t>(n) + static_cast<std::size_t>(i - 1)];
++        return data[i - 1][j - 1];
+     }
+ 
+     inline const typeReal &operator()(int i, int j) const {
+-        return data[static_cast<std::size_t>(j - 1) * static_cast<std::size_t>(n) + static_cast<std::size_t>(i - 1)];
++        return data[i - 1][j - 1];
+     }
+ };
+ 

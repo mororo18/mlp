@@ -1,0 +1,38 @@
+diff -ruN a/Sources/ILS.swift b/Sources/ILS.swift
+--- a/Sources/ILS.swift	2026-11-17 20:37:56.436552034 -0300
++++ b/Sources/ILS.swift	2026-11-21 11:53:41.528182566 -0300
+@@ -89,8 +89,8 @@
+ 	return s
+ }
+ 
+-func perturb(s: Solution, data: inout Data) -> Solution {
+-	var s = s
++func perturb(s src: Solution, into s: inout Solution, data: inout Data) {
++	s.sequence = src.sequence
+ 	var aStart = 1;
+     var aEnd = 1;
+     var bStart = 1;
+@@ -117,8 +117,6 @@
+ 	s.sequence.reinsert(blockStart: aStart, blockSize: aBlockSize, at: bEnd-1)
+ 
+ 	s.updateSubseqMatrix(data: data)
+-
+-	return s
+ }
+ 
+ func searchSwap(s: inout Solution, data: Data) -> Bool {
+@@ -346,11 +344,12 @@
+ 			rvnd(s: &current, data: &data)
+ 		
+ 			if current.cost < localBest.cost {
+-				localBest = current
++				localBest.sequence = current.sequence
++				localBest.cost = current.cost
+ 				iterIls = 0
+ 			}
+ 
+-			current = perturb(s: localBest, data: &data)
++			perturb(s: localBest, into: &current, data: &data)
+ 
+ 			iterIls += 1
+ 		}

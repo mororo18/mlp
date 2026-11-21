@@ -1,0 +1,150 @@
+diff -ruN a/Sources/ILS.swift b/Sources/ILS.swift
+--- a/Sources/ILS.swift	2026-11-17 20:37:56.436552034 -0300
++++ b/Sources/ILS.swift	2026-11-21 11:53:41.282712213 -0300
+@@ -56,7 +56,7 @@
+ 	var i = left-1
+ 
+ 	for j in left..<right {
+-		if data.getDistance(r, arr[j]) < data.getDistance(r, pivot) {
++		if data.matrix[r][arr[j]] < data.matrix[r][pivot] {
+ 			i += 1
+ 			arr.swapAt(i, j)
+ 		}
+@@ -134,12 +134,12 @@
+ 		let sI = s.sequence[i]
+ 		let sINext = s.sequence[iNext]
+ 
+-		let costConcat1 =               s.getSeq(0, iPrev).t + data.getDistance(sIPrev, sINext)
+-		let costConcat2 = costConcat1 + s.getSeq(i, iNext).t + data.getDistance(sI, s.sequence[i+2])
++		let costConcat1 =               s.seq[(0) * s.dimension + (iPrev)].t + data.matrix[sIPrev][sINext]
++		let costConcat2 = costConcat1 + s.seq[(i) * s.dimension + (iNext)].t + data.matrix[sI][s.sequence[i+2]]
+ 
+-		let costNew = s.getSeq(0, iPrev).c
+-					+ s.getSeq(i, iNext).w                * costConcat1 + data.getDistance(sINext, sI)
+-					+ s.getSeq(iNext+1, data.dimension).w * costConcat2 + s.getSeq(iNext+1, data.dimension).c
++		let costNew = s.seq[(0) * s.dimension + (iPrev)].c
++					+ s.seq[(i) * s.dimension + (iNext)].w                * costConcat1 + data.matrix[sINext][sI]
++					+ s.seq[(iNext+1) * s.dimension + (data.dimension)].w * costConcat2 + s.seq[(iNext+1) * s.dimension + (data.dimension)].c
+ 
+ 		if costNew < costBest {
+ 			costBest = costNew - EPSILON
+@@ -154,16 +154,16 @@
+ 			let sJ = s.sequence[j]
+ 			let sJNext = s.sequence[jNext]
+ 
+-			let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(sIPrev, sJ)
+-			let costConcat2 = costConcat1 + data.getDistance(sJ, sINext)
+-			let costConcat3 = costConcat2 + s.getSeq(iNext, jPrev).t + data.getDistance(sJPrev, sI)
+-			let costConcat4 = costConcat3 + data.getDistance(sI, sJNext)
++			let costConcat1 = s.seq[(0) * s.dimension + (iPrev)].t + data.matrix[sIPrev][sJ]
++			let costConcat2 = costConcat1 + data.matrix[sJ][sINext]
++			let costConcat3 = costConcat2 + s.seq[(iNext) * s.dimension + (jPrev)].t + data.matrix[sJPrev][sI]
++			let costConcat4 = costConcat3 + data.matrix[sI][sJNext]
+ 
+-			let costNew = s.getSeq(0, iPrev).c
++			let costNew = s.seq[(0) * s.dimension + (iPrev)].c
+ 						+ costConcat1
+-						+ s.getSeq(iNext, jPrev).w * costConcat2 + s.getSeq(iNext, jPrev).c
++						+ s.seq[(iNext) * s.dimension + (jPrev)].w * costConcat2 + s.seq[(iNext) * s.dimension + (jPrev)].c
+ 						+ costConcat3
+-						+ s.getSeq(jNext, data.dimension).w * costConcat4 + s.getSeq(jNext, data.dimension).c
++						+ s.seq[(jNext) * s.dimension + (data.dimension)].w * costConcat4 + s.seq[(jNext) * s.dimension + (data.dimension)].c
+ 
+ 			if costNew < costBest {
+ 				costBest = costNew - EPSILON
+@@ -193,7 +193,7 @@
+ 		let iPrev = i-1
+ 		let sIPrev = s.sequence[iPrev]
+ 		let sI = s.sequence[i]
+-		var revSeqCost = s.getSeq(i, i+1).t
++		var revSeqCost = s.seq[(i) * s.dimension + (i+1)].t
+ 
+ 		for j in i+2..<data.dimension {
+ 			let jNext = j+1
+@@ -201,14 +201,14 @@
+ 			let sJ = s.sequence[j]
+ 			let sJNext = s.sequence[jNext]
+ 
+-			revSeqCost += data.getDistance(sJPrev, sJ) * (s.getSeq(i, j).w - 1.0)
++			revSeqCost += data.matrix[sJPrev][sJ] * (s.seq[(i) * s.dimension + (j)].w - 1.0)
+ 
+-			let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(sJ, sIPrev)
+-			let costConcat2 = costConcat1 + s.getSeq(i, j).t + data.getDistance(sJNext, sI)
++			let costConcat1 = s.seq[(0) * s.dimension + (iPrev)].t + data.matrix[sJ][sIPrev]
++			let costConcat2 = costConcat1 + s.seq[(i) * s.dimension + (j)].t + data.matrix[sJNext][sI]
+ 
+-			let costNew = s.getSeq(0, iPrev).c
+-						+ s.getSeq(i, j).w * costConcat1 + revSeqCost
+-						+ s.getSeq(jNext, data.dimension).w * costConcat2 + s.getSeq(jNext, data.dimension).c
++			let costNew = s.seq[(0) * s.dimension + (iPrev)].c
++						+ s.seq[(i) * s.dimension + (j)].w * costConcat1 + revSeqCost
++						+ s.seq[(jNext) * s.dimension + (data.dimension)].w * costConcat2 + s.seq[(jNext) * s.dimension + (data.dimension)].c
+ 
+ 			if costNew < costBest {
+ 				costBest = costNew - EPSILON
+@@ -249,14 +249,14 @@
+             let sK = s.sequence[k]
+             let sKNext = s.sequence[kNext]
+             
+-            let costConcat1 = s.getSeq(0, k).t + data.getDistance(sK, sI)
+-            let costConcat2 = costConcat1 + s.getSeq(i, j).t + data.getDistance(sJ, sKNext)
+-            let costConcat3 = costConcat2 + s.getSeq(kNext, iPrev).t + data.getDistance(sIPrev, sJNext)
+-
+-            let costNew = s.getSeq(0, k).c
+-                         + s.getSeq(i, j).w                  * costConcat1 + s.getSeq(i, j).c
+-                         + s.getSeq(kNext, iPrev).w          * costConcat2 + s.getSeq(kNext, iPrev).c
+-                         + s.getSeq(jNext, data.dimension).w * costConcat3 + s.getSeq(jNext, data.dimension).c
++            let costConcat1 = s.seq[(0) * s.dimension + (k)].t + data.matrix[sK][sI]
++            let costConcat2 = costConcat1 + s.seq[(i) * s.dimension + (j)].t + data.matrix[sJ][sKNext]
++            let costConcat3 = costConcat2 + s.seq[(kNext) * s.dimension + (iPrev)].t + data.matrix[sIPrev][sJNext]
++
++            let costNew = s.seq[(0) * s.dimension + (k)].c
++                         + s.seq[(i) * s.dimension + (j)].w                  * costConcat1 + s.seq[(i) * s.dimension + (j)].c
++                         + s.seq[(kNext) * s.dimension + (iPrev)].w          * costConcat2 + s.seq[(kNext) * s.dimension + (iPrev)].c
++                         + s.seq[(jNext) * s.dimension + (data.dimension)].w * costConcat3 + s.seq[(jNext) * s.dimension + (data.dimension)].c
+ 
+             if(costNew < costBest){
+                 costBest = costNew - EPSILON
+@@ -271,14 +271,14 @@
+             let sK = s.sequence[k]
+             let sKNext = s.sequence[kNext]
+ 
+-            let costConcat1 = s.getSeq(0, iPrev).t + data.getDistance(sIPrev, sJNext)
+-            let costConcat2 = costConcat1 + s.getSeq(jNext, k).t + data.getDistance(sK, sI)
+-            let costConcat3 = costConcat2 + s.getSeq(i, j).t + data.getDistance(sJ, sKNext)
+-
+-            let costNew = s.getSeq(0, iPrev).c
+-                    + s.getSeq(jNext, k).w              * costConcat1 + s.getSeq(jNext, k).c
+-                    + s.getSeq(i, j).w                  * costConcat2 + s.getSeq(i, j).c
+-                    + s.getSeq(kNext, data.dimension).w * costConcat3 + s.getSeq(kNext, data.dimension).c
++            let costConcat1 = s.seq[(0) * s.dimension + (iPrev)].t + data.matrix[sIPrev][sJNext]
++            let costConcat2 = costConcat1 + s.seq[(jNext) * s.dimension + (k)].t + data.matrix[sK][sI]
++            let costConcat3 = costConcat2 + s.seq[(i) * s.dimension + (j)].t + data.matrix[sJ][sKNext]
++
++            let costNew = s.seq[(0) * s.dimension + (iPrev)].c
++                    + s.seq[(jNext) * s.dimension + (k)].w              * costConcat1 + s.seq[(jNext) * s.dimension + (k)].c
++                    + s.seq[(i) * s.dimension + (j)].w                  * costConcat2 + s.seq[(i) * s.dimension + (j)].c
++                    + s.seq[(kNext) * s.dimension + (data.dimension)].w * costConcat3 + s.seq[(kNext) * s.dimension + (data.dimension)].c
+ 
+             if costNew < costBest {
+                 costBest = costNew - EPSILON
+diff -ruN a/Sources/Solution.swift b/Sources/Solution.swift
+--- a/Sources/Solution.swift	2026-07-25 17:04:06.417174488 -0300
++++ b/Sources/Solution.swift	2026-11-21 11:53:41.283281912 -0300
+@@ -35,13 +35,13 @@
+ 
+ 			for j in i+1..<dimension {
+ 				let jPrev = j-1
+-				seq[i * dimension + j].t = data.getDistance(sequence[jPrev], sequence[j]) + self.getSeq(i , jPrev).t
+-				seq[i * dimension + j].c = self.getSeq(i,j).t + self.getSeq(i, jPrev).c
++				seq[i * dimension + j].t = data.matrix[sequence[jPrev]][sequence[j]] + seq[(i ) * dimension + (jPrev)].t
++				seq[i * dimension + j].c = seq[(i) * dimension + (j)].t + seq[(i) * dimension + (jPrev)].c
+ 				seq[i * dimension + j].w = Double(j+k)
+ 			}
+ 		}
+ 
+-		cost = self.getSeq(0, dimension-1).c
++		cost = seq[(0) * dimension + (dimension-1)].c
+ 	}
+ 
+ }

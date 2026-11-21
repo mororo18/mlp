@@ -1,0 +1,17 @@
+diff -ruN a/types.hpp b/types.hpp
+--- a/types.hpp	2026-07-29 00:25:05.000000000 -0300
++++ b/types.hpp	2026-11-21 11:53:43.228800803 -0300
+@@ -66,11 +66,11 @@
+     inline const int &s_at(int i) const { return s[static_cast<std::size_t>(i - 1)]; }
+ 
+     inline tSeqInfo &seq_at(int j, int i) {
+-        return seq[static_cast<std::size_t>(i - 1) * static_cast<std::size_t>(seq_dim) + static_cast<std::size_t>(j - 1)];
++        return seq[(unsigned)((i - 1) * seq_dim + (j - 1))];
+     }
+ 
+     inline const tSeqInfo &seq_at(int j, int i) const {
+-        return seq[static_cast<std::size_t>(i - 1) * static_cast<std::size_t>(seq_dim) + static_cast<std::size_t>(j - 1)];
++        return seq[(unsigned)((i - 1) * seq_dim + (j - 1))];
+     }
+ };
+ 
