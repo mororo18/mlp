@@ -198,12 +198,12 @@ Leitura:
       autor antes da Fase 3.**
 
 ### Fase 3. Variantes
-- [ ] Um patch por fator; manifesto; montagem e build de todas as variantes;
+- [x] Um patch por fator; manifesto; montagem e build de todas as variantes;
       conferência do custo em uma instância pequena antes de subir para o
       servidor.
 
 ### Fase 4. Rodadas
-- [ ] Lotes 1 e 2 no servidor. Estimativa: umas 60 variantes compiladas ou
+- [x] Lotes 1 e 2 no servidor. Estimativa: umas 60 variantes compiladas ou
       JIT, de 6 a 8 horas; Lua e Python interpretados, umas 2 horas.
 
 ### Fase 5. Análise e texto
@@ -490,6 +490,29 @@ Leitura:
   dessas duas instâncias fica explicado. No kroA100 não fica (0,919 contra
   0,820). O que falta explicar está no kroA100 e no berlin52, as duas
   instâncias curtas, o que reforça a H-J5 (aquecimento do JIT).
+
+## Pendências de investigação (lista de trabalho, 2026-11-21)
+
+Pedido do autor: tratar os itens em ordem; problema ou hipótese nova que
+possa esperar vai para o fim da lista.
+
+- [ ] **P1. Java nas instâncias curtas (H-J5).** J1 + J2 explicam o gr202 e
+  o lin318, mas não o kroA100 (0,919 contra 0,820) nem o berlin52.
+- [ ] **P2. Julia sem o berlin52 (L1).** Nenhuma variante explica os −3,8%;
+  medir a compilação dentro do trecho medido. Também: os dois patamares do
+  nosso Julia no berlin52 (0,134 s e 0,169 s).
+- [ ] **P3. Metade do gap do C++ → Go.** G2 explica −1,4% de −2,8%; G1
+  refutado.
+- [ ] **P4. Índice `unsigned` (H-R1b).** Custa de 1% a 36% nas traduções
+  para C++ e nada no nosso C++.
+- [ ] **P5. `Float64Array` (H-JS4).** Confirmar na inversa: as três
+  subsequências da tradução como `Array`.
+- [ ] **P6. Inversas dos pares em que a tradução ganha.** O escopo pede a
+  inversa para confirmar a direta; só o Java (J3) tem. Go (G2: o acessor
+  `at()` na tradução) e Swift (S3: a cópia da solução na tradução); o
+  JavaScript é o P5.
+- [ ] **P7. lin318 do JavaScript (H-JS5).** 7,8 vezes o gr202 nos dois lados
+  (C++: 3,1). Adiado pelo autor em 2026-11-21; entra por último.
 
 ## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
 

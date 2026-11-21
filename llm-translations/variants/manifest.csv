@@ -43,3 +43,8 @@ csharp_cpp.row_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/row_matrix.
 ours_java.direct_no_locals,ours/java,ours_java/direct_no_locals.patch,J1+J2 (D): direct array access and no local copies of the route
 go_cpp.epsilon_row_matrix,go_cpp,go_cpp/measure.patch go_cpp/epsilon.patch go_cpp/row_matrix.patch,Go->C++ (I): epsilon and double** distance matrix
 fortran_cpp.epsilon_row_matrix,fortran_cpp,fortran_cpp/epsilon.patch fortran_cpp/row_matrix.patch,Fortran->C++ (I): epsilon and double** distance matrix
+ours_java.warm,ours/java,ours_java/warm.patch,P1 diagnostic: one untimed search before the timed one (JIT warm-up)
+ours_java.direct_no_locals_warm,ours/java,ours_java/direct_no_locals.patch ours_java/warm.patch,P1 diagnostic: J1+J2 with one untimed search before the timed one
+cpp_java.warm,cpp_java,cpp_java/measure.patch cpp_java/warm.patch,P1 diagnostic: one untimed search before the timed one (JIT warm-up)
+ours_julia.warm,ours/julia,ours_julia/warm.patch,P2 diagnostic: one untimed search before the timed one (JIT compilation)
+cpp_julia.warm,cpp_julia,cpp_julia/measure.patch cpp_julia/warm.patch,P2 diagnostic: one untimed search before the timed one (JIT compilation)

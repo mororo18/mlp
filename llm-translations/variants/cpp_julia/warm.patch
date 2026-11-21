@@ -1,0 +1,12 @@
+diff -ruN a/main.jl b/main.jl
+--- a/main.jl	2026-11-21 15:59:17.953229697 -0300
++++ b/main.jl	2026-11-21 15:59:17.958412735 -0300
+@@ -469,6 +469,8 @@
+ 
+     Iils = data.dimen < 100 ? data.dimen : 100
+ 
++    GILS_RVND(Imax, Iils, data, verbose)
++    data.rnd_index = 1
+     t1 = time_ns()
+     cost_best = GILS_RVND(Imax, Iils, data, verbose)
+     t2 = time_ns()

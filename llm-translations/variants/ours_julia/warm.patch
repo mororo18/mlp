@@ -1,0 +1,12 @@
+diff -ruN a/main.jl b/main.jl
+--- a/main.jl	2026-11-19 23:40:45.899355746 -0300
++++ b/main.jl	2026-11-21 15:59:17.942506360 -0300
+@@ -463,6 +463,8 @@
+ 
+     data::tData = tData(cost, dimension, 1, 2, 3, 4, 5, eps(Float64), 0, rand_values, 1)
+ 
++    GILS_RVND(Imax, Iils, R, data, verbose)
++    data.rnd_index = 1
+     _cpu0 = _cputime()
+     cost = 0.0
+     time = @elapsed (cost = GILS_RVND(Imax, Iils, R, data, verbose))

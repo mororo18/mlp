@@ -1,0 +1,12 @@
+diff -ruN a/Main.java b/Main.java
+--- a/Main.java	2026-11-21 15:59:17.974892693 -0300
++++ b/Main.java	2026-11-21 15:59:17.980506313 -0300
+@@ -536,6 +536,8 @@
+         Random rand = new Random(System.nanoTime());
+ 
+         Iils = data.dimen < 100 ? data.dimen : 100;
++        GILS_RVND(Imax, Iils, data, verbose);
++        data.rnd_index = 0;
+         long t1 = System.nanoTime();
+         ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+         long start = bean.getCurrentThreadCpuTime();

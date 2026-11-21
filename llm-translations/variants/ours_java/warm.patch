@@ -1,0 +1,11 @@
+diff -ruN a/main.java b/main.java
+--- a/main.java	2026-11-17 20:39:22.223862557 -0300
++++ b/main.java	2026-11-21 15:59:17.966751187 -0300
+@@ -13,6 +13,7 @@
+     }
+ 
+     private static void read(boolean verbose){
++        new GILS_RVND(verbose).solve();
+         GILS_RVND tsp = new GILS_RVND(verbose);
+         OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+         long cpuTime = - osBean.getProcessCpuTime();
