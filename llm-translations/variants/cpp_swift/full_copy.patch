@@ -1,0 +1,21 @@
+diff -ruN a/main.swift b/main.swift
+--- a/main.swift	2026-11-21 16:11:18.750309568 -0300
++++ b/main.swift	2026-11-21 16:11:18.754933026 -0300
+@@ -41,8 +41,7 @@
+ }
+ 
+ func solutionCpy(_ src: TSolution, _ tgt: inout TSolution) {
+-    tgt.s = src.s
+-    tgt.cost = src.cost
++    tgt = src
+ }
+ 
+ func rTable(_ i: Int) -> Double {
+@@ -422,6 +421,7 @@
+                 iterILS = 0
+             }
+ 
++            solutCrnt = solutPartial
+             solutCrnt.s = perturb(solutPartial, &data)
+             updateSubseqInfoMatrix(&solutCrnt, data)
+             iterILS += 1

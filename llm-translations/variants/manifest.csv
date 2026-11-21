@@ -48,3 +48,9 @@ ours_java.direct_no_locals_warm,ours/java,ours_java/direct_no_locals.patch ours_
 cpp_java.warm,cpp_java,cpp_java/measure.patch cpp_java/warm.patch,P1 diagnostic: one untimed search before the timed one (JIT warm-up)
 ours_julia.warm,ours/julia,ours_julia/warm.patch,P2 diagnostic: one untimed search before the timed one (JIT compilation)
 cpp_julia.warm,cpp_julia,cpp_julia/measure.patch cpp_julia/warm.patch,P2 diagnostic: one untimed search before the timed one (JIT compilation)
+ours_go.style,ours/go,ours_go/direct_index.patch ours_go/style.patch,P3 (D): G2 plus subsequence field order T/C/W and the RVND list as in the translation
+cpp_javascript.array,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/array.patch,P5 (I): the three subsequence arrays as Array(n) instead of Float64Array
+cpp_go.at_accessor,cpp_go,cpp_go/measure.patch cpp_go/at_accessor.patch,P6 (I): G2 inverse: our at() method with the dim field in the translation
+cpp_swift.full_copy,cpp_swift,cpp_swift/measure.patch cpp_swift/full_copy.patch,P6 (I): S3 inverse: whole-solution copies (copy-on-write of seq) on improvement and perturbation
+rust_cpp.index32_int,rust_cpp,rust_cpp/measure.patch rust_cpp/index32_int.patch,P4 control: unsigned index computed in int arithmetic as in our to_1D
+ours_cplusplus.size_t_counter,ours/cplusplus,ours_cplusplus/size_t_counter.patch,P4 (D): size_t column counter in update_subseq_info_matrix truncated by to_1D(int)

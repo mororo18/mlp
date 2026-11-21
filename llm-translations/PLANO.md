@@ -513,6 +513,53 @@ possa esperar vai para o fim da lista.
   JavaScript é o P5.
 - [ ] **P7. lin318 do JavaScript (H-JS5).** 7,8 vezes o gr202 nos dois lados
   (C++: 3,1). Adiado pelo autor em 2026-11-21; entra por último.
+- [ ] **P8. Mecanismo do `index32` em C# → C++ e Fortran → C++.** Nesses
+  dois, o patch trunca uma conta feita em `int` (a mesma forma do nosso
+  `to_1D`) e ainda custa 13 a 15 pontos no servidor; localmente, o C# → C++
+  só perde 3% em ciclos (instruções +11%). Ver a explicação do P4.
+- [ ] **P9. Mesmo caminho de busca nos outros pares.** O vetor `rnd` tem
+  exatamente o número de sorteios do caminho de referência; no Go, o nosso
+  e a tradução consomem todos (P3). Conferir os demais da mesma forma (em
+  JavaScript, ler além do fim não dá erro, ver P7).
+
+### Andamento das pendências
+
+**P1 e P2 (2026-11-21).** Variantes de diagnóstico `warm`: uma busca inteira
+fora do tempo antes da busca medida, no mesmo processo (o nosso Java recria
+o `GILS_RVND`; nos outros, `rnd_index` volta ao início). Se o gap das
+instâncias curtas sumir com o aquecimento, a causa é o JIT. Rodada
+`runs/warm-20261121/`, com `cpp_java.base` e `cpp_julia.base` de novo para
+comparar na mesma rodada.
+
+**P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
+campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
+RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e
+`reverse` como funções sobre o vetor e o índice `uint` do `rnd`. Os dois
+fazem o mesmo caminho de busca: instrumentados localmente, consomem
+exatamente os 17.313, 50.313 e 108.601 sorteios do berlin52, do kroA100 e
+do gr202 (o tamanho do vetor `rnd`). Variante `ours_go.style` (G2 + ordem
+dos campos + lista do RVND) para a próxima rodada; se não chegar à razão da
+tradução, o resto fica como efeito de geração de código.
+
+**P4 (2026-11-21, local, `perf`).** No Rust → C++ (kroA100), o `index32`
+sobe as instruções de 12,1 para 15,1 bilhões (+25%) e os ciclos em 33%; o
+tempo de `update_subseq_info_matrix` passa de 0,81 para 1,86 bilhão de
+ciclos. No assembly desse laço, a versão de base mantém o T e o C do
+elemento anterior em registrador e avança o ponteiro 24 bytes por iteração;
+com o `index32`, ela relê os dois da memória a cada iteração (a escrita de
+uma iteração vira leitura da seguinte) e recalcula o endereço com três
+`lea`. A causa não é a conta em 64 bits: a variante de controle
+`rust_cpp.index32_int`, que faz a conta em `int` como o nosso `to_1D`,
+fica igual (14,8 bilhões de instruções). A causa é o contador do laço:
+truncar um contador de 64 bits (`size_t j`) para 32 bits tira do índice a
+forma linear no contador, e o compilador deixa de provar que `(i, j-1)` e
+`(i, j)` são vizinhos. Confirmação no nosso C++: trocar só o `j` de
+`update_subseq_info_matrix` para `size_t` (que o `to_1D(int, ...)` trunca)
+sobe as instruções em 14% e os ciclos em 24%. Com contador `int` (o nosso),
+o `unsigned` não custa nada, o que explica o `index64` sem efeito. Variantes
+`ours_cplusplus.size_t_counter` e `rust_cpp.index32_int` para a próxima
+rodada. Consequência para o texto: a recomendação não é "índice `unsigned`",
+e sim não misturar contador de 64 bits com índice de 32.
 
 ## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
 

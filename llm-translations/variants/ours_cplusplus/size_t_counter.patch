@@ -1,0 +1,21 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-17 20:37:09.121648263 -0300
++++ b/main.cpp	2026-11-21 16:13:10.135562619 -0300
+@@ -178,7 +178,7 @@
+ #ifdef FLAT 
+ 
+ void update_subseq_info_matrix(tSolution & solut, const tData & data, int index = 0){
+-    alignas(INT_SZ) int i, j, j_prev, k;
++    alignas(INT_SZ) int i, k; std::size_t j, j_prev;
+     alignas(INT_SZ) int from = index;
+     alignas(1) bool t;
+     for (i = 0; i < data.dimen+1; i++) {
+@@ -369,7 +369,7 @@
+ #elif defined(MATRIX)
+ 
+ void update_subseq_info_matrix(tSolution & solut, const tData & data, int index = 0){
+-    alignas(INT_SZ) int i, j, j_prev, k;
++    alignas(INT_SZ) int i, k; std::size_t j, j_prev;
+     alignas(INT_SZ) int from = index;
+     alignas(1) bool t;
+     for (i = 0; i < data.dimen+1; i++) {

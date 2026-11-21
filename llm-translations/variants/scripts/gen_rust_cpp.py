@@ -11,6 +11,15 @@ def idx32(b):
     n = sub(h, r'return data\[row_size \* row \+ col\];', 'return data[(unsigned)(row_size * row + col)];')
     print('idx32', n)
 
+def size_t_counter(b):
+    n = sub(b / 'main.cpp', r'    alignas\(INT_SZ\) int i, j, j_prev, k;\n', '    alignas(INT_SZ) int i, k; std::size_t j, j_prev;\n')
+    print('size_t_counter', n)
+
+def idx32_int(b):
+    h = b / 'cpp/subseq.hpp'
+    n = sub(h, r'return data\[row_size \* row \+ col\];', 'return data[(unsigned)((int)row_size * (int)row + (int)col)];')
+    print('idx32_int', n)
+
 def rows(b):
     h = b / 'cpp/subseq.hpp'
     t = h.read_text()
@@ -29,6 +38,7 @@ def route_int(b):
     sub(h, r'    std::vector<std::size_t> s;\n', '    std::vector<int> s;\n')
 
 write({'ours_cplusplus/index64.patch': (OURS, idx64, ()),
+       'ours_cplusplus/size_t_counter.patch': (OURS, size_t_counter, ()),
        'rust_cpp/index32.patch': (TR, idx32, ('rust_cpp/measure.patch',)),
        'rust_cpp/row_matrix.patch': (TR, rows, ('rust_cpp/measure.patch',)),
-       'rust_cpp/route_int.patch': (TR, route_int, ('rust_cpp/measure.patch',))})
+       'rust_cpp/index32_int.patch': (TR, idx32_int, ('rust_cpp/measure.patch',))})

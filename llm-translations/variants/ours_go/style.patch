@@ -1,0 +1,39 @@
+diff -ruN a/main.go b/main.go
+--- a/main.go	2026-11-21 16:01:11.097074627 -0300
++++ b/main.go	2026-11-21 16:01:11.103427502 -0300
+@@ -20,8 +20,8 @@
+ 
+ type tSubseq struct {
+ 	T float64
+-	W float64
+ 	C float64
++	W float64
+ }
+ 
+ type tData struct {
+@@ -435,10 +435,7 @@
+ }
+ 
+ func RVND(solut *tSolution, data *tData) {
+-	n_list_b := []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
+-	n_list := make([]int, 5)
+-
+-	copy(n_list, n_list_b)
++	n_list := []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
+ 
+ 	for len(n_list) > 0 {
+         index := data.rnd[data.rnd_index]
+@@ -459,11 +456,10 @@
+ 		}
+ 
+ 		if improve == true {
+-			n_list = make([]int, 5)
+-			copy(n_list, n_list_b)
++			n_list = []int{SWAP, TWO_OPT, REINSERTION, OR_OPT_2, OR_OPT_3}
+ 
+ 		} else {
+-			n_list = remove(n_list, index)
++			n_list = append(n_list[:index], n_list[index+1:]...)
+ 		}
+ 	}
+ }

@@ -1,0 +1,16 @@
+diff -ruN a/main.js b/main.js
+--- a/main.js	2026-11-21 16:10:19.789639940 -0300
++++ b/main.js	2026-11-21 16:10:19.799623137 -0300
+@@ -26,9 +26,9 @@
+     solut.s = new Array(data.dimen + 1).fill(0);
+ 
+     const sz = (data.dimen + 1) * (data.dimen + 1);
+-    solut.seq_T = new Float64Array(sz);
+-    solut.seq_C = new Float64Array(sz);
+-    solut.seq_W = new Float64Array(sz);
++    solut.seq_T = Array(sz);
++    solut.seq_C = Array(sz);
++    solut.seq_W = Array(sz);
+ 
+     solut.cost = DBL_MAX;
+ 
