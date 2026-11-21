@@ -30,6 +30,11 @@ def cs_idx(b):
     sub(b / 'Data.hpp', r'return c\[to_1D\(i, j\)\];', 'return c[(unsigned)to_1D(i, j)];')
     print('cs idx', n)
 
+def cs_idx_field(b):
+    n = sub(b / 'tSolution.hpp', r'seq\[i \* \(d \+ 1\) \* 3 \+ j \* 3 \+ k\]', 'seq[3 * (std::size_t)(unsigned)(i * (d + 1) + j) + k]')
+    sub(b / 'Data.hpp', r'return c\[to_1D\(i, j\)\];', 'return c[(unsigned)to_1D(i, j)];')
+    print('cs idx field', n)
+
 def cs_rows(b):
     h = b / 'Data.hpp'
     sub(h, r'        std::vector<double> c;\n', '        double **c = nullptr;\n')
@@ -43,4 +48,5 @@ write({'swift_cpp/route_copy.patch': (T / 'swift_cpp', sw_route, ('swift_cpp/mea
        'swift_cpp/index32.patch': (T / 'swift_cpp', sw_idx, ('swift_cpp/measure.patch',)),
        'swift_cpp/row_matrix.patch': (T / 'swift_cpp', sw_rows, ('swift_cpp/measure.patch',)),
        'csharp_cpp/index32.patch': (T / 'csharp_cpp', cs_idx, ('csharp_cpp/measure.patch',)),
+       'csharp_cpp/index32_field.patch': (T / 'csharp_cpp', cs_idx_field, ('csharp_cpp/measure.patch',)),
        'csharp_cpp/row_matrix.patch': (T / 'csharp_cpp', cs_rows, ('csharp_cpp/measure.patch',))})
