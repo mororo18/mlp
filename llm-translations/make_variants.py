@@ -1,7 +1,7 @@
 """Monta as variantes do experimento e o catálogo que o bench.py -t lê.
 
 Cada linha de variants/manifest.csv é uma variante: uma cópia de
-translations/<base>/ com os patches da coluna `patches` aplicados em ordem
+translations/<base>/ (ou da nossa implementação, com base ours/<pasta>) com os patches da coluna `patches` aplicados em ordem
 (caminhos relativos a variants/, separados por espaço). Nada é editado à mão.
 
 Saída em --out: uma pasta por variante e um benchmark.py com PROJETOS,
@@ -35,6 +35,11 @@ def carregar_ambiente():
     env["GO111MODULE"] = "off"
     _c.ENV = env
     return env
+
+
+def _ours(src):
+    lang, ref = next((k, v) for k, v in _c.REFERENCIAS.items() if v["src"] == src)
+    return {{"lang": lang, "build": copy.deepcopy(ref["build"]), "run": list(ref["run"])}}
 
 
 PROJETOS = {{
@@ -74,11 +79,19 @@ def main():
         dest = out / r["id"]
         if dest.exists():
             shutil.rmtree(dest)
-        shutil.copytree(HERE / "translations" / r["base"], dest)
+        if r["base"].startswith("ours/"):
+            src = r["base"].split("/", 1)[1]
+            shutil.copytree(HERE.parent / src, dest,
+                            ignore=shutil.ignore_patterns("*.class", "obj", "bin", "target", ".build", "solve", "main"))
+            entry = f'{{"traduzida": _ours({src!r})}}'
+        else:
+            shutil.copytree(HERE / "translations" / r["base"], dest)
+            entry = f'{{"traduzida": copy.deepcopy(_c.PROJETOS[{r["base"]!r}]["traduzida"])}}'
+
         for p in r["patches"].split():
             subprocess.run(["patch", "-p1", "-s", "--no-backup-if-mismatch", "-d", str(dest),
                             "-i", str(HERE / "variants" / p)], check=True)
-        entries.append(f'    {r["id"]!r}: {{"traduzida": copy.deepcopy(_c.PROJETOS[{r["base"]!r}]["traduzida"])}},')
+        entries.append(f'    {r["id"]!r}: {entry},')
 
     (out / "benchmark.py").write_text(CATALOG.format(harness=str(HERE / "harness"),
                                                      entries="\n".join(entries)))

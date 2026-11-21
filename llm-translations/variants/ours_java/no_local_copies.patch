@@ -1,0 +1,108 @@
+diff -ruN a/GILS_RVND.java b/GILS_RVND.java
+--- a/GILS_RVND.java	2026-11-17 20:39:22.223729006 -0300
++++ b/GILS_RVND.java	2026-11-21 11:41:03.013514296 -0300
+@@ -101,17 +101,14 @@
+         for(int i = 1; i < dimension-1; i++){
+             int i_prev = i - 1;
+             int i_next = i + 1;
+-            int s_i_prev = solut.getSolut().get(i_prev);
+-            int s_i_next = solut.getSolut().get(i_next);
+-            int s_i = solut.getSolut().get(i);
+ 
+             // immediate nodes case
+ 
+-            cost_concat_1 =                 solut.getSeq(0, i_prev, info.T) + info.getCost(s_i_prev, s_i_next);
+-            cost_concat_2 = cost_concat_1 + solut.getSeq(i, i_next, info.T) + info.getCost(s_i, solut.getSolut().get(i_next+1));
++            cost_concat_1 =                 solut.getSeq(0, i_prev, info.T) + info.getCost(solut.getSolut().get(i_prev), solut.getSolut().get(i_next));
++            cost_concat_2 = cost_concat_1 + solut.getSeq(i, i_next, info.T) + info.getCost(solut.getSolut().get(i), solut.getSolut().get(i_next+1));
+ 
+             cost_new = solut.getSeq(0, i_prev, info.C)                                                            // 1st subseq 
+-                    + solut.getSeq(i, i_next, info.W)           * (cost_concat_1) + info.getCost(s_i_next, s_i)              // concat 2nd subseq
++                    + solut.getSeq(i, i_next, info.W)           * (cost_concat_1) + info.getCost(solut.getSolut().get(i_next), solut.getSolut().get(i))              // concat 2nd subseq
+                     + solut.getSeq(i_next+1, dimension , info.W) * (cost_concat_2) + solut.getSeq(i_next+1, dimension, info.C);  // concat 3rd subseq
+ 
+             if(cost_new < cost_best){
+@@ -123,14 +120,11 @@
+             for(int j = i_next+1; j < dimension; j++){
+                 int j_next = j+1;
+                 int j_prev = j-1;
+-                int s_j = solut.getSolut().get(j);
+-                int s_j_prev = solut.getSolut().get(j_prev);
+-                int s_j_next = solut.getSolut().get(j_next);
+-
+-                cost_concat_1 = solut.getSeq(0, i_prev, info.T) + info.getCost(s_i_prev, s_j);
+-                cost_concat_2 = cost_concat_1 + info.getCost(s_j, s_i_next);
+-                cost_concat_3 = cost_concat_2 + solut.getSeq(i_next, j_prev, info.T) + info.getCost(s_j_prev, s_i);
+-                cost_concat_4 = cost_concat_3 + info.getCost(s_i, s_j_next);
++
++                cost_concat_1 = solut.getSeq(0, i_prev, info.T) + info.getCost(solut.getSolut().get(i_prev), solut.getSolut().get(j));
++                cost_concat_2 = cost_concat_1 + info.getCost(solut.getSolut().get(j), solut.getSolut().get(i_next));
++                cost_concat_3 = cost_concat_2 + solut.getSeq(i_next, j_prev, info.T) + info.getCost(solut.getSolut().get(j_prev), solut.getSolut().get(i));
++                cost_concat_4 = cost_concat_3 + info.getCost(solut.getSolut().get(i), solut.getSolut().get(j_next));
+ 
+                 cost_new = solut.getSeq(0, i_prev, info.C)                                                        /* first subseq */
+                         + cost_concat_1                                                             /* concatenate second subseq (single node) */
+@@ -166,20 +160,15 @@
+ 
+         for(int i = 1; i < dimension-1; i++){
+             int i_prev = i -1;
+-            int s_i = solut.getSolut().get(i);
+-            int s_i_prev = solut.getSolut().get(i_prev);
+             double rev_seq_cost = solut.getSeq(i, i+1, info.T);
+ 
+             for(int j = i+2; j < dimension; j++){
+                 int j_next = j+1;
+-                int s_j_next = solut.getSolut().get(j_next);
+-                int s_j_prev = solut.getSolut().get(j-1);
+-                int s_j = solut.getSolut().get(j);
+ 
+-                rev_seq_cost += info.getCost(s_j_prev, s_j) * (solut.getSeq(i, j, info.W)-1);
++                rev_seq_cost += info.getCost(solut.getSolut().get(j-1), solut.getSolut().get(j)) * (solut.getSeq(i, j, info.W)-1);
+ 
+-                cost_concat_1 =                 solut.getSeq(0, i_prev, info.T) + info.getCost(s_j, s_i_prev);
+-                cost_concat_2 = cost_concat_1 + solut.getSeq(i, j, info.T) + info.getCost(s_j_next, s_i);
++                cost_concat_1 =                 solut.getSeq(0, i_prev, info.T) + info.getCost(solut.getSolut().get(j), solut.getSolut().get(i_prev));
++                cost_concat_2 = cost_concat_1 + solut.getSeq(i, j, info.T) + info.getCost(solut.getSolut().get(j_next), solut.getSolut().get(i));
+ 
+                 cost_new = solut.getSeq(0, i_prev, info.C)                                                        /*        1st subseq */
+                         + solut.getSeq(i, j, info.W)              * cost_concat_1 + rev_seq_cost                  /* concat 2nd subseq (reversed seq) */
+@@ -217,20 +206,14 @@
+             int j = opt + i - 1;
+             int i_prev = i-1;
+             int j_next = j+1;
+-            int s_i = solut.getSolut().get(i);
+-            int s_j = solut.getSolut().get(j);
+-            int s_i_prev = solut.getSolut().get(i_prev);
+-            int s_j_next = solut.getSolut().get(j_next);
+ 
+             // k -> reinsertion places
+             for(int k = 0; k < i_prev; k++){
+                 int k_next = k+1;
+-                int s_k = solut.getSolut().get(k);
+-                int s_k_next = solut.getSolut().get(k_next);
+                 
+-                cost_concat_1 = solut.getSeq(0, k, info.T) + info.getCost(s_k, s_i);
+-                cost_concat_2 = cost_concat_1 + solut.getSeq(i, j, info.T) + info.getCost(s_j, s_k_next);
+-                cost_concat_3 = cost_concat_2 + solut.getSeq(k_next, i_prev, info.T) + info.getCost(s_i_prev, s_j_next);
++                cost_concat_1 = solut.getSeq(0, k, info.T) + info.getCost(solut.getSolut().get(k), solut.getSolut().get(i));
++                cost_concat_2 = cost_concat_1 + solut.getSeq(i, j, info.T) + info.getCost(solut.getSolut().get(j), solut.getSolut().get(k_next));
++                cost_concat_3 = cost_concat_2 + solut.getSeq(k_next, i_prev, info.T) + info.getCost(solut.getSolut().get(i_prev), solut.getSolut().get(j_next));
+ 
+                 cost_new = solut.getSeq(0, k, info.C)                                                             /*        1st subseq */
+                         + solut.getSeq(i, j, info.W)              * cost_concat_1 + solut.getSeq(i, j, info.C)                  /* concat 2nd subseq (reinserted seq) */
+@@ -247,12 +230,10 @@
+ 
+             for(int k = i+opt; k < dimension; k++){
+                 int k_next = k+1;
+-                int s_k = solut.getSolut().get(k);
+-                int s_k_next = solut.getSolut().get(k_next);
+ 
+-                cost_concat_1 = solut.getSeq(0, i_prev, info.T) + info.getCost(s_i_prev, s_j_next);
+-                cost_concat_2 = cost_concat_1 + solut.getSeq(j_next, k, info.T) + info.getCost(s_k, s_i);
+-                cost_concat_3 = cost_concat_2 + solut.getSeq(i, j, info.T) + info.getCost(s_j, s_k_next);
++                cost_concat_1 = solut.getSeq(0, i_prev, info.T) + info.getCost(solut.getSolut().get(i_prev), solut.getSolut().get(j_next));
++                cost_concat_2 = cost_concat_1 + solut.getSeq(j_next, k, info.T) + info.getCost(solut.getSolut().get(k), solut.getSolut().get(i));
++                cost_concat_3 = cost_concat_2 + solut.getSeq(i, j, info.T) + info.getCost(solut.getSolut().get(j), solut.getSolut().get(k_next));
+ 
+                 cost_new = solut.getSeq(0, i_prev, info.C)                                                        /*      1st subseq */
+                         + solut.getSeq(j_next, k, info.W)         * cost_concat_1 + solut.getSeq(j_next, k, info.C)             /* concat 2nd subseq */

@@ -10,3 +10,8 @@ csharp_cpp.base,csharp_cpp,csharp_cpp/measure.patch,translation as delivered + m
 swift_cpp.base,swift_cpp,swift_cpp/measure.patch,translation as delivered + measurement fix
 fortran_cpp.base,fortran_cpp,,translation as delivered (no measurement fix needed)
 go_cpp.base,go_cpp,go_cpp/measure.patch,translation as delivered + measurement fix
+ours_java.z_final,ours/java,ours_java/z_final.patch,J1a (D): Z of getSeq as static final
+ours_java.direct_access,ours/java,ours_java/direct_access.patch,J1 (D): direct array access instead of getSeq/setSeq/getCost/getSolut().get in the search
+ours_java.no_local_copies,ours/java,ours_java/no_local_copies.patch,J2 (D): route values read in place instead of copied to locals
+ours_java.arraycopy_shift,ours/java,ours_java/arraycopy_shift.patch,J4 (D): tArray.shift with System.arraycopy
+cpp_java.aos,cpp_java,cpp_java/measure.patch cpp_java/aos.patch,J3 (I): subsequences in one interleaved array (our AoS)

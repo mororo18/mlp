@@ -1,0 +1,12 @@
+diff -ruN a/tSolution.java b/tSolution.java
+--- a/tSolution.java	2026-11-11 18:53:56.700260058 -0300
++++ b/tSolution.java	2026-11-21 11:41:03.001771507 -0300
+@@ -9,7 +9,7 @@
+     private int n1;
+ 
+     private double cost;
+-    private static int Z = 3;
++    private static final int Z = 3;
+ 
+ 
+     tSolution(int dimen, double c) {

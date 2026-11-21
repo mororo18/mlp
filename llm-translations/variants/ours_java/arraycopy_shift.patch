@@ -1,0 +1,23 @@
+diff -ruN a/tArray.java b/tArray.java
+--- a/tArray.java	2026-07-07 14:08:48.860327020 -0300
++++ b/tArray.java	2026-11-21 11:41:03.017118392 -0300
+@@ -67,18 +67,7 @@
+     }
+ 
+     private void shift(int from, int to, int sz) {
+-        if (from < to) {
+-            int dist = to - from;
+-
+-            for (int i = from+sz-1, j = to+sz-1; i >= from; i--,j--) {
+-                arr[j] = arr[i];
+-            }
+-        } else {
+-            for (int i = from, j = to; i < from+sz; i++, j++) {
+-                arr[j] = arr[i];
+-            }
+-        }
+-
++        System.arraycopy(arr, from, arr, to, sz);
+     }
+ 
+     public void swap(int i, int j) {

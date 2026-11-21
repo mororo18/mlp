@@ -336,6 +336,32 @@ os 7 do outro usuário. O nosso Java repete a rodada de base e a das figuras:
 Gap com a repetição: −10,9% (base: −11,1%). O gap é da tradução, não da
 medição do nosso Java; segue para a Fase 3 com J1 a J4.
 
+## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
+
+Pedido do autor (2026-11-21): registrar aqui, como hipóteses, as diferenças
+novas que aparecerem ao ler o código, mesmo fora da lista da Fase 2.
+
+### Java
+- **H-J1a. `Z` não constante no nosso `getSeq`.** Em `tSolution.java`,
+  `private static int Z = 3` não é `final`; o C2 só dobra constantes de
+  campos `static final`, então todo acesso às subsequências lê `Z` da
+  memória e multiplica. Variante `ours_java.z_final`.
+- **H-J5. Aquecimento do JIT.** O gap se concentra nas instâncias pequenas
+  (berlin52 0,88, kroA100 0,80) e cai nas grandes (gr202 0,95, lin318
+  0,93). O nosso Java tem mais classes e chamadas no caminho quente
+  (`tArray`, `tSolution`, `tInfo`, acessores), o que pode atrasar a
+  compilação e a inlining do C2; nas execuções curtas, esse atraso pesa
+  mais. Teste possível sem mudar código: contar e cronometrar as
+  compilações (`-Xlog:jit+compilation`) nos dois programas, ou medir o
+  tempo de cada busca local. Fica para depois das variantes J1 a J4.
+- **Sem efeito esperado, só registro:** a tradução aloca um vetor novo em
+  cada `reinsert` (o nosso usa um buffer fixo), o que joga contra ela; e
+  aceita o melhor movimento com `cost_best < cost - DBL_EPSILON` no swap e
+  na reinserção, enquanto o nosso compara sem ε (custos idênticos nas
+  quatro instâncias).
+- O `index` de `update_subseq_info_matrix` na tradução (herdado do nosso
+  C++) não muda o laço: a recomputação é completa nos dois lados.
+
 ## Restrições
 
 - Servidor q-dual (`ssh q-dual`, via `jump`, com fail2ban): logins únicos e

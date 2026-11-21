@@ -22,6 +22,8 @@ OURS = {"cpp_java": "java", "cpp_julia": "julia", "cpp_swift": "swift", "cpp_go"
 
 def our_lang(variant):
     pair = variant.split(".")[0]
+    if pair.startswith("ours_"):
+        return pair[len("ours_"):]
     return OURS.get(pair, "cplusplus")
 
 
