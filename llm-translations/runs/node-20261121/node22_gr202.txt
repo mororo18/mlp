@@ -1,0 +1,13 @@
+these 4 paths will be fetched (19.4 MiB download, 92.0 MiB unpacked):
+  /nix/store/xv1lykwi8n984ips4rpjv1imfwqpak31-nodejs-22.20.0
+  /nix/store/ks3slx52c0jmfgg717n0jq9lp354mlnw-sqlite-3.48.0
+  /nix/store/17qrg8r0mpynmz06lx60fgs8g6dgbb3a-sqlite-3.48.0-bin
+  /nix/store/x8r21k5xskd7647wzb625g3gfxrj97w8-sqlite-3.48.0-dev
+copying path '/nix/store/17qrg8r0mpynmz06lx60fgs8g6dgbb3a-sqlite-3.48.0-bin' from 'https://cache.nixos.org'...
+copying path '/nix/store/ks3slx52c0jmfgg717n0jq9lp354mlnw-sqlite-3.48.0' from 'https://cache.nixos.org'...
+copying path '/nix/store/x8r21k5xskd7647wzb625g3gfxrj97w8-sqlite-3.48.0-dev' from 'https://cache.nixos.org'...
+copying path '/nix/store/xv1lykwi8n984ips4rpjv1imfwqpak31-nodejs-22.20.0' from 'https://cache.nixos.org'...
+v22.20.0
+COST:  2909247
+TIME:  49.740378
+wall clock (s):  49.688

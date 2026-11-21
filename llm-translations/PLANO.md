@@ -501,19 +501,19 @@ possa esperar vai para o fim da lista.
 - [x] **P2. Julia sem o berlin52 (L1).** Nenhuma variante explica os −3,8%;
   medir a compilação dentro do trecho medido. Também: os dois patamares do
   nosso Julia no berlin52 (0,134 s e 0,169 s).
-- [ ] **P3. Metade do gap do C++ → Go.** G2 explica −1,4% de −2,8%; G1
+- [x] **P3. Metade do gap do C++ → Go.** G2 explica −1,4% de −2,8%; G1
   refutado.
-- [ ] **P4. Índice `unsigned` (H-R1b).** Custa de 1% a 36% nas traduções
+- [x] **P4. Índice `unsigned` (H-R1b).** Custa de 1% a 36% nas traduções
   para C++ e nada no nosso C++.
-- [ ] **P5. `Float64Array` (H-JS4).** Confirmar na inversa: as três
+- [x] **P5. `Float64Array` (H-JS4).** Confirmar na inversa: as três
   subsequências da tradução como `Array`.
-- [ ] **P6. Inversas dos pares em que a tradução ganha.** O escopo pede a
+- [x] **P6. Inversas dos pares em que a tradução ganha.** O escopo pede a
   inversa para confirmar a direta; só o Java (J3) tem. Go (G2: o acessor
   `at()` na tradução) e Swift (S3: a cópia da solução na tradução); o
   JavaScript é o P5.
-- [ ] **P7. lin318 do JavaScript (H-JS5).** 7,8 vezes o gr202 nos dois lados
+- [x] **P7. lin318 do JavaScript (H-JS5).** 7,8 vezes o gr202 nos dois lados
   (C++: 3,1). Adiado pelo autor em 2026-11-21; entra por último.
-- [ ] **P8. Mecanismo do `index32` em C# → C++ e Fortran → C++.** Nesses
+- [x] **P8. Mecanismo do `index32` em C# → C++ e Fortran → C++.** Nesses
   dois, o patch trunca uma conta feita em `int` (a mesma forma do nosso
   `to_1D`) e ainda custa 13 a 15 pontos no servidor; localmente, o C# → C++
   só perde 3% em ciclos (instruções +11%). Ver a explicação do P4.
@@ -529,6 +529,15 @@ possa esperar vai para o fim da lista.
   (1,012 e 0,991). No berlin52, uma busca de aquecimento não basta (o nosso
   continua em 0,31 s, a tradução cai para 0,19 s).
 - [ ] **P12. Índice de cidade a partir de 1 no Julia (H-L4).** Ver o P10.
+- [ ] **P13. Node 24 nas rodadas das figuras.** O lin318 lento é do Node 24
+  (P7). Conferir com que Node foi medido o JavaScript das figuras e se a
+  frase do artigo "JavaScript is the only language whose gap grows with
+  instance size" é efeito da versão (instâncias acima de cerca de 300
+  clientes).
+- [ ] **P14. `index32` no C# → C++: subsequências ou matriz?** O controle
+  com o deslocamento do campo fora do truncamento não mudou nada no
+  servidor (P8). Os dois patches truncam também o índice da matriz de
+  distâncias; separar os dois.
 
 ### Andamento das pendências
 
@@ -604,6 +613,64 @@ diferente. Traduções para C++ (kroA100): Rust, C#, Fortran, Go e Swift →
 C++ consomem os 50.313 sorteios. Só o Swift nativo (o nosso e o C++ →
 Swift) ficou sem conferir, por falta do compilador na máquina local; o gap
 dele já está explicado pelo S3.
+
+### Rodada das pendências P3 a P8 (`runs/p3p8-20261121/`, 19:50 a 21:21 do servidor)
+
+640 execuções (16 programas x 4 instâncias x 10), commit `0f24a3e`, todos os
+custos certos; 81 de 92 leituras com 11 processos acima de 50%. Razões
+(berlin52, kroA100, gr202, lin318):
+
+| Comparação | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| `cpp_go.base` / nosso Go | 0,971 0,967 0,968 0,979 | −2,9% | −2,9% |
+| `ours_go.style` (G2 + campos + RVND) / nosso Go | 0,995 0,985 0,975 0,987 | −1,5% | −1,8% |
+| `cpp_go.at_accessor` (G2 inversa) / `cpp_go.base` | 1,032 1,019 1,013 1,013 | +1,9% | +1,5% |
+| `cpp_swift.full_copy` (S3 inversa) / `cpp_swift.base` | 1,012 1,006 1,018 1,012 | +1,2% | +1,2% |
+| `cpp_javascript.base` / nosso JavaScript | 1,138 1,194 1,196 0,954 | +12,1% | +11,5% |
+| `cpp_javascript.array` / nosso JavaScript | 1,012 1,027 1,063 0,933 | +0,9% | +0,8% |
+| `cpp_javascript.array` / `cpp_javascript.base` | 0,890 0,860 0,888 0,979 | −9,6% | −9,1% |
+| `ours_cplusplus.size_t_counter` / nosso C++ | 1,263 1,349 1,362 1,318 | +32,3% | +34,3% |
+| `rust_cpp.index32` / nosso C++ | 1,369 1,465 1,476 1,425 | +43,4% | +45,6% |
+| `rust_cpp.index32_int` / nosso C++ | 1,142 1,164 1,148 1,134 | +14,7% | +14,8% |
+| `csharp_cpp.index32` / nosso C++ | 1,231 1,284 1,294 1,256 | +26,6% | +27,8% |
+| `csharp_cpp.index32_field` / `csharp_cpp.index32` | 0,993 1,005 1,006 0,994 | −0,1% | +0,2% |
+
+Leitura:
+- **P3 (Go):** a ordem dos campos e a lista do RVND não somam nada ao G2
+  (−1,5% contra −1,4% do G2 sozinho). A outra metade do gap (cerca de
+  1,4%) fica como efeito de geração de código do compilador Go, como
+  concluía o relatório antigo; o caminho de busca é o mesmo (P9).
+- **P6 (inversas):** o acessor `at()` na tradução a deixa 1,5 a 1,9% mais
+  lenta (G2 confirmado nos dois sentidos); a cópia da solução inteira no
+  C++ → Swift, 1,2% (S3 confirmado nos dois sentidos).
+- **P5 (JavaScript, H-JS4 confirmada):** com as três subsequências em
+  `Array`, a tradução fica 9,6% mais rápida e empata com o nosso (+0,9%).
+  O `Float64Array` explica o gap do C++ → JavaScript nos dois sentidos.
+- **P4 (índice):** o contador `size_t` truncado pelo `to_1D(int, ...)`
+  deixa o nosso C++ 32% mais lento no servidor (24% de ciclos na máquina
+  local): o mecanismo está confirmado. No Rust → C++, fazer a conta em
+  `int` tira dois terços do custo no servidor (+43% → +15%), embora quase
+  não mude o número de instruções na máquina local; o resto vem dos
+  contadores `size_t` truncados (`(int)col`). Conclusão para o texto: o
+  custo é de truncar para 32 bits um índice calculado a partir de
+  contadores de 64 bits; com contadores `int`, como no nosso C++, o
+  `unsigned` não custa nada.
+- **P8 (C#):** tirar o deslocamento do campo do truncamento não muda nada
+  no servidor (−0,1%), apesar de tirar um terço das instruções a mais na
+  máquina local. Hipótese refutada; a causa no C# → C++ fica aberta (P14).
+
+**P7 (2026-11-21, servidor, `runs/node-20261121/`).** O nosso JavaScript,
+uma execução por versão, gr202 e lin318 em paralelo:
+
+| Node | gr202 | lin318 | lin318 / gr202 |
+|---|---|---|---|
+| 20.19.6 (nixos-25.05) | 59,7 s | 168,9 s | 2,8 |
+| 22.20.0 (nixos-25.05) | 49,7 s | 143,6 s | 2,9 |
+| 24.18.0 (flake das rodadas) | 42,5 s | 333,1 s | 7,8 |
+
+O lin318 lento é uma regressão do Node 24: ele é o mais rápido no gr202 e
+2,3 vezes mais lento que o Node 22 no lin318. Não é da CPU nem do código
+(H-JS5 resolvida). Consequência para o artigo: P13.
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do

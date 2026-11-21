@@ -1,0 +1,14 @@
+error (ignored): SQLite database '/root/.cache/nix/eval-cache-v6/2bbd13f37c84d9677141bb07e8b2d2821c10107d95cd8d7187a3b0761780a1a2.sqlite' is busy
+these 4 paths will be fetched (19.4 MiB download, 92.0 MiB unpacked):
+  /nix/store/xv1lykwi8n984ips4rpjv1imfwqpak31-nodejs-22.20.0
+  /nix/store/ks3slx52c0jmfgg717n0jq9lp354mlnw-sqlite-3.48.0
+  /nix/store/17qrg8r0mpynmz06lx60fgs8g6dgbb3a-sqlite-3.48.0-bin
+  /nix/store/x8r21k5xskd7647wzb625g3gfxrj97w8-sqlite-3.48.0-dev
+copying path '/nix/store/17qrg8r0mpynmz06lx60fgs8g6dgbb3a-sqlite-3.48.0-bin' from 'https://cache.nixos.org'...
+copying path '/nix/store/ks3slx52c0jmfgg717n0jq9lp354mlnw-sqlite-3.48.0' from 'https://cache.nixos.org'...
+copying path '/nix/store/x8r21k5xskd7647wzb625g3gfxrj97w8-sqlite-3.48.0-dev' from 'https://cache.nixos.org'...
+copying path '/nix/store/xv1lykwi8n984ips4rpjv1imfwqpak31-nodejs-22.20.0' from 'https://cache.nixos.org'...
+v22.20.0
+COST:  5620197
+TIME:  143.675084
+wall clock (s):  143.562

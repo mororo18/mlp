@@ -1,0 +1,7 @@
+waiting for another Nix process to finish fetching input 'github:numtide/flake-utils/11707dc2f618dd54ca8739b309ec4fc024de578b?narHash=sha256-l0KFg5HjrsfsO/JpG%2Br7fRrqm12kzFHyUHqHCVpMMbI%3D'...
+unpacking 'github:nix-systems/default/da67096a3b9bf56a91d16901293e51ba5b49a27e?narHash=sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768%3D' into the Git cache...
+error (ignored): SQLite database '/root/.cache/nix/eval-cache-v6/3ff0e825e5338d5bd0c98fd12e8e025bd4f571725d5d515857ed612d4eee3c7e.sqlite' is busy
+v24.18.0
+COST:  2909247
+TIME:  42.565866
+wall clock (s):  42.477
