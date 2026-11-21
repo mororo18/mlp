@@ -496,9 +496,9 @@ Leitura:
 Pedido do autor: tratar os itens em ordem; problema ou hipótese nova que
 possa esperar vai para o fim da lista.
 
-- [ ] **P1. Java nas instâncias curtas (H-J5).** J1 + J2 explicam o gr202 e
+- [x] **P1. Java nas instâncias curtas (H-J5).** J1 + J2 explicam o gr202 e
   o lin318, mas não o kroA100 (0,919 contra 0,820) nem o berlin52.
-- [ ] **P2. Julia sem o berlin52 (L1).** Nenhuma variante explica os −3,8%;
+- [x] **P2. Julia sem o berlin52 (L1).** Nenhuma variante explica os −3,8%;
   medir a compilação dentro do trecho medido. Também: os dois patamares do
   nosso Julia no berlin52 (0,134 s e 0,169 s).
 - [ ] **P3. Metade do gap do C++ → Go.** G2 explica −1,4% de −2,8%; G1
@@ -521,6 +521,13 @@ possa esperar vai para o fim da lista.
   exatamente o número de sorteios do caminho de referência; no Go, o nosso
   e a tradução consomem todos (P3). Conferir os demais da mesma forma (em
   JavaScript, ler além do fim não dá erro, ver P7).
+- [ ] **P10. Julia: gap de −3,3% em regime.** Depois do aquecimento, a
+  tradução continua 3,1 a 3,6% mais rápida do kroA100 ao lin318 (P2), e
+  nenhuma variante (L2, L3) explica. Reler os laços quentes dos dois.
+- [ ] **P11. Java no kroA100 depois do aquecimento.** Com aquecimento e
+  J1 + J2, sobram 7% no kroA100 (0,927); no gr202 e no lin318, nada
+  (1,012 e 0,991). No berlin52, uma busca de aquecimento não basta (o nosso
+  continua em 0,31 s, a tradução cai para 0,19 s).
 
 ### Andamento das pendências
 
@@ -530,6 +537,37 @@ o `GILS_RVND`; nos outros, `rnd_index` volta ao início). Se o gap das
 instâncias curtas sumir com o aquecimento, a causa é o JIT. Rodada
 `runs/warm-20261121/`, com `cpp_java.base` e `cpp_julia.base` de novo para
 comparar na mesma rodada.
+
+Resultado (`runs/warm-20261121/`, 18:59 a 19:46 do servidor, 360
+execuções, commit `3e7b545`, todos os custos certos; 38 de 48 leituras com
+11 processos acima de 50%). Razões por instância (berlin52, kroA100, gr202,
+lin318):
+
+| Comparação | Razões | Gap sem berlin52 |
+|---|---|---|
+| Java: tradução / nosso, sem aquecimento | 0,891 0,807 0,951 0,918 | −10,8% |
+| Java: tradução / nosso, com aquecimento | 0,609 0,872 0,971 0,930 | −7,6% |
+| Java: nosso com aquecimento / sem | 0,407 0,761 0,967 0,989 | −9,4% |
+| Java: tradução com aquecimento / sem | 0,278 0,821 0,987 1,001 | −6,3% |
+| Java: tradução / nosso J1 + J2, ambos com aquecimento | 0,632 0,927 1,012 0,991 | −2,3% |
+| Julia: tradução / nosso, sem aquecimento | 0,797 0,965 0,950 0,966 | −4,0% |
+| Julia: tradução / nosso, com aquecimento | 0,968 0,964 0,966 0,969 | −3,3% |
+| Julia: nosso com aquecimento / sem | 0,822 1,003 0,982 1,002 | −0,4% |
+| Julia: tradução com aquecimento / sem | 0,997 1,001 0,999 1,005 | +0,2% |
+
+Leitura:
+- **Java (H-J5 confirmada em parte):** o aquecimento do JIT pesa nos dois
+  programas até o kroA100 (o nosso perde 24% no kroA100 por ele, a
+  tradução 18%) e quase nada do gr202 em diante. Com os dois aquecidos, o
+  gap do kroA100 cai de 19% para 13%; com aquecimento e J1 + J2, para 7%.
+  No gr202 e no lin318, J1 + J2 explicam tudo. O resto do kroA100 e o
+  berlin52 vão para o P11.
+- **Julia (L1 confirmada só no berlin52):** a compilação dentro do trecho
+  medido custa ao nosso Julia 0,028 s no berlin52 (0,161 → 0,133 s) e nada
+  na tradução, que já compila antes; isso explica toda a diferença do
+  berlin52 (0,797 → 0,968) e os dois patamares (com aquecimento, cv 0,2%).
+  Nas outras instâncias, o aquecimento não muda nada: os −3,3% são de
+  regime e vão para o P10.
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
