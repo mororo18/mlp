@@ -467,6 +467,30 @@ Leitura:
   JS1c para 0,936). O lin318 do nosso JavaScript continua lento: 336 s,
   7,8 vezes o gr202 (C++: 3,1).
 
+### Lote das combinações (2026-11-21, 18:32 a 18:48 do servidor, `runs/combo-20261121/`)
+
+200 execuções (5 programas x 4 instâncias x 10), commit `ba85d9f`, todos os
+custos certos. Carga: 11 de 15 leituras com 11 processos acima de 50%. O
+nosso C++ e o nosso Java repetem os lotes anteriores (diferença abaixo de
+1%, exceto o berlin52 do Java, 0,803 s contra 0,775 s).
+
+| Variante | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| `go_cpp.epsilon_row_matrix` (I) | 1,017 1,011 1,008 1,008 | +1,1% | +0,9% |
+| `fortran_cpp.epsilon_row_matrix` (I) | 0,981 0,979 0,967 0,969 | −2,6% | −2,8% |
+| `ours_java.direct_no_locals` (J1 + J2, D) | 0,920 0,919 0,950 0,945 | −6,6% | −6,2% |
+
+Leitura:
+- **Go → C++:** ε e matriz em linhas juntos levam o gap de +28,7% a +1,1%.
+- **Fortran → C++:** os dois juntos levam o gap de +34,1% a −2,6%: a
+  tradução passa a ganhar do nosso por pouco.
+- **Java:** J1 + J2 juntos dão −6,2% sem o berlin52, perto da soma dos
+  dois separados (−7,1%). No gr202 e no lin318, a variante chega à razão
+  da tradução (0,950 e 0,945 contra 0,951 e 0,926 no lote Java): o gap
+  dessas duas instâncias fica explicado. No kroA100 não fica (0,919 contra
+  0,820). O que falta explicar está no kroA100 e no berlin52, as duas
+  instâncias curtas, o que reforça a H-J5 (aquecimento do JIT).
+
 ## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
 
 Pedido do autor (2026-11-21): registrar aqui, como hipóteses, as diferenças
