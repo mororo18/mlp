@@ -534,7 +534,7 @@ possa esperar vai para o fim da lista.
   frase do artigo "JavaScript is the only language whose gap grows with
   instance size" é efeito da versão (instâncias acima de cerca de 300
   clientes).
-- [ ] **P14. `index32` no C# → C++: subsequências ou matriz?** O controle
+- [x] **P14. `index32` no C# → C++: subsequências ou matriz?** O controle
   com o deslocamento do campo fora do truncamento não mudou nada no
   servidor (P8). Os dois patches truncam também o índice da matriz de
   distâncias; separar os dois.
@@ -768,6 +768,27 @@ figuras não se repetem com nenhuma das duas versões, e a versão usada
 naquelas rodadas não está registrada. A conclusão do P13 continua: a frase
 de que o gap do JavaScript cresce com o tamanho vem de instâncias com
 tempos que não se repetem. Fica o P15.
+
+### Rodada do P14 (`runs/p14-20261121/`, 23:21 a 23:35 do servidor)
+
+240 execuções (6 programas x 4 instâncias x 10), commit `fe245f4`, todos os
+custos certos; 14 de 15 leituras com 11 processos acima de 50%. Razões sobre
+`csharp_cpp.base` (berlin52, kroA100, gr202, lin318):
+
+| Variante | Razões | Gap |
+|---|---|---|
+| `csharp_cpp.index32` (subsequências e matriz) | 1,104 1,129 1,148 1,150 | +13,3% |
+| `csharp_cpp.index32_seq` (só subsequências) | 1,143 1,163 1,174 1,163 | +16,1% |
+| `csharp_cpp.index32_matrix` (só matriz) | 0,976 0,980 0,984 0,983 | −1,9% |
+| `csharp_cpp.index32_seq_assume` (só subsequências, índices não negativos) | 1,007 1,009 1,012 1,014 | +1,1% |
+
+Leitura: o servidor confirma o que a máquina local mostrou. O custo do
+`index32` no C# → C++ é todo do índice das subsequências; truncar o índice
+da matriz deixa a tradução 2% mais rápida. Declarar os índices e o `d` não
+negativos tira quase todo o custo (+16,1% → +1,1%). Mecanismo confirmado:
+o `unsigned` custa quando o compilador não prova que o índice é não
+negativo (C# → C++) ou quando ele vem de contadores de 64 bits truncados
+(Rust → C++, P4).
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
