@@ -41,3 +41,5 @@ swift_cpp.row_matrix,swift_cpp,swift_cpp/measure.patch swift_cpp/row_matrix.patc
 csharp_cpp.index32,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32.patch,C#->C++ (I): unsigned subsequence and matrix index
 csharp_cpp.row_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/row_matrix.patch,C#->C++ (I): distance matrix as double** rows
 ours_java.direct_no_locals,ours/java,ours_java/direct_no_locals.patch,J1+J2 (D): direct array access and no local copies of the route
+go_cpp.epsilon_row_matrix,go_cpp,go_cpp/measure.patch go_cpp/epsilon.patch go_cpp/row_matrix.patch,Go->C++ (I): epsilon and double** distance matrix
+fortran_cpp.epsilon_row_matrix,fortran_cpp,fortran_cpp/epsilon.patch fortran_cpp/row_matrix.patch,Fortran->C++ (I): epsilon and double** distance matrix

@@ -372,6 +372,101 @@ Leitura:
   combinada `ours_java.direct_no_locals` (J1 + J2) e o diagnóstico de
   aquecimento do JIT (H-J5).
 
+### Lote principal (2026-11-21, 15:10 a 18:19 do servidor, `runs/factors-20261121/`)
+
+1.560 execuções (39 programas x 4 instâncias x 10), commit `d8b35cf`, todos
+os custos certos, nenhum timeout. Carga: 167 de 190 leituras com 11
+processos acima de 50% (os 4 da rodada e os 7 do outro usuário), 12 com 12.
+cv até 1,6%, exceto duas execuções isoladas: uma de 122,7 s entre nove de
+cerca de 336 s em `ours_javascript.no_globals` no lin318, e o nosso Julia no
+berlin52 com dois patamares (4 execuções em 0,134 s e 6 em 0,169 s). Os
+gaps de base repetem a Fase 1 (diferença de até 0,7 ponto).
+
+Tempos do nosso lado (média, s): C++ 0,093, 1,201, 11,59, 36,01; Go 0,226,
+2,965, 28,49, 80,84; Swift 0,123, 1,665, 16,65, 49,59; Julia 0,155, 1,712,
+16,27, 47,57; JavaScript 0,421, 4,337, 43,08, 336,6.
+
+Razões (berlin52, kroA100, gr202, lin318) sobre a nossa implementação da
+linguagem de destino:
+
+**To-C++ (sentido I, a nossa escolha na tradução):**
+
+| Variante | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| `rust_cpp.base` | 1,072 1,095 1,090 1,077 | +8,4% | +8,7% |
+| `rust_cpp.row_matrix` | 0,977 0,993 0,989 0,997 | −1,1% | −0,7% |
+| `rust_cpp.index32` | 1,395 1,468 1,475 1,422 | +44,0% | +45,5% |
+| `csharp_cpp.base` | 1,145 1,138 1,127 1,091 | +12,5% | +11,9% |
+| `csharp_cpp.row_matrix` | 0,995 0,998 1,005 0,994 | −0,2% | −0,1% |
+| `csharp_cpp.index32` | 1,256 1,287 1,314 1,254 | +27,8% | +28,5% |
+| `swift_cpp.base` | 1,129 1,137 1,135 1,094 | +12,4% | +12,2% |
+| `swift_cpp.row_matrix` | 1,011 1,014 1,025 1,009 | +1,5% | +1,6% |
+| `swift_cpp.route_copy` | 1,117 1,142 1,112 1,086 | +11,4% | +11,3% |
+| `swift_cpp.index32` | 1,146 1,143 1,143 1,107 | +13,5% | +13,1% |
+| `go_cpp.base` | 1,255 1,285 1,310 1,301 | +28,7% | +29,8% |
+| `go_cpp.epsilon` | 1,023 1,022 1,026 1,018 | +2,2% | +2,2% |
+| `go_cpp.row_matrix` | 1,220 1,260 1,275 1,272 | +25,7% | +26,9% |
+| `go_cpp.index32` | 1,323 1,341 1,343 1,336 | +33,6% | +34,0% |
+| `fortran_cpp.base` | 1,365 1,353 1,335 1,310 | +34,1% | +33,3% |
+| `fortran_cpp.epsilon` | 1,138 1,107 1,074 1,038 | +8,9% | +7,3% |
+| `fortran_cpp.row_matrix` | 1,211 1,241 1,241 1,251 | +23,6% | +24,4% |
+| `fortran_cpp.index32` | 1,501 1,503 1,471 1,416 | +47,3% | +46,3% |
+| `ours_cplusplus.index64` (D) | 0,995 1,002 0,990 1,000 | −0,3% | −0,3% |
+
+**From-C++ (sentido D, a escolha da tradução no nosso):**
+
+| Variante | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| `cpp_go.base` | 0,973 0,968 0,972 0,975 | −2,8% | −2,8% |
+| `ours_go.direct_index` (G2) | 0,990 0,985 0,985 0,986 | −1,4% | −1,5% |
+| `ours_go.epsilon` (G1) | 1,009 1,014 1,013 1,001 | +0,9% | +0,9% |
+| `cpp_swift.base` | 0,999 0,992 0,963 0,985 | −1,5% | −2,0% |
+| `ours_swift.route_copy` (S3) | 0,989 0,994 0,976 0,984 | −1,4% | −1,5% |
+| `ours_swift.no_local_copies` (S2) | 1,001 0,997 0,983 0,988 | −0,8% | −1,1% |
+| `ours_swift.direct_access` (S1) | 0,997 0,999 0,992 0,998 | −0,4% | −0,4% |
+| `cpp_julia.base` | 0,830 0,966 0,959 0,960 | −7,1% | −3,8% |
+| `ours_julia.struct_vector` (L3) | 0,870 1,012 0,999 0,997 | −3,1% | +0,3% |
+| `ours_julia.hoist_fields` (L2) | 1,077 1,002 1,001 1,001 | +2,0% | +0,2% |
+| `cpp_javascript.base` | 1,137 1,196 1,192 0,987 | +12,8% | +12,5% |
+| `ours_javascript.float64array` (JS1a) | 1,163 1,194 1,164 1,044 | +14,1% | +13,4% |
+| `ours_javascript.const_offsets` (JS1b) | 0,907 0,905 0,901 0,970 | −7,9% | −7,5% |
+| `ours_javascript.no_globals` (JS1c) | 0,998 1,004 1,007 0,936 | −1,4% | −1,8% |
+| `ours_javascript.function_decl` (JS2) | 0,996 1,003 1,002 0,999 | 0,0% | +0,1% |
+
+Leitura:
+- **Matriz de distâncias plana (to-C++):** com o nosso `double**`, o gap
+  some no Rust (+8,4% → −1,1%), no C# (+12,5% → −0,2%) e no Swift
+  (+12,4% → +1,5%). É o fator principal desses três pares. O relatório
+  antigo dizia o contrário para o Rust (o plano custaria 4 a 8% no nosso).
+- **ε (Go e Fortran → C++):** explica quase todo o gap do Go (+28,7% →
+  +2,2%) e três quartos do Fortran (+34,1% → +8,9%). A matriz em linhas
+  ajuda os dois (3 e 10 pontos). Próximo teste: os dois juntos
+  (`go_cpp.epsilon_row_matrix`, `fortran_cpp.epsilon_row_matrix`, conferidos
+  localmente).
+- **Índice de 32 bits sem sinal:** truncar o índice para `unsigned` piora
+  todas as traduções (Rust +36 pontos, Fortran +13, C# +15, Go +5, Swift
+  +1), mas usar 64 bits no nosso C++ não muda nada (−0,3%). O R1 antigo
+  repete no sentido I (+48 a +54% antes, +44% agora) e não repete no D
+  (antes −4,5 a −6,4%). Ver H-R1b.
+- **Swift → C++:** a cópia da solução na perturbação (`route_copy`) vale só
+  1 ponto; o gap é da matriz.
+- **Go (from-C++):** G2 explica metade do gap (−1,4% de −2,8%). G1
+  refutado: o ε deixa o nosso Go 1% mais lento (o relatório antigo dava −3
+  a −4%).
+- **Swift (from-C++):** S3 explica o gap sozinho (−1,4% de −1,5%); S1 e S2
+  dão menos de 1%. É o H-S3b (copy-on-write das subsequências), com efeito
+  pequeno.
+- **Julia:** nenhuma variante explica o gap sem o berlin52 (−3,8%). L2 sem
+  efeito; L3 só muda o berlin52, onde o nosso Julia tem dois patamares (ver
+  acima), então não conta. Fica o L1 (compilação JIT), a medir.
+- **JavaScript:** o `Float64Array` no nosso reproduz o gap (+14,1% contra
+  +12,8%, com o mesmo perfil por instância, menor no lin318). As constantes
+  literais nos offsets vão no sentido oposto (−7,9%): a tradução ganha com
+  elas e perde mais com o `Float64Array`. H-JS3 refutada (ver abaixo).
+  JS1c e JS2 sem efeito (a execução isolada de 122,7 s puxa o lin318 do
+  JS1c para 0,936). O lin318 do nosso JavaScript continua lento: 336 s,
+  7,8 vezes o gr202 (C++: 3,1).
+
 ## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
 
 Pedido do autor (2026-11-21): registrar aqui, como hipóteses, as diferenças
@@ -422,7 +517,29 @@ novas que aparecerem ao ler o código, mesmo fora da lista da Fase 2.
   não voltar ao modo rápido ao ser preenchido, os acessos ficam muito
   mais lentos nas instâncias grandes. A variante `float64array` testa isso
   junto com o tipo dos elementos. Não explica o lin318 lento nos dois
-  lados (a tradução usa `Float64Array`).
+  lados (a tradução usa `Float64Array`). **Refutada** (lote principal): o
+  `Float64Array` deixa o nosso 4 a 19% mais lento, e não mais rápido.
+- **H-JS4. `Float64Array` mais lento que `Array` de `double`.** Um `Array`
+  preenchido só com números fica em modo de elementos `double` sem caixa
+  no V8; o acesso a `Float64Array` passa pelas verificações de array
+  tipado. Explicaria o gap do C++ → JavaScript. Teste possível: a inversa,
+  as três subsequências da tradução como `Array`.
+- **H-JS5. lin318 lento nos dois lados.** O lin318 leva 7,8 vezes o gr202
+  no nosso JavaScript e na tradução (C++: 3,1). Como os dois usam layouts
+  diferentes (`Array` intercalado e três `Float64Array`), o efeito não vem
+  do vetor de subsequências. Não investigado (decisão do autor).
+
+### C++ (índice)
+- **H-R1b. O custo do índice de 32 bits depende do contexto.** O nosso C++
+  calcula `to_1D` em `int` e devolve `unsigned`, o mesmo truncamento das
+  variantes `index32`, e trocar por `size_t` não muda nada; nas traduções,
+  o truncamento custa de 1% (Swift → C++) a 36% (Rust → C++). Hipótese: o
+  `unsigned` só atrapalha quando o compilador precisa refazer a extensão de
+  zero do índice dentro de um laço em que, com 64 bits, ele transformaria a
+  multiplicação em incremento de ponteiro (indexação plana `row * n + col`
+  com `n` lido de membro); no nosso, o índice é recalculado em cada acesso
+  de todo jeito. Teste possível: ler o assembly dos laços do `rust_cpp`
+  com e sem o `index32`, e uma variante `index32` sobre o `row_matrix`.
 
 ### To-C++
 - **Fortran → C++:** a matriz de distâncias fica em colunas (column-major)
