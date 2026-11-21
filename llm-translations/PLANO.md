@@ -672,6 +672,20 @@ O lin318 lento é uma regressão do Node 24: ele é o mais rápido no gr202 e
 2,3 vezes mais lento que o Node 22 no lin318. Não é da CPU nem do código
 (H-JS5 resolvida). Consequência para o artigo: P13.
 
+**P13 (2026-11-21).** Nos dados das figuras (`results/main/cleaned_data.csv`
+do artigo, rodadas de 16 a 18/11), o JavaScript fica entre 3,3 e 4,0 vezes o
+C em todas as instâncias acima de 150 clientes, menos quatro: pr299 (9,48),
+linhp318 (9,58), lin318 (9,50) e pr439 (6,49); a rd400, maior, fica em 3,52.
+É o mesmo padrão do Node 24 no lin318 (P7). Sem essas quatro, o JavaScript
+fica 228,8% mais lento que o C acima de 100 clientes (com elas na mediana
+das demais, 3,67 vezes o C: 234,8%), contra 303,8% na figura e 282,8% até
+100 clientes. Ou seja, a frase do artigo de que o gap do JavaScript cresce
+com o tamanho da instância vem dessas quatro instâncias. O servidor não tem
+Node fora do container, e a versão usada nas rodadas de 16 a 18/11 não está
+registrada (pendência antiga do TODO do artigo). Próximo passo:
+`diag/node_versions.sh` com Node 22 e 24 na pr299, na pr439 e na rd400
+(controle), depois da rodada do P11 e do P12.
+
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
 RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e

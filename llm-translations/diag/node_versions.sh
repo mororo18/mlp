@@ -3,8 +3,10 @@
 # no lin318 com Node 20, 22 e 24, no servidor, com as mesmas matrizes de
 # distância do bench.py (.bench/dm_cache).
 #
-# Uso (no servidor): NIX_IMAGE_DIGEST=... llm-translations/diag/node_versions.sh <saida>
-# Node 20 e 22 vêm do nixos-25.05; o 24 é o do flake.nix das rodadas.
+# Uso (no servidor): NIX_IMAGE_DIGEST=... [INSTANCES="gr202 lin318"] [VERSIONS="20 22 24"] \
+#     llm-translations/diag/node_versions.sh <saida>
+# Node 20 e 22 vêm do nixos-25.05; o 24 é o do flake.nix das rodadas. As
+# instâncias sem matriz em .bench/dm_cache são carregadas com mlp-instances/load.
 set -euo pipefail
 
 LT=$(cd "$(dirname "$0")/.." && pwd)
@@ -19,15 +21,23 @@ if [ -z "${INSIDE:-}" ]; then
     git -C "$REPO" rev-parse HEAD > "$OUT/commit.txt"
     cp "$REPO/flake.nix" "$REPO/flake.lock" "$OUT/flake/"
     taskset -c 8,9,10,11 podman run --rm -v fa-nix:/nix -v "$REPO":/repo -v "$OUT":/out -w /repo \
-        -e INSIDE=1 -e NIX_IMAGE_DIGEST="$NIX_IMAGE_DIGEST" "$IMAGE" \
+        -e INSIDE=1 -e NIX_IMAGE_DIGEST="$NIX_IMAGE_DIGEST" \
+        -e INSTANCES="${INSTANCES:-gr202 lin318}" -e VERSIONS="${VERSIONS:-20 22 24}" "$IMAGE" \
         bash /repo/llm-translations/diag/node_versions.sh /out
     echo FIM
     exit 0
 fi
 
+matrix() {
+    local inst=$1 f=/repo/.bench/dm_cache/$1.tsp.distance_matrix
+    if [ ! -f "$f" ]; then
+        $NIX develop path:/out/flake -c bash -c "cd /repo/mlp-instances && ./load $inst.tsp > /dev/null && cp ../distance_matrix $f"
+    fi
+}
+
 run_pair() {
     local tag=$1; shift
-    for inst in gr202 lin318; do
+    for inst in $INSTANCES; do
         local box=/tmp/box_${tag}_${inst}
         rm -rf "$box"; mkdir -p "$box"
         cp -r /repo/javascript "$box/js"
@@ -37,6 +47,10 @@ run_pair() {
     wait
 }
 
-run_pair 20 $NIX shell github:NixOS/nixpkgs/nixos-25.05#nodejs_20 -c
-run_pair 22 $NIX shell github:NixOS/nixpkgs/nixos-25.05#nodejs_22 -c
-run_pair 24 $NIX develop path:/out/flake -c
+for inst in $INSTANCES; do matrix "$inst"; done
+for v in $VERSIONS; do
+    case $v in
+        24) run_pair 24 $NIX develop path:/out/flake -c ;;
+        *)  run_pair "$v" $NIX shell "github:NixOS/nixpkgs/nixos-25.05#nodejs_$v" -c ;;
+    esac
+done
