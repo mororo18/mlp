@@ -544,6 +544,9 @@ possa esperar vai para o fim da lista.
   execuções em cerca de 370 s, 5 em cerca de 1.100 s). Decidir com o autor
   a versão do Node da campanha nova e medir o JavaScript de novo em todas as
   instâncias antes de manter a frase sobre o gap crescer com o tamanho.
+  **Decisão do autor (2026-11-21): Node 24** (o 24.18 do `flake.nix`).
+  Rodada `runs/js66-20261121/`: o nosso JavaScript nas 66 instâncias
+  (`instances66.txt`, a lista `inst-list-66` do servidor), 10 execuções.
 
 ### Andamento das pendências
 
