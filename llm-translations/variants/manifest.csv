@@ -57,3 +57,5 @@ ours_cplusplus.size_t_counter,ours/cplusplus,ours_cplusplus/size_t_counter.patch
 csharp_cpp.index32_field,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_field.patch,P8 control: unsigned subsequence index with the T/C/W offset outside the truncation
 ours_java.soa,ours/java,ours_java/soa.patch,P11 (D): J1+J2 with the subsequences in three arrays (SoA) as in the translation
 ours_java.soa_warm,ours/java,ours_java/soa.patch ours_java/warm.patch,P11 diagnostic: J1+J2+SoA with one untimed search before the timed one
+ours_julia.zero_based,ours/julia,ours_julia/zero_based.patch,P12 (D): route with 0-based city ids and +1 in the distance lookup as in the translation
+ours_julia.zero_based_warm,ours/julia,ours_julia/zero_based.patch ours_julia/warm.patch,P12 diagnostic: zero_based with one untimed search before the timed one

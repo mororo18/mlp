@@ -43,5 +43,13 @@ def structs(b):
     assert 'solut.seq[T' not in t and 'solut.seq[C' not in t and 'solut.seq[W' not in t
     m.write_text(t); print('structs', k, n)
 
-write({'ours_julia/hoist_fields.patch': (OURS, hoist, ()),
+def zero_based(b):
+    m = b / 'main.jl'
+    sub(m, r'\n    push!\(s, 1\)\n    return s\n', '\n    push!(s, 1)\n    return s .- 1\n')
+    n = sub(m, r'data\.cost\[solut\.s\[([^\[\]]+)\], solut\.s\[([^\[\]]+)\]\]', r'data.cost[solut.s[\1]+1, solut.s[\2]+1]')
+    assert not re.search(r'data\.cost\[solut\.s\[[^\]]+\], ', m.read_text())
+    print('zero_based', n)
+
+write({'ours_julia/zero_based.patch': (OURS, zero_based, ()),
+       'ours_julia/hoist_fields.patch': (OURS, hoist, ()),
        'ours_julia/struct_vector.patch': (OURS, structs, ())})

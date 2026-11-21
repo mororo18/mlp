@@ -590,6 +590,11 @@ Variantes `ours_java.soa` (J1 + J2 com as subsequências em três vetores,
 como na tradução) e `ours_java.soa_warm` (com aquecimento), conferidas
 localmente.
 
+**P12 (2026-11-21).** Variante `ours_julia.zero_based`: a construção
+devolve a rota com as cidades a partir de 0 e todo `data.cost[s[a], s[b]]`
+da busca vira `data.cost[s[a]+1, s[b]+1]`, como na tradução (17 acessos);
+`ours_julia.zero_based_warm` com aquecimento. Custos conferidos localmente.
+
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
 RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e
