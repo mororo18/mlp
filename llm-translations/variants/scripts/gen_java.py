@@ -55,7 +55,12 @@ def aos(b):
         sub(m, r'\.seq%s\[to_1D\(([^()]+)\)\]' % f, r'.seq[3 * to_1D(\1) + %d]' % o)
     assert not re.search(r'seq[TCW]', m.read_text())
 
+def direct_no_locals(b):
+    no_locals(b)
+    direct(b)
+
 jobs = {
+    'ours_java/direct_no_locals.patch': (OURS, direct_no_locals, ()),
     'ours_java/z_final.patch': (OURS, z_final, ()),
     'ours_java/direct_access.patch': (OURS, direct, ()),
     'ours_java/no_local_copies.patch': (OURS, no_locals, ()),

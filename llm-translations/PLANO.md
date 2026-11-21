@@ -336,13 +336,49 @@ os 7 do outro usuário. O nosso Java repete a rodada de base e a das figuras:
 Gap com a repetição: −10,9% (base: −11,1%). O gap é da tradução, não da
 medição do nosso Java; segue para a Fase 3 com J1 a J4.
 
+## Fase 4: resultados
+
+### Lote Java (2026-11-21, `runs/java-factors-20261121/`)
+
+280 execuções (7 programas x 4 instâncias x 10), todos os custos certos;
+carga com os 4 processos da rodada e os 7 do outro usuário (22 de 28
+leituras com 11 acima de 50%). Razão sobre o nosso Java na mesma rodada
+(berlin52, kroA100, gr202, lin318) e gap médio; o berlin52 tem cv de 4 a
+12%, então vale também o gap sem ele:
+
+| Variante | Razões | Gap | Gap sem berlin52 |
+|---|---|---|---|
+| `cpp_java.base` (tradução) | 0,907 0,820 0,951 0,926 | −9,9% | −10,1% |
+| `ours_java.no_local_copies` (J2, D) | 0,934 0,970 0,953 0,944 | −5,0% | −4,4% |
+| `ours_java.direct_access` (J1, D) | 1,056 0,958 0,981 0,978 | −0,7% | −2,7% |
+| `ours_java.z_final` (J1a, D) | 0,996 1,030 1,030 1,026 | +2,0% | +2,9% |
+| `ours_java.arraycopy_shift` (J4, D) | 1,055 1,000 1,002 1,009 | +1,6% | +0,4% |
+| `cpp_java.aos` (J3, I) | 0,863 0,862 0,939 0,956 | −9,5% | −8,1% |
+
+Leitura:
+- **J2 explica cerca de metade do gap:** sem as cópias locais da rota, o
+  nosso Java fica 4 a 5% mais rápido, em todas as instâncias (o relatório
+  antigo dava 7,5%).
+- **J1 (acessores) ajuda pouco:** 2 a 4% a partir do kroA100.
+- **H-J1a refutada:** o `Z` como `static final` deixou o nosso Java 3% mais
+  lento, e não mais rápido. Fica registrado como resultado contrário à
+  hipótese; o mecanismo não foi investigado.
+- **J4 sem efeito.**
+- **J3:** o AoS na tradução muda pouco no total (−9,5% contra −9,9%), mas
+  piora a tradução no kroA100 (0,862 contra 0,820) e no lin318 (0,956
+  contra 0,926) e melhora no gr202.
+- **Falta explicar:** J1 e J2 somados dariam uns 7%, contra 10% do gap; o
+  kroA100 (0,82) continua o caso mais distante. Próximo teste: a variante
+  combinada `ours_java.direct_no_locals` (J1 + J2) e o diagnóstico de
+  aquecimento do JIT (H-J5).
+
 ## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
 
 Pedido do autor (2026-11-21): registrar aqui, como hipóteses, as diferenças
 novas que aparecerem ao ler o código, mesmo fora da lista da Fase 2.
 
 ### Java
-- **H-J1a. `Z` não constante no nosso `getSeq`.** Em `tSolution.java`,
+- **H-J1a. `Z` não constante no nosso `getSeq`** (refutada, ver Fase 4). Em `tSolution.java`,
   `private static int Z = 3` não é `final`; o C2 só dobra constantes de
   campos `static final`, então todo acesso às subsequências lê `Z` da
   memória e multiplica. Variante `ours_java.z_final`.

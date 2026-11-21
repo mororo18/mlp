@@ -40,3 +40,4 @@ swift_cpp.index32,swift_cpp,swift_cpp/measure.patch swift_cpp/index32.patch,Swif
 swift_cpp.row_matrix,swift_cpp,swift_cpp/measure.patch swift_cpp/row_matrix.patch,Swift->C++ (I): distance matrix as double** rows
 csharp_cpp.index32,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32.patch,C#->C++ (I): unsigned subsequence and matrix index
 csharp_cpp.row_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/row_matrix.patch,C#->C++ (I): distance matrix as double** rows
+ours_java.direct_no_locals,ours/java,ours_java/direct_no_locals.patch,J1+J2 (D): direct array access and no local copies of the route
