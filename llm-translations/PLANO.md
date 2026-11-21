@@ -142,8 +142,9 @@ llm-translations/
       `doc/artigo-linguagens/results/julia/cpp_julia-2026-11-20/main.jl.patch`).
 - [x] Conferir que as nossas implementações imprimem `wall clock (s):` só em
       volta da busca.
-- [ ] `catalog.py` e `make_variants.py`; teste local de montagem e build de
-      todas as bases.
+- [x] `catalog.py` (como `harness/catalog_base.py` + catálogo gerado) e
+      `make_variants.py`; teste de montagem e build de todas as bases (local e
+      no servidor, `runs/smoke*`).
 
 ### Fase 1. Gap de base
 - [x] Rodar `<par>.base` e as nossas implementações nas instâncias do lote,
@@ -189,10 +190,10 @@ Leitura:
   critério do escopo, passam a precisar de variantes (decisão do autor).
 
 ### Fase 2. Mapa das diferenças
-- [ ] Para cada par, listar as diferenças de projeto entre a tradução e a
+- [x] Para cada par, listar as diferenças de projeto entre a tradução e a
       nossa implementação atual (atualiza a Tabela 7 e o mapa do apêndice). As
       seis linguagens que mudaram precisam ser feitas do zero.
-- [ ] Lista de fatores a testar: Tabela 7, candidatos dos relatórios antigos
+- [x] Lista de fatores a testar (seção "Fase 2: lista de fatores proposta"): Tabela 7, candidatos dos relatórios antigos
       (`doc/tcc/relatorios-ia/`) e o que aparecer de novo. **Revisão do
       autor antes da Fase 3.**
 
