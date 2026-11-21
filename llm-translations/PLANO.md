@@ -521,15 +521,15 @@ possa esperar vai para o fim da lista.
   exatamente o número de sorteios do caminho de referência; no Go, o nosso
   e a tradução consomem todos (P3). Conferir os demais da mesma forma (em
   JavaScript, ler além do fim não dá erro, ver P7).
-- [ ] **P10. Julia: gap de −3,3% em regime.** Depois do aquecimento, a
+- [x] **P10. Julia: gap de −3,3% em regime.** Depois do aquecimento, a
   tradução continua 3,1 a 3,6% mais rápida do kroA100 ao lin318 (P2), e
   nenhuma variante (L2, L3) explica. Reler os laços quentes dos dois.
-- [ ] **P11. Java no kroA100 depois do aquecimento.** Com aquecimento e
+- [x] **P11. Java no kroA100 depois do aquecimento.** Com aquecimento e
   J1 + J2, sobram 7% no kroA100 (0,927); no gr202 e no lin318, nada
   (1,012 e 0,991). No berlin52, uma busca de aquecimento não basta (o nosso
   continua em 0,31 s, a tradução cai para 0,19 s).
-- [ ] **P12. Índice de cidade a partir de 1 no Julia (H-L4).** Ver o P10.
-- [ ] **P13. Node 24 nas rodadas das figuras.** O lin318 lento é do Node 24
+- [x] **P12. Índice de cidade a partir de 1 no Julia (H-L4).** Ver o P10.
+- [x] **P13. Node 24 nas rodadas das figuras.** O lin318 lento é do Node 24
   (P7). Conferir com que Node foi medido o JavaScript das figuras e se a
   frase do artigo "JavaScript is the only language whose gap grows with
   instance size" é efeito da versão (instâncias acima de cerca de 300
@@ -538,6 +538,12 @@ possa esperar vai para o fim da lista.
   com o deslocamento do campo fora do truncamento não mudou nada no
   servidor (P8). Os dois patches truncam também o índice da matriz de
   distâncias; separar os dois.
+- [ ] **P15. JavaScript das figuras não se repete.** No P13, a pr299 leva
+  125 s (Node 24) e 148 s (Node 22) no servidor, contra 348 s em todas as
+  10 execuções das figuras; a pr439 das figuras tem dois patamares (4
+  execuções em cerca de 370 s, 5 em cerca de 1.100 s). Decidir com o autor
+  a versão do Node da campanha nova e medir o JavaScript de novo em todas as
+  instâncias antes de manter a frase sobre o gap crescer com o tamanho.
 
 ### Andamento das pendências
 
@@ -705,6 +711,60 @@ texto (junto com o P4): truncar o índice para 32 bits só não custa quando o
 compilador prova que ele é não negativo e calculado de contadores de 32
 bits; o nosso C++ satisfaz as duas condições por acaso, pelo jeito como os
 laços estão escritos.
+
+### Rodada do P11 e do P12 (`runs/p11p12-20261121/`, 21:36 a 22:46 do servidor)
+
+560 execuções (14 programas x 4 instâncias x 10), commit `ef8bbd8`, todos os
+custos certos; 63 de 71 leituras com 11 processos acima de 50%. Razões
+(berlin52, kroA100, gr202, lin318):
+
+| Comparação | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| `cpp_java.base` / nosso Java | 0,901 0,801 0,949 0,925 | −10,6% | −10,8% |
+| `ours_java.direct_no_locals` (J1 + J2) / nosso Java | 0,984 0,917 0,946 0,939 | −5,3% | −6,6% |
+| `ours_java.soa` (J1 + J2 + SoA) / nosso Java | 0,947 0,865 0,951 0,925 | −7,8% | −8,6% |
+| tradução / J1 + J2, ambos com aquecimento | 0,615 0,919 1,011 0,988 | −11,7% | −2,7% |
+| tradução / J1 + J2 + SoA, ambos com aquecimento | 0,622 0,992 1,013 1,001 | −9,3% | +0,2% |
+| `cpp_julia.base` / nosso Julia | 0,810 0,966 0,963 0,965 | −7,4% | −3,5% |
+| `ours_julia.zero_based` / nosso Julia | 0,817 0,963 0,966 0,973 | −7,0% | −3,3% |
+| tradução / nosso, ambos com aquecimento | 0,965 0,964 0,961 0,963 | −3,7% | −3,8% |
+| tradução / `zero_based`, ambos com aquecimento | 0,982 1,005 0,995 0,989 | −0,7% | −0,4% |
+
+Leitura:
+- **P11 (Java, explicado):** as subsequências em três vetores (a direta do
+  J3) deixam o nosso Java mais rápido no kroA100 (0,865 contra 0,917 só com
+  J1 + J2) e não mudam o gr202 e o lin318. Com aquecimento, J1 + J2 + SoA
+  chegam à tradução do kroA100 ao lin318 (0,992, 1,013, 1,001). O gap do
+  C++ → Java fica assim: J2 (cópias locais da rota), J1 (acessores), SoA no
+  kroA100 e aquecimento do JIT nas instâncias curtas. O berlin52 continua
+  0,62 com uma busca de aquecimento só: o JIT ainda não terminou de
+  compilar o nosso programa nessa instância.
+- **P12 (Julia, H-L4 confirmada):** guardar as cidades a partir de 0 e somar
+  1 no acesso à matriz deixa o nosso Julia 2,7 a 3,7% mais rápido do
+  kroA100 ao lin318, o mesmo tamanho do gap; com aquecimento, a tradução e
+  a variante empatam (−0,4%). O gap do C++ → Julia fica explicado: a
+  compilação JIT dentro do tempo medido no berlin52 (P2) e o índice de
+  cidade a partir de 1 nas outras instâncias (o P10 tinha achado o
+  mecanismo no assembly).
+
+**P13 (2026-11-21, servidor, `runs/node2-20261121/`, uma execução por
+versão, três instâncias em paralelo).**
+
+| Instância | Node 22.20 | Node 24.18 | Figuras (média de 10) |
+|---|---|---|---|
+| pr299 | 147,7 s | 125,1 s | 348,2 s |
+| pr439 | 410,3 s | 348,9 s | 742,2 s |
+| rd400 | 562,9 s | 491,2 s | 535,4 s |
+
+O Node 24 não fica lento na pr299 nem na pr439, ao contrário do lin318
+(P7). Nas figuras, a pr299 leva 348 s nas 10 execuções, 2,8 vezes o tempo
+de agora, e a pr439 tem dois patamares (4 execuções em cerca de 370 s, que
+é o tempo de agora, e 5 em cerca de 1.100 s). Então só o lin318 (e
+provavelmente o linhp318) se explica pelo Node 24; a pr299 e a pr439 das
+figuras não se repetem com nenhuma das duas versões, e a versão usada
+naquelas rodadas não está registrada. A conclusão do P13 continua: a frase
+de que o gap do JavaScript cresce com o tamanho vem de instâncias com
+tempos que não se repetem. Fica o P15.
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do

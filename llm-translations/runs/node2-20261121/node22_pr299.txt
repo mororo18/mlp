@@ -1,0 +1,5 @@
+unpacking 'github:NixOS/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d' into the Git cache...
+v22.20.0
+COST:  6556628
+TIME:  147.710888
+wall clock (s):  147.691

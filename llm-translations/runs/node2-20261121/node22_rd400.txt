@@ -1,0 +1,6 @@
+waiting for another Nix process to finish fetching input 'github:NixOS/nixpkgs/nixos-25.05'...
+error (ignored): SQLite database '/root/.cache/nix/eval-cache-v6/2bbd13f37c84d9677141bb07e8b2d2821c10107d95cd8d7187a3b0761780a1a2.sqlite' is busy
+v22.20.0
+COST:  2770334
+TIME:  562.956262
+wall clock (s):  562.867
