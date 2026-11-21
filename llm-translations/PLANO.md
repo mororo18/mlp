@@ -528,6 +528,7 @@ possa esperar vai para o fim da lista.
   J1 + J2, sobram 7% no kroA100 (0,927); no gr202 e no lin318, nada
   (1,012 e 0,991). No berlin52, uma busca de aquecimento não basta (o nosso
   continua em 0,31 s, a tradução cai para 0,19 s).
+- [ ] **P12. Índice de cidade a partir de 1 no Julia (H-L4).** Ver o P10.
 
 ### Andamento das pendências
 
@@ -568,6 +569,26 @@ Leitura:
   berlin52 (0,797 → 0,968) e os dois patamares (com aquecimento, cv 0,2%).
   Nas outras instâncias, o aquecimento não muda nada: os −3,3% são de
   regime e vão para o P10.
+
+**P10 (2026-11-21, local, `perf` com jitdump do Julia, kroA100).** Por
+função, a tradução gasta menos ciclos em `search_reinsertion` (−14%),
+`search_swap` (−10%) e `search_two_opt` (−6%) e mais em
+`update_subseq_info_matrix` (+7%); no total da busca, −7,7% (no servidor,
+−3,3%). No `code_native` do `search_reinsertion`, o laço interno tem 29 a
+40 instruções no nosso e 26 a 33 na tradução. As instruções a mais do
+nosso: mais ponteiros de indução (o índice 3D `[campo, j, i]`) e o ajuste
+do índice de cidade, que começa em 1 (`cost[s[k], s[i]]`, refeito a cada
+iteração com `movabs` + `add`, por falta de registrador); a tradução guarda
+as cidades a partir de 0 e soma 1 dentro de `dist`, o que vira deslocamento
+fixo. Como o L3 (subsequências como vetor de `struct`) não mudou nada no
+servidor, o índice 3D sozinho não explica. Hipótese H-L4 (o índice de
+cidade a partir de 1 na matriz de distâncias) no fim da lista (P12).
+
+**P11 (2026-11-21).** A inversa do J3 (AoS na tradução) piorou a tradução
+no kroA100 (0,862 contra 0,820) e no lin318; a direta nunca foi testada.
+Variantes `ours_java.soa` (J1 + J2 com as subsequências em três vetores,
+como na tradução) e `ours_java.soa_warm` (com aquecimento), conferidas
+localmente.
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do

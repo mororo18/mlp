@@ -55,11 +55,24 @@ def aos(b):
         sub(m, r'\.seq%s\[to_1D\(([^()]+)\)\]' % f, r'.seq[3 * to_1D(\1) + %d]' % o)
     assert not re.search(r'seq[TCW]', m.read_text())
 
+def soa(b):
+    direct_no_locals(b)
+    sub(b / 'tSolution.java', r'(    int n1;\n)', r'\1    double [] seqT, seqC, seqW;\n')
+    sub(b / 'tSolution.java', r'(        n1 = dimen\+1;\n)', r'\1        seqT = new double [n1*n1];\n        seqC = new double [n1*n1];\n        seqW = new double [n1*n1];\n')
+    g = b / 'GILS_RVND.java'
+    t, n = re.subn(r'solut\.seq2d\[\(\(([^()]+)\)\*solut\.n1 \+ \(([^()]+)\)\)\*tSolution\.Z \+ tInfo\.([TCW])\]',
+                   r'solut.seq\3[(\1)*solut.n1 + (\2)]', g.read_text())
+    t, m = re.subn(r'solut\.getSeq\(0, info\.getDimen\(\), info\.C\)', 'solut.seqC[info.getDimen()]', t)
+    assert m == 1 and 'seq2d' not in t and 'getSeq(' not in t, re.findall(r'.*seq2d.*', t)
+    g.write_text(t)
+    print('soa', n)
+
 def direct_no_locals(b):
     no_locals(b)
     direct(b)
 
 jobs = {
+    'ours_java/soa.patch': (OURS, soa, ()),
     'ours_java/direct_no_locals.patch': (OURS, direct_no_locals, ()),
     'ours_java/z_final.patch': (OURS, z_final, ()),
     'ours_java/direct_access.patch': (OURS, direct, ()),

@@ -55,3 +55,5 @@ cpp_swift.full_copy,cpp_swift,cpp_swift/measure.patch cpp_swift/full_copy.patch,
 rust_cpp.index32_int,rust_cpp,rust_cpp/measure.patch rust_cpp/index32_int.patch,P4 control: unsigned index computed in int arithmetic as in our to_1D
 ours_cplusplus.size_t_counter,ours/cplusplus,ours_cplusplus/size_t_counter.patch,P4 (D): size_t column counter in update_subseq_info_matrix truncated by to_1D(int)
 csharp_cpp.index32_field,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_field.patch,P8 control: unsigned subsequence index with the T/C/W offset outside the truncation
+ours_java.soa,ours/java,ours_java/soa.patch,P11 (D): J1+J2 with the subsequences in three arrays (SoA) as in the translation
+ours_java.soa_warm,ours/java,ours_java/soa.patch ours_java/warm.patch,P11 diagnostic: J1+J2+SoA with one untimed search before the timed one
