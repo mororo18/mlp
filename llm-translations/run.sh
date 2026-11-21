@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Rodada do experimento no servidor (q-dual).
 #
-# Uso: llm-translations/run.sh <saida> "<linguagens nossas>" <variante> [<variante> ...]
+# Uso: llm-translations/run.sh <saida> "<linguagens nossas>" [<variante> ...]
 #   ex.: llm-translations/run.sh ~/mlp-test/fa/runs/base "java julia cplusplus" cpp_java.base rust_cpp.base
 #
 # Fora do container: confere que o código das nossas implementações e desta
@@ -68,6 +68,10 @@ set -o pipefail
 
 mkdir -p "$REPO/benchmarks"
 cp "$LT/harness/bench.py" "$LT/harness/core.py" "$REPO/benchmarks/"
-python3 "$LT/make_variants.py" --out "$OUT/work" --ids $IDS
-python3 "$REPO/benchmarks/bench.py" -l $LANGS -t $IDS --translations-dir "$OUT/work" \
+TARGETS=""
+if [ -n "$IDS" ]; then
+    python3 "$LT/make_variants.py" --out "$OUT/work" --ids $IDS
+    TARGETS="-t $IDS --translations-dir $OUT/work"
+fi
+python3 "$REPO/benchmarks/bench.py" -l $LANGS $TARGETS \
     -n "$REPS" -j 4 -I "$LT/$INST" --out "$OUT/csv"
