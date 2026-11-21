@@ -30,6 +30,20 @@ def cs_idx(b):
     sub(b / 'Data.hpp', r'return c\[to_1D\(i, j\)\];', 'return c[(unsigned)to_1D(i, j)];')
     print('cs idx', n)
 
+def cs_idx_seq(b):
+    n = sub(b / 'tSolution.hpp', r'seq\[i \* \(d \+ 1\) \* 3 \+ j \* 3 \+ k\]', 'seq[(unsigned)(i * (d + 1) * 3 + j * 3 + k)]')
+    print('cs idx seq', n)
+
+def cs_idx_seq_assume(b):
+    cs_idx_seq(b)
+    h = b / 'tSolution.hpp'
+    a = 'if (i < 0 || j < 0 || k < 0 || d < 0) __builtin_unreachable(); '
+    sub(h, r'(inline double GetSeq\(int i, int j, int k\) const \{\n            )', r'\g<1>' + a.replace('\\', '\\\\'))
+    sub(h, r'(inline void SetSeq\(int i, int j, int k, double v\) \{ )', r'\g<1>' + a)
+
+def cs_idx_mat(b):
+    sub(b / 'Data.hpp', r'return c\[to_1D\(i, j\)\];', 'return c[(unsigned)to_1D(i, j)];')
+
 def cs_idx_field(b):
     n = sub(b / 'tSolution.hpp', r'seq\[i \* \(d \+ 1\) \* 3 \+ j \* 3 \+ k\]', 'seq[3 * (std::size_t)(unsigned)(i * (d + 1) + j) + k]')
     sub(b / 'Data.hpp', r'return c\[to_1D\(i, j\)\];', 'return c[(unsigned)to_1D(i, j)];')
@@ -48,5 +62,8 @@ write({'swift_cpp/route_copy.patch': (T / 'swift_cpp', sw_route, ('swift_cpp/mea
        'swift_cpp/index32.patch': (T / 'swift_cpp', sw_idx, ('swift_cpp/measure.patch',)),
        'swift_cpp/row_matrix.patch': (T / 'swift_cpp', sw_rows, ('swift_cpp/measure.patch',)),
        'csharp_cpp/index32.patch': (T / 'csharp_cpp', cs_idx, ('csharp_cpp/measure.patch',)),
+       'csharp_cpp/index32_seq.patch': (T / 'csharp_cpp', cs_idx_seq, ('csharp_cpp/measure.patch',)),
+       'csharp_cpp/index32_seq_assume.patch': (T / 'csharp_cpp', cs_idx_seq_assume, ('csharp_cpp/measure.patch',)),
+       'csharp_cpp/index32_matrix.patch': (T / 'csharp_cpp', cs_idx_mat, ('csharp_cpp/measure.patch',)),
        'csharp_cpp/index32_field.patch': (T / 'csharp_cpp', cs_idx_field, ('csharp_cpp/measure.patch',)),
        'csharp_cpp/row_matrix.patch': (T / 'csharp_cpp', cs_rows, ('csharp_cpp/measure.patch',))})

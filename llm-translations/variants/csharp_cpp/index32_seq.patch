@@ -1,0 +1,16 @@
+diff -ruN a/tSolution.hpp b/tSolution.hpp
+--- a/tSolution.hpp	2026-07-29 00:11:17.000000000 -0300
++++ b/tSolution.hpp	2026-11-21 18:42:10.437178146 -0300
+@@ -22,10 +22,10 @@
+         void StoreSolut(std::vector<int> sl) { s = std::move(sl); }
+ 
+         inline double GetSeq(int i, int j, int k) const {
+-            return seq[i * (d + 1) * 3 + j * 3 + k];
++            return seq[(unsigned)(i * (d + 1) * 3 + j * 3 + k)];
+         }
+ 
+-        inline void SetSeq(int i, int j, int k, double v) { seq[i * (d + 1) * 3 + j * 3 + k] = v; }
++        inline void SetSeq(int i, int j, int k, double v) { seq[(unsigned)(i * (d + 1) * 3 + j * 3 + k)] = v; }
+ 
+         double GetCost() const { return cost; }
+         void SetCost(double v) { cost = v; }

@@ -59,3 +59,6 @@ ours_java.soa,ours/java,ours_java/soa.patch,P11 (D): J1+J2 with the subsequences
 ours_java.soa_warm,ours/java,ours_java/soa.patch ours_java/warm.patch,P11 diagnostic: J1+J2+SoA with one untimed search before the timed one
 ours_julia.zero_based,ours/julia,ours_julia/zero_based.patch,P12 (D): route with 0-based city ids and +1 in the distance lookup as in the translation
 ours_julia.zero_based_warm,ours/julia,ours_julia/zero_based.patch ours_julia/warm.patch,P12 diagnostic: zero_based with one untimed search before the timed one
+csharp_cpp.index32_seq,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq.patch,P14: unsigned index only in the subsequence accessors
+csharp_cpp.index32_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_matrix.patch,P14: unsigned index only in the distance matrix accessor
+csharp_cpp.index32_seq_assume,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq_assume.patch,P14: index32_seq with the indices and d declared non-negative (__builtin_unreachable)

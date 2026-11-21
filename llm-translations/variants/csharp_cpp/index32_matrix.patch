@@ -1,0 +1,12 @@
+diff -ruN a/Data.hpp b/Data.hpp
+--- a/Data.hpp	2026-07-29 00:11:03.000000000 -0300
++++ b/Data.hpp	2026-11-21 18:42:10.553486566 -0300
+@@ -34,7 +34,7 @@
+         int GetDimen() const { return dimension; }
+ 
+         double GetCost(int i, int j) const {
+-            return c[to_1D(i, j)];
++            return c[(unsigned)to_1D(i, j)];
+         }
+ 
+         int GetRndCrnt() { return rnd[rnd_index++]; }

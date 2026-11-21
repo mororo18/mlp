@@ -686,6 +686,26 @@ registrada (pendência antiga do TODO do artigo). Próximo passo:
 `diag/node_versions.sh` com Node 22 e 24 na pr299, na pr439 e na rd400
 (controle), depois da rodada do P11 e do P12.
 
+**P14 (2026-11-21, local, `perf`, kroA100, média de 3).** Separando os dois
+truncamentos do `index32` do C# → C++: só nas subsequências, 14,95 bilhões
+de instruções e 5,52 bilhões de ciclos; só na matriz, 12,42 e 4,87; base,
+12,94 e 5,05. O custo é todo das subsequências. No laço de
+`update_subseq_info_matrix`, a variante relê da memória o T e o C do
+elemento anterior e calcula um endereço para cada campo (`lea` + 3, + 4,
++ 5 em 32 bits), o mesmo sintoma do Rust → C++ (P4). Mecanismo: o
+`unsigned` só sai de graça quando o compilador prova que o índice não é
+negativo. No nosso C++, o passo do índice (`dimen`) é o mesmo valor do
+limite do laço, e daí sai a prova; no C# → C++, o passo é o `d` de outro
+objeto (`tSolution`), que pode ser negativo para o compilador. Teste:
+declarar `i`, `j`, `k` e `d` não negativos (`__builtin_unreachable`) volta a
+12,97 bilhões de instruções e 5,29 bilhões de ciclos. Variantes
+`csharp_cpp.index32_seq`, `csharp_cpp.index32_matrix` e
+`csharp_cpp.index32_seq_assume` para a próxima rodada. Conclusão para o
+texto (junto com o P4): truncar o índice para 32 bits só não custa quando o
+compilador prova que ele é não negativo e calculado de contadores de 32
+bits; o nosso C++ satisfaz as duas condições por acaso, pelo jeito como os
+laços estão escritos.
+
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
 RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e
