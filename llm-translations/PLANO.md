@@ -595,6 +595,13 @@ devolve a rota com as cidades a partir de 0 e todo `data.cost[s[a], s[b]]`
 da busca vira `data.cost[s[a]+1, s[b]+1]`, como na tradução (17 acessos);
 `ours_julia.zero_based_warm` com aquecimento. Custos conferidos localmente.
 
+**P9 (2026-11-21, local, kroA100 salvo onde indicado).** Mesmo caminho de
+busca (consumo igual ao tamanho do vetor `rnd`) conferido no Go (berlin52,
+kroA100, gr202; P3), no JavaScript (gr202 e lin318; P7), no Java (kroA100:
+50.313 nos dois) e no Julia (kroA100: 50.313 nos dois). O resto do Java no
+kroA100 (P11) e o gap do Julia em regime (P10) não vêm de caminho
+diferente. Faltam as traduções para C++ e o Swift.
+
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
 RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e
