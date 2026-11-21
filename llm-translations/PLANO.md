@@ -561,6 +561,31 @@ o `unsigned` não custa nada, o que explica o `index64` sem efeito. Variantes
 rodada. Consequência para o texto: a recomendação não é "índice `unsigned`",
 e sim não misturar contador de 64 bits com índice de 32.
 
+**P8 (2026-11-21, local, `perf`).** No C# → C++ (kroA100), o `index32` sobe
+as instruções em cerca de 10% em todas as buscas, não num laço só
+(`search_reinsertion` 7,3 → 8,0 bilhões, `update_subseq_info_matrix` 2,5 →
+3,0). O índice ali é `(unsigned)(i * (d + 1) * 3 + j * 3 + k)`: o
+deslocamento do campo (`k`, de T, C e W) fica dentro do truncamento, e cada
+campo precisa do próprio cálculo de endereço. Variante de controle
+`csharp_cpp.index32_field` (`3 * (size_t)(unsigned)(i * (d + 1) + j) + k`,
+o `k` fora, como os campos da `struct` do nosso C++): 13,89 bilhões de
+instruções, contra 12,94 na base e 14,41 no `index32`, então explica cerca
+de um terço do acréscimo. Os ciclos locais não serviram (máquina ocupada);
+o tempo sai da próxima rodada.
+
+**P7 (2026-11-21, local).** O lin318 lento é do servidor: na máquina local
+(Node 20.16, Intel de 4 núcleos), o nosso JavaScript leva 198,7 s no gr202 e
+448,2 s no lin318 (razão 2,3; a tradução, 212,3 e 474,7 s), contra 7,8 no
+servidor (Node 24.18, Xeon Silver 4316). O caminho de busca é o de
+referência nos dois programas e nas duas instâncias (108.601 e 110.584
+sorteios, o tamanho do vetor `rnd`), não há laço de desotimização
+(`--trace-deopt`: 9 a 14 desotimizações, todas de aquecimento, nas duas
+instâncias), e o perfil por função é o mesmo (`search_reinsertion` 62%,
+`update_subseq_info_matrix` 14%, `search_two_opt` 12%, `search_swap` 10%).
+IPC e faltas de cache e de TLB por instrução também são parecidos nas duas
+instâncias. Falta separar versão do Node e CPU: `diag/node_versions.sh` roda
+o nosso JavaScript nas duas instâncias com Node 20, 22 e 24 no servidor.
+
 ## Hipóteses novas da Fase 3 (achados durante a escrita das variantes)
 
 Pedido do autor (2026-11-21): registrar aqui, como hipóteses, as diferenças
