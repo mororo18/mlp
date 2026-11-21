@@ -308,6 +308,34 @@ nosso C++:
 - **Go → C++:** melhor movimento sem ε (antigo: 9 a 13%); matriz em
   `vector<vector<double>>`; ponteiros para a solução e `tData` por valor.
 
+## Decisões do autor sobre a Fase 2 (2026-11-21)
+
+- Lista de fatores aprovada, sem o S4 (`ContiguousArray` e laços `for` no
+  Swift).
+- C#, Swift, Fortran e Go → C++ passam a ter variantes, só com os fatores já
+  conhecidos (tipo do índice, layout da matriz e os específicos de cada uma).
+- JavaScript no lin318 (cerca de 333 s nos dois lados): registrado, não
+  investigado agora.
+- O trabalho segue na sessão principal, sem subagente (custo de tokens).
+- Antes da Fase 3: repetir o nosso Java nas quatro instâncias, com o mesmo
+  protocolo (`run.sh` sem variantes, `3bf8628`), para conferir o gap de −11%
+  do C++ → Java (`runs/java-20261121/`).
+
+### Repetição do nosso Java (2026-11-21, 14:28 a 14:32 do servidor)
+
+40 execuções, custos iguais aos da base, carga com os 4 processos da rodada e
+os 7 do outro usuário. O nosso Java repete a rodada de base e a das figuras:
+
+| Instância | Repetição (cv) | Base 20/11 | Figuras | Repetição ÷ base | Tradução ÷ repetição |
+|---|---|---|---|---|---|
+| berlin52 | 0,775 s (8,5%) | 0,785 s | 0,845 s | 0,987 | 0,883 |
+| kroA100 | 3,079 s (1,6%) | 3,077 s | 3,071 s | 1,001 | 0,804 |
+| gr202 | 22,93 s (0,4%) | 22,90 s | 22,86 s | 1,001 | 0,949 |
+| lin318 | 65,09 s (0,9%) | 65,07 s | 65,87 s | 1,000 | 0,929 |
+
+Gap com a repetição: −10,9% (base: −11,1%). O gap é da tradução, não da
+medição do nosso Java; segue para a Fase 3 com J1 a J4.
+
 ## Restrições
 
 - Servidor q-dual (`ssh q-dual`, via `jump`, com fail2ban): logins únicos e
