@@ -24,15 +24,7 @@ def tr_array(b):
     for f in 'TCW':
         sub(b / 'main.js', r'    solut\.seq_%s = new Float64Array\(sz\);' % f, '    solut.seq_%s = Array(sz);' % f)
 
-def ncr(b):
-    sub(b / 'run_node.sh', r'node main\.js', 'node --no-concurrent-recompilation main.js')
-
-def ncr_new(b):
-    (b / 'run_node.sh').write_text('#! /usr/bin/bash\nnode --no-concurrent-recompilation main.js "$@"\n')
-
-write({'ours_javascript/no_concurrent_recompilation.patch': (OURS, ncr, ()),
-       'cpp_javascript/no_concurrent_recompilation.patch': (LT / 'translations' / 'cpp_javascript', ncr_new, ('cpp_javascript/measure.patch',)),
-       'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),'ours_javascript/float64array.patch': (OURS, typed, ()),
+write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),'ours_javascript/float64array.patch': (OURS, typed, ()),
        'ours_javascript/const_offsets.patch': (OURS, consts, ()),
        'ours_javascript/no_globals.patch': (OURS, locals_, ()),
        'ours_javascript/function_decl.patch': (OURS, fdecl, ())})

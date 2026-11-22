@@ -141,7 +141,7 @@ REF_SWIFT_BUILD_FLAGS = [
 REF_SWIFTC_FLAGS = ["-O", "-Xfrontend", "-Ounchecked"]
 
 # runtimes interpretados -- exatamente os run_*.sh da referencia
-REF_NODE = ["node"]                                             # ../javascript/run_node.sh
+REF_NODE = ["node", "--no-concurrent-recompilation"]           # ../javascript/run_node.sh
 REF_JULIA = ["julia", "--check-bounds=no", "--math-mode=fast"]  # ../julia/run_julia.sh
 REF_LUA = ["lua"]                                               # ../lua/run_lua.sh
 REF_LUAJIT = ["luajit"]                                         # ../lua/run_luajit.sh

@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-node main.js "$@"
+node --no-concurrent-recompilation main.js "$@"
