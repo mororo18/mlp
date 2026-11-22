@@ -1449,6 +1449,40 @@ artigo. Feito:
 - **F7.** `mlp-standard` e `mlp-naive` ainda rodam `node main.js` sem a
   flag. Perguntar ao autor se a flag vale para as três (é configuração do
   runtime, não otimização do código).
+- **F8.** Rodadas em andamento no servidor (cadeia `p19.sh`, depois
+  `p21.sh`): ao terminar cada uma, buscar, conferir custos e registrar.
+  (a) `noisy4-20261122`: recalcular o gap acima de 100 clientes de todas as
+  linguagens com d493, gr120, pcb442 e pr439 novas (P19); (b)
+  `jsncr-20261122`: o par do JavaScript com a flag nas 4 instâncias;
+  (c) `js66ncr-20261122`: o nosso JavaScript com a flag nas 66.
+- **F9.** Trocar as linhas do C++ → JavaScript do `tables.py` e da Tabela 8
+  (`tab:translation-gaps-pitfalls-from`) pelos números da rodada `jsncr`
+  (hoje são de rodadas sem a flag, com o lin318 no patamar lento nos dois
+  lados), copiar a rodada para `results/factor_analysis/2026-11-22/runs/`
+  e atualizar o README da pasta (que já avisa da troca).
+- **F10.** Conferir a tabela de desvios da 7.4
+  (`tab:translation-deviations`) célula a célula contra o mapa da Fase 2;
+  a passagem por valor do Swift → C++ continua como desvio, mas vale 1
+  ponto de 12 (o gap é da matriz).
+- **F11.** Texto da 7.5 e da 7.6 (passos 4 a 6 da Fase 5): o parágrafo de
+  método ainda descreve a análise antiga (outra máquina, bier127); os
+  parágrafos em volta das Tabelas 8 a 12 citam números antigos (Swift → C++
+  explicado pela passagem por valor, C → C++ e o índice com sinal, o
+  `unsigned` custando 4 a 6% ao nosso C++, o ε do Fortran, os "6% sem
+  explicação" do Julia, os "3 a 4%" do Go); o parágrafo logo abaixo da
+  Tabela 12 é o antigo. Fazer o esqueleto para o autor revisar antes da
+  prosa; depois o parágrafo de fechamento (`\todo` da 7.6).
+- **F12.** A análise antiga não tem dados brutos nem patches: só os
+  relatórios (`doc/tcc/relatorios-ia/`) e os valores copiados em
+  `results/factor_analysis/earlier/` do artigo. Só o F1 (medir de novo
+  esses pares) centraliza tudo; até lá, as linhas com asterisco ficam com a
+  nota de origem.
+- **F13.** Dados novos da Seção 6 (`runs/js66-20261121`, `p17-20261122`,
+  `noisy4-20261122`, `js66ncr-20261122`) ainda só nesta pasta: levá-los
+  para `results/` do artigo, com README e mapa, junto com o F2.
+- **F14.** Parágrafo da flag do JavaScript na Seção 6 está como rascunho
+  (`[Draft]`, em laranja) para revisão do autor, com o `\todo` das
+  figuras; tirar o destaque depois da revisão e do F2.
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório
