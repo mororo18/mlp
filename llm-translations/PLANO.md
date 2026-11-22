@@ -314,7 +314,9 @@ subsequências +16,1%, com índices não negativos +1,1%) para o mecanismo.
 
 1. Pares fora do escopo: **(a)**, linhas antigas nas tabelas com nota; (c)
    fica como pendência futura (F1).
-2. Divisão 7.5 × 7.6 mantida, com a classificação proposta.
+2. Divisão 7.5 × 7.6 mantida, com a classificação proposta. O aquecimento
+   do JIT (Java, Julia) não é escolha de nenhum dos dois programas: vai em
+   linha própria, com o valor medido com os dois aquecidos e nota.
 3. Tabela das traduções mais rápidas sai; os pares vão para as tabelas de
    gaps, com um parágrafo curto na 7.6.
 4. **Colunas: duas, sem marcador (D)/(I)**, que confunde a leitura. Formato:
@@ -330,7 +332,11 @@ subsequências +16,1%, com índices não negativos +1,1%) para o mecanismo.
 
 ### Passos
 
-1. **`analyze.py`** (nesta pasta): uma lista de comparações (numerador,
+1. **`tables.py`** (nesta pasta; o `analyze.py` continua sendo o resumo por
+   rodada) — **feito em 2026-11-22** (`comparisons.csv`, 46 comparações,
+   custos conferidos; o aquecimento do JIT ganhou a coluna `both`, mudança
+   nos dois programas). As linhas do JavaScript trocam pelos números da
+   rodada `jsncr` quando ela terminar. Plano original: uma lista de comparações (numerador,
    denominador, rodada, sentido D/I, linha da tabela); para cada uma, tempo
    médio, cv e razão por instância, gap e gap sem o berlin52; confere os
    custos; grava `comparisons.csv` e as linhas LaTeX das tabelas.
