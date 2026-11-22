@@ -538,7 +538,7 @@ possa esperar vai para o fim da lista.
   com o deslocamento do campo fora do truncamento não mudou nada no
   servidor (P8). Os dois patches truncam também o índice da matriz de
   distâncias; separar os dois.
-- [ ] **P15. JavaScript das figuras não se repete.** No P13, a pr299 leva
+- [x] **P15. JavaScript das figuras não se repete.** No P13, a pr299 leva
   125 s (Node 24) e 148 s (Node 22) no servidor, contra 348 s em todas as
   10 execuções das figuras; a pr439 das figuras tem dois patamares (4
   execuções em cerca de 370 s, 5 em cerca de 1.100 s). Decidir com o autor
@@ -547,6 +547,28 @@ possa esperar vai para o fim da lista.
   **Decisão do autor (2026-11-21): Node 24** (o 24.18 do `flake.nix`).
   Rodada `runs/js66-20261121/`: o nosso JavaScript nas 66 instâncias
   (`instances66.txt`, a lista `inst-list-66` do servidor), 10 execuções.
+  Resultado: se repete (ver a rodada do P15).
+- [ ] **P16. Dois patamares do Node 24.** Na rodada do P15, a pr299 tem uma
+  execução em 125 s e nove em cerca de 348 s, e a pr439 uma em 350 s e nove
+  em cerca de 970 s, com o mesmo caminho de busca (o custo é o mesmo em
+  todas). O patamar lento sai por sorteio de execução, não da instância.
+  Hipótese H-JS6: a compilação em segundo plano do V8 (Maglev/TurboFan
+  concorrentes) termina em momentos diferentes e às vezes deixa a busca no
+  código pior; com 4 processos em 4 núcleos, as threads do compilador
+  disputam CPU (no diagnóstico do P13, 3 processos em 4 núcleos, as três
+  execuções caíram no patamar rápido). Teste: a pr299 com 10 execuções,
+  `-j 4`, com `--no-concurrent-recompilation` (ou `--single-threaded`) e sem.
+  Para o texto: decidir com o autor como reportar o JavaScript (média com os
+  dois patamares, ou mediana) e se o lin318 e o linhp318 também têm um
+  patamar rápido que não apareceu em 10 execuções.
+- [ ] **P17. C da d493 nas figuras.** Nos dados das figuras, o C leva 403 s
+  na d493 (dispersão máx/mín de 1,31), contra 176 s na pcb442; todas as
+  linguagens ficam com a razão sobre o C menor nela (Rust 1,02 contra 1,35
+  nas outras quatro instâncias acima de 400, Fortran 0,80, Java 1,25,
+  JavaScript 1,66). O C da d493 (e talvez o da pcb442, dispersão 1,16) está
+  inflado e puxa para baixo as razões do grupo acima de 100 clientes. Medir
+  de novo o C (e o C++) nas cinco instâncias acima de 400 clientes, junto
+  com a campanha completa nova.
 
 ### Andamento das pendências
 
@@ -789,6 +811,56 @@ negativos tira quase todo o custo (+16,1% → +1,1%). Mecanismo confirmado:
 o `unsigned` custa quando o compilador não prova que o índice é não
 negativo (C# → C++) ou quando ele vem de contadores de 64 bits truncados
 (Rust → C++, P4).
+
+### Rodada do P15 (`runs/js66-20261121/`, 23:36 de 21/11 a 03:27 de 22/11 do servidor)
+
+O nosso JavaScript nas 66 instâncias, Node 24.18 (`flake.nix`), 10
+execuções, `-j 4`; 660 execuções, todos os custos iguais aos do C; carga
+de cerca de 11 durante toda a rodada (como na do P14). Comparação com o
+JavaScript das figuras (`results/main/cleaned_data.csv`), com o C das
+figuras como base nas duas colunas:
+
+| Instância | C (figuras) | JavaScript, figuras | JavaScript, Node 24 | Razão, figuras | Razão, Node 24 |
+|---|---|---|---|---|---|
+| a280 | 44,6 s | 146,8 s | 145,9 s | 3,29 | 3,27 |
+| pr299 | 36,7 s | 348,2 s | 326,1 s | 9,48 | 8,88 |
+| lin318 | 35,4 s | 336,1 s | 337,9 s | 9,50 | 9,55 |
+| linhp318 | 46,6 s | 446,7 s | 452,2 s | 9,58 | 9,70 |
+| rd400 | 152,2 s | 535,4 s | 494,3 s | 3,52 | 3,25 |
+| fl417 | 135,6 s | 525,8 s | 444,5 s | 3,88 | 3,28 |
+| gr431 | 120,7 s | 483,9 s | 403,7 s | 4,01 | 3,34 |
+| pr439 | 114,3 s | 742,2 s | 909,6 s | 6,49 | 7,96 |
+| pcb442 | 176,1 s | 665,3 s | 550,3 s | 3,78 | 3,12 |
+| d493 | 403,5 s | 964,3 s | 671,0 s | 2,39 | 1,66 |
+
+Até a a280, as duas medições do JavaScript batem (diferença abaixo de 2%
+em quase todas as instâncias). Os quatro picos das figuras se repetem com
+o Node 24: lin318 e linhp318 nas 10 execuções, pr299 em nove (uma em
+125 s) e pr439 em nove (uma em 350 s, e cerca de 970 s nas outras; nas
+figuras foram 4 em cerca de 370 s e 5 em cerca de 1.100 s). As execuções
+isoladas do P13 (125 s na pr299, 349 s na pr439) caíram no patamar
+rápido; daí a impressão de que as figuras não se repetiam. Conclusão: o
+JavaScript das figuras foi, muito provavelmente, medido com o Node 24, e os
+picos são do Node 24, não de ruído daquelas rodadas. Novo: os dois
+patamares (P16). Acima de 400 clientes, o JavaScript de agora fica 8 a 30%
+mais rápido que o das figuras, que tinham dispersão de 1,07 a 1,13 nessas
+instâncias (agora 1,01 a 1,04).
+
+Gap sobre o C (média dos tempos do grupo, a métrica da figura):
+
+| Grupo | Figuras | Node 24 |
+|---|---|---|
+| até 100 clientes (28) | 282,8% | 283,0% |
+| acima de 100 (38) | 303,8% | 273,0% |
+
+Por faixa, a mediana da razão sobre o C com o Node 24 é 4,53 até 100
+clientes, 3,70 de 101 a 300, 9,55 de 301 a 400 (três instâncias, os três
+picos) e 3,28 de 401 a 500. Consequência para o texto: com a medição nova,
+o gap do JavaScript não cresce com o tamanho da instância (283% contra
+273%); a frase do artigo vem de dois efeitos que não são do tamanho, os
+picos do Node 24 em quatro instâncias e o JavaScript mais lento das
+figuras acima de 400 clientes. O C de base ainda é o das figuras, com a
+d493 inflada (P17).
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
