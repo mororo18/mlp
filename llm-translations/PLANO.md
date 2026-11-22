@@ -310,6 +310,24 @@ subsequências +16,1%, com índices não negativos +1,1%) para o mecanismo.
    instâncias (cerca de 2 h de servidor, depois das rodadas do P19) e usar
    esses números, com nota.
 
+### Decisões do autor (2026-11-22)
+
+1. Pares fora do escopo: **(a)**, linhas antigas nas tabelas com nota; (c)
+   fica como pendência futura (F1).
+2. Divisão 7.5 × 7.6 mantida, com a classificação proposta.
+3. Tabela das traduções mais rápidas sai; os pares vão para as tabelas de
+   gaps, com um parágrafo curto na 7.6.
+4. **Colunas: duas, sem marcador (D)/(I)**, que confunde a leitura. Formato:
+   Par | Gap | Fator | Gap com a nossa escolha na tradução | Gap com a
+   escolha da tradução no nosso código. As duas colunas dão o gap da
+   tradução sobre o nosso depois da mudança, cada uma com a mudança num dos
+   programas; "—" quando o sentido não foi medido. Nos pares com os dois
+   sentidos (Go G2, Swift S3, JavaScript `Float64Array`, Java três vetores)
+   a tabela mostra a confirmação nos dois.
+5. JavaScript no lin318: medir o par com `--no-concurrent-recompilation` nas
+   4 instâncias (rodada `runs/jsncr-20261122/`, encadeada depois das
+   instâncias ruidosas) e usar esses números, com nota.
+
 ### Passos
 
 1. **`analyze.py`** (nesta pasta): uma lista de comparações (numerador,
@@ -1352,3 +1370,42 @@ Registro de cada problema encontrado no caminho e da solução adotada.
     binário do C recompilado localmente (`3d3d4db`+1). **Solução:** commit
     que restaura o binário anterior; commits daqui em diante só com
     `git add` dos arquivos.
+17. **Variante com flag mediria o Node padrão (2026-11-22).** O comando de
+    execução das variantes vem do catálogo (`catalog_base.py`: `node
+    main.js`), não do `run_node.sh`; o patch do `run_node.sh` da variante
+    `ours_javascript.no_concurrent_recompilation` não teria efeito, e a
+    rodada das 66 instâncias com a flag (encadeada no `p19.sh`) mediria a
+    configuração padrão de novo. Pego antes de a rodada começar.
+    **Solução:** o `make_variants.py` passa a usar o comando do `run_*.sh`
+    quando um patch da variante altera ou cria esse script (nenhuma variante
+    antiga mexe nele, conferido); a cadeia `p19.sh` foi parada depois da
+    rodada das instâncias ruidosas (que continuou) e trocada pela `p20.sh`
+    (par do JavaScript com a flag nas 4 instâncias, depois o nosso nas 66).
+    Teste local: os três programas com a flag dão o custo certo no berlin52
+    e o catálogo gerado roda `node --no-concurrent-recompilation main.js`.
+
+## Pendências futuras (registradas em 2026-11-22)
+
+- **F1.** Medir de novo os pares fora do escopo (from-C++ Rust, C#, C, Lua,
+  LuaJIT, Python, PyPy; to-C++ C, Python, Java, JavaScript, Julia) com o
+  protocolo novo, para tirar as linhas antigas das tabelas (decisão 1c):
+  escrever as variantes, cerca de um dia, e 3 a 4 h de servidor.
+- **F2.** Seção 6 com os dados novos: trocar as instâncias ruidosas
+  (`runs/noisy4-20261122/`) e o JavaScript (Node 24 padrão, P15; com a flag,
+  `runs/js66ncr-20261122/`) nos dados das figuras, refazer as Figuras 4 a 6 e
+  os mapas de calor e rever a frase "JavaScript is the only language whose
+  gap grows with instance size" (P13, P15, P18, P19). Avisar o autor antes de
+  mexer no artigo.
+- **F3.** Figura 7: unificar o método de tempo (pendência antiga) e decidir
+  se ela é medida de novo com o protocolo da análise nova.
+- **F4.** Hipótese H-JS7: no teste local, os três programas JavaScript com a
+  flag gastaram mais tempo de CPU no berlin52 (1,35 a 1,75 s) que o nosso
+  sem a flag (0,61 s, outra hora). Conferir nas instâncias curtas da rodada
+  `jsncr` contra o P15; se a flag pesa nelas, dizer no texto.
+- **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
+  depois que o artigo fechar.
+- **F6.** Pendências antigas que continuam: bump do submódulo no repositório
+  do TCC; referência do Nix na bibliografia; campanha completa nova (menos
+  Julia), se o F2 não bastar; métrica dos mapas de calor (`\todo` do
+  apêndice).
+
