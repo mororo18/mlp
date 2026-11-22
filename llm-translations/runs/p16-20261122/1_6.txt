@@ -1,0 +1,5 @@
+flags: --single-threaded
+COST:  6556628
+TIME:  125.881273
+wall clock (s):  125.885
+wall_ms: 125947

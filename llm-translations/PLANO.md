@@ -548,7 +548,7 @@ possa esperar vai para o fim da lista.
   Rodada `runs/js66-20261121/`: o nosso JavaScript nas 66 instâncias
   (`instances66.txt`, a lista `inst-list-66` do servidor), 10 execuções.
   Resultado: se repete (ver a rodada do P15).
-- [ ] **P16. Dois patamares do Node 24.** Na rodada do P15, a pr299 tem uma
+- [x] **P16. Dois patamares do Node 24.** Na rodada do P15, a pr299 tem uma
   execução em 125 s e nove em cerca de 348 s, e a pr439 uma em 350 s e nove
   em cerca de 970 s, com o mesmo caminho de busca (o custo é o mesmo em
   todas). O patamar lento sai por sorteio de execução, não da instância.
@@ -561,6 +561,7 @@ possa esperar vai para o fim da lista.
   Para o texto: decidir com o autor como reportar o JavaScript (média com os
   dois patamares, ou mediana) e se o lin318 e o linhp318 também têm um
   patamar rápido que não apareceu em 10 execuções.
+  Resultado: H-JS6 confirmada (ver a rodada do P16).
 - [ ] **P17. C da d493 nas figuras.** Nos dados das figuras, o C leva 403 s
   na d493 (dispersão máx/mín de 1,31), contra 176 s na pcb442; todas as
   linguagens ficam com a razão sobre o C menor nela (Rust 1,02 contra 1,35
@@ -569,6 +570,13 @@ possa esperar vai para o fim da lista.
   inflado e puxa para baixo as razões do grupo acima de 100 clientes. Medir
   de novo o C (e o C++) nas cinco instâncias acima de 400 clientes, junto
   com a campanha completa nova.
+- [ ] **P18. Compilação concorrente nas outras instâncias.** O P16 mostrou
+  o patamar lento na pr299 vindo da recompilação concorrente do V8. Conferir
+  se o lin318, o linhp318 e a pr439 também caem no patamar rápido com
+  `--no-concurrent-recompilation`, e se a flag muda o tempo numa instância
+  sem pico (gr202). Rodada `runs/p18-20261122/`, 5 execuções por conjunto.
+  Para o texto, decidir com o autor: manter o Node 24 padrão (e explicar os
+  picos) ou medir o JavaScript com a flag.
 
 ### Andamento das pendências
 
@@ -861,6 +869,26 @@ o gap do JavaScript não cresce com o tamanho da instância (283% contra
 picos do Node 24 em quatro instâncias e o JavaScript mais lento das
 figuras acima de 400 clientes. O C de base ainda é o das figuras, com a
 d493 inflada (P17).
+
+### Rodada do P16 (`runs/p16-20261122/`, 03:35 a 04:25 do servidor)
+
+`diag/node_flags.sh`: o nosso JavaScript na pr299, Node 24.18, 10
+execuções de cada conjunto de flags, intercaladas, 4 em paralelo; custo
+certo nas 30.
+
+| Flags | Execuções em cerca de 125 s | Execuções em cerca de 348 s | Média |
+|---|---|---|---|
+| padrão | 2 | 8 | 302,1 s |
+| `--single-threaded` | 10 | 0 | 125,7 s |
+| `--no-concurrent-recompilation` | 10 | 0 | 125,9 s |
+
+H-JS6 confirmada: o patamar lento vem da recompilação concorrente do V8
+(otimização do TurboFan em segundo plano). Desligando só ela, as 10
+execuções caem no patamar rápido; `--single-threaded`, que desliga também
+GC e marcação concorrentes, não muda mais nada. Com a otimização em
+segundo plano, o código otimizado entra num momento que varia de execução
+para execução, e em 8 de 10 a busca fica num código pior até o fim.
+Próximo: P18 (as outras instâncias com pico).
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do

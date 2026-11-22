@@ -1,0 +1,6 @@
+waiting for another Nix process to finish fetching input 'path:/out/flake'...
+flags: --no-concurrent-recompilation
+COST:  6556628
+TIME:  126.449927
+wall clock (s):  126.452
+wall_ms: 126511
