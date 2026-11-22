@@ -1,0 +1,7 @@
+diff -ruN a/run_node.sh b/run_node.sh
+--- a/run_node.sh	2026-07-07 15:23:35.991973164 -0300
++++ b/run_node.sh	2026-11-22 10:36:37.645488027 -0300
+@@ -1,2 +1,2 @@
+ #! /usr/bin/bash
+-node main.js "$@"
++node --no-concurrent-recompilation main.js "$@"

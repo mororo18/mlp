@@ -62,3 +62,4 @@ ours_julia.zero_based_warm,ours/julia,ours_julia/zero_based.patch ours_julia/war
 csharp_cpp.index32_seq,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq.patch,P14: unsigned index only in the subsequence accessors
 csharp_cpp.index32_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_matrix.patch,P14: unsigned index only in the distance matrix accessor
 csharp_cpp.index32_seq_assume,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq_assume.patch,P14: index32_seq with the indices and d declared non-negative (__builtin_unreachable)
+ours_javascript.no_concurrent_recompilation,ours/javascript,ours_javascript/no_concurrent_recompilation.patch,P18: node --no-concurrent-recompilation (V8 optimizes on the main thread)

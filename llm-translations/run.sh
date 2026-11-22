@@ -73,5 +73,5 @@ if [ -n "$IDS" ]; then
     python3 "$LT/make_variants.py" --out "$OUT/work" --ids $IDS
     TARGETS="-t $IDS --translations-dir $OUT/work"
 fi
-python3 "$REPO/benchmarks/bench.py" -l $LANGS $TARGETS \
+python3 "$REPO/benchmarks/bench.py" ${LANGS:+-l $LANGS} $TARGETS \
     -n "$REPS" -j 4 -I "$LT/$INST" --out "$OUT/csv"
