@@ -562,7 +562,7 @@ possa esperar vai para o fim da lista.
   dois patamares, ou mediana) e se o lin318 e o linhp318 também têm um
   patamar rápido que não apareceu em 10 execuções.
   Resultado: H-JS6 confirmada (ver a rodada do P16).
-- [ ] **P17. C da d493 nas figuras.** Nos dados das figuras, o C leva 403 s
+- [x] **P17. C da d493 nas figuras.** Nos dados das figuras, o C leva 403 s
   na d493 (dispersão máx/mín de 1,31), contra 176 s na pcb442; todas as
   linguagens ficam com a razão sobre o C menor nela (Rust 1,02 contra 1,35
   nas outras quatro instâncias acima de 400, Fortran 0,80, Java 1,25,
@@ -570,6 +570,8 @@ possa esperar vai para o fim da lista.
   inflado e puxa para baixo as razões do grupo acima de 100 clientes. Medir
   de novo o C (e o C++) nas cinco instâncias acima de 400 clientes, junto
   com a campanha completa nova.
+  Resultado: confirmado, e o efeito vai além do C (ver a rodada do P17 e o
+  P19).
 - [ ] **P18. Compilação concorrente nas outras instâncias.** O P16 mostrou
   o patamar lento na pr299 vindo da recompilação concorrente do V8. Conferir
   se o lin318, o linhp318 e a pr439 também caem no patamar rápido com
@@ -577,6 +579,21 @@ possa esperar vai para o fim da lista.
   sem pico (gr202). Rodada `runs/p18-20261122/`, 5 execuções por conjunto.
   Para o texto, decidir com o autor: manter o Node 24 padrão (e explicar os
   picos) ou medir o JavaScript com a flag.
+- [ ] **P19. Instâncias ruidosas nas figuras pesam no gap acima de 100.**
+  A métrica da figura (razão das médias do grupo) é dominada pelas
+  instâncias maiores, e a d493 sozinha tem cerca de 20% do tempo do C acima
+  de 100 clientes. Nos dados das figuras, a d493 e a pcb442 têm dispersão
+  alta em várias linguagens (d493: C 1,31, C++ 1,28, Fortran 1,55, Java
+  1,20; pcb442: Fortran 1,31, Java 1,25, C++ 1,19, C 1,16); Julia, Lua,
+  Python, Rust e Swift ficam limpas (até 1,04 na d493). Tirar só a d493 muda
+  o gap acima de 100 de quase todas: Rust 27,3 → 36,8%, Fortran 2,9 → 11,6%,
+  Swift 44,9 → 59,5%, Java 74,8 → 93,6%, Julia 11,2 → 28,9%, JavaScript
+  303,8 → 365,7%. Precisa medir de novo todas as linguagens nas instâncias
+  ruidosas (pelo menos pcb442 e d493; com dispersão acima de 1,10 em cinco
+  ou mais linguagens: pcb442, pr439, d493, gr120) ou fazer a campanha
+  completa nova (pendência antiga). Estimativa só das AOT e JIT nessas
+  quatro: cerca de 7 h de servidor. Decidir com o autor, junto com a flag do
+  JavaScript (P18).
 
 ### Andamento das pendências
 
@@ -889,6 +906,28 @@ GC e marcação concorrentes, não muda mais nada. Com a otimização em
 segundo plano, o código otimizado entra num momento que varia de execução
 para execução, e em 8 de 10 a busca fica num código pior até o fim.
 Próximo: P18 (as outras instâncias com pico).
+
+### Rodada do P17 (`runs/p17-20261122/`, 04:25 a 05:20 do servidor)
+
+C e C++ nas cinco instâncias acima de 400 clientes, 10 execuções, mesmo
+`run.sh` das outras rodadas; custos certos nas 100; carga mediana de 11.
+Média (dispersão máx/mín):
+
+| Instância | C, figuras | C, agora | C++, figuras | C++, agora | JavaScript (Node 24) / C de agora |
+|---|---|---|---|---|---|
+| rd400 | 152,2 s (1,07) | 148,7 s (1,05) | 152,3 s (1,07) | 150,5 s (1,03) | 3,32 |
+| fl417 | 135,6 s (1,05) | 133,7 s (1,03) | 137,6 s (1,05) | 135,0 s (1,04) | 3,33 |
+| gr431 | 120,7 s (1,02) | 121,3 s (1,02) | 121,2 s (1,02) | 122,7 s (1,03) | 3,33 |
+| pcb442 | 176,1 s (1,16) | 167,8 s (1,03) | 186,4 s (1,19) | 168,8 s (1,03) | 3,28 |
+| d493 | 403,5 s (1,31) | 204,2 s (1,04) | 423,5 s (1,28) | 205,6 s (1,03) | 3,29 |
+
+O C e o C++ da d493 nas figuras levam o dobro do tempo de agora; a pcb442
+fica 5 a 10% acima. As outras três batem com as figuras (até 2%). Com o C
+de agora, o JavaScript fica em 3,3 vezes o C nas cinco, o mesmo nível de
+101 a 300 clientes. Com o JavaScript do Node 24 e o C de agora nessas
+cinco, o gap do JavaScript acima de 100 clientes vai a 335,6% (283,0% até
+100); sem os quatro picos, 237,7%. O C da d493 inflado puxava para baixo o
+gap acima de 100 de todas as linguagens medidas limpas nela (P19).
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
