@@ -1348,3 +1348,7 @@ Registro de cada problema encontrado no caminho e da solução adotada.
     the implementations"). **Solução:** `git checkout -- c/solve` antes de
     cada `run.sh` no script encadeado (`~/mlp-test/fa/p19.sh`).
 
+16. **`c/solve` entrou num commit (2026-11-22).** Um `git commit -a` levou o
+    binário do C recompilado localmente (`3d3d4db`+1). **Solução:** commit
+    que restaura o binário anterior; commits daqui em diante só com
+    `git add` dos arquivos.
