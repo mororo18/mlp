@@ -595,6 +595,12 @@ possa esperar vai para o fim da lista.
   completa nova (pendência antiga). Estimativa só das AOT e JIT nessas
   quatro: cerca de 7 h de servidor. Decidir com o autor, junto com a flag do
   JavaScript (P18).
+  **Decisão do autor (2026-11-22): só as instâncias ruidosas, e o
+  JavaScript nas duas configurações.** Rodadas encadeadas: AOT e JIT (menos
+  JavaScript) na d493, gr120, pcb442 e pr439 (`instances_noisy4.txt`,
+  `runs/noisy4-20261122/`), depois a variante
+  `ours_javascript.no_concurrent_recompilation` nas 66 instâncias
+  (`runs/js66ncr-20261122/`); o JavaScript padrão é o do P15.
 
 ### Andamento das pendências
 
@@ -1202,3 +1208,9 @@ Registro de cada problema encontrado no caminho e da solução adotada.
     `construction`, que termina igual; o programa abortou ("stack
     smashing"). **Solução:** a troca passou a valer só a partir de
     `void perturb(`; o teste local reproduz o custo.
+15. **`c/solve` modificado barrou a rodada (2026-11-22).** O binário do C é
+    versionado; a compilação da rodada do P17 o reescreveu no checkout do
+    servidor, e o `run.sh` seguinte recusou rodar ("uncommitted changes in
+    the implementations"). **Solução:** `git checkout -- c/solve` antes de
+    cada `run.sh` no script encadeado (`~/mlp-test/fa/p19.sh`).
+
