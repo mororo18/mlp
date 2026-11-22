@@ -260,7 +260,7 @@ mudança é a escolha da tradução no nosso código quando ela ganha):
 | C++ → JavaScript | +12,8% | representação das subsequências (`Float64Array`) | +0,9% (I) |
 | C++ → Swift | −1,5% | cópia da solução na perturbação | ≈ 0% (D) |
 | C++ → Java | −10,6% | subsequências em três vetores | entra na combinação abaixo |
-| C++ → Julia | −7,1% | compilação JIT no tempo medido (berlin52) | −3,8% sem o berlin52 (D, aquecimento) |
+| C++ → Julia | −7,1% | compilação JIT no tempo medido (berlin52) | −3,3% (D: os dois com aquecimento) |
 
 Outros fatores (7.6):
 
@@ -271,7 +271,7 @@ Outros fatores (7.6):
 | Fortran → C++ | +34,1% | ε | +8,9% |
 | | | ε + matriz | −2,6% |
 | Rust, C#, Swift, Go, Fortran → C++ | | índice `unsigned` de 32 bits (o nosso) | +44,0, +27,8, +13,5, +33,6, +47,3% (piora) |
-| C++ → Java | −10,6% | cópias locais da rota (J2), acessores (J1) | −6,6% (J1 + J2) |
+| C++ → Java | −10,6% | cópias locais da rota (J2), acessores (J1) | a calcular no `analyze.py` (o nosso com J1 + J2 fica 6,6% mais rápido) |
 | | | J1 + J2 + três vetores + aquecimento | +0,2% sem o berlin52 |
 | C++ → Julia | −3,8% sem berlin52 | índice de cidade a partir de 1 | −0,4% (com aquecimento) |
 | C++ → Go | −2,8% | acessor `at()` (G2) | −1,4% (resto: geração de código) |
