@@ -344,12 +344,21 @@ subsequências +16,1%, com índices não negativos +1,1%) para o mecanismo.
    denominador, rodada, sentido D/I, linha da tabela); para cada uma, tempo
    médio, cv e razão por instância, gap e gap sem o berlin52; confere os
    custos; grava `comparisons.csv` e as linhas LaTeX das tabelas.
-2. **Pasta do artigo** `results/factor_analysis/2026-11-22/`: os CSVs das
+2. **Feito em 2026-11-22** (artigo `6f60713`): pasta com `tables.py`,
+   `comparisons.csv`, README e `runs/` das 7 rodadas usadas; os antigos em
+   `results/factor_analysis/earlier/`; mapa do `results/README.md`
+   atualizado. Plano original: **Pasta do artigo** `results/factor_analysis/2026-11-22/`: os CSVs das
    rodadas usadas (só as colunas de tempo e custo), o `comparisons.csv`, o
    script e um README com rodada, commit e carga de cada comparação; os
    `gaps_*.csv` antigos vão para `results/factor_analysis/earlier/` (se a
    decisão 1 for (a)); atualizar o mapa do `results/README.md`.
-3. **Tabelas no `main.tex`** (com `git pull` antes): reconstruir as quatro
+3. **Feito em 2026-11-22** (`6f60713`): as quatro tabelas de gaps no
+   formato de duas colunas, números novos sem marcador, linhas antigas com
+   asterisco (análise anterior) e † (tradução de versão anterior); a última
+   coluna da linha do índice usa o nosso C++ com índice de 64 bits
+   (`ours_cplusplus.index64`, 5 comparações novas no `tables.py`). Falta: a
+   conferência da tabela de desvios (7.4) e trocar as linhas do JavaScript
+   pela rodada com a flag. Plano original: **Tabelas no `main.tex`** (com `git pull` antes): reconstruir as quatro
    de gaps a partir do `analyze.py`; tirar ou trocar a das mais rápidas
    (decisão 3); conferir a de desvios (7.4): passagem por valor do Swift →
    C++ continua, mas vale 1 ponto e não o gap; nota a sobre PyPy continua
