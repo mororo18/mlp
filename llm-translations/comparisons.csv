@@ -30,6 +30,11 @@ other,to,C# -> C++,Index type,ours_in_translation,factors-20261121,csharp_cpp.in
 other,to,Swift -> C++,Index type,ours_in_translation,factors-20261121,swift_cpp.index32,cplusplus,1.1457,1.1426,1.1427,1.1072,13.5,13.1,1.0
 other,to,Go -> C++,Index type,ours_in_translation,factors-20261121,go_cpp.index32,cplusplus,1.3234,1.3407,1.3426,1.3356,33.6,34.0,1.0
 other,to,Fortran -> C++,Index type,ours_in_translation,factors-20261121,fortran_cpp.index32,cplusplus,1.5012,1.5029,1.4710,1.4158,47.3,46.3,1.0
+other,to,Rust -> C++,Index type,translation_in_ours,factors-20261121,rust_cpp.base,ours_cplusplus.index64,1.0778,1.0921,1.1014,1.0770,8.7,9.0,0.8
+other,to,C# -> C++,Index type,translation_in_ours,factors-20261121,csharp_cpp.base,ours_cplusplus.index64,1.1509,1.1352,1.1390,1.0912,12.9,12.2,1.7
+other,to,Swift -> C++,Index type,translation_in_ours,factors-20261121,swift_cpp.base,ours_cplusplus.index64,1.1347,1.1347,1.1468,1.0943,12.8,12.5,0.8
+other,to,Go -> C++,Index type,translation_in_ours,factors-20261121,go_cpp.base,ours_cplusplus.index64,1.2616,1.2815,1.3234,1.3003,29.2,30.2,1.1
+other,to,Fortran -> C++,Index type,translation_in_ours,factors-20261121,fortran_cpp.base,ours_cplusplus.index64,1.3725,1.3498,1.3484,1.3098,34.5,33.6,0.9
 other,from,C++ -> Java,Accessors + local copies,translation_in_ours,p11p12-20261121,cpp_java.base,ours_java.direct_no_locals,0.9153,0.8738,1.0036,0.9855,-5.5,-4.6,7.4
 other,from,C++ -> Java,Accessors + local copies + subsequence storage,translation_in_ours,p11p12-20261121,cpp_java.base,ours_java.soa,0.9514,0.9268,0.9978,1.0004,-3.1,-2.5,11.1
 other,from,C++ -> Java,"All, with JIT warm-up",translation_in_ours,p11p12-20261121,cpp_java.warm,ours_java.soa_warm,0.6219,0.9921,1.0130,1.0007,-9.3,0.2,3.4
