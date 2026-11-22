@@ -572,13 +572,14 @@ possa esperar vai para o fim da lista.
   com a campanha completa nova.
   Resultado: confirmado, e o efeito vai além do C (ver a rodada do P17 e o
   P19).
-- [ ] **P18. Compilação concorrente nas outras instâncias.** O P16 mostrou
+- [x] **P18. Compilação concorrente nas outras instâncias.** O P16 mostrou
   o patamar lento na pr299 vindo da recompilação concorrente do V8. Conferir
   se o lin318, o linhp318 e a pr439 também caem no patamar rápido com
   `--no-concurrent-recompilation`, e se a flag muda o tempo numa instância
   sem pico (gr202). Rodada `runs/p18-20261122/`, 5 execuções por conjunto.
   Para o texto, decidir com o autor: manter o Node 24 padrão (e explicar os
   picos) ou medir o JavaScript com a flag.
+  Resultado: os quatro picos são o mesmo efeito (ver a rodada do P18).
 - [ ] **P19. Instâncias ruidosas nas figuras pesam no gap acima de 100.**
   A métrica da figura (razão das médias do grupo) é dominada pelas
   instâncias maiores, e a d493 sozinha tem cerca de 20% do tempo do C acima
@@ -928,6 +929,28 @@ de agora, o JavaScript fica em 3,3 vezes o C nas cinco, o mesmo nível de
 cinco, o gap do JavaScript acima de 100 clientes vai a 335,6% (283,0% até
 100); sem os quatro picos, 237,7%. O C da d493 inflado puxava para baixo o
 gap acima de 100 de todas as linguagens medidas limpas nela (P19).
+
+### Rodada do P18 (`runs/p18-20261122/`, 05:20 a 06:25 do servidor)
+
+`diag/node_flags.sh`, Node 24.18, 5 execuções por conjunto, intercaladas, 4
+em paralelo; custo certo em todas. Tempos (s):
+
+| Instância | Padrão | `--no-concurrent-recompilation` | Com a flag / C |
+|---|---|---|---|
+| gr202 | 43 43 43 43 42 | 42 42 43 42 42 | 3,73 |
+| lin318 | 336 334 334 333 333 | 122 122 122 123 124 | 3,46 |
+| linhp318 | 440 445 442 443 443 | 162 162 162 162 162 | 3,48 |
+| pr439 | 960 974 966 970 973 | 355 352 356 354 353 | 3,10 |
+
+(pr299 do P16: 125,9 s com a flag, 3,43 vezes o C.) Os quatro picos são o
+mesmo efeito: com a recompilação concorrente desligada, o JavaScript fica
+entre 3,1 e 3,5 vezes o C nas quatro, como nas instâncias vizinhas, e a
+flag não muda a instância sem pico (gr202, −1,5%). No lin318 e no linhp318
+o patamar lento saiu nas 15 execuções com a configuração padrão (10 do P15
+e 5 daqui). Com os tempos da flag nos quatro picos e o C de agora acima de
+400 clientes, o gap do JavaScript acima de 100 clientes fica em 235,9%,
+contra 283,0% até 100: o gap cai com o tamanho, como nas outras linguagens
+com JIT. Decisão pendente com o autor (P18 e P19).
 
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do

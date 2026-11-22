@@ -1,0 +1,5 @@
+flags: 
+COST:  2909247
+TIME:  43.690466
+wall clock (s):  43.779
+wall_ms: 43833

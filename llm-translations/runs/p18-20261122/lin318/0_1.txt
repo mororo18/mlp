@@ -1,0 +1,7 @@
+waiting for another Nix process to finish fetching input 'path:/out/flake'...
+waiting for another Nix process to finish fetching input 'path:/out/flake'...
+flags: 
+COST:  5620197
+TIME:  334.413721
+wall clock (s):  380.84
+wall_ms: 380921
