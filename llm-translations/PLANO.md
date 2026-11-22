@@ -210,6 +210,140 @@ Leitura:
 - [ ] `analyze.py`, tabelas em `results/factor_analysis/<data>/` do artigo,
       texto da 7.5 e da 7.6, `README.md` desta pasta.
 
+## Fase 5: plano das tabelas e da análise (2026-11-22, para revisão do autor)
+
+### Situação de hoje no artigo (Seção 7, `main.tex` em `186064e`)
+
+| Tabela | Rótulo | Origem dos números | Situação |
+|---|---|---|---|
+| Desvios do catálogo (7.4) | `tab:translation-deviations` | leitura do código | conferir célula a célula com o mapa da Fase 2 |
+| Gaps das armadilhas, from/to (7.5) | `tab:translation-gaps-pitfalls-from/-to` | relatórios antigos (`gaps_pitfalls.csv`): outra máquina, berlin52/bier127/gr202, 1 a 10 execuções, versões antigas das nossas | refazer |
+| Gaps dos outros fatores, from/to (7.6) | `tab:translation-gaps-other-from/-to` | relatórios antigos (`gaps_other.csv`) | refazer |
+| Traduções mais rápidas (7.6) | `tab:translation-faster` | relatórios antigos + coluna de situação | substituir (ver decisão 3) |
+
+Dependências fora desta fase: a Figura 7 (`fig:translation-runtime`) ainda é
+da campanha antiga (pendência "unificar o método de tempo da Figura 7"), e o
+JavaScript dela tem o efeito do Node 24 (P16 a P18).
+
+### O que a análise nova cobre
+
+Mesmo protocolo para tudo: servidor, berlin52, kroA100, gr202 e lin318, 10
+execuções, comparação sempre dentro da mesma rodada; gap = 100 x (média das
+razões nas 4 instâncias − 1), o método da Figura 7, mais o gap sem o berlin52
+nas linguagens com JIT.
+
+- **From-C++ (a tradução ganha; variante direta no nosso, inversa confirma):**
+  Java, Julia, Swift, Go; JavaScript (a tradução perde; critério 2). Fortran
+  sai (−0,1%, sem gap).
+- **To-C++:** Rust, C#, Swift, Go, Fortran.
+- **Fora do escopo (só análise antiga):** from-C++ Rust, C#, C, Lua, LuaJIT,
+  Python, PyPy; to-C++ C, Python, Java, JavaScript, Julia.
+
+### Esboço das tabelas novas (números provisórios, do diário acima)
+
+Armadilhas do catálogo (7.5), to-C++ (gap sobre o nosso C++):
+
+| Par | Gap | Armadilha | Gap com a nossa escolha |
+|---|---|---|---|
+| Rust → C++ | +8,4% | matriz de distâncias | −1,1% |
+| C# → C++ | +12,5% | matriz de distâncias | −0,2% |
+| Swift → C++ | +12,4% | matriz de distâncias | +1,5% |
+| | | passagem por valor | +11,4% |
+| Go → C++ | +28,7% | matriz de distâncias | +25,7% |
+| Fortran → C++ | +34,1% | matriz de distâncias | +23,6% |
+
+Armadilhas do catálogo (7.5), from-C++ (gap da tradução sobre o nosso; a
+mudança é a escolha da tradução no nosso código quando ela ganha):
+
+| Par | Gap | Armadilha | Gap depois da mudança |
+|---|---|---|---|
+| C++ → JavaScript | +12,8% | representação das subsequências (`Float64Array`) | +0,9% (I) |
+| C++ → Swift | −1,5% | cópia da solução na perturbação | ≈ 0% (D) |
+| C++ → Java | −10,6% | subsequências em três vetores | entra na combinação abaixo |
+| C++ → Julia | −7,1% | compilação JIT no tempo medido (berlin52) | −3,8% sem o berlin52 (D, aquecimento) |
+
+Outros fatores (7.6):
+
+| Par | Gap | Fator | Gap depois da mudança |
+|---|---|---|---|
+| Go → C++ | +28,7% | ε na atualização do melhor movimento | +2,2% |
+| | | ε + matriz | +1,1% |
+| Fortran → C++ | +34,1% | ε | +8,9% |
+| | | ε + matriz | −2,6% |
+| Rust, C#, Swift, Go, Fortran → C++ | | índice `unsigned` de 32 bits (o nosso) | +44,0, +27,8, +13,5, +33,6, +47,3% (piora) |
+| C++ → Java | −10,6% | cópias locais da rota (J2), acessores (J1) | −6,6% (J1 + J2) |
+| | | J1 + J2 + três vetores + aquecimento | +0,2% sem o berlin52 |
+| C++ → Julia | −3,8% sem berlin52 | índice de cidade a partir de 1 | −0,4% (com aquecimento) |
+| C++ → Go | −2,8% | acessor `at()` (G2) | −1,4% (resto: geração de código) |
+
+E o controle do índice no nosso C++ (`size_t_counter`, +32,3%) e o P14 (só
+subsequências +16,1%, com índices não negativos +1,1%) para o mecanismo.
+
+### Decisões do autor
+
+1. **Pares fora do escopo (análise antiga).** (a) Linhas antigas nas mesmas
+   tabelas, marcadas com nota ("análise anterior: outra máquina, berlin52,
+   bier127, gr202"), e o parágrafo de método descreve os dois experimentos;
+   (b) só a análise nova nas tabelas e os achados antigos no texto, com a
+   ressalva (perde a linha mais forte da seção, verificação de limites no
+   C++ → Rust, 81% → 3%); (c) medir de novo esses pares (escrever as
+   variantes: cerca de um dia de trabalho e 3 a 4 h de servidor).
+   Recomendação: (a) agora, (c) se der tempo antes da submissão.
+2. **Divisão 7.5 × 7.6.** Manter "armadilhas do catálogo" × "outros
+   fatores". Classificação proposta: catálogo = matriz de distâncias,
+   armazenamento das subsequências (inclui `Float64Array` e os três vetores
+   do Java), passagem por valor/cópia, verificação de limites, tipos
+   estáveis, compilação JIT no tempo medido (Seção 5); outros = ε, índice
+   `unsigned`, acessores, cópias locais, índice a partir de 1, geração de
+   código.
+3. **Tabela das traduções mais rápidas.** A coluna de situação existia
+   porque a análise antiga era sobre versões velhas das nossas; a nova é
+   sobre as atuais. Proposta: tirar a tabela e pôr esses pares nas tabelas
+   de gaps (linhas from-C++ com a mudança direta), com um parágrafo curto na
+   7.6 sobre as traduções que ganham.
+4. **Colunas.** Um só par de colunas, "Gap" e "Gap depois da mudança", com
+   (D) ou (I) dizendo em qual programa entrou a mudança. Alternativa: duas
+   tabelas separadas para os pares em que a tradução ganha.
+5. **JavaScript no lin318.** Os dois lados do par estão no patamar lento do
+   Node 24 (empate em cerca de 333 s). Proposta: medir o par e o
+   `cpp_javascript.array` com `--no-concurrent-recompilation` nas 4
+   instâncias (cerca de 2 h de servidor, depois das rodadas do P19) e usar
+   esses números, com nota.
+
+### Passos
+
+1. **`analyze.py`** (nesta pasta): uma lista de comparações (numerador,
+   denominador, rodada, sentido D/I, linha da tabela); para cada uma, tempo
+   médio, cv e razão por instância, gap e gap sem o berlin52; confere os
+   custos; grava `comparisons.csv` e as linhas LaTeX das tabelas.
+2. **Pasta do artigo** `results/factor_analysis/2026-11-22/`: os CSVs das
+   rodadas usadas (só as colunas de tempo e custo), o `comparisons.csv`, o
+   script e um README com rodada, commit e carga de cada comparação; os
+   `gaps_*.csv` antigos vão para `results/factor_analysis/earlier/` (se a
+   decisão 1 for (a)); atualizar o mapa do `results/README.md`.
+3. **Tabelas no `main.tex`** (com `git pull` antes): reconstruir as quatro
+   de gaps a partir do `analyze.py`; tirar ou trocar a das mais rápidas
+   (decisão 3); conferir a de desvios (7.4): passagem por valor do Swift →
+   C++ continua, mas vale 1 ponto e não o gap; nota a sobre PyPy continua
+   antiga.
+4. **Parágrafo de método** da 7.5: protocolo novo (máquina, instâncias,
+   execuções, mesma rodada, métrica, D/I) no lugar do atual (outra máquina,
+   bier127).
+5. **Texto da 7.5 e da 7.6, estrutura primeiro:** um esqueleto por
+   parágrafo, cada afirmação com a célula da tabela que a sustenta, para
+   revisão antes da prosa. Afirmações do texto atual que caem: "Swift → C++:
+   a passagem por valor explica o gap", "C → C++: o índice com sinal cancela
+   as matrizes aninhadas" (análise antiga), "o `unsigned` custa 4 a 6% ao
+   nosso C++" (o nosso não paga nada, P4), "o resto do Julia não tem
+   explicação" (P10/P12), o "Go: 3 a 4% de geração de código" (agora 1,4%).
+6. **Parágrafo de fechamento** (o `\todo` da 7.6): lições práticas, com o
+   índice `unsigned` (o compilador precisa provar que não é negativo), ε,
+   matriz e as armadilhas de JIT (aquecimento, `Float64Array`, recompilação
+   concorrente do V8).
+7. **`README.md`** desta pasta: como montar as variantes, rodar no servidor e
+   gerar as tabelas.
+8. **TCC:** espelhar as tabelas na monografia depois que o artigo fechar.
+
 ## Fase 2: lista de fatores proposta (para revisão do autor)
 
 Diferenças de projeto entre cada tradução e a nossa implementação atual
