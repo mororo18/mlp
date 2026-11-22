@@ -1390,6 +1390,31 @@ Registro de cada problema encontrado no caminho e da solução adotada.
     Teste local: os três programas com a flag dão o custo certo no berlin52
     e o catálogo gerado roda `node --no-concurrent-recompilation main.js`.
 
+## Flag do JavaScript no repositório (autor, 2026-11-22)
+
+O autor pediu a flag no script que roda o JavaScript e a informação no
+artigo. Feito:
+- `javascript/run_node.sh`: `node --no-concurrent-recompilation main.js`
+  (commit `10e381f`); `harness/catalog_base.py`: `REF_NODE` com a flag, então
+  o nosso JavaScript e todas as traduções para JavaScript rodam com ela.
+- As variantes `*.no_concurrent_recompilation` saíram (a flag virou o
+  padrão); o `make_variants.py` continua usando o `run_*.sh` alterado por
+  patch, se aparecer outro caso.
+- Servidor: a cadeia `p20.sh` foi parada antes de começar e trocada pela
+  `p21.sh`: depois das instâncias ruidosas, o par (`javascript`,
+  `cpp_javascript.base`, `cpp_javascript.array`) nas 4 instâncias
+  (`runs/jsncr-20261122/`) e o nosso JavaScript nas 66
+  (`runs/js66ncr-20261122/`), ambos já com a flag do repositório.
+- Artigo (`ffee501`): parágrafo na Seção 6, depois do protocolo, com o
+  mecanismo e os números do P16 e do P18, e um `\todo` dizendo que as
+  figuras da seção ainda são da medição sem a flag; no protocolo da 7.1, as
+  traduções rodam "with the same build and runtime settings as our own
+  (Table compilation-modes and, for JavaScript, the flag described in
+  Section 6)".
+- Consequência para a decisão "os dois" (P18): a configuração principal das
+  figuras passa a ser com a flag (`js66ncr`); a medição sem a flag (P15) fica
+  como análise à parte, citada no parágrafo.
+
 ## Pendências futuras (registradas em 2026-11-22)
 
 - **F1.** Medir de novo os pares fora do escopo (from-C++ Rust, C#, C, Lua,
@@ -1408,6 +1433,9 @@ Registro de cada problema encontrado no caminho e da solução adotada.
   flag gastaram mais tempo de CPU no berlin52 (1,35 a 1,75 s) que o nosso
   sem a flag (0,61 s, outra hora). Conferir nas instâncias curtas da rodada
   `jsncr` contra o P15; se a flag pesa nelas, dizer no texto.
+- **F7.** `mlp-standard` e `mlp-naive` ainda rodam `node main.js` sem a
+  flag. Perguntar ao autor se a flag vale para as três (é configuração do
+  runtime, não otimização do código).
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório
