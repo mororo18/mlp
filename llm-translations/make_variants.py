@@ -13,6 +13,8 @@ Uso: python make_variants.py --out <dir> [--ids id1 id2 ...]
 """
 import argparse
 import csv
+import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -88,9 +90,16 @@ def main():
             shutil.copytree(HERE / "translations" / r["base"], dest)
             entry = f'{{"traduzida": copy.deepcopy(_c.PROJETOS[{r["base"]!r}]["traduzida"])}}'
 
+        scripts = set()
         for p in r["patches"].split():
             subprocess.run(["patch", "-p1", "-s", "--no-backup-if-mismatch", "-d", str(dest),
                             "-i", str(HERE / "variants" / p)], check=True)
+            scripts |= set(re.findall(r"^\+\+\+ b/(run_[^/\s]*\.sh)", (HERE / "variants" / p).read_text(), re.M))
+        for script in scripts:
+            with open(dest / script) as f:
+                f.readline()
+                cmd = [tok for tok in shlex.split(f.readline()) if tok != "$@"]
+            entry = f'{{"traduzida": dict({entry[14:-1]}, run={cmd!r})}}'
         entries.append(f'    {r["id"]!r}: {entry},')
 
     (out / "benchmark.py").write_text(CATALOG.format(harness=str(HERE / "harness"),

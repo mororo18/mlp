@@ -63,3 +63,5 @@ csharp_cpp.index32_seq,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_se
 csharp_cpp.index32_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_matrix.patch,P14: unsigned index only in the distance matrix accessor
 csharp_cpp.index32_seq_assume,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq_assume.patch,P14: index32_seq with the indices and d declared non-negative (__builtin_unreachable)
 ours_javascript.no_concurrent_recompilation,ours/javascript,ours_javascript/no_concurrent_recompilation.patch,P18: node --no-concurrent-recompilation (V8 optimizes on the main thread)
+cpp_javascript.no_concurrent_recompilation,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/no_concurrent_recompilation.patch,P18: translation with node --no-concurrent-recompilation
+cpp_javascript.array_no_concurrent_recompilation,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/array.patch cpp_javascript/no_concurrent_recompilation.patch,P5 + P18: Array subsequences with node --no-concurrent-recompilation
