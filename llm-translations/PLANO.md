@@ -319,6 +319,10 @@ subsequências +16,1%, com índices não negativos +1,1%) para o mecanismo.
    linha própria, com o valor medido com os dois aquecidos e nota.
 3. Tabela das traduções mais rápidas sai; os pares vão para as tabelas de
    gaps, com um parágrafo curto na 7.6.
+   **Revisto pelo autor (2026-11-22):** a tabela fica, no formato das de
+   gaps (duas colunas de mudança, aquecimento em linha própria, sem o
+   berlin52 entre parênteses para Java e Julia). Feito no artigo (`8aec4d8`),
+   com os números do `tables.py`; o texto da 7.6 sobre ela ainda é o antigo.
 4. **Colunas: duas, sem marcador (D)/(I)**, que confunde a leitura. Formato:
    Par | Gap | Fator | Gap com a nossa escolha na tradução | Gap com a
    escolha da tradução no nosso código. As duas colunas dão o gap da
