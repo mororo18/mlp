@@ -774,7 +774,7 @@ possa esperar vai para o fim da lista.
   (`runs/js66ncr-20261122/`); o JavaScript padrão é o do P15.
   Resultado: a d493 das figuras era lenta em quase todas as linguagens, e
   os gaps acima de 100 sobem (ver as rodadas do P19).
-- [ ] **P20. Intercalado × três vetores no JavaScript (autor, 2026-11-23).**
+- [x] **P20. Intercalado × três vetores no JavaScript (autor, 2026-11-23).**
   Com o nosso JavaScript em `Float64Array` (F15), a diferença que resta no
   par é o layout das subsequências: um `Float64Array` intercalado (T, C, W
   lado a lado, nosso) × três `Float64Array` (`seq_T`, `seq_C`, `seq_W`,
@@ -789,8 +789,38 @@ possa esperar vai para o fim da lista.
   variáveis locais no início de cada função, como na tradução, e índice
   `x*n + y`) e `cpp_javascript.interleaved` (`solut.seq` intercalado, índice
   `to_1D(...)*3 + campo`). As quatro versões dão o custo certo no berlin52.
-  **Rodando (2026-11-23):** `runs/p20-20261123/` (cadeia `p23.sh`, antes do
-  F15).
+  **Resultado (`runs/p20-20261123/`, commit `6eaa1c2`, 05:56 a 06:29 UTC,
+  carga de 10 a 11 processos, os 4 da rodada e os 7 do outro usuário).**
+  Razões por instância (berlin52, kroA100, gr202, lin318) e gap (sem o
+  berlin52):
+  - tradução / nossa: 0,999 1,009 1,034 1,062, +2,6% (+3,5%); repete a
+    `jsf64` (+2,2%).
+  - tradução intercalada / nossa (nossa escolha na tradução): 0,939 0,929
+    0,935 0,941, −6,4% (−6,5%).
+  - tradução / nossa com três vetores (escolha da tradução na nossa): 1,051
+    1,054 1,027 1,050, +4,5% (+4,4%).
+  - controle, nossa com três vetores / nossa: 0,950 0,957 1,007 1,011, −1,9%
+    (−0,9%).
+  - tradução intercalada / tradução: 0,940 0,921 0,905 0,886, −8,7% (−9,6%).
+  Leitura: o efeito do layout não é simétrico. Na tradução, o intercalado
+  ganha 6% a 11%, crescendo com a instância; no nosso código, os três
+  vetores ganham 5% nas instâncias pequenas e perdem 1% nas grandes. Com o
+  intercalado, a tradução fica 6% mais rápida que a nossa, então o resto do
+  código da tradução é mais rápido que o nosso, e o layout dela esconde
+  isso no gap do par. Hipótese em P21. Todas as execuções reproduzem o
+  custo de referência (CV máximo 0,9%).
+
+- [ ] **P21. O que deixa a tradução C++ → JavaScript mais rápida que a
+  nossa, fora do layout (achado do P20, 2026-11-23).** Com o mesmo layout
+  intercalado, a tradução fica 6,4% à frente da nossa nas 4 instâncias. Na
+  leitura do código, a tradução copia para constantes locais, no início de
+  cada busca, o que o nosso lê do objeto `info` a cada acesso: `dimen` e
+  `cost` (o nosso usa `info.dimension` e `info.c` dentro dos laços), além
+  dos deslocamentos de T, C e W (`info.T`, `info.C`, `info.W` no nosso, que
+  a variante `ours_javascript.const_offsets` já mede em parte) e do índice
+  (`x*(n+1) + y` na tradução, `(x*n + y)*3 + z` no nosso). A testar: uma
+  variante da nossa com `info.dimension` e `info.c` em variáveis locais, e a
+  combinação com `const_offsets`. Não muda as tabelas sem decisão do autor.
 
 ### Andamento das pendências
 
@@ -1639,8 +1669,14 @@ artigo. Feito:
   diferença que resta é intercalado × três vetores, os dois `Float64Array`)
   e o que a Seção 4 diz do layout do nosso JavaScript. A diferença que
   resta (intercalado × três vetores) é o P20.
-  **Rodando (2026-11-23):** `runs/js66f64-20261123/` (cadeia `p23.sh`, depois
-  do P20).
+  **Rodado (2026-11-23):** `runs/js66f64-20261123/` (commit `6eaa1c2`, 06:29
+  a 09:56 UTC, carga de 11 processos na maior parte da rodada). As 66
+  instâncias reproduzem os custos da `js66ncr-20261122` (o nosso antigo com
+  `Array` e a flag). Razão nova / antiga por instância: média 1,130 até 100
+  clientes (1,000 a 1,192), 1,160 de 101 a 300 (1,146 a 1,178) e 1,157
+  acima de 300 (1,149 a 1,168); 1,147 no geral. O `Float64Array` custa 15%
+  ao nosso JavaScript nas 66 instâncias, como nas 4 da `jsf64` (16%). Falta
+  levar a rodada às figuras da Seção 6 (F2).
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório
