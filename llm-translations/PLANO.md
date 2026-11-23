@@ -774,6 +774,16 @@ possa esperar vai para o fim da lista.
   (`runs/js66ncr-20261122/`); o JavaScript padrão é o do P15.
   Resultado: a d493 das figuras era lenta em quase todas as linguagens, e
   os gaps acima de 100 sobem (ver as rodadas do P19).
+- [ ] **P20. Intercalado × três vetores no JavaScript (autor, 2026-11-23).**
+  Com o nosso JavaScript em `Float64Array` (F15), a diferença que resta no
+  par é o layout das subsequências: um `Float64Array` intercalado (T, C, W
+  lado a lado, nosso) × três `Float64Array` (`seq_T`, `seq_C`, `seq_W`,
+  tradução). Gap do par na `jsf64`: +2,2% (+3,1% sem o berlin52), crescendo
+  com a instância (0,995 no berlin52 a 1,061 no lin318). Variantes nos dois
+  sentidos: o nosso com três `Float64Array` (D) e a tradução com um
+  `Float64Array` intercalado (I), com a flag, nas 4 instâncias, junto com a
+  nossa e a tradução na mesma rodada (cerca de 35 min). Pode rodar junto com
+  o F15.
 
 ### Andamento das pendências
 
@@ -1620,7 +1630,8 @@ artigo. Feito:
   Seção 6 (F2), que hoje usam o `Array`. **Para decidir com o autor:** a
   linha do JavaScript na Tabela 8 (o gap do par cai a cerca de 2%, e a
   diferença que resta é intercalado × três vetores, os dois `Float64Array`)
-  e o que a Seção 4 diz do layout do nosso JavaScript.
+  e o que a Seção 4 diz do layout do nosso JavaScript. A diferença que
+  resta (intercalado × três vetores) é o P20.
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório
