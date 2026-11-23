@@ -1596,6 +1596,13 @@ artigo. Feito:
   os mapas de calor e rever a frase "JavaScript is the only language whose
   gap grows with instance size" (P13, P15, P18, P19). Avisar o autor antes de
   mexer no artigo.
+  **Figura 5 feita (autor, 2026-11-23, commit `d670fc5` do artigo):**
+  `results/main/cleaned_data_2026-11-23.csv` (gerado pelo `merge_reruns.py`
+  com `noisy4-20261122` e `js66f64-20261123`, 110 pares trocados, custos
+  conferidos). JavaScript 348,0 até 100 e 290,6 acima de 100; o parágrafo
+  da figura foi reescrito: o JavaScript estreita o gap como C# e PyPy, e o
+  Swift passa a ser a única linguagem cujo gap cresce (43,5 → 46,9). Falta:
+  Figuras 4 e 6 e mapas de calor (o `\todo` do artigo diz isso).
 - **F3.** Figura 7: unificar o método de tempo (pendência antiga) e decidir
   se ela é medida de novo com o protocolo da análise nova.
 - [x] **F4.** Fechado em 2026-11-23 (rodada `js66ncr`: a flag não custa nas
