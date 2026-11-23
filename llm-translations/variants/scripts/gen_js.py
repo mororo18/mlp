@@ -24,7 +24,35 @@ def tr_array(b):
     for f in 'TCW':
         sub(b / 'main.js', r'    solut\.seq_%s = new Float64Array\(sz\);' % f, '    solut.seq_%s = Array(sz);' % f)
 
-write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),'ours_javascript/plain_array.patch': (OURS, plain_array, ()),
+def three_arrays(b):
+    # P20: T, C e W em três Float64Array, como na tradução C++ -> JavaScript
+    m = b / 'main.js'
+    sub(m, r'    seq = new Float64Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);',
+        '    var sz = (dimension+1)*(dimension+1);\n    seq = [new Float64Array(sz), new Float64Array(sz), new Float64Array(sz)];')
+    sub(m, r'var to_1D = function \(x, y, z, n\) \{\n    return \(x\*n \+ y\)\*3 \+ z;\n\}\n',
+        'var to_2D = function (x, y, n) {\n    return x*n + y;\n}\n')
+    sub(m, r'\bsubseq\[to_1D\(([^,()]+), ([^,()]+), info\.([TCW]), info\.dimension\)\]', r'subseq[info.\3][to_2D(\1, \2, info.dimension)]', 3)
+    n = sub(m, r'\bseq\[to_1D\(([^,()]+), ([^,()]+), info\.([TCW]), info\.dimension\)\]', r'seq_\3[to_2D(\1, \2, info.dimension)]', 50)
+    k = sub(m, r'(\nfunction (subseq_load|search_swap|search_two_opt|search_reinsertion)\(s, seq, info(, opt)?\) \{\n)',
+            r'\1    var seq_T = seq[info.T], seq_C = seq[info.C], seq_W = seq[info.W];\n', 4)
+    assert k == 4 and 'to_1D' not in m.read_text(), (n, k)
+    print('three_arrays', n)
+
+def tr_interleaved(b):
+    # P20: uma Float64Array intercalada (T, C, W), como na nossa implementação
+    m = b / 'main.js'
+    sub(m, r'    solut\.seq_T = new Float64Array\(sz\);\n    solut\.seq_C = new Float64Array\(sz\);\n    solut\.seq_W = new Float64Array\(sz\);',
+        '    solut.seq = new Float64Array(sz*3);')
+    k = sub(m, r'const T = solut\.seq_T, C = solut\.seq_C, W = solut\.seq_W;', 'const S = solut.seq;', 4)
+    off = {'T': '', 'C': ' + 1', 'W': ' + 2'}
+    n = sub(m, r'\b([TCW])\[to_1D\(([^()]*)\)\]', lambda mo: 'S[to_1D(%s)*3%s]' % (mo.group(2), off[mo.group(1)]), 30)
+    assert 'solut.seq_' not in m.read_text() and k == 4, k
+    print('tr_interleaved', n)
+
+write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),
+       'cpp_javascript/interleaved.patch': (LT / 'translations' / 'cpp_javascript', tr_interleaved, ('cpp_javascript/measure.patch',)),
+       'ours_javascript/plain_array.patch': (OURS, plain_array, ()),
+       'ours_javascript/three_arrays.patch': (OURS, three_arrays, ()),
        'ours_javascript/const_offsets.patch': (OURS, consts, ()),
        'ours_javascript/no_globals.patch': (OURS, locals_, ()),
        'ours_javascript/function_decl.patch': (OURS, fdecl, ())})

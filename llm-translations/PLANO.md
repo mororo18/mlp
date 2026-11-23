@@ -784,6 +784,13 @@ possa esperar vai para o fim da lista.
   `Float64Array` intercalado (I), com a flag, nas 4 instâncias, junto com a
   nossa e a tradução na mesma rodada (cerca de 35 min). Pode rodar junto com
   o F15.
+  Variantes feitas (`gen_js.py`): `ours_javascript.three_arrays` (`seq`
+  vira três `Float64Array`, com `seq_T`, `seq_C` e `seq_W` copiados para
+  variáveis locais no início de cada função, como na tradução, e índice
+  `x*n + y`) e `cpp_javascript.interleaved` (`solut.seq` intercalado, índice
+  `to_1D(...)*3 + campo`). As quatro versões dão o custo certo no berlin52.
+  **Rodando (2026-11-23):** `runs/p20-20261123/` (cadeia `p23.sh`, antes do
+  F15).
 
 ### Andamento das pendências
 
@@ -1632,6 +1639,8 @@ artigo. Feito:
   diferença que resta é intercalado × três vetores, os dois `Float64Array`)
   e o que a Seção 4 diz do layout do nosso JavaScript. A diferença que
   resta (intercalado × três vetores) é o P20.
+  **Rodando (2026-11-23):** `runs/js66f64-20261123/` (cadeia `p23.sh`, depois
+  do P20).
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório
