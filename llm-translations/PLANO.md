@@ -1776,6 +1776,20 @@ artigo. Feito:
     Python; C, Lua e Python → C++. Lua → C++ nunca teve análise de fatores.
     Lua e Python interpretados são lentos: decidir as instâncias (as 4 da
     análise nova custam caro no lin318) antes de escrever as variantes.
+    **Decidido (2026-11-23, autor pediu instâncias razoáveis):** C++ → Lua e
+    C++ → Python (interpretados) em berlin52, kroA100 e lin105
+    (`instances_interp.txt`), 10 execuções. Tempos da nossa na Seção 6: Lua
+    17, 216 e 206 s; Python 17, 207 e 199 s (gr202 e lin318 levam 2000 e
+    5300 s). Duas instâncias são as da análise nova, o que permite comparar
+    com os outros pares, e o lin105 é a menor acima de 100 clientes. A
+    razão Lua / C quase não muda com o tamanho (180 no kroA100, 175 no gr202,
+    148 no lin318), então o custo do interpretador por operação deve dominar
+    o gap também nas instâncias grandes. Estimativa: uns 7 programas por
+    par a cerca de 1,4 vez o tempo da nossa, 440 s por execução nas três
+    instâncias: cerca de 3 h de servidor por par, 6 h para os dois (uma
+    noite). Os outros pares, incluindo Lua → C++ e Python → C++ (o programa
+    medido é C++), LuaJIT e PyPy (35 e 153 s no lin318), usam as 4
+    instâncias de sempre.
   - A traduzir de novo (F17): Java, JavaScript e Julia → C++.
   Falta: fechar os abertos, medir os 10 pares, o texto da subseção e o
   parágrafo de fechamento da Seção 7 (`\todo` logo abaixo da tabela).
