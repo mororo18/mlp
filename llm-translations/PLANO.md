@@ -821,6 +821,14 @@ possa esperar vai para o fim da lista.
   (`x*(n+1) + y` na tradução, `(x*n + y)*3 + z` no nosso). A testar: uma
   variante da nossa com `info.dimension` e `info.c` em variáveis locais, e a
   combinação com `const_offsets`. Não muda as tabelas sem decisão do autor.
+  Variantes feitas (`gen_js.py`, 2026-11-23): `ours_javascript.local_info`
+  (`var dimension = info.dimension, c = info.c;` no início de
+  `subseq_load` e das três buscas, e os acessos trocados por essas
+  variáveis) e `ours_javascript.local_info_consts` (a mesma, com a
+  `const_offsets`). Custo certo no berlin52. **Rodando (2026-11-23):**
+  `runs/p21-20261123/` (cadeia `p24.sh`): a nossa, `const_offsets`,
+  `local_info`, `local_info_consts` e a tradução intercalada, nas 4
+  instâncias, com a flag.
 
 ### Andamento das pendências
 
@@ -1669,6 +1677,11 @@ artigo. Feito:
   diferença que resta é intercalado × três vetores, os dois `Float64Array`)
   e o que a Seção 4 diz do layout do nosso JavaScript. A diferença que
   resta (intercalado × três vetores) é o P20.
+  **Decidido (autor, 2026-11-23):** tabelas e texto atualizados com o P20.
+  Linha do JavaScript na Tabela 8 (`tables.py`, rodada `p20-20261123`): gap
+  +2,6, nossa escolha na tradução −6,4, escolha da tradução na nossa +4,5;
+  nota a e parágrafo dos from-C++ reescritos, e a nota a da tabela de
+  desvios corrigida (PyPy). Commit `76a6a72` do artigo, ainda sem push.
   **Rodado (2026-11-23):** `runs/js66f64-20261123/` (commit `6eaa1c2`, 06:29
   a 09:56 UTC, carga de 11 processos na maior parte da rodada). As 66
   instâncias reproduzem os custos da `js66ncr-20261122` (o nosso antigo com

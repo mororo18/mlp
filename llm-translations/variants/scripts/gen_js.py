@@ -49,10 +49,36 @@ def tr_interleaved(b):
     assert 'solut.seq_' not in m.read_text() and k == 4, k
     print('tr_interleaved', n)
 
+HOT = ('subseq_load', 'search_swap', 'search_two_opt', 'search_reinsertion')
+
+def local_info(b):
+    # P21: info.dimension e info.c em variáveis locais no início das buscas, como
+    # a tradução C++ -> JavaScript faz com dimen e cost
+    m = b / 'main.js'
+    parts = re.split(r'(?m)^(?=function )', m.read_text())
+    k = 0
+    for i, p in enumerate(parts):
+        mo = re.match(r'function (\w+)\([^)]*\) \{\n', p)
+        if not mo or mo.group(1) not in HOT:
+            continue
+        body = p[mo.end():]
+        body = re.sub(r'info\.dimension\b', 'dimension', body)
+        body = re.sub(r'info\.c\[', 'c[', body)
+        parts[i] = mo.group(0) + '    var dimension = info.dimension, c = info.c;\n' + body
+        k += 1
+    assert k == 4, k
+    m.write_text(''.join(parts))
+
+def local_info_consts(b):
+    local_info(b)
+    consts(b)
+
 write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),
        'cpp_javascript/interleaved.patch': (LT / 'translations' / 'cpp_javascript', tr_interleaved, ('cpp_javascript/measure.patch',)),
        'ours_javascript/plain_array.patch': (OURS, plain_array, ()),
        'ours_javascript/three_arrays.patch': (OURS, three_arrays, ()),
        'ours_javascript/const_offsets.patch': (OURS, consts, ()),
        'ours_javascript/no_globals.patch': (OURS, locals_, ()),
-       'ours_javascript/function_decl.patch': (OURS, fdecl, ())})
+       'ours_javascript/function_decl.patch': (OURS, fdecl, ()),
+       'ours_javascript/local_info.patch': (OURS, local_info, ()),
+       'ours_javascript/local_info_consts.patch': (OURS, local_info_consts, ())})

@@ -10,9 +10,9 @@ pitfalls,to,Go -> C++,,gap,factors-20261121,go_cpp.base,cplusplus,1.2549,1.2846,
 pitfalls,to,Go -> C++,Distance matrix,ours_in_translation,factors-20261121,go_cpp.row_matrix,cplusplus,1.2196,1.2600,1.2751,1.2718,25.7,26.9,1.0
 pitfalls,to,Fortran -> C++,,gap,factors-20261121,fortran_cpp.base,cplusplus,1.3651,1.3530,1.3346,1.3101,34.1,33.3,1.0
 pitfalls,to,Fortran -> C++,Distance matrix,ours_in_translation,factors-20261121,fortran_cpp.row_matrix,cplusplus,1.2108,1.2410,1.2409,1.2509,23.6,24.4,1.0
-pitfalls,from,C++ -> JavaScript,,gap,jsf64-20261122,cpp_javascript.base,javascript,1.1572,1.1768,1.1959,1.2268,18.9,20.0,0.8
-pitfalls,from,C++ -> JavaScript,Subsequence storage,ours_in_translation,jsf64-20261122,cpp_javascript.array,javascript,1.0276,1.0235,1.0701,1.0757,4.9,5.6,0.8
-pitfalls,from,C++ -> JavaScript,Subsequence storage,translation_in_ours,jsf64-20261122,cpp_javascript.base,ours_javascript.float64array,0.9951,1.0037,1.0287,1.0611,2.2,3.1,0.6
+pitfalls,from,C++ -> JavaScript,,gap,p20-20261123,cpp_javascript.base,javascript,0.9986,1.0088,1.0336,1.0615,2.6,3.5,0.5
+pitfalls,from,C++ -> JavaScript,Subsequence storage,ours_in_translation,p20-20261123,cpp_javascript.interleaved,javascript,0.9389,0.9294,0.9352,0.9407,-6.4,-6.5,0.9
+pitfalls,from,C++ -> JavaScript,Subsequence storage,translation_in_ours,p20-20261123,cpp_javascript.base,ours_javascript.three_arrays,1.0510,1.0538,1.0268,1.0504,4.5,4.4,0.8
 pitfalls,from,C++ -> Swift,,gap,factors-20261121,cpp_swift.base,swift,0.9989,0.9920,0.9626,0.9849,-1.5,-2.0,0.9
 pitfalls,from,C++ -> Swift,Copy of the solution,translation_in_ours,factors-20261121,cpp_swift.base,ours_swift.route_copy,1.0101,0.9976,0.9857,1.0007,-0.1,-0.5,0.9
 pitfalls,from,C++ -> Swift,Copy of the solution,ours_in_translation,p3p8-20261121,cpp_swift.full_copy,swift,1.0073,0.9926,0.9926,0.9930,-0.4,-0.7,0.7
@@ -42,6 +42,8 @@ other,from,C++ -> Julia,"1-based city index, with JIT warm-up",translation_in_ou
 other,from,C++ -> Go,,gap,factors-20261121,cpp_go.base,go,0.9730,0.9679,0.9722,0.9754,-2.8,-2.8,0.8
 other,from,C++ -> Go,Accessor,translation_in_ours,factors-20261121,cpp_go.base,ours_go.direct_index,0.9833,0.9829,0.9868,0.9892,-1.4,-1.4,0.7
 other,from,C++ -> Go,Accessor,ours_in_translation,p3p8-20261121,cpp_go.at_accessor,go,1.0026,0.9856,0.9799,0.9917,-1.0,-1.4,0.7
+controls,from,JavaScript,"Subsequence storage, three Float64Array",control,p20-20261123,ours_javascript.three_arrays,javascript,0.9502,0.9573,1.0066,1.0105,-1.9,-0.9,0.8
+controls,from,C++ -> JavaScript,"Subsequence storage, interleaved, against the translation",control,p20-20261123,cpp_javascript.interleaved,cpp_javascript.base,0.9402,0.9213,0.9048,0.8863,-8.7,-9.6,0.9
 controls,to,C++,size_t counter truncated to 32 bits,control,p3p8-20261121,ours_cplusplus.size_t_counter,cplusplus,1.2634,1.3492,1.3625,1.3183,32.3,34.3,4.3
 controls,to,C++,64-bit index,control,factors-20261121,ours_cplusplus.index64,cplusplus,0.9946,1.0024,0.9898,1.0002,-0.3,-0.3,1.0
 controls,to,C# -> C++,,gap,p14-20261121,csharp_cpp.base,cplusplus,1.1353,1.1398,1.1270,1.0982,12.5,12.2,1.0
