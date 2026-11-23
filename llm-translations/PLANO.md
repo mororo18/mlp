@@ -1545,7 +1545,24 @@ artigo. Feito:
   (hoje são de rodadas sem a flag, com o lin318 no patamar lento nos dois
   lados), copiar a rodada para `results/factor_analysis/2026-11-22/runs/`
   e atualizar o README da pasta (que já avisa da troca).
-- **F10.** Conferir a tabela de desvios da 7.4
+- [x] **F10.** Conferido em 2026-11-23 no código das 22 traduções
+  (`~/Downloads/claude_new/claude/`, as mesmas da análise nova) e no
+  catálogo (C → C++ e Rust → C++ compilados com `-DFLAT`): as seis linhas
+  batem. Subsequências: from-C++ em três vetores no Java (`double[]`
+  `seqT/C/W`), no JavaScript (três `Float64Array`) e no PyPy, tabela ou
+  objeto por subsequência em Lua e Python; as outras em AoS; to-C++ em
+  `vector` por linha só no Java (`seq2d`/`seq3d`) e no Python
+  (`vector<vector<array<double,3>>>`). Matriz to-C++: `vector<vector>` no C,
+  Go, Java, JavaScript, Lua e Python, plana no C#, Fortran (`tMatrix`),
+  Julia, Rust e Swift. Passagem por valor: só o Swift → C++ no laço (o Go →
+  C++ passa o `tData` por valor uma vez, na chamada do `GILS_RVND`, fora do
+  laço). Duas correções de texto para o F11: (1) a nota a da tabela diz que
+  os três vetores do PyPy deixaram o nosso 2 a 8% mais rápido "(Tabela 8)",
+  mas a Tabela 8 mostra o outro sentido (o nosso layout na tradução, +35);
+  o valor é da análise antiga e não aparece em tabela nenhuma; (2) com a
+  flag, o `Float64Array` do JavaScript passa a explicar a maior parte do gap
+  do par (14 de 19 pontos), o que muda o parágrafo da 7.5. Texto original
+  do item: Conferir a tabela de desvios da 7.4
   (`tab:translation-deviations`) célula a célula contra o mapa da Fase 2;
   a passagem por valor do Swift → C++ continua como desvio, mas vale 1
   ponto de 12 (o gap é da matriz).
