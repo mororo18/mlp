@@ -1779,8 +1779,8 @@ artigo. Feito:
     **Decidido (2026-11-23, autor pediu instâncias razoáveis):** C++ → Lua e
     C++ → Python (interpretados) em berlin52, kroA100 e lin105
     (`instances_interp.txt`), 10 execuções. Tempos da nossa na Seção 6: Lua
-    17, 216 e 206 s; Python 17, 207 e 199 s (gr202 e lin318 levam 2000 e
-    5300 s). Duas instâncias são as da análise nova, o que permite comparar
+    17, 216 e 206 s; Python 17, 207 e 199 s (o gr202 leva cerca de 2000 s e o
+    lin318 de 5300 a 6400 s). Duas instâncias são as da análise nova, o que permite comparar
     com os outros pares, e o lin105 é a menor acima de 100 clientes. A
     razão Lua / C quase não muda com o tamanho (180 no kroA100, 175 no gr202,
     148 no lin318), então o custo do interpretador por operação deve dominar
