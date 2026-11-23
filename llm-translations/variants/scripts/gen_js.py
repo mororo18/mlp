@@ -1,8 +1,8 @@
 from common import *
 OURS = LT.parent / 'javascript'
 
-def plain_array(b):
-    sub(b / 'main.js', r'    seq = new Float64Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);', '    seq = Array((dimension+1)*(dimension+1)*3);')
+def typed(b):
+    sub(b / 'main.js', r'    seq = Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);', '    seq = new Float64Array((dimension+1)*(dimension+1)*3);')
 
 def consts(b):
     m = b / 'main.js'
@@ -13,7 +13,7 @@ def consts(b):
     m.write_text(t); print('consts', n)
 
 def locals_(b):
-    sub(b / 'main.js', r'    seq = new Float64Array\(', '    var seq = new Float64Array(')
+    sub(b / 'main.js', r'    seq = Array\(', '    var seq = Array(')
     sub(b / 'main.js', r'    subseq = subseq_fill\(', '    var subseq = subseq_fill(')
 
 def fdecl(b):
@@ -27,7 +27,7 @@ def tr_array(b):
 def three_arrays(b):
     # P20: T, C e W em três Float64Array, como na tradução C++ -> JavaScript
     m = b / 'main.js'
-    sub(m, r'    seq = new Float64Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);',
+    sub(m, r'    seq = Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);',
         '    var sz = (dimension+1)*(dimension+1);\n    seq = [new Float64Array(sz), new Float64Array(sz), new Float64Array(sz)];')
     sub(m, r'var to_1D = function \(x, y, z, n\) \{\n    return \(x\*n \+ y\)\*3 \+ z;\n\}\n',
         'var to_2D = function (x, y, n) {\n    return x*n + y;\n}\n')
@@ -75,7 +75,7 @@ def local_info_consts(b):
 
 write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),
        'cpp_javascript/interleaved.patch': (LT / 'translations' / 'cpp_javascript', tr_interleaved, ('cpp_javascript/measure.patch',)),
-       'ours_javascript/plain_array.patch': (OURS, plain_array, ()),
+       'ours_javascript/float64array.patch': (OURS, typed, ()),
        'ours_javascript/three_arrays.patch': (OURS, three_arrays, ()),
        'ours_javascript/const_offsets.patch': (OURS, consts, ()),
        'ours_javascript/no_globals.patch': (OURS, locals_, ()),

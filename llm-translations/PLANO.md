@@ -1697,6 +1697,22 @@ artigo. Feito:
   acima de 300 (1,149 a 1,168); 1,147 no geral. O `Float64Array` custa 15%
   ao nosso JavaScript nas 66 instâncias, como nas 4 da `jsf64` (16%). Falta
   levar a rodada às figuras da Seção 6 (F2).
+  **Revertido (autor, 2026-11-23):** com os dados (o `Array` é 13 a 16% mais
+  rápido nas 66 instâncias e 12% mais rápido também na tradução), o autor
+  decidiu voltar ao `Array`. `javascript/main.js` volta a
+  `seq = Array(...)`; a variante volta a ser `ours_javascript.float64array`
+  (patch idêntico ao de antes do `f54ab04`) e a `plain_array` sai. As
+  variantes `three_arrays`, `local_info` e `local_info_consts` foram geradas
+  de novo sobre o `Array` (custo certo no berlin52), mas as rodadas `p20` e
+  `p21` mediram as versões sobre o `Float64Array`: os números delas comparam
+  os dois programas com `Float64Array`. Tabela 8: volta à rodada `jsf64`
+  (+18,9, +4,9, +2,2); o P20 vira análise na Seção 7.6. Figura 5: o
+  JavaScript volta à `js66ncr-20261122` (`Array` com a flag). Conferido com
+  `%DebugPrint` (`--allow-natives-syntax`), depois do primeiro
+  `subseq_load`: o V8 guarda o nosso `Array` como `HOLEY_DOUBLE_ELEMENTS`,
+  um `FixedDoubleArray` contíguo de doubles de 64 bits, no berlin52 (8427
+  elementos) e no lin318 (305283). Mesma largura e mesma precisão do
+  `Float64Array`; a diferença de tempo não vem do tamanho dos elementos.
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório

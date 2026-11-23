@@ -22,11 +22,11 @@ ours_swift.no_local_copies,ours/swift,ours_swift/no_local_copies.patch,S2 (D): r
 ours_swift.route_copy,ours/swift,ours_swift/route_copy.patch,S3 (D): perturb into current and copy only route and cost (no copy-on-write of seq)
 ours_julia.hoist_fields,ours/julia,ours_julia/hoist_fields.patch,L2 (D): dimen in a local and epsilon as a constant
 ours_julia.struct_vector,ours/julia,ours_julia/struct_vector.patch,L3 (D): subsequences as a vector of immutable structs
-ours_javascript.plain_array,ours/javascript,ours_javascript/plain_array.patch,JS1a (I since 2026-11-23): seq as a holey Array, our choice before 2026-11-23, instead of Float64Array
+ours_javascript.float64array,ours/javascript,ours_javascript/float64array.patch,JS1a (D): seq as Float64Array instead of a holey Array (our code used Float64Array from f54ab04 to the revert of 2026-11-23)
 ours_javascript.const_offsets,ours/javascript,ours_javascript/const_offsets.patch,JS1b (D): T/C/W offsets as literals instead of info fields
 ours_javascript.no_globals,ours/javascript,ours_javascript/no_globals.patch,JS1c (D): seq and subseq declared with var instead of implicit globals
 ours_javascript.function_decl,ours/javascript,ours_javascript/function_decl.patch,JS2 (D): to_1D as a function declaration
-ours_javascript.three_arrays,ours/javascript,ours_javascript/three_arrays.patch,P20 (D): T C and W in three Float64Array as in the translation instead of one interleaved Float64Array
+ours_javascript.three_arrays,ours/javascript,ours_javascript/three_arrays.patch,P20 (D): T C and W in three Float64Array as in the translation instead of one interleaved Array (measured in p20-20261123 against our Float64Array version)
 ours_javascript.local_info,ours/javascript,ours_javascript/local_info.patch,P21 (D): info.dimension and info.c copied to local variables at the start of each search as the translation does with dimen and cost
 ours_javascript.local_info_consts,ours/javascript,ours_javascript/local_info_consts.patch,P21 (D): local_info plus the T/C/W offsets as literals (const_offsets)
 ours_cplusplus.index64,ours/cplusplus,ours_cplusplus/index64.patch,R1 (D): to_1D with 64-bit arithmetic and return type
