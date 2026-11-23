@@ -4,7 +4,7 @@ Registrado em 2026-11-20. Este arquivo é o plano e também o diário do
 experimento: todo problema que aparecer entra na seção "Problemas e soluções",
 com a solução adotada.
 
-> **2026-11-23:** a continuação (todos os pares, retraduções e Figura 7)
+> **2026-11-23:** a continuação (todos os pares e Figura 7)
 > está em `PLANO_FECHAMENTO.md`.
 
 ## Objetivo
@@ -1811,3 +1811,9 @@ artigo. Feito:
   como "To translate again". Também da Figura 7: o tempo relativo dos
   from-C++ Fortran, Go, Swift, Java e JavaScript tem de ser recalculado
   com as nossas versões atuais (comentário "PENDING RE-RUN" do artigo).
+  **Decidido (autor, 2026-11-23): não traduzir de novo.** As sete traduções
+  ficam como foram entregues e são medidas contra o nosso C++ atual, com a
+  nota de versão anterior; Java, JavaScript e Julia → C++ passam a "a medir"
+  (frente B do `PLANO_FECHAMENTO.md`). A Figura 7 do lado to-C++ e a
+  `tab:translation-durations` continuam valendo; o lado from-C++ segue
+  pendente (frente D).

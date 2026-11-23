@@ -3,7 +3,8 @@
 Registrado em 2026-11-23, a pedido do autor. Continua o `PLANO.md` (a análise de
 fatores nova, Fases 0 a 5) e substitui o escopo dele: agora entram **todos os
 pares**, inclusive os que só tinham a análise antiga, e as traduções para C++
-feitas de versões anteriores das nossas implementações. O `PLANO.md` continua
+feitas de versões anteriores das nossas implementações (medidas como estão:
+o autor decidiu não traduzir de novo). O `PLANO.md` continua
 sendo o diário da análise anterior e a referência das decisões técnicas.
 Problemas novos deste plano entram no fim da seção "Problemas e soluções"
 deste arquivo.
@@ -78,9 +79,9 @@ com duas mudanças:
 | C → C++ | 0* | a medir | B |
 | Lua → C++ | sem análise | a medir | B |
 | Python → C++ | +6* | a medir | B |
-| Java → C++ | +6* | a traduzir de novo | C |
-| JavaScript → C++ | +25* | a traduzir de novo | C |
-| Julia → C++ | +27* | a traduzir de novo | C |
+| Java → C++ | +6* | a medir; fonte antiga | B, C |
+| JavaScript → C++ | +25* | a medir; fonte antiga | B, C |
+| Julia → C++ | +27* | a medir; fonte antiga | B, C |
 
 \* Análise antiga (outra máquina, berlin52/bier127/gr202, 1 a 10 execuções,
 versões antigas das nossas): só ponto de partida.
@@ -108,13 +109,14 @@ versões antigas das nossas): só ponto de partida.
   variante da nossa sem as classes intermediárias, se (1) e (2) apontarem
   para elas. Sem rodada grande até ter a hipótese.
 
-## Frente B. Pares só com a análise antiga (10)
+## Frente B. Pares só com a análise antiga (13)
 
 Fases como no `PLANO.md`:
 
 - **B0. Protocolo.** Copiar as traduções de `claude_new/claude/` para
   `translations/` (`cpp_c`, `cpp_rust`, `cpp_csharp`, `cpp_lua`, `cpp_pypy`,
-  `cpp_python`, `c_cpp`, `lua_cpp`, `python_cpp`), com `RESULTS.md`,
+  `cpp_python`, `c_cpp`, `lua_cpp`, `python_cpp`, `java_cpp`,
+  `javascript_cpp`, `julia_cpp`), com `RESULTS.md`,
   `CLAUDE.md` e `prompt.txt`. Conferir em cada uma o relógio, o trecho
   medido e a impressão de `wall clock (s):`; escrever os `measure.patch`.
   Conferir como a nossa LuaJIT e a nossa Lua rodam (mesmo código? FFI só no
@@ -138,13 +140,17 @@ Fases como no `PLANO.md`:
   | C → C++ | gap antigo 0: tipo do índice (com o nosso, +12) e matriz (−4) se compensam; conferir se o gap novo fica em ±2% sem mudança |
   | Lua → C++ | sem análise: matriz em `vector`s aninhados (Tabela de desvios), o resto pela leitura |
   | Python → C++ | armazenamento das subsequências (+6 → 0, um `vector` por linha), matriz aninhada |
+  | Java → C++ | armazenamento das subsequências (+6 → +2, um `vector` por linha, como os arrays irregulares do nosso Java de julho), matriz aninhada |
+  | JavaScript → C++ | deslocamentos de T, C e W lidos de campos (+25 → +1), matriz aninhada |
+  | Julia → C++ | deslocamentos de T, C e W lidos de campos (+27 → +2), matriz plana (coluna) |
 
 - **B3. Variantes:** um patch por fator, a combinação, custo conferido no
   berlin52 antes de subir.
 - **B4. Rodadas:**
   - Lote B-comp (4 instâncias): C++ → C, Rust, C#, LuaJIT, PyPy; C, Lua,
-    Python → C++. Uns 8 pares x 4 a 6 programas. Estimativa: 2 a 3 h (o PyPy
-    pesa: 153 s no lin318, cerca de 1 h sozinho).
+    Python, Java, JavaScript, Julia → C++. Uns 11 pares x 4 a 6 programas.
+    Estimativa: 3 a 4 h (o PyPy pesa: 153 s no lin318, cerca de 1 h
+    sozinho).
   - Lote B-interp (`instances_interp.txt`): C++ → Lua e C++ → Python. Uns 7
     programas por par a cerca de 1,4 vez o tempo da nossa: cerca de 3 h por
     par, 6 h os dois (uma noite).
@@ -153,31 +159,27 @@ Fases como no `PLANO.md`:
 
 ## Frente C. Traduções para C++ feitas de versões anteriores
 
-As traduções para C++ de Fortran, Go, Swift, Java, JavaScript e Julia (e
-talvez C#, ver C0) partiram das versões de julho das nossas implementações,
-que mudaram depois (comentário "PENDING RE-RUN" do artigo).
+**Decidido (autor, 2026-11-23): não traduzir de novo.** As traduções para C++
+de Fortran, Go, Swift, Java, JavaScript e Julia (e talvez C#) partiram das
+versões de julho das nossas implementações, que mudaram depois. Ficam como
+foram entregues e são medidas contra o nosso C++ atual, que não mudou desde
+julho. Consequências:
 
-- **C0. Escopo (decisão do autor).** Traduzir de novo só Java, JavaScript e
-  Julia → C++ (os que estão "To translate again"), ou também Fortran, Go,
-  Swift e C#, que hoje fecham mas sobre fontes antigas. Recomendação: os
-  sete, para que a Seção 7 inteira descreva traduções das versões
-  publicadas. Conferir se o C# de julho já tinha o `GCHandle` (o escopo
-  inicial do `PLANO.md` diz que não; o comentário do artigo sobre a Tabela 7
-  diz que o C# não foi afetado).
-- **C1. Tradução.** Mesmo protocolo da Seção 7.1: sessão nova, contexto
-  vazio, o mesmo prompt inicial e as mesmas instruções do Apêndice, cópia do
-  projeto em sandbox, o mesmo modelo e esforço (Claude Opus 5, medium) se
-  ainda estiver disponível; registrar a data, a duração e as intervenções.
-  Quem faz: o autor, como em julho. Eu preparo as cópias do projeto com as
-  fontes atuais do `mlp-main` (commit registrado).
-- **C2.** Copiar para `translations/` (`<ling>_cpp` novas, as de julho ficam
-  com sufixo `_jul26` até a decisão do texto), `measure.patch`, gap de base,
-  mapa, variantes e combinação (como B0 a B5). Lote: uns 7 pares x 4 a 5
-  programas em C++, cerca de 1,5 h.
-- **C3. Figura 7 e durações.** O tempo relativo das 7 traduções novas nas 66
-  instâncias (cerca de 45 min de servidor por tradução, umas 5 h no total) e a
-  `tab:translation-durations`. Junto, o F3 do `PLANO.md`: unificar o método
-  de tempo da Figura 7.
+- **C1. Medição:** Java, JavaScript e Julia → C++ entram na frente B (B0 a
+  B5). Fortran, Go, Swift e C# → C++ já fecham na análise nova.
+- **C2. Texto:** a nota "tradução de uma versão anterior da nossa
+  implementação (julho de 2026)" fica nas Tabelas 8 a 13 para os sete
+  pares, sem o "to be translated again". O texto da 7.7 explica que o
+  fechamento compara com o nosso C++, e que as diferenças das fontes antigas
+  (por exemplo, os deslocamentos de T, C e W lidos de campos no nosso
+  JavaScript e Julia de julho) entram como fatores herdados da fonte.
+- **C3. Figura 7 e durações:** o lado to-C++ continua válido (mesma tradução,
+  mesmo C++ de referência), salvo o F3 (método de tempo). A
+  `tab:translation-durations` não muda.
+- **C4. Pendente:** conferir se o C# de julho já tinha o `GCHandle` (o
+  escopo inicial do `PLANO.md` diz que não; o comentário do artigo sobre a
+  Tabela 7 diz que o C# não foi afetado), para saber se o C# → C++ leva a
+  nota.
 
 ## Frente D. Figura 7, lado from-C++
 
@@ -189,28 +191,26 @@ razão; se não, medir as 5 traduções nas 66 instâncias (cerca de 4 h).
 
 ## Ordem proposta
 
-1. A1 (dados da `p26`, já rodando) e a decisão C0 do autor.
-2. B0 a B3 para os 10 pares (cerca de 1,5 a 2 dias de trabalho) e, em
-   paralelo, as retraduções C1 pelo autor.
-3. Lote B-comp e lote C2 juntos (uma tarde); lote B-interp numa noite.
+1. A1 (dados da `p26`, já rodando) e C4.
+2. B0 a B3 para os 13 pares (cerca de 2 dias de trabalho).
+3. Lote B-comp numa tarde; lote B-interp numa noite.
 4. A2 (Java) entre as rodadas, com as medições de JIT.
-5. C3 e D (Figura 7), numa noite.
+5. D (Figura 7, lado from-C++), numa noite, se precisar medir.
 6. Tabela 13 completa, saída dos asteriscos, texto da 7.7 e o parágrafo de
    fechamento da Seção 7.
 
-Servidor no total: cerca de 9 h para as variantes (B e C) e 5 a 9 h para a
-Figura 7 (C3 e D). O servidor está mais carregado desde 2026-11-23 (outros
+Servidor no total: cerca de 9 a 10 h para as variantes (B) e até 4 h para a
+Figura 7 (D). O servidor está mais carregado desde 2026-11-23 (outros
 dois usuários nos CPUs 0 a 6, 12 a 39 e 40 a 46, e um `podman` sem pinning que
 já contaminou núcleos irmãos dos nossos): conferir o log de carga de toda
 rodada e refazer as células com tempo bimodal por núcleo, como no P21.
 
 ## Pendências de decisão do autor
 
-1. C0: traduzir de novo três ou sete pares.
-2. Modelo das retraduções, se o Claude Opus 5 medium de julho não estiver mais
-   disponível.
-3. Push do `mlp-main` e do artigo (hoje só local; as rodadas vão por bundle).
-4. Figura 7: medir de novo só as traduções afetadas ou todas com o método
+1. ~~C0: traduzir de novo três ou sete pares.~~ Decidido: não traduzir
+   de novo (2026-11-23).
+2. Push do `mlp-main` e do artigo (hoje só local; as rodadas vão por bundle).
+3. Figura 7: medir de novo só as traduções afetadas ou todas com o método
    unificado (F3).
 
 ## Problemas e soluções
