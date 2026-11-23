@@ -1,0 +1,11 @@
+g++ (GCC) 15.3.0
+GNU Fortran (GCC) 15.3.0
+go version go1.26.5 linux/amd64
+javac 21.0.12
+openjdk version "21.0.12" 2026-07-21
+v24.18.0
+Swift version 5.10.1 (swift-5.10.1-RELEASE)
+rustc 1.97.0 (2d8144b78 2026-07-07) (built from a source tarball)
+julia version 1.12.6
+Python 3.14.6
+affinity: [8, 9, 10, 11]

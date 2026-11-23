@@ -1197,6 +1197,24 @@ tradução 150,6 s) e o gap do par sobe de +12,1 para +19,3%. O
 outro sentido (o nosso com `Float64Array`), que a Tabela 8 mostra: rodada
 `runs/jsf64-20261122/` com os quatro programas juntos (problema 19).
 
+**Rodada `runs/jsf64-20261122/`** (00:48 a 01:20 de 23/11, commit `8162079`,
+160 execuções, custos certos): nossa, tradução, `cpp_javascript.array` e
+`ours_javascript.float64array`, com a flag. Razões (berlin52, kroA100,
+gr202, lin318):
+
+| Comparação | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| tradução / nossa | 1,157 1,177 1,196 1,227 | +18,9 | +20,0 |
+| tradução com `Array` / nossa | 1,028 1,024 1,070 1,076 | +4,9 | +5,6 |
+| tradução / nossa com `Float64Array` | 0,995 1,004 1,029 1,061 | +2,2 | +3,1 |
+| nossa com `Float64Array` / nossa (controle) | 1,163 1,172 1,163 1,156 | +16,4 | +16,4 |
+
+Os dois sentidos confirmam: o `Float64Array` custa 16% ao nosso e explica
+cerca de 14 dos 19 pontos do gap; o resto (2 a 5 pontos) cresce com a
+instância. Bate com a `jsncr` (+19,3 e +5,4). O `tables.py` passa a usar
+esta rodada nas três linhas do JavaScript (antes: `p3p8` e `factors`, sem a
+flag: +12,1, +0,9, −1,3).
+
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
 RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e
@@ -1540,7 +1558,9 @@ artigo. Feito:
   linguagens com d493, gr120, pcb442 e pr439 novas (P19); (b)
   `jsncr-20261122`: o par do JavaScript com a flag nas 4 instâncias;
   (c) `js66ncr-20261122`: o nosso JavaScript com a flag nas 66.
-- **F9.** Trocar as linhas do C++ → JavaScript do `tables.py` e da Tabela 8
+- **F9.** Feito no `tables.py` em 2026-11-23 (rodada `jsf64`: +18,9, +4,9 e
+  +2,2); falta o artigo (Tabela 8, nota, cópia da rodada e README da pasta).
+  Trocar as linhas do C++ → JavaScript do `tables.py` e da Tabela 8
   (`tab:translation-gaps-pitfalls-from`) pelos números da rodada `jsncr`
   (hoje são de rodadas sem a flag, com o lin318 no patamar lento nos dois
   lados), copiar a rodada para `results/factor_analysis/2026-11-22/runs/`

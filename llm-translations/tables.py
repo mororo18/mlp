@@ -35,9 +35,9 @@ C = [
     ("pitfalls", "to", "Fortran -> C++", "", "gap", "factors-20261121", "fortran_cpp.base", "cplusplus"),
     ("pitfalls", "to", "Fortran -> C++", "Distance matrix", "ours_in_translation", "factors-20261121", "fortran_cpp.row_matrix", "cplusplus"),
 
-    ("pitfalls", "from", "C++ -> JavaScript", "", "gap", "p3p8-20261121", "cpp_javascript.base", "javascript"),
-    ("pitfalls", "from", "C++ -> JavaScript", "Subsequence storage", "ours_in_translation", "p3p8-20261121", "cpp_javascript.array", "javascript"),
-    ("pitfalls", "from", "C++ -> JavaScript", "Subsequence storage", "translation_in_ours", "factors-20261121", "cpp_javascript.base", "ours_javascript.float64array"),
+    ("pitfalls", "from", "C++ -> JavaScript", "", "gap", "jsf64-20261122", "cpp_javascript.base", "javascript"),
+    ("pitfalls", "from", "C++ -> JavaScript", "Subsequence storage", "ours_in_translation", "jsf64-20261122", "cpp_javascript.array", "javascript"),
+    ("pitfalls", "from", "C++ -> JavaScript", "Subsequence storage", "translation_in_ours", "jsf64-20261122", "cpp_javascript.base", "ours_javascript.float64array"),
     ("pitfalls", "from", "C++ -> Swift", "", "gap", "factors-20261121", "cpp_swift.base", "swift"),
     ("pitfalls", "from", "C++ -> Swift", "Copy of the solution", "translation_in_ours", "factors-20261121", "cpp_swift.base", "ours_swift.route_copy"),
     ("pitfalls", "from", "C++ -> Swift", "Copy of the solution", "ours_in_translation", "p3p8-20261121", "cpp_swift.full_copy", "swift"),

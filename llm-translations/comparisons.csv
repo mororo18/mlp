@@ -10,9 +10,9 @@ pitfalls,to,Go -> C++,,gap,factors-20261121,go_cpp.base,cplusplus,1.2549,1.2846,
 pitfalls,to,Go -> C++,Distance matrix,ours_in_translation,factors-20261121,go_cpp.row_matrix,cplusplus,1.2196,1.2600,1.2751,1.2718,25.7,26.9,1.0
 pitfalls,to,Fortran -> C++,,gap,factors-20261121,fortran_cpp.base,cplusplus,1.3651,1.3530,1.3346,1.3101,34.1,33.3,1.0
 pitfalls,to,Fortran -> C++,Distance matrix,ours_in_translation,factors-20261121,fortran_cpp.row_matrix,cplusplus,1.2108,1.2410,1.2409,1.2509,23.6,24.4,1.0
-pitfalls,from,C++ -> JavaScript,,gap,p3p8-20261121,cpp_javascript.base,javascript,1.1379,1.1945,1.1960,0.9536,12.1,11.5,11.7
-pitfalls,from,C++ -> JavaScript,Subsequence storage,ours_in_translation,p3p8-20261121,cpp_javascript.array,javascript,1.0123,1.0267,1.0625,0.9335,0.9,0.8,11.7
-pitfalls,from,C++ -> JavaScript,Subsequence storage,translation_in_ours,factors-20261121,cpp_javascript.base,ours_javascript.float64array,0.9780,1.0014,1.0240,0.9452,-1.3,-1.0,0.8
+pitfalls,from,C++ -> JavaScript,,gap,jsf64-20261122,cpp_javascript.base,javascript,1.1572,1.1768,1.1959,1.2268,18.9,20.0,0.8
+pitfalls,from,C++ -> JavaScript,Subsequence storage,ours_in_translation,jsf64-20261122,cpp_javascript.array,javascript,1.0276,1.0235,1.0701,1.0757,4.9,5.6,0.8
+pitfalls,from,C++ -> JavaScript,Subsequence storage,translation_in_ours,jsf64-20261122,cpp_javascript.base,ours_javascript.float64array,0.9951,1.0037,1.0287,1.0611,2.2,3.1,0.6
 pitfalls,from,C++ -> Swift,,gap,factors-20261121,cpp_swift.base,swift,0.9989,0.9920,0.9626,0.9849,-1.5,-2.0,0.9
 pitfalls,from,C++ -> Swift,Copy of the solution,translation_in_ours,factors-20261121,cpp_swift.base,ours_swift.route_copy,1.0101,0.9976,0.9857,1.0007,-0.1,-0.5,0.9
 pitfalls,from,C++ -> Swift,Copy of the solution,ours_in_translation,p3p8-20261121,cpp_swift.full_copy,swift,1.0073,0.9926,0.9926,0.9930,-0.4,-0.7,0.7
