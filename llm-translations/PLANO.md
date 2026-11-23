@@ -4,6 +4,9 @@ Registrado em 2026-11-20. Este arquivo é o plano e também o diário do
 experimento: todo problema que aparecer entra na seção "Problemas e soluções",
 com a solução adotada.
 
+> **2026-11-23:** a continuação (todos os pares, retraduções e Figura 7)
+> está em `PLANO_FECHAMENTO.md`.
+
 ## Objetivo
 
 Refazer a análise de fatores das traduções por LLM (Seção 7 do artigo) contra
@@ -1750,7 +1753,8 @@ artigo. Feito:
   do TCC; referência do Nix na bibliografia; campanha completa nova (menos
   Julia), se o F2 não bastar; métrica dos mapas de calor (`\todo` do
   apêndice).
-- **F16. Seção "Closing the gaps" (autor, 2026-11-23).** Nova subseção no
+- **F16. Seção "Closing the gaps" (autor, 2026-11-23).** Plano de execução
+  (com o F17): `PLANO_FECHAMENTO.md`. Nova subseção no
   fim da Seção 7 (`sec:LLM-closing`, Tabela `tab:translation-closing`): para
   cada par, as mudanças aplicadas juntas que levam a tradução ao tempo da
   nossa, o gap residual e a situação. Fechado = resíduo dentro de ±2%. Só
