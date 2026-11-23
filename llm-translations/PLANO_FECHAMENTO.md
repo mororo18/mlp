@@ -66,7 +66,7 @@ com duas mudanças:
 | Go → C++ | +28,7 → +1,1 | fechado (ε, matriz); fonte antiga | C |
 | Rust → C++ | +8,4 → −1,1 | fechado (matriz) | — |
 | Swift → C++ | +12,4 → +1,5 | fechado (matriz); fonte antiga | C |
-| C# → C++ | +12,5 → −0,2 | fechado (matriz); fonte antiga? | C |
+| C# → C++ | +12,5 → −0,2 | fechado (matriz) | — |
 | C++ → JavaScript | +18,9 → +4,9 | aberto | A |
 | C++ → Java | −10,6 → −3,1 | aberto | A |
 | C++ → C | +4* | a medir | B |
@@ -160,13 +160,13 @@ Fases como no `PLANO.md`:
 ## Frente C. Traduções para C++ feitas de versões anteriores
 
 **Decidido (autor, 2026-11-23): não traduzir de novo.** As traduções para C++
-de Fortran, Go, Swift, Java, JavaScript e Julia (e talvez C#) partiram das
+de Fortran, Go, Swift, Java, JavaScript e Julia partiram das
 versões de julho das nossas implementações, que mudaram depois. Ficam como
 foram entregues e são medidas contra o nosso C++ atual, que não mudou desde
 julho. Consequências:
 
 - **C1. Medição:** Java, JavaScript e Julia → C++ entram na frente B (B0 a
-  B5). Fortran, Go, Swift e C# → C++ já fecham na análise nova.
+  B5). Fortran, Go e Swift → C++ já fecham na análise nova.
 - **C2. Texto:** a nota "tradução de uma versão anterior da nossa
   implementação (julho de 2026)" fica nas Tabelas 8 a 13 para os sete
   pares, sem o "to be translated again". O texto da 7.7 explica que o
@@ -176,10 +176,8 @@ julho. Consequências:
 - **C3. Figura 7 e durações:** o lado to-C++ continua válido (mesma tradução,
   mesmo C++ de referência), salvo o F3 (método de tempo). A
   `tab:translation-durations` não muda.
-- **C4. Pendente:** conferir se o C# de julho já tinha o `GCHandle` (o
-  escopo inicial do `PLANO.md` diz que não; o comentário do artigo sobre a
-  Tabela 7 diz que o C# não foi afetado), para saber se o C# → C++ leva a
-  nota.
+- **C4. C# → C++ (autor, 2026-11-23):** não leva a nota de versão anterior;
+  o par entra na Tabela 13 sem marca.
 
 ## Frente D. Figura 7, lado from-C++
 
@@ -191,7 +189,7 @@ razão; se não, medir as 5 traduções nas 66 instâncias (cerca de 4 h).
 
 ## Ordem proposta
 
-1. A1 (dados da `p26`, já rodando) e C4.
+1. A1 (dados da `p26`, já rodando).
 2. B0 a B3 para os 13 pares (cerca de 2 dias de trabalho).
 3. Lote B-comp numa tarde; lote B-interp numa noite.
 4. A2 (Java) entre as rodadas, com as medições de JIT.

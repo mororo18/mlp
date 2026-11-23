@@ -1817,3 +1817,4 @@ artigo. Feito:
   (frente B do `PLANO_FECHAMENTO.md`). A Figura 7 do lado to-C++ e a
   `tab:translation-durations` continuam valendo; o lado from-C++ segue
   pendente (frente D).
+  C# → C++ não é uma delas (autor, 2026-11-23): sem nota.
