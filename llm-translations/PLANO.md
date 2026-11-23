@@ -1750,4 +1750,46 @@ artigo. Feito:
   do TCC; referência do Nix na bibliografia; campanha completa nova (menos
   Julia), se o F2 não bastar; métrica dos mapas de calor (`\todo` do
   apêndice).
-
+- **F16. Seção "Closing the gaps" (autor, 2026-11-23).** Nova subseção no
+  fim da Seção 7 (`sec:LLM-closing`, Tabela `tab:translation-closing`): para
+  cada par, as mudanças aplicadas juntas que levam a tradução ao tempo da
+  nossa, o gap residual e a situação. Fechado = resíduo dentro de ±2%. Só
+  contam mudanças com nome (escolhas das Seções 4.3 e 5 ou um detalhe
+  identificado no código); o que não fechar fica como "não explicado". Os
+  fatores medidos um por vez não se somam (Fortran → C++: ε 8,9%, matriz
+  23,6%, os dois juntos −2,6%), por isso a tabela usa as combinações.
+  Decisão do autor: medir de novo todos os pares com asterisco (substitui
+  as opções 1a e 1b do F1). Tabela feita, sem texto. Situação em
+  2026-11-23, com os dados do `comparisons.csv`:
+  - Fechados (9): C++ → Fortran (−0,1, nada), C++ → Go (−2,8 → −1,4,
+    acessor na nossa), C++ → Swift (−1,5, nada), C++ → Julia (−7,4 → −0,7,
+    índice base 0 na nossa e aquecimento nos dois), Fortran → C++ (+34,1 →
+    −2,6, ε e matriz), Go → C++ (+28,7 → +1,1, ε e matriz), Rust → C++ (+8,4
+    → −1,1, matriz), Swift → C++ (+12,4 → +1,5, matriz), C# → C++ (+12,5 →
+    −0,2, matriz).
+  - Abertos (2): C++ → JavaScript (+18,9 → +4,9 com o `Array`; o resto é
+    layout mais deslocamentos e cópias locais, medido só com `Float64Array`
+    no P20 e no P21; rodada `p26-20261123` sobre o `Array` rodando) e C++ →
+    Java (−10,6 → −3,1 com acessores, cópias locais e armazenamento das
+    subsequências na nossa; −9,3 com aquecimento: falta explicar).
+  - A medir no protocolo novo (10): C++ → C, Rust, C#, LuaJIT, PyPy, Lua e
+    Python; C, Lua e Python → C++. Lua → C++ nunca teve análise de fatores.
+    Lua e Python interpretados são lentos: decidir as instâncias (as 4 da
+    análise nova custam caro no lin318) antes de escrever as variantes.
+  - A traduzir de novo (F17): Java, JavaScript e Julia → C++.
+  Falta: fechar os abertos, medir os 10 pares, o texto da subseção e o
+  parágrafo de fechamento da Seção 7 (`\todo` logo abaixo da tabela).
+- **F17. Traduções para C++ feitas de versões anteriores das nossas
+  (2026-11-23).** As traduções para C++ de Fortran, Go, Swift, Java,
+  JavaScript e Julia (e C# antes do `GCHandle`, segundo o escopo inicial;
+  o comentário do artigo sobre a Tabela 7 diz que o C# não foi afetado,
+  conferir) partiram das versões de julho das nossas implementações, que
+  mudaram depois. Fazer: traduzir de novo, com o mesmo protocolo (prompt
+  e instruções do Apêndice), a partir das versões atuais do `mlp-main`;
+  medir o gap e as variantes no protocolo novo; atualizar a Figura 7, a
+  duração das traduções (`tab:translation-durations`) e a Tabela 13.
+  Hoje Fortran, Go, Swift e C# → C++ entram fechados na Tabela 13 com a nota
+  c (tradução de versão anterior); Java, JavaScript e Julia → C++ ficam
+  como "To translate again". Também da Figura 7: o tempo relativo dos
+  from-C++ Fortran, Go, Swift, Java e JavaScript tem de ser recalculado
+  com as nossas versões atuais (comentário "PENDING RE-RUN" do artigo).
