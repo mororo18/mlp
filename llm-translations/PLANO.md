@@ -810,7 +810,7 @@ possa esperar vai para o fim da lista.
   isso no gap do par. Hipótese em P21. Todas as execuções reproduzem o
   custo de referência (CV máximo 0,9%).
 
-- [ ] **P21. O que deixa a tradução C++ → JavaScript mais rápida que a
+- [x] **P21. O que deixa a tradução C++ → JavaScript mais rápida que a
   nossa, fora do layout (achado do P20, 2026-11-23).** Com o mesmo layout
   intercalado, a tradução fica 6,4% à frente da nossa nas 4 instâncias. Na
   leitura do código, a tradução copia para constantes locais, no início de
@@ -825,10 +825,37 @@ possa esperar vai para o fim da lista.
   (`var dimension = info.dimension, c = info.c;` no início de
   `subseq_load` e das três buscas, e os acessos trocados por essas
   variáveis) e `ours_javascript.local_info_consts` (a mesma, com a
-  `const_offsets`). Custo certo no berlin52. **Rodando (2026-11-23):**
-  `runs/p21-20261123/` (cadeia `p24.sh`): a nossa, `const_offsets`,
-  `local_info`, `local_info_consts` e a tradução intercalada, nas 4
-  instâncias, com a flag.
+  `const_offsets`). Custo certo no berlin52.
+  **Resultado (`runs/p21-20261123/`, commit `e695076`, cadeia `p24.sh`).**
+  A nossa, `const_offsets`, `local_info`, `local_info_consts` e a tradução
+  intercalada, nas 4 instâncias, com a flag, todas sobre o `Float64Array`.
+  Todas as execuções reproduzem o custo de referência. A nossa no lin318
+  saiu contaminada: 142 s no núcleo 8 e 222 a 291 s nos núcleos 9 a 11 (no
+  P20, 142 s estável). Na hora havia um `podman` de outro usuário a cerca de
+  350% de CPU, sem pinning, no CPU 51 (irmão do núcleo 11), e outro usuário
+  com 28 processos nos CPUs 12 a 39. Célula refeita em
+  `runs/p21b-20261123/` (`INST=lin318.txt`, a nossa e `local_info_consts`
+  juntas): a nossa 141,9 a 147,3 s (média 144,5), `local_info_consts` 129,2
+  s (129,9 na `p21`); razão pareada 0,894. Razões por instância (berlin52,
+  kroA100, gr202, lin318, com o lin318 da nossa vindo da `p21b`) e gap (sem
+  o berlin52):
+  - `local_info` / nossa: 0,982 0,980 0,987 0,985, −1,6% (−1,6%).
+  - `const_offsets` / nossa: 0,904 0,907 0,911 0,905, −9,3% (−9,3%).
+  - `local_info_consts` / nossa: 0,877 0,887 0,896 0,899, −11,0% (−10,6%).
+  - tradução intercalada / nossa: 0,951 0,929 0,944 0,941, −5,9% (−6,2%);
+    repete o P20 (−6,4%).
+  - tradução intercalada / `local_info_consts`: 1,084 1,047 1,053 1,046,
+    +5,8% (+4,9%).
+  - tradução intercalada / `local_info`: 0,968 0,947 0,956 0,955, −4,3%.
+  Leitura: os deslocamentos de T, C e W como constantes explicam a maior
+  parte (9%); as cópias locais de `info.dimension` e `info.c` somam 2%. Com
+  as duas mudanças, a nossa fica 5 a 8% à frente da tradução com o mesmo
+  layout. A vantagem de 6% da tradução no P20 vem de ler esses valores como
+  constantes ou variáveis locais, o mesmo padrão do JavaScript → C++ (campos
+  lidos em tempo de execução). Artigo: o `\todo{P21}` da Seção 7.6 virou o
+  fim do parágrafo do JavaScript. Em aberto: as variantes sobre o `Array`
+  (o nosso atual) não foram medidas; não muda as tabelas sem decisão do
+  autor.
 
 ### Andamento das pendências
 
@@ -1603,6 +1630,10 @@ artigo. Feito:
   da figura foi reescrito: o JavaScript estreita o gap como C# e PyPy, e o
   Swift passa a ser a única linguagem cujo gap cresce (43,5 → 46,9). Falta:
   Figuras 4 e 6 e mapas de calor (o `\todo` do artigo diz isso).
+  **Refeita com o `Array` (2026-11-23, depois da reversão do F15):** o
+  `merge_reruns.py` usa `noisy4-20261122` e `js66ncr-20261122`. JavaScript
+  282,7 até 100 e 237,3 acima de 100; o parágrafo continua com o
+  JavaScript estreitando o gap e o Swift como a única que cresce.
 - **F3.** Figura 7: unificar o método de tempo (pendência antiga) e decidir
   se ela é medida de novo com o protocolo da análise nova.
 - [x] **F4.** Fechado em 2026-11-23 (rodada `js66ncr`: a flag não custa nas

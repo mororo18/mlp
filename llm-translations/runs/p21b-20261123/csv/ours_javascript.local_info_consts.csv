@@ -1,0 +1,11 @@
+branch,source,instance,COST,TIME,WALL_TIME,mem_avg,mem_max,mem_lookups,timed_out
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,130.144,,19.756312295358242,51.4453125,2596,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,131.149,,20.416679105368743,51.4453125,2617,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,129.46,,20.46190990369725,51.4453125,2583,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,127.977,,20.37269113542891,51.4453125,2553,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,130.919,,19.737286741481622,19.9453125,2612,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,128.473,,20.417942840421382,51.4453125,2563,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,128.353,,20.42456254880906,51.52734375,2561,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,127.388,,19.712876794846576,19.95703125,2542,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,129.828,,19.732456563706563,51.52734375,2590,False
+main,ours_javascript.local_info_consts,lin318.tsp,5620197.0,128.137,,19.758290660441926,51.52734375,2557,False
