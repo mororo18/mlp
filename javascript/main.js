@@ -5,7 +5,7 @@ var to_1D = function (x, y, z, n) {
 }
 
 function subseq_fill(dimension) {
-    seq = Array((dimension+1)*(dimension+1)*3);
+    seq = new Float64Array((dimension+1)*(dimension+1)*3);
     return seq;
 }
 

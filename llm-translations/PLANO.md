@@ -1605,6 +1605,22 @@ artigo. Feito:
 - **F14.** Parágrafo da flag do JavaScript na Seção 6 está como rascunho
   (`[Draft]`, em laranja) para revisão do autor, com o `\todo` das
   figuras; tirar o destaque depois da revisão e do F2.
+- **F15. Rodar o nosso JavaScript novo (decisão do autor, 2026-11-23).** O
+  autor considerou incorreto o `Array` comum (com buracos) nas subsequências
+  do nosso JavaScript e pediu `Float64Array`, mesmo com o custo medido (16%
+  mais lento nas 4 instâncias da `jsf64`). Feito em `javascript/main.js`
+  (só a linha do `subseq_fill`; custo certo no berlin52). Variantes: a
+  `ours_javascript.float64array` virou `ours_javascript.plain_array` (o
+  `Array` antigo, sentido I) e os patches do nosso JavaScript foram gerados
+  de novo. O código novo é idêntico ao da variante medida na `jsf64`, então
+  o par já está medido: tradução / nossa nova = +2,2% (+3,1% sem o berlin52)
+  e a nossa antiga com `Array` 14% mais rápida que a nova. **Para rodar:**
+  o nosso JavaScript novo, com a flag, nas 66 instâncias (cerca de 3 h,
+  `INST=instances66.txt run.sh <saída> "javascript"`), para as figuras da
+  Seção 6 (F2), que hoje usam o `Array`. **Para decidir com o autor:** a
+  linha do JavaScript na Tabela 8 (o gap do par cai a cerca de 2%, e a
+  diferença que resta é intercalado × três vetores, os dois `Float64Array`)
+  e o que a Seção 4 diz do layout do nosso JavaScript.
 - **F5.** Espelhar na monografia (`doc/tcc`) as tabelas e o texto da Seção 7
   depois que o artigo fechar.
 - **F6.** Pendências antigas que continuam: bump do submódulo no repositório

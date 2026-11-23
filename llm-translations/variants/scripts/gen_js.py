@@ -1,8 +1,8 @@
 from common import *
 OURS = LT.parent / 'javascript'
 
-def typed(b):
-    sub(b / 'main.js', r'    seq = Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);', '    seq = new Float64Array((dimension+1)*(dimension+1)*3);')
+def plain_array(b):
+    sub(b / 'main.js', r'    seq = new Float64Array\(\(dimension\+1\)\*\(dimension\+1\)\*3\);', '    seq = Array((dimension+1)*(dimension+1)*3);')
 
 def consts(b):
     m = b / 'main.js'
@@ -13,7 +13,7 @@ def consts(b):
     m.write_text(t); print('consts', n)
 
 def locals_(b):
-    sub(b / 'main.js', r'    seq = Array\(', '    var seq = Array(')
+    sub(b / 'main.js', r'    seq = new Float64Array\(', '    var seq = new Float64Array(')
     sub(b / 'main.js', r'    subseq = subseq_fill\(', '    var subseq = subseq_fill(')
 
 def fdecl(b):
@@ -24,7 +24,7 @@ def tr_array(b):
     for f in 'TCW':
         sub(b / 'main.js', r'    solut\.seq_%s = new Float64Array\(sz\);' % f, '    solut.seq_%s = Array(sz);' % f)
 
-write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),'ours_javascript/float64array.patch': (OURS, typed, ()),
+write({'cpp_javascript/array.patch': (LT / 'translations' / 'cpp_javascript', tr_array, ('cpp_javascript/measure.patch',)),'ours_javascript/plain_array.patch': (OURS, plain_array, ()),
        'ours_javascript/const_offsets.patch': (OURS, consts, ()),
        'ours_javascript/no_globals.patch': (OURS, locals_, ()),
        'ours_javascript/function_decl.patch': (OURS, fdecl, ())})
