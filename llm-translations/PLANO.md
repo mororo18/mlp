@@ -751,7 +751,7 @@ possa esperar vai para o fim da lista.
   Para o texto, decidir com o autor: manter o Node 24 padrão (e explicar os
   picos) ou medir o JavaScript com a flag.
   Resultado: os quatro picos são o mesmo efeito (ver a rodada do P18).
-- [ ] **P19. Instâncias ruidosas nas figuras pesam no gap acima de 100.**
+- [x] **P19. Instâncias ruidosas nas figuras pesam no gap acima de 100.**
   A métrica da figura (razão das médias do grupo) é dominada pelas
   instâncias maiores, e a d493 sozinha tem cerca de 20% do tempo do C acima
   de 100 clientes. Nos dados das figuras, a d493 e a pcb442 têm dispersão
@@ -772,6 +772,8 @@ possa esperar vai para o fim da lista.
   `runs/noisy4-20261122/`), depois a variante
   `ours_javascript.no_concurrent_recompilation` nas 66 instâncias
   (`runs/js66ncr-20261122/`); o JavaScript padrão é o do P15.
+  Resultado: a d493 das figuras era lenta em quase todas as linguagens, e
+  os gaps acima de 100 sobem (ver as rodadas do P19).
 
 ### Andamento das pendências
 
@@ -1129,6 +1131,72 @@ e 5 daqui). Com os tempos da flag nos quatro picos e o C de agora acima de
 contra 283,0% até 100: o gap cai com o tamanho, como nas outras linguagens
 com JIT. Decisão pendente com o autor (P18 e P19).
 
+### Rodadas do P19 e do JavaScript com a flag (servidor, 13:39 de 22/11 a 00:14 de 23/11)
+
+Três rodadas com o `run.sh`, 10 execuções, carga mediana de 11, custos
+certos e nenhum estouro de tempo nas 1220 execuções:
+
+- `runs/noisy4-20261122/` (13:39 a 20:49, commit `747b403`): as AOT e JIT
+  menos o JavaScript (C, C++, C#, Fortran, Go, Java, Julia, LuaJIT, PyPy,
+  Rust, Swift) na d493, gr120, pcb442 e pr439. Lua e Python ficaram de fora.
+- `runs/jsncr-20261122/` (20:50 a 21:14, commit `8162079`): o par do
+  JavaScript (nosso, `cpp_javascript.base` e `cpp_javascript.array`) com a
+  flag nas 4 instâncias da análise.
+- `runs/js66ncr-20261122/` (21:15 a 00:14, commit `8162079`): o nosso
+  JavaScript com a flag nas 66.
+
+**Instâncias ruidosas.** A d493 das figuras era lenta em quase todas as
+linguagens, e não só nas de dispersão alta: agora o C cai 49,5%, o C++
+51,6%, C#, Fortran, Go, Rust e Swift de 33 a 38%, Java 29,6%, PyPy 26,7% e
+LuaJIT 15,6%. Só o Julia bate (+0,1%), porque o dado dele nas figuras já é
+a rodada de 20/11. Swift (1,03) e Rust (1,04) tinham dispersão baixa e
+mesmo assim caem um terço: era a máquina, naquela hora, e não ruído entre
+execuções. Na pcb442 e na pr439 a queda vai de 4 a 28% (Swift 26 e 28%,
+Fortran 25% na pcb442, C# e Go perto de 20%); o LuaJIT da pcb442 sobe
+13,9%. A gr120 bate (até 2,5%, LuaJIT −8,4%). Gap acima de 100 clientes
+(métrica da Figura 5), figuras → com as quatro novas:
+
+| Linguagem | Até 100 | Acima de 100, figuras | Acima de 100, novo |
+|---|---|---|---|
+| C++ | 1,8 | 2,5 | 0,6 |
+| Fortran | 11,2 | 2,9 | 6,4 |
+| Julia | 47,5 | 11,2 | 30,2 |
+| Rust | 44,0 | 27,3 | 36,8 |
+| Swift | 43,5 | 44,9 | 46,9 |
+| Java | 232,8 | 74,8 | 85,0 |
+| Go | 150,5 | 139,2 | 146,1 |
+| LuaJIT | 243,0 | 159,5 | 200,2 |
+| C# | 451,8 | 206,1 | 215,2 |
+| PyPy | 456,5 | 293,1 | 331,5 |
+| JavaScript, Node 24 padrão (P15) | 283,0 | 303,8 | 336,7 |
+| JavaScript com a flag | 282,7 | — | 237,3 |
+
+A ordem das linguagens acima de 100 não muda, mas os gaps sobem (Julia
+quase triplica). Com a flag, o JavaScript fica como as outras com JIT: gap
+menor acima de 100 que até 100. Lua e Python não foram medidas de novo; os
+números delas acima de 100 continuam com a d493 velha no numerador e o C
+novo no denominador, o que os infla (problema 18).
+
+**JavaScript com a flag nas 66.** Dispersão máxima 1,05 (cv até 2,0%).
+Contra o Node 24 padrão (P15): os quatro picos caem a 36 a 39% do tempo
+(linhp318, lin318, pr299, pr439); nas outras 62 a razão fica entre 0,94
+(swiss42, dantzig42) e 1,02, com média de 0,982 até 100 clientes. A flag
+não custa tempo nas instâncias curtas (fecha o F4).
+
+**Par do JavaScript com a flag** (`jsncr`; razões por instância berlin52,
+kroA100, gr202, lin318):
+
+| Comparação | Razões | Gap | Sem berlin52 |
+|---|---|---|---|
+| tradução / nossa | 1,162 1,193 1,198 1,221 | +19,3 | +20,4 |
+| tradução com `Array` / nossa | 1,028 1,039 1,073 1,075 | +5,4 | +6,3 |
+
+Com a flag o lin318 sai do patamar lento nos dois lados (nossa 123,4 s,
+tradução 150,6 s) e o gap do par sobe de +12,1 para +19,3%. O
+`Float64Array` da tradução explica cerca de 14 dos 19 pontos. Faltou o
+outro sentido (o nosso com `Float64Array`), que a Tabela 8 mostra: rodada
+`runs/jsf64-20261122/` com os quatro programas juntos (problema 19).
+
 **P3 (2026-11-21).** O resto do laço quente difere em detalhes: ordem dos
 campos da subsequência (T, W, C no nosso; T, C, W na tradução), lista do
 RVND (o nosso copia de uma lista-base com `make` + `copy`), `swap` e
@@ -1402,6 +1470,21 @@ Registro de cada problema encontrado no caminho e da solução adotada.
     (par do JavaScript com a flag nas 4 instâncias, depois o nosso nas 66).
     Teste local: os três programas com a flag dão o custo certo no berlin52
     e o catálogo gerado roda `node --no-concurrent-recompilation main.js`.
+18. **Lua e Python fora da rodada das instâncias ruidosas (2026-11-23).** A
+    `noisy4` mediu só as AOT e JIT (menos o JavaScript). Como a d493 das
+    figuras era lenta em quase todas as linguagens, os números de Lua e
+    Python acima de 100 clientes ficam com a d493 velha no numerador e o C
+    novo no denominador (14354% e 17202%, contra 12247% e 14680% nas
+    figuras). **Solução:** nenhuma ainda. Elas ficam fora da Figura 5, mas
+    entram na Figura 4 e nos mapas de calor; decidir com o F2 (medir as duas
+    nas quatro, umas 10 h de servidor, ou só nas que pesam, d493 e pcb442).
+19. **Faltou um sentido no par do JavaScript (2026-11-23).** A rodada
+    `jsncr` mediu a tradução com a nossa escolha (`cpp_javascript.array`),
+    mas não o nosso com a escolha da tradução
+    (`ours_javascript.float64array`), que a Tabela 8 mostra. **Solução:**
+    rodada `runs/jsf64-20261122/` (cadeia `p22.sh`) com os quatro programas
+    juntos (nossa, tradução, as duas variantes), para as três razões da
+    linha virem da mesma rodada.
 
 ## Flag do JavaScript no repositório (autor, 2026-11-22)
 
@@ -1442,14 +1525,16 @@ artigo. Feito:
   mexer no artigo.
 - **F3.** Figura 7: unificar o método de tempo (pendência antiga) e decidir
   se ela é medida de novo com o protocolo da análise nova.
-- **F4.** Hipótese H-JS7: no teste local, os três programas JavaScript com a
+- [x] **F4.** Fechado em 2026-11-23 (rodada `js66ncr`: a flag não custa nas
+  instâncias curtas, razão média 0,982 até 100 clientes). Hipótese H-JS7: no teste local, os três programas JavaScript com a
   flag gastaram mais tempo de CPU no berlin52 (1,35 a 1,75 s) que o nosso
   sem a flag (0,61 s, outra hora). Conferir nas instâncias curtas da rodada
   `jsncr` contra o P15; se a flag pesa nelas, dizer no texto.
 - **F7.** `mlp-standard` e `mlp-naive` ainda rodam `node main.js` sem a
   flag. Perguntar ao autor se a flag vale para as três (é configuração do
   runtime, não otimização do código).
-- **F8.** Rodadas em andamento no servidor (cadeia `p19.sh`, depois
+- [x] **F8.** Feito em 2026-11-23 (ver as rodadas do P19; falta só a
+  `jsf64`, problema 19). Rodadas em andamento no servidor (cadeia `p19.sh`, depois
   `p21.sh`): ao terminar cada uma, buscar, conferir custos e registrar.
   (a) `noisy4-20261122`: recalcular o gap acima de 100 clientes de todas as
   linguagens com d493, gr120, pcb442 e pr439 novas (P19); (b)
