@@ -98,6 +98,24 @@ versões antigas das nossas): só ponto de partida.
   `local_info_consts` ficar mais rápida que a tradução, registrar que o par
   fecha na direção da nossa. Saída: linha da Tabela 13 e o parágrafo da
   7.6 sobre o `Array`.
+  **Resultado (p26, 2026-11-23; custos iguais, CV ≤ 1,4%, sem bimodalidade).**
+  Diferenças em relação à nossa sobre o `Array` (média das razões por
+  instância, berlin52/kroA100/gr202/lin318):
+  - tradução com `Array` (três vetores): +5,0% (reproduz o +4,9% da jsf64);
+  - tradução com `Array` intercalado: −6,6% (o layout intercalado deixa a
+    tradução 11% mais rápida);
+  - nossa com três `Array`s: +1,4% (o intercalado é melhor na nossa);
+  - nossa com `const_offsets`: −10,4%; com `local_info`: −0,8%; com os dois
+    (`local_info_consts`): −10,7%;
+  - mesmo tipo, mesmo layout e mesmas constantes e cópias locais nos dois
+    programas (tradução `interleaved_array` × nossa `local_info_consts`): a
+    tradução fica **+4,6%** mais lenta (+7,9, +4,5, +2,5, +3,7% por
+    instância). Mesmo quadro do P21 com `Float64Array` (5 a 8%).
+  Conclusão: o par **não fecha**. Igualando as três escolhas, sobra uma
+  diferença de 4,6% a favor da nossa, de causa não identificada (a
+  tradução ainda difere em outros pontos do código). Para a Tabela 13:
+  mudanças "tipo de array, layout intercalado (na tradução); posições
+  constantes e cópias locais (na nossa)", resíduo +4,6%, Aberto.
 - **A2. C++ → Java.** Resíduo de −3,1% com acessores, cópias locais e
   armazenamento das subsequências na nossa (`ours_java.soa`), −9,3% com
   aquecimento. Hipóteses H-J5 e H-J6 do `PLANO.md`: o caminho quente do
