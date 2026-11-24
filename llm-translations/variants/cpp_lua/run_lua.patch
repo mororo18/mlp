@@ -1,0 +1,6 @@
+diff -ruN a/run_lua_only.sh b/run_lua_only.sh
+--- a/run_lua_only.sh
++++ b/run_lua_only.sh
+@@ -0,0 +1,2 @@
++#!/usr/bin/env bash
++lua main.lua "$@"

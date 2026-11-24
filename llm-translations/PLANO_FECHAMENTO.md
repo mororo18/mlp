@@ -231,4 +231,22 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
 
 ## Problemas e soluções
 
-(vazio)
+- **B0 feita (2026-11-24).** As 12 traduções copiadas de `claude_new/claude/`
+  para `translations/` (sem binários, `.git` e `.claude`). Um
+  `measure.patch` por tradução: a busca devolve o custo e o `main` imprime
+  `COST:` depois de parar o relógio; relógio de parede em nanossegundos onde
+  era em milissegundos (`cpp_c`, `cpp_rust`, `cpp_csharp`) ou só CPU
+  (`c_cpp`, `lua_cpp`, `python_cpp`); a tradução para Lua usa
+  `clock_gettime` pela FFI no LuaJIT (como a nossa) e `os.clock()` no `lua`.
+  As 12 bases compilam e dão 143721 no berlin52 na máquina local.
+- **Catálogo do Rust (2026-11-24).** O `catalog_base.py` decide o binário do
+  `cpp_rust` olhando uma pasta que não existe aqui e caía em
+  `cpp_to_rust`; agora também olha `translations/cpp_rust/Cargo.toml`
+  (binário `solve`).
+- **LuaJIT e Lua separados (2026-11-24).** A base `cpp_lua` gera duas
+  execuções (lua e luajit). O lote compilado só quer o LuaJIT e o lote
+  interpretado só o lua: variantes `cpp_lua.luajit` e `cpp_lua.lua`, cada
+  uma com um `run_*_only.sh`; o `make_variants.py` passou a tratar o
+  `run_*.sh` de um patch como o único comando da variante
+  (`runtimes_extras=[]`).
+

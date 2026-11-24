@@ -1,0 +1,40 @@
+diff -ruN a/main.c b/main.c
+--- a/main.c	2026-11-24 01:10:44.030691886 -0300
++++ b/main.c	2026-11-24 01:10:44.031077814 -0300
+@@ -655,7 +655,7 @@
+ }
+ 
+ 
+-void GILS_RVND(int Imax, int Iils, tData * data, bool verbose) {
++double GILS_RVND(int Imax, int Iils, tData * data, bool verbose) {
+ 
+     tSolution solut_partial = Solution_init(*data);
+     tSolution solut_crnt = Solution_init(*data);
+@@ -710,7 +710,7 @@
+         }
+ 
+     }
+-    printf("COST: %.2lf\n", solut_best.cost);
++    return solut_best.cost;
+ }
+ 
+ int main(int argc, char **argv){
+@@ -745,14 +745,13 @@
+     struct timespec t1, t2;
+     clock_gettime(CLOCK_MONOTONIC, &t1);
+     size_t start = clock();
+-    GILS_RVND(Imax, Iils, &data, verbose);
++    double best_cost = GILS_RVND(Imax, Iils, &data, verbose);
+     double cpu_time = (double)(clock() - start) / CLOCKS_PER_SEC ;
+     clock_gettime(CLOCK_MONOTONIC, &t2);
+-    long duration = (t2.tv_sec - t1.tv_sec) * 1000L + (t2.tv_nsec - t1.tv_nsec) / 1000000L;
+-
+-    double res = (double)duration / 10e2;
++    double res = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_nsec - t1.tv_nsec) / 1e9;
++    printf("COST: %.2lf\n", best_cost);
+     printf("TIME: %g\n", cpu_time);
+-    printf("wall clock (s): %g\n", res);
++    printf("wall clock (s): %.9f\n", res);
+ 
+     printf("Tamanho RND %d\n", rnd_size);
+ 

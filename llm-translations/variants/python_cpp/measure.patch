@@ -1,0 +1,52 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 01:12:12.034703734 -0300
++++ b/main.cpp	2026-11-24 01:12:12.035044693 -0300
+@@ -6,6 +6,7 @@
+ #include <cstdio>
+ #include <cstring>
+ #include <ctime>
++#include <chrono>
+ #include <iostream>
+ #include <limits>
+ #include <string>
+@@ -440,7 +441,7 @@
+     return s;
+ }
+ 
+-void GILS_RVND(int Imax, int Iils, const std::vector<double> &R, tInfo &info,
++double GILS_RVND(int Imax, int Iils, const std::vector<double> &R, tInfo &info,
+                bool verbose = false) {
+ 
+     tSolution solut_partial(std::vector<int>(info.dimen + 1, 0), subseq_fill(info), 0.0);
+@@ -493,15 +494,7 @@
+             std::cout << "\tCurrent best solution cost: " << py_float(solut_best.cost) << std::endl;
+     }
+ 
+-    std::cout << "COST: " << py_float(solut_best.cost) << std::endl;
+-
+-    std::cout << "SOLUTION: [";
+-    for (size_t i = 0; i < solut_best.s.size(); i++) {
+-        if (i > 0)
+-            std::cout << ", ";
+-        std::cout << solut_best.s[i];
+-    }
+-    std::cout << "]" << std::endl;
++    return solut_best.cost;
+ }
+ 
+ int main(int argc, char **argv) {
+@@ -527,9 +520,13 @@
+     tInfo info(dimension, cost, rnd);
+ 
+     clock_t start = clock();
+-    GILS_RVND(Imax, Iils, R, info, verbose);
++    const auto wall_start = std::chrono::steady_clock::now();
++    double best_cost = GILS_RVND(Imax, Iils, R, info, verbose);
++    const auto wall_end = std::chrono::steady_clock::now();
++    std::cout << "COST: " << py_float(best_cost) << std::endl;
+     std::cout << "TIME: " << py_float((double)(clock() - start) / CLOCKS_PER_SEC) << " "
+               << std::endl;
++    std::printf("wall clock (s): %.9f\n", std::chrono::duration<double>(wall_end - wall_start).count());
+ 
+     std::cout << "ITERACOES:  " << info.IT << std::endl;
+ 

@@ -1,0 +1,46 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 01:12:12.056378745 -0300
++++ b/main.cpp	2026-11-24 01:12:12.056849460 -0300
+@@ -393,7 +393,7 @@
+     return s;
+ }
+ 
+-static void GILS_RVND(int Imax, int Iils, const std::vector<double> &R, tData &data, bool verbose) {
++static double GILS_RVND(int Imax, int Iils, const std::vector<double> &R, tData &data, bool verbose) {
+ 
+     tSolution solut_best = solution_init(data, std::numeric_limits<double>::infinity());
+     tSolution solut_partial = solution_init(data, 0.0);
+@@ -446,15 +446,7 @@
+             std::printf("\tCurrent best solution cost: %.2lf\n", solut_best.cost);
+         }
+     }
+-    std::printf("COST: %.2lf\n", solut_best.cost);
+-    std::printf("SOLUTION: ");
+-    std::printf("[");
+-    for (size_t i = 0; i < solut_best.s.size(); i++) {
+-        std::printf("%d", solut_best.s[i]);
+-        if (i + 1 < solut_best.s.size())
+-            std::printf(", ");
+-    }
+-    std::printf("]\n");
++    return solut_best.cost;
+ }
+ 
+ int main(int argc, char **argv) {
+@@ -494,13 +486,14 @@
+ 
+     double _cpu0 = _cputime();
+     auto t0 = std::chrono::steady_clock::now();
+-    GILS_RVND(Imax, Iils, R, data, verbose);
++    double best_cost = GILS_RVND(Imax, Iils, R, data, verbose);
+     auto t1 = std::chrono::steady_clock::now();
+     double cpu_time = _cputime() - _cpu0;
+     double time = std::chrono::duration<double>(t1 - t0).count();
+ 
++    std::printf("COST: %.2lf\n", best_cost);
+     std::printf("TIME: %.6lf\n", cpu_time);
+-    std::printf("wall clock (s): %.6lf\n", time);
++    std::printf("wall clock (s): %.9f\n", time);
+     std::printf("reinsertion calls %ld\n", data.reinsert_count);
+ 
+     return 0;

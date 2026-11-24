@@ -1,0 +1,39 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 01:12:12.049315735 -0300
++++ b/main.cpp	2026-11-24 01:12:12.049765937 -0300
+@@ -397,7 +397,7 @@
+     std::cout << (s.size() > 0 ? " ]" : "]") << std::endl;
+ }
+ 
+-static void GILS_RVND(int Iils, int Imax, const std::vector<double> & R, Info & info, bool verbose) {
++static double GILS_RVND(int Iils, int Imax, const std::vector<double> & R, Info & info, bool verbose) {
+ 
+     std::vector<double> subseq = subseq_fill(info.dimension);
+     std::vector<int> s_best;
+@@ -450,8 +450,7 @@
+         }
+     }
+ 
+-    print_solution(s_best);
+-    std::cout << "COST:  " << num_to_string(cost_best) << std::endl;
++    return cost_best;
+ }
+ 
+ static double cpu_usage_seconds() {
+@@ -499,12 +498,14 @@
+ 
+     double cpuStart = cpu_usage_seconds();
+     double start = wall_clock_seconds();
+-    GILS_RVND(Iils, Imax, R, info, verbose);
++    double best_cost = GILS_RVND(Iils, Imax, R, info, verbose);
+     double end = wall_clock_seconds();
+     double cpuUsage = cpu_usage_seconds() - cpuStart;
+ 
++    std::cout << "COST:  " << num_to_string(best_cost) << std::endl;
++
+     std::cout << "TIME:  " << num_to_string(cpuUsage) << std::endl;
+-    std::cout << "wall clock (s):  " << num_to_string(end - start) << std::endl;
++    std::printf("wall clock (s): %.6f\n", end - start);
+ 
+     return 0;
+ }

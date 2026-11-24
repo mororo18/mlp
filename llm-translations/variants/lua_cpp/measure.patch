@@ -1,0 +1,44 @@
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 01:12:12.028378766 -0300
++++ b/main.cpp	2026-11-24 01:12:12.028863460 -0300
+@@ -5,6 +5,7 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <ctime>
++#include <chrono>
+ #include <limits>
+ #include <string>
+ #include <vector>
+@@ -541,7 +542,7 @@
+     return s;
+ }
+ 
+-void GILS_RVND(int Imax, int Iils, const std::vector<double> &R, tInfo &info, bool verbose) {
++double GILS_RVND(int Imax, int Iils, const std::vector<double> &R, tInfo &info, bool verbose) {
+ 
+     const int seq_n = 3 * (info.dimension + 1) * (info.dimension + 1);
+ 
+@@ -615,7 +616,7 @@
+         }
+     }
+ 
+-    printf("COST: \t%s\n", num_str(solut_best.cost).c_str());
++    return solut_best.cost;
+ }
+ 
+ int main(int argc, char **argv) {
+@@ -643,9 +644,13 @@
+     }
+ 
+     const clock_t start = clock();
+-    GILS_RVND(Imax, Iils, R, info, verbose);
++    const auto wall_start = std::chrono::steady_clock::now();
++    double best_cost = GILS_RVND(Imax, Iils, R, info, verbose);
++    const auto wall_end = std::chrono::steady_clock::now();
+ 
++    printf("COST: \t%s\n", num_str(best_cost).c_str());
+     printf("TIME: \t%s\n", num_str((double)(clock() - start) / CLOCKS_PER_SEC).c_str());
++    printf("wall clock (s): %.9f\n", std::chrono::duration<double>(wall_end - wall_start).count());
+ 
+     return 0;
+ }

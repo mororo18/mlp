@@ -311,6 +311,8 @@ PROJETOS = {
             **({"build": ("cargo", {"bin": "solve"}), "run": ["./target/release/solve"]}
                if os.path.exists(os.path.join(RAIZ, "cpp_rust", "target", "release", "solve"))
                or (os.path.exists(os.path.join(RAIZ, "cpp_rust", "Cargo.toml")) and 'name = "solve"' in open(os.path.join(RAIZ, "cpp_rust", "Cargo.toml"), errors='ignore').read())
+               # llm-translations: the copy in translations/ (Frente B, 2026-11-24)
+               or (os.path.exists(os.path.join(PAI, "translations", "cpp_rust", "Cargo.toml")) and 'name = "solve"' in open(os.path.join(PAI, "translations", "cpp_rust", "Cargo.toml"), errors='ignore').read())
                else {"build": ("cargo", {"bin": "cpp_to_rust"}), "run": ["./target/release/cpp_to_rust"]})
         },
     },

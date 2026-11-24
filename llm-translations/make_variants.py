@@ -99,7 +99,8 @@ def main():
             with open(dest / script) as f:
                 f.readline()
                 cmd = [tok for tok in shlex.split(f.readline()) if tok != "$@"]
-            entry = f'{{"traduzida": dict({entry[14:-1]}, run={cmd!r})}}'
+            # a run_*.sh from a patch is the variant's only run command
+            entry = f'{{"traduzida": dict({entry[14:-1]}, run={cmd!r}, runtimes_extras=[])}}'
         entries.append(f'    {r["id"]!r}: {entry},')
 
     (out / "benchmark.py").write_text(CATALOG.format(harness=str(HERE / "harness"),

@@ -68,3 +68,17 @@ ours_julia.zero_based_warm,ours/julia,ours_julia/zero_based.patch ours_julia/war
 csharp_cpp.index32_seq,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq.patch,P14: unsigned index only in the subsequence accessors
 csharp_cpp.index32_matrix,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_matrix.patch,P14: unsigned index only in the distance matrix accessor
 csharp_cpp.index32_seq_assume,csharp_cpp,csharp_cpp/measure.patch csharp_cpp/index32_seq_assume.patch,P14: index32_seq with the indices and d declared non-negative (__builtin_unreachable)
+cpp_c.base,cpp_c,cpp_c/measure.patch,translation as delivered + measurement fix
+cpp_rust.base,cpp_rust,cpp_rust/measure.patch,translation as delivered + measurement fix
+cpp_csharp.base,cpp_csharp,cpp_csharp/measure.patch,translation as delivered + measurement fix
+cpp_lua.base,cpp_lua,cpp_lua/measure.patch,translation as delivered + measurement fix
+cpp_pypy.base,cpp_pypy,cpp_pypy/measure.patch,translation as delivered + measurement fix
+cpp_python.base,cpp_python,cpp_python/measure.patch,translation as delivered + measurement fix
+c_cpp.base,c_cpp,c_cpp/measure.patch,translation as delivered + measurement fix
+lua_cpp.base,lua_cpp,lua_cpp/measure.patch,translation as delivered + measurement fix
+python_cpp.base,python_cpp,python_cpp/measure.patch,translation as delivered + measurement fix
+java_cpp.base,java_cpp,java_cpp/measure.patch,translation as delivered + measurement fix
+javascript_cpp.base,javascript_cpp,javascript_cpp/measure.patch,translation as delivered + measurement fix
+julia_cpp.base,julia_cpp,julia_cpp/measure.patch,translation as delivered + measurement fix
+cpp_lua.luajit,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.patch,translation as delivered + measurement fix; LuaJIT only
+cpp_lua.lua,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch,translation as delivered + measurement fix; plain Lua only

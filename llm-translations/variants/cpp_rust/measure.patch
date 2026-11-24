@@ -1,0 +1,37 @@
+diff -ruN a/src/main.rs b/src/main.rs
+--- a/src/main.rs	2026-11-24 01:11:11.948985075 -0300
++++ b/src/main.rs	2026-11-24 01:11:11.949418677 -0300
+@@ -453,7 +453,7 @@
+     s
+ }
+ 
+-fn gils_rvnd(imax: i32, iils: i32, data: &mut AlgoData, verbose: bool) {
++fn gils_rvnd(imax: i32, iils: i32, data: &mut AlgoData, verbose: bool) -> f64 {
+     let mut solut_partial = solution_init(data);
+     let mut solut_crnt = solution_init(data);
+     let mut solut_best = solution_init(data);
+@@ -506,7 +506,7 @@
+         }
+     }
+ 
+-    println!("COST: {:.2}", solut_best.cost);
++    solut_best.cost
+ }
+ 
+ fn main() {
+@@ -534,12 +534,11 @@
+ 
+     let t1 = Instant::now();
+     let start_cpu = Instant::now();
+-    gils_rvnd(imax, iils, &mut data, verbose);
++    let best_cost = gils_rvnd(imax, iils, &mut data, verbose);
+     let cpu_time = start_cpu.elapsed().as_secs_f64();
+     let t2 = Instant::now();
+-    let duration_ms = t2.duration_since(t1).as_millis();
+-
+-    let res = duration_ms as f64 / 10e2;
++    let res = t2.duration_since(t1).as_secs_f64();
++    println!("COST: {:.2}", best_cost);
+     println!("TIME: {}", cpu_time);
+     println!("wall clock (s): {}", res);
+ 

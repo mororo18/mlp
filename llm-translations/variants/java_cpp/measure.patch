@@ -1,0 +1,67 @@
+diff -ruN a/GILS_RVND.cpp b/GILS_RVND.cpp
+--- a/GILS_RVND.cpp	2026-11-24 01:12:12.041859306 -0300
++++ b/GILS_RVND.cpp	2026-11-24 01:12:12.042155325 -0300
+@@ -342,7 +342,7 @@
+     return sl_cpy;
+ }
+ 
+-void GILS_RVND::solve() {
++double GILS_RVND::solve() {
+     tInfo & info = *this->info;
+ 
+     tSolution solut_best = tSolution(info.getDimen(), std::numeric_limits<double>::max());
+@@ -394,8 +394,5 @@
+         }
+     }
+ 
+-    std::cout << "COST: ";
+-    std::cout << std::setprecision(15) << solut_best.getCost() << std::endl;
+-    std::cout << "SOLUTION: ";
+-    solut_best.getSolut().printPretty();
++    return solut_best.getCost();
+ }
+diff -ruN a/GILS_RVND.h b/GILS_RVND.h
+--- a/GILS_RVND.h	2026-11-24 01:12:12.040868772 -0300
++++ b/GILS_RVND.h	2026-11-24 01:12:12.041134173 -0300
+@@ -33,7 +33,7 @@
+     tArray perturb(tArray & sl, tInfo & info);
+ 
+ public:
+-    void solve();
++    double solve();
+ };
+ 
+ #endif
+diff -ruN a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 01:12:12.042714988 -0300
++++ b/main.cpp	2026-11-24 01:12:12.042899682 -0300
+@@ -1,7 +1,9 @@
+ #include "GILS_RVND.h"
+ 
+ #include <chrono>
++#include <cstdio>
+ #include <ctime>
++#include <iomanip>
+ #include <iostream>
+ #include <string>
+ 
+@@ -20,14 +22,16 @@
+     GILS_RVND tsp = GILS_RVND(verbose);
+     long cpuTime = - processCpuTime();
+     long time = - nanoTime();
+-    tsp.solve();
++    double best_cost = tsp.solve();
+     time += nanoTime();
+     cpuTime += processCpuTime();
+ 
++    std::cout << "COST: ";
++    std::cout << std::setprecision(15) << best_cost << std::endl;
++
+     std::cout << "TIME: ";
+     std::cout << cpuTime/10e8 << std::endl;
+-    std::cout << "wall clock (s): ";
+-    std::cout << time/10e8 << std::endl;
++    std::printf("wall clock (s): %.9f\n", time / 1e9);
+ }
+ 
+ int main(int argc, char *argv[]) {

@@ -1,0 +1,6 @@
+diff -ruN a/run_luajit_only.sh b/run_luajit_only.sh
+--- a/run_luajit_only.sh
++++ b/run_luajit_only.sh
+@@ -0,0 +1,2 @@
++#!/usr/bin/env bash
++luajit main.lua "$@"

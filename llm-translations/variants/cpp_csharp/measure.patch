@@ -1,0 +1,40 @@
+diff -ruN a/Program.cs b/Program.cs
+--- a/Program.cs	2026-11-24 01:11:11.953899726 -0300
++++ b/Program.cs	2026-11-24 01:11:11.954500091 -0300
+@@ -691,7 +691,7 @@
+             return s;
+         }
+ 
+-        private static void GILS_RVND(int Imax, int Iils, TData data, bool verbose)
++        private static double GILS_RVND(int Imax, int Iils, TData data, bool verbose)
+         {
+             TSolution solut_partial = Solution_init(data);
+             TSolution solut_crnt = Solution_init(data);
+@@ -751,7 +751,7 @@
+                     Console.WriteLine();
+                 }
+             }
+-            Console.Write(string.Format(CultureInfo.InvariantCulture, "COST: {0:F2}\n", solut_best.cost));
++            return solut_best.cost;
+         }
+ 
+         // Mimics the default formatting of std::ostream for doubles (6 significant digits)
+@@ -787,14 +787,13 @@
+             Iils = data.dimen < 100 ? data.dimen : 100;
+             Stopwatch t1 = Stopwatch.StartNew();
+             TimeSpan start = Process.GetCurrentProcess().TotalProcessorTime;
+-            GILS_RVND(Imax, Iils, data, verbose);
++            double best_cost = GILS_RVND(Imax, Iils, data, verbose);
+             double cpu_time = (Process.GetCurrentProcess().TotalProcessorTime - start).TotalSeconds;
+             t1.Stop();
+-            long duration = (long)t1.Elapsed.TotalMilliseconds;
+-
+-            double res = (double)duration / 10e2;
++            double res = t1.Elapsed.TotalSeconds;
++            Console.Write(string.Format(CultureInfo.InvariantCulture, "COST: {0:F2}\n", best_cost));
+             Console.WriteLine("TIME: " + Ostream(cpu_time));
+-            Console.WriteLine("wall clock (s): " + Ostream(res));
++            Console.WriteLine("wall clock (s): " + res.ToString("R", CultureInfo.InvariantCulture));
+ 
+             Console.WriteLine("Tamanho RND " + rnd.Count);
+ 

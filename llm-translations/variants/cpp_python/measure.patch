@@ -1,0 +1,28 @@
+diff -ruN a/main.py b/main.py
+--- a/main.py	2026-11-24 01:11:11.969166976 -0300
++++ b/main.py	2026-11-24 01:11:11.969526896 -0300
+@@ -392,7 +392,7 @@
+             print(f"\tCurrent best cost: {solut_best.cost}")
+             print("SOLUCAO: " + " ".join(str(v) for v in solut_best.s))
+ 
+-    print(f"COST: {solut_best.cost:.2f}")
++    return solut_best.cost
+ 
+ 
+ def main():
+@@ -412,12 +412,11 @@
+ 
+     t1 = time.perf_counter()
+     start = time.process_time()
+-    gils_rvnd(Imax, Iils, data, verbose)
++    best_cost = gils_rvnd(Imax, Iils, data, verbose)
+     cpu_time = time.process_time() - start
+     t2 = time.perf_counter()
+-    duration = (t2 - t1) * 1000
+-
+-    res = duration / 10e2
++    res = t2 - t1
++    print(f"COST: {best_cost:.2f}")
+     print(f"TIME: {cpu_time}")
+     print(f"wall clock (s): {res}")
+ 

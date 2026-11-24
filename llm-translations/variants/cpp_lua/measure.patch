@@ -1,0 +1,49 @@
+diff -ruN a/main.lua b/main.lua
+--- a/main.lua	2026-11-24 01:11:11.959868614 -0300
++++ b/main.lua	2026-11-24 01:11:11.960257781 -0300
+@@ -454,7 +454,23 @@
+         end
+     end
+ 
+-    print(string.format("COST: %.2f", solut_best.cost))
++    return solut_best.cost
++end
++
++-- measure.patch: monotonic wall clock through the FFI under LuaJIT (as our
++-- Lua does); os.clock() under plain Lua, which has no wall clock.
++local ffi_ok, ffi = pcall(require, "ffi")
++local wall_clock = os.clock
++if ffi_ok then
++    ffi.cdef[[
++        typedef struct { long tv_sec; long tv_nsec; } mlp_timespec;
++        int clock_gettime(int clk_id, mlp_timespec *tp);
++    ]]
++    local ts = ffi.new("mlp_timespec")
++    wall_clock = function()
++        ffi.C.clock_gettime(1, ts)
++        return tonumber(ts.tv_sec) + tonumber(ts.tv_nsec) * 1e-9
++    end
+ end
+ 
+ local function main(argv)
+@@ -481,16 +497,17 @@
+ 
+     Iils = (data.dimen < 100) and data.dimen or 100
+ 
+-    local t1 = os.clock()
++    local t1 = wall_clock()
+     local cpu_start = os.clock()
+-    GILS_RVND(Imax, Iils, data, verbose)
++    local best_cost = GILS_RVND(Imax, Iils, data, verbose)
+     -- Lua's standard library only exposes CPU time via os.clock(); there is
+     -- no separate high-resolution wall-clock source without a C extension,
+     -- so both timings below are derived from it.
+     local cpu_time = os.clock() - cpu_start
+-    local t2 = os.clock()
++    local t2 = wall_clock()
+ 
+     local res = t2 - t1
++    print(string.format("COST: %.2f", best_cost))
+ 
+     print("TIME: " .. tostring(cpu_time))
+     print("wall clock (s): " .. tostring(res))
