@@ -69,22 +69,27 @@ com duas mudanças:
 | C# → C++ | +12,5 → −0,2 | fechado (matriz) | — |
 | C++ → JavaScript | +18,9 → +4,9 | aberto | A |
 | C++ → Java | −10,6 → −3,1 | aberto | A |
-| C++ → C | +4* | a medir | B |
-| C++ → Rust | +81* | a medir | B |
-| C++ → C# | +6* | a medir | B |
-| C++ → LuaJIT | +97* | a medir | B |
-| C++ → PyPy | +29* | a medir | B |
+| C++ → C | +0,7 (+1,1 sem berlin52) | fechado (nada) | — |
+| C++ → Rust | +69,5 | aberto | B |
+| C++ → C# | +8,5 (+15,2 sem berlin52) | aberto | B |
+| C++ → LuaJIT | +73,4 | aberto | B |
+| C++ → PyPy | +39,3 | aberto | B |
 | C++ → Lua | +75* | a medir (interpretado) | B |
 | C++ → Python | +92* | a medir (interpretado) | B |
-| C → C++ | 0* | a medir | B |
-| Lua → C++ | sem análise | a medir | B |
-| Python → C++ | +6* | a medir | B |
-| Java → C++ | +6* | a medir; fonte antiga | B, C |
-| JavaScript → C++ | +25* | a medir; fonte antiga | B, C |
-| Julia → C++ | +27* | a medir; fonte antiga | B, C |
+| C → C++ | +0,2 (+2,6†) | a confirmar (berlin52) | B |
+| Lua → C++ | −0,1 (+2,3†) | a confirmar (berlin52) | B |
+| Python → C++ | +3,8 (+6,2†) | aberto | B |
+| Java → C++ | +5,1 (+7,5†) | aberto; fonte antiga | B, C |
+| JavaScript → C++ | +20,6 (+23,4†) | aberto; fonte antiga | B, C |
+| Julia → C++ | +29,3 (+32,4†) | aberto; fonte antiga | B, C |
 
 \* Análise antiga (outra máquina, berlin52/bier127/gr202, 1 a 10 execuções,
 versões antigas das nossas): só ponto de partida.
+
+Gaps de base da Frente B: rodada `b-comp-20261124` (B1, 4 instâncias, 10
+execuções, custo ok em todas). † Estimativa com a mediana do nosso C++ no
+berlin52 (duas execuções fora da curva nesta rodada; ver Problemas); vale a
+repetição do berlin52.
 
 ## Frente A. Pares abertos
 
@@ -142,6 +147,27 @@ Fases como no `PLANO.md`:
   tradução para Lua rodando no LuaJIT contra a nossa Lua no LuaJIT).
   Catálogo e smoke de build de todas as bases, local e no servidor.
 - **B1. Gap de base.** `<par>.base` e as nossas, nas instâncias do lote.
+  Lote compilado feito (`runs/b-comp-20261124`, 2026-11-24, cerca de 1 h 30);
+  razões por instância (berlin52, kroA100, gr202, lin318):
+
+  | Par | Gap | Razões |
+  |---|---|---|
+  | C++ → C | +0,7 | 0,995 1,007 1,018 1,007 |
+  | C++ → Rust | +69,5 | 1,726 1,699 1,718 1,636 |
+  | C++ → C# | +8,5 | 0,883 1,095 1,195 1,165 |
+  | C++ → LuaJIT | +73,4 | 1,567 1,651 1,957 1,758 |
+  | C++ → PyPy | +39,3 | 1,321 1,410 1,440 1,400 |
+  | C → C++ | +0,2 | 0,933 1,027 1,028 1,019 |
+  | Lua → C++ | −0,1 | 0,912 1,024 1,029 1,033 |
+  | Python → C++ | +3,8 | 0,922 1,045 1,089 1,096 |
+  | Java → C++ | +5,1 | 0,941 1,066 1,102 1,094 |
+  | JavaScript → C++ | +20,6 | 1,078 1,236 1,264 1,246 |
+  | Julia → C++ | +29,3 | 1,192 1,348 1,346 1,286 |
+
+  O berlin52 dos pares para C++ está puxado para baixo pelas duas execuções
+  lentas do nosso C++ (ver Problemas). No C++ → C# o berlin52 é real: o
+  nosso C# leva 1,46 s no berlin52 (a tradução, 1,29 s); a diferença do
+  tempo fixo entra na B2. Lote interpretado (`b-interp-20261124`) rodando.
 - **B2. Mapa e lista de fatores**, a partir da Tabela de desvios, da
   análise antiga e da leitura do código. **Revisão do autor antes da B3.**
   Pontos de partida:
@@ -249,4 +275,17 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   uma com um `run_*_only.sh`; o `make_variants.py` passou a tratar o
   `run_*.sh` de um patch como o único comando da variante
   (`runtimes_extras=[]`).
-
+- **Nosso C++ lento no berlin52 (2026-11-24).** Na `b-comp-20261124`, duas
+  das 10 execuções do nosso C++ no berlin52 levaram 0,138 e 0,147 s (as
+  outras, 0,093 a 0,094, como em todas as rodadas anteriores): cv de 19%,
+  média 10% acima da mediana, e as razões das seis traduções para C++ no
+  berlin52 caem para 0,91 a 0,94. É a única série com cv acima de 2,4%.
+  Solução: repetir o berlin52 do nosso C++ e das seis traduções para C++ na
+  mesma rodada (`INST=smoke.txt`, `REPS=10`) depois do lote interpretado, e
+  usar essa rodada no berlin52.
+- **Conexão (2026-11-24).** O jump parou de responder ao SSH (aceitava TCP
+  sem mandar o banner) e voltou sozinho. O `~/.ssh/config` local passou a ter
+  `ServerAliveInterval 30` nos dois hosts e `ControlPersist 12h` no q-dual;
+  o acompanhamento das rodadas usa o master aberto. Antes de toda rodada,
+  `git checkout -- c/solve` (o lote compilado recompila o binário
+  versionado e o `run.sh` recusa a rodada seguinte).

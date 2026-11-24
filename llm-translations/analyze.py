@@ -17,13 +17,17 @@ import sys
 from statistics import mean, pstdev
 
 OURS = {"cpp_java": "java", "cpp_julia": "julia", "cpp_swift": "swift", "cpp_go": "go",
-        "cpp_fortran": "fortran", "cpp_javascript": "javascript"}
+        "cpp_fortran": "fortran", "cpp_javascript": "javascript",
+        "cpp_c": "c", "cpp_rust": "rust", "cpp_csharp": "csharp", "cpp_pypy": "pypy",
+        "cpp_python": "python"}
 
 
 def our_lang(variant):
     pair = variant.split(".")[0]
     if pair.startswith("ours_"):
         return pair[len("ours_"):]
+    if pair == "cpp_lua":
+        return variant.split(".")[1]  # cpp_lua.luajit ou cpp_lua.lua
     return OURS.get(pair, "cplusplus")
 
 
