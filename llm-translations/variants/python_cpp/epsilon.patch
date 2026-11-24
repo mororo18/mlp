@@ -1,0 +1,29 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:45:38.138753238 -0300
++++ b/main.cpp	2026-11-24 15:45:38.140898310 -0300
+@@ -7,6 +7,7 @@
+ #include <cstring>
+ #include <ctime>
+ #include <chrono>
++#include <cfloat>
+ #include <iostream>
+ #include <limits>
+ #include <string>
+@@ -51,7 +52,7 @@
+     static const int OR_OPT_3 = 3;
+     static const int TWO_OPT = 4;
+ 
+-    static constexpr double EPSILON = 1e-13;
++    static constexpr double EPSILON = DBL_EPSILON; // ours
+ 
+     std::vector<int> rnd;
+     int rnd_index = 0;
+@@ -160,7 +161,7 @@
+         }
+     }
+ 
+-    solut.cost = solut.seq[0][dimen][C] - tInfo::EPSILON;
++    solut.cost = solut.seq[0][dimen][C];
+ }
+ 
+ void swap(std::vector<int> &s, int i, int j) {

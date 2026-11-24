@@ -1,0 +1,26 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:42:44.668168927 -0300
++++ b/main.cpp	2026-11-24 15:42:44.670147636 -0300
+@@ -12,7 +12,7 @@
+ #include <vector>
+ 
+ struct Info {
+-    std::vector<std::vector<double> > c;
++    double **c; // distance matrix as separately allocated rows (our double**)
+     std::vector<int> rnd;
+     int dimension;
+     int T;
+@@ -488,7 +488,12 @@
+     const std::vector<double> R(R_values, R_values + sizeof(R_values)/sizeof(R_values[0]));
+ 
+     Info info;
+-    info.c = c;
++    info.c = new double *[c.size()];
++    for (size_t i = 0; i < c.size(); i++) {
++        info.c[i] = new double[c.size()];
++        for (size_t j = 0; j < c.size(); j++)
++            info.c[i][j] = c[i][j];
++    }
+     info.rnd = rnd;
+     info.dimension = dimension;
+     info.T = 0;

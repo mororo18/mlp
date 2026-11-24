@@ -1,0 +1,103 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/src/main.rs b/src/main.rs
+--- a/src/main.rs	2026-11-24 15:38:16.674868762 -0300
++++ b/src/main.rs	2026-11-24 15:38:16.677700131 -0300
+@@ -21,8 +21,40 @@
+     }
+ }
+ 
++// Vec indexed without bounds checks, as the get_unchecked of our Rust
++#[derive(Clone)]
++struct UVec<T>(Vec<T>);
++
++impl<T> std::ops::Index<usize> for UVec<T> {
++    type Output = T;
++    #[inline]
++    fn index(&self, i: usize) -> &T {
++        unsafe { self.0.get_unchecked(i) }
++    }
++}
++
++impl<T> std::ops::IndexMut<usize> for UVec<T> {
++    #[inline]
++    fn index_mut(&mut self, i: usize) -> &mut T {
++        unsafe { self.0.get_unchecked_mut(i) }
++    }
++}
++
++impl<T> std::ops::Deref for UVec<T> {
++    type Target = Vec<T>;
++    fn deref(&self) -> &Vec<T> {
++        &self.0
++    }
++}
++
++impl<T> std::ops::DerefMut for UVec<T> {
++    fn deref_mut(&mut self) -> &mut Vec<T> {
++        &mut self.0
++    }
++}
++
+ struct AlgoData {
+-    cost: Vec<Vec<f64>>,
++    cost: UVec<UVec<f64>>,
+     dimen: i32,
+     rnd: Vec<i32>,
+     rnd_index: usize,
+@@ -38,8 +70,8 @@
+ }
+ 
+ struct Solution {
+-    s: Vec<i32>,
+-    seq: Vec<SeqInfo>,
++    s: UVec<i32>,
++    seq: UVec<SeqInfo>,
+     cost: f64,
+ }
+ 
+@@ -50,8 +82,8 @@
+ fn solution_init(data: &AlgoData) -> Solution {
+     let n = (data.dimen + 1) as usize;
+     Solution {
+-        s: vec![0; n],
+-        seq: vec![SeqInfo::default(); n * n],
++        s: UVec(vec![0; n]),
++        seq: UVec(vec![SeqInfo::default(); n * n]),
+         cost: f64::MAX,
+     }
+ }
+@@ -419,7 +451,7 @@
+     }
+ }
+ 
+-fn perturb(solut: &Solution, data: &mut AlgoData) -> Vec<i32> {
++fn perturb(solut: &Solution, data: &mut AlgoData) -> UVec<i32> {
+     let mut s = solut.s.clone();
+     let mut a_start = 1i32;
+     let mut a_end = 1i32;
+@@ -469,7 +501,7 @@
+             println!("\t[+] Constructing..");
+         }
+ 
+-        solut_crnt.s = construct(alpha, data);
++        solut_crnt.s = UVec(construct(alpha, data));
+         update_subseq_info_matrix(&mut solut_crnt, data, 0);
+ 
+         solution_cpy(&solut_crnt, &mut solut_partial);
+@@ -499,7 +531,7 @@
+             println!("\tCurrent best cost: {}", solut_best.cost);
+ 
+             print!("SOLUCAO: ");
+-            for v in &solut_best.s {
++            for v in solut_best.s.iter() {
+                 print!("{} ", v);
+             }
+             println!();
+@@ -524,7 +556,7 @@
+     let (cost, dimen) = load_data(&mut rnd);
+ 
+     let mut data = AlgoData {
+-        cost,
++        cost: UVec(cost.into_iter().map(UVec).collect()),
+         dimen,
+         rnd: rnd.clone(),
+         rnd_index: 0,

@@ -1,0 +1,27 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:42:44.650712138 -0300
++++ b/main.cpp	2026-11-24 15:42:44.652907395 -0300
+@@ -15,9 +15,10 @@
+     std::vector<std::vector<double> > c;
+     std::vector<int> rnd;
+     int dimension;
+-    int T;
+-    int C;
+-    int W;
++    // T, C and W offsets as compile-time constants (ours: struct fields)
++    static constexpr int T = 0;
++    static constexpr int C = 1;
++    static constexpr int W = 2;
+     int rnd_index;
+ };
+ 
+@@ -491,9 +492,6 @@
+     info.c = c;
+     info.rnd = rnd;
+     info.dimension = dimension;
+-    info.T = 0;
+-    info.C = 1;
+-    info.W = 2;
+     info.rnd_index = 0;
+ 
+     double cpuStart = cpu_usage_seconds();

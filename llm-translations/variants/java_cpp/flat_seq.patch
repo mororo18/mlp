@@ -1,0 +1,38 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/tSolution.h b/tSolution.h
+--- a/tSolution.h	2026-11-24 15:44:50.608662105 -0300
++++ b/tSolution.h	2026-11-24 15:44:50.610510577 -0300
+@@ -14,6 +14,8 @@
+ 
+     std::vector<std::vector<std::vector<double>>> seq3d;
+     std::vector<std::vector<double>> seq2d;
++    std::vector<double> seq1d; // all subsequences in one contiguous array (ours)
++    int n1d = 0;
+ 
+     double cost;
+     static constexpr int Z = 3;
+@@ -21,7 +23,7 @@
+ public:
+     tSolution(int dimen, double c) {
+ if (TEST)
+-        seq2d.assign(dimen+1, std::vector<double>((dimen+1)*Z, 0.0));
++        { n1d = dimen+1; seq1d.assign((size_t)n1d*n1d*Z, 0.0); }
+ else
+         seq3d.assign(dimen+1, std::vector<std::vector<double>>(dimen+1, std::vector<double>(Z, 0.0)));
+         cost = c;
+@@ -31,14 +33,14 @@
+ 
+     double getSeq(int i, int j, int k) {
+ if (TEST)
+-        return seq2d[i][j*Z + k];
++        return seq1d[(i*n1d + j)*Z + k];
+ else
+         return seq3d[i][j][k];
+     }
+ 
+     void setSeq(int i, int j, int k, double value) {
+ if (TEST)
+-        seq2d[i][j*Z + k] = value;
++        seq1d[(i*n1d + j)*Z + k] = value;
+ else
+         seq3d[i][j][k] = value;
+     }

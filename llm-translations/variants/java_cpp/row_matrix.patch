@@ -1,0 +1,34 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/tInfo.h b/tInfo.h
+--- a/tInfo.h	2026-11-24 15:44:50.625959981 -0300
++++ b/tInfo.h	2026-11-24 15:44:50.627890763 -0300
+@@ -1,6 +1,7 @@
+ #ifndef TINFO_H
+ #define TINFO_H
+ 
++#include <cstddef>
+ #include <vector>
+ 
+ class tInfo {
+@@ -9,7 +10,7 @@
+     int                 rnd_index;
+ 
+     int                 dimension;
+-    std::vector<std::vector<double>> c;
++    double **c; // distance matrix as separately allocated rows (our double**)
+ 
+ public:
+     static constexpr double EPSILON = 1e-16;
+@@ -27,7 +28,12 @@
+     tInfo(int dimen, const std::vector<std::vector<double>> & cost, const std::vector<int> & rnd_arr) {
+         rnd = rnd_arr;
+         dimension = dimen;
+-        c = cost;
++        c = new double *[cost.size()];
++        for (std::size_t i = 0; i < cost.size(); i++) {
++            c[i] = new double[cost[i].size()];
++            for (std::size_t j = 0; j < cost[i].size(); j++)
++                c[i][j] = cost[i][j];
++        }
+         rnd_index = 0;
+     }
+ 

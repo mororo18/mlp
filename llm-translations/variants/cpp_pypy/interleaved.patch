@@ -1,0 +1,214 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/mlp_solver.py b/mlp_solver.py
+--- a/mlp_solver.py	2026-11-24 15:41:29.485017405 -0300
++++ b/mlp_solver.py	2026-11-24 15:41:29.486622818 -0300
+@@ -24,7 +24,7 @@
+ 
+ 
+ class Solution:
+-    __slots__ = ("s", "seqT", "seqC", "seqW", "cost")
++    __slots__ = ("s", "seq", "cost")
+ 
+ 
+ def R_table(i):
+@@ -84,9 +84,7 @@
+     solut = Solution()
+     solut.s = [0] * (data.dimen + 1)
+     n = (data.dimen + 1) * (data.dimen + 1)
+-    solut.seqT = [0.0] * n
+-    solut.seqC = [0.0] * n
+-    solut.seqW = [0.0] * n
++    solut.seq = [0.0] * (3 * n)
+     solut.cost = DBL_MAX
+     return solut
+ 
+@@ -154,9 +152,7 @@
+     stride = dimen + 1
+     cost = data.cost
+     s = solut.s
+-    seqT = solut.seqT
+-    seqC = solut.seqC
+-    seqW = solut.seqW
++    seq = solut.seq
+ 
+     from_ = index
+     for i in range(dimen + 1):
+@@ -164,9 +160,9 @@
+         t = (i == from_)
+ 
+         idx_ii = i * stride + i
+-        seqT[idx_ii] = 0.0
+-        seqC[idx_ii] = 0.0
+-        seqW[idx_ii] = 0.0 if i == 0 else 1.0
++        seq[3 * (idx_ii)] = 0.0
++        seq[3 * (idx_ii) + 1] = 0.0
++        seq[3 * (idx_ii) + 2] = 0.0 if i == 0 else 1.0
+ 
+         base = i * stride
+         for j in range(i + 1, dimen + 1):
+@@ -174,14 +170,14 @@
+             idx_ij = base + j
+             idx_ijprev = base + j_prev
+ 
+-            seqT[idx_ij] = cost[s[j_prev]][s[j]] + seqT[idx_ijprev]
+-            seqC[idx_ij] = seqT[idx_ij] + seqC[idx_ijprev]
+-            seqW[idx_ij] = j + k
++            seq[3 * (idx_ij)] = cost[s[j_prev]][s[j]] + seq[3 * (idx_ijprev)]
++            seq[3 * (idx_ij) + 1] = seq[3 * (idx_ij)] + seq[3 * (idx_ijprev) + 1]
++            seq[3 * (idx_ij) + 2] = j + k
+ 
+         if t:
+             from_ += 1
+ 
+-    solut.cost = seqC[dimen]
++    solut.cost = seq[3 * (dimen) + 1]
+ 
+ 
+ def search_swap(solut, data):
+@@ -189,9 +185,7 @@
+     stride = dimen + 1
+     cost = data.cost
+     s = solut.s
+-    seqT = solut.seqT
+-    seqC = solut.seqC
+-    seqW = solut.seqW
++    seq = solut.seq
+ 
+     cost_best = DBL_MAX
+     I = J = -1
+@@ -204,12 +198,12 @@
+         idx_i_inext = i * stride + i_next
+         idx_inextp1_dimen = (i_next + 1) * stride + dimen
+ 
+-        cost_concat_1 = seqT[idx_0_iprev] + cost[s[i_prev]][s[i_next]]
+-        cost_concat_2 = cost_concat_1 + seqT[idx_i_inext] + cost[s[i]][s[i_next + 1]]
++        cost_concat_1 = seq[3 * (idx_0_iprev)] + cost[s[i_prev]][s[i_next]]
++        cost_concat_2 = cost_concat_1 + seq[3 * (idx_i_inext)] + cost[s[i]][s[i_next + 1]]
+ 
+-        cost_new = (seqC[idx_0_iprev]
+-                    + seqW[idx_i_inext] * cost_concat_1 + cost[s[i_next]][s[i]]
+-                    + seqW[idx_inextp1_dimen] * cost_concat_2 + seqC[idx_inextp1_dimen])
++        cost_new = (seq[3 * (idx_0_iprev) + 1]
++                    + seq[3 * (idx_i_inext) + 2] * cost_concat_1 + cost[s[i_next]][s[i]]
++                    + seq[3 * (idx_inextp1_dimen) + 2] * cost_concat_2 + seq[3 * (idx_inextp1_dimen) + 1])
+ 
+         if cost_new < cost_best:
+             cost_best = cost_new - EPS
+@@ -223,16 +217,16 @@
+             idx_inext_jprev = i_next * stride + j_prev
+             idx_jnext_dimen = j_next * stride + dimen
+ 
+-            cost_concat_1 = seqT[idx_0_iprev] + cost[s[i_prev]][s[j]]
++            cost_concat_1 = seq[3 * (idx_0_iprev)] + cost[s[i_prev]][s[j]]
+             cost_concat_2 = cost_concat_1 + cost[s[j]][s[i_next]]
+-            cost_concat_3 = cost_concat_2 + seqT[idx_inext_jprev] + cost[s[j_prev]][s[i]]
++            cost_concat_3 = cost_concat_2 + seq[3 * (idx_inext_jprev)] + cost[s[j_prev]][s[i]]
+             cost_concat_4 = cost_concat_3 + cost[s[i]][s[j_next]]
+ 
+-            cost_new = (seqC[idx_0_iprev]
++            cost_new = (seq[3 * (idx_0_iprev) + 1]
+                         + cost_concat_1
+-                        + seqW[idx_inext_jprev] * cost_concat_2 + seqC[idx_inext_jprev]
++                        + seq[3 * (idx_inext_jprev) + 2] * cost_concat_2 + seq[3 * (idx_inext_jprev) + 1]
+                         + cost_concat_3
+-                        + seqW[idx_jnext_dimen] * cost_concat_4 + seqC[idx_jnext_dimen])
++                        + seq[3 * (idx_jnext_dimen) + 2] * cost_concat_4 + seq[3 * (idx_jnext_dimen) + 1])
+ 
+             if cost_new < cost_best:
+                 cost_best = cost_new - EPS
+@@ -252,9 +246,7 @@
+     stride = dimen + 1
+     cost = data.cost
+     s = solut.s
+-    seqT = solut.seqT
+-    seqC = solut.seqC
+-    seqW = solut.seqW
++    seq = solut.seq
+ 
+     cost_best = DBL_MAX
+     I = J = -1
+@@ -263,21 +255,21 @@
+         i_prev = i - 1
+         idx_0_iprev = i_prev
+ 
+-        rev_seq_cost = seqT[i * stride + i + 1]
++        rev_seq_cost = seq[3 * (i * stride + i + 1)]
+         for j in range(i + 2, dimen):
+             j_next = j + 1
+             idx_i_j = i * stride + j
+ 
+-            rev_seq_cost += cost[s[j - 1]][s[j]] * (seqW[idx_i_j] - 1.0)
++            rev_seq_cost += cost[s[j - 1]][s[j]] * (seq[3 * (idx_i_j) + 2] - 1.0)
+ 
+             idx_jnext_dimen = j_next * stride + dimen
+ 
+-            cost_concat_1 = seqT[idx_0_iprev] + cost[s[j]][s[i_prev]]
+-            cost_concat_2 = cost_concat_1 + seqT[idx_i_j] + cost[s[j_next]][s[i]]
++            cost_concat_1 = seq[3 * (idx_0_iprev)] + cost[s[j]][s[i_prev]]
++            cost_concat_2 = cost_concat_1 + seq[3 * (idx_i_j)] + cost[s[j_next]][s[i]]
+ 
+-            cost_new = (seqC[idx_0_iprev]
+-                        + seqW[idx_i_j] * cost_concat_1 + rev_seq_cost
+-                        + seqW[idx_jnext_dimen] * cost_concat_2 + seqC[idx_jnext_dimen])
++            cost_new = (seq[3 * (idx_0_iprev) + 1]
++                        + seq[3 * (idx_i_j) + 2] * cost_concat_1 + rev_seq_cost
++                        + seq[3 * (idx_jnext_dimen) + 2] * cost_concat_2 + seq[3 * (idx_jnext_dimen) + 1])
+ 
+             if cost_new < cost_best:
+                 cost_best = cost_new - EPS
+@@ -297,9 +289,7 @@
+     stride = dimen + 1
+     cost = data.cost
+     s = solut.s
+-    seqT = solut.seqT
+-    seqC = solut.seqC
+-    seqW = solut.seqW
++    seq = solut.seq
+ 
+     cost_best = DBL_MAX
+     I = J = POS = -1
+@@ -319,14 +309,14 @@
+             idx_knext_iprev = k_next * stride + i_prev
+             idx_jnext_dimen = j_next * stride + dimen
+ 
+-            cost_concat_1 = seqT[idx_0_k] + cost[s[k]][s[i]]
+-            cost_concat_2 = cost_concat_1 + seqT[idx_i_j] + cost[s[j]][s[k_next]]
+-            cost_concat_3 = cost_concat_2 + seqT[idx_knext_iprev] + cost[s[i_prev]][s[j_next]]
+-
+-            cost_new = (seqC[idx_0_k]
+-                        + seqW[idx_i_j] * cost_concat_1 + seqC[idx_i_j]
+-                        + seqW[idx_knext_iprev] * cost_concat_2 + seqC[idx_knext_iprev]
+-                        + seqW[idx_jnext_dimen] * cost_concat_3 + seqC[idx_jnext_dimen])
++            cost_concat_1 = seq[3 * (idx_0_k)] + cost[s[k]][s[i]]
++            cost_concat_2 = cost_concat_1 + seq[3 * (idx_i_j)] + cost[s[j]][s[k_next]]
++            cost_concat_3 = cost_concat_2 + seq[3 * (idx_knext_iprev)] + cost[s[i_prev]][s[j_next]]
++
++            cost_new = (seq[3 * (idx_0_k) + 1]
++                        + seq[3 * (idx_i_j) + 2] * cost_concat_1 + seq[3 * (idx_i_j) + 1]
++                        + seq[3 * (idx_knext_iprev) + 2] * cost_concat_2 + seq[3 * (idx_knext_iprev) + 1]
++                        + seq[3 * (idx_jnext_dimen) + 2] * cost_concat_3 + seq[3 * (idx_jnext_dimen) + 1])
+ 
+             if cost_new < cost_best:
+                 cost_best = cost_new - EPS
+@@ -341,14 +331,14 @@
+             idx_jnext_k = j_next * stride + k
+             idx_knext_dimen = k_next * stride + dimen
+ 
+-            cost_concat_1 = seqT[idx_0_iprev] + cost[s[i_prev]][s[j_next]]
+-            cost_concat_2 = cost_concat_1 + seqT[idx_jnext_k] + cost[s[k]][s[i]]
+-            cost_concat_3 = cost_concat_2 + seqT[idx_i_j] + cost[s[j]][s[k_next]]
+-
+-            cost_new = (seqC[idx_0_iprev]
+-                        + seqW[idx_jnext_k] * cost_concat_1 + seqC[idx_jnext_k]
+-                        + seqW[idx_i_j] * cost_concat_2 + seqC[idx_i_j]
+-                        + seqW[idx_knext_dimen] * cost_concat_3 + seqC[idx_knext_dimen])
++            cost_concat_1 = seq[3 * (idx_0_iprev)] + cost[s[i_prev]][s[j_next]]
++            cost_concat_2 = cost_concat_1 + seq[3 * (idx_jnext_k)] + cost[s[k]][s[i]]
++            cost_concat_3 = cost_concat_2 + seq[3 * (idx_i_j)] + cost[s[j]][s[k_next]]
++
++            cost_new = (seq[3 * (idx_0_iprev) + 1]
++                        + seq[3 * (idx_jnext_k) + 2] * cost_concat_1 + seq[3 * (idx_jnext_k) + 1]
++                        + seq[3 * (idx_i_j) + 2] * cost_concat_2 + seq[3 * (idx_i_j) + 1]
++                        + seq[3 * (idx_knext_dimen) + 2] * cost_concat_3 + seq[3 * (idx_knext_dimen) + 1])
+ 
+             if cost_new < cost_best:
+                 cost_best = cost_new - EPS

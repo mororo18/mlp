@@ -1,0 +1,64 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:45:38.173019025 -0300
++++ b/main.cpp	2026-11-24 15:45:38.174774330 -0300
+@@ -39,7 +39,7 @@
+ public:
+     int IT = 0;
+     int dimen;
+-    Matrix cost;
++    double **cost; // separately allocated rows (our double**)
+ 
+     static const int T = 0;
+     static const int C = 1;
+@@ -57,7 +57,14 @@
+     int rnd_index = 0;
+ 
+     tInfo(int dimension, const Matrix &cost, const std::vector<int> &rnd)
+-        : dimen(dimension), cost(cost), rnd(rnd) {}
++        : dimen(dimension), rnd(rnd) {
++        this->cost = new double *[cost.size()];
++        for (size_t i = 0; i < cost.size(); i++) {
++            this->cost[i] = new double[cost[i].size()];
++            for (size_t j = 0; j < cost[i].size(); j++)
++                this->cost[i][j] = cost[i][j];
++        }
++    }
+ };
+ 
+ class tSolution {
+@@ -142,7 +149,7 @@
+     const int C = tInfo::C;
+     const int W = tInfo::W;
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+ 
+     for (int i = 0; i < dimen + 1; i++) {
+         int k = 1 - i - (int)(!i);
+@@ -194,7 +201,7 @@
+     int J = -1;
+ 
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+     const std::vector<int> &s = solut.s;
+     const tSeq &seq = solut.seq;
+ 
+@@ -260,7 +267,7 @@
+     int J = -1;
+ 
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+     const std::vector<int> &s = solut.s;
+     const tSeq &seq = solut.seq;
+ 
+@@ -314,7 +321,7 @@
+     const int MAX = info.dimen - opt;
+ 
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+     const std::vector<int> &s = solut.s;
+     const int T = tInfo::T;
+     const int C = tInfo::C;

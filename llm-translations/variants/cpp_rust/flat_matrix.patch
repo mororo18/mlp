@@ -1,0 +1,131 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/src/main.rs b/src/main.rs
+--- a/src/main.rs	2026-11-24 15:38:16.699472825 -0300
++++ b/src/main.rs	2026-11-24 15:38:16.702777560 -0300
+@@ -22,7 +22,8 @@
+ }
+ 
+ struct AlgoData {
+-    cost: Vec<Vec<f64>>,
++    cost: Vec<f64>,
++    cost_n: usize,
+     dimen: i32,
+     rnd: Vec<i32>,
+     rnd_index: usize,
+@@ -81,7 +82,7 @@
+     let pivot = arr[right as usize];
+     let mut i = left - 1;
+     for j in left..right {
+-        if data.cost[r as usize][arr[j as usize] as usize] < data.cost[r as usize][pivot as usize]
++        if data.cost[(r as usize) * data.cost_n + (arr[j as usize] as usize)] < data.cost[(r as usize) * data.cost_n + (pivot as usize)]
+         {
+             i += 1;
+             arr.swap(i as usize, j as usize);
+@@ -168,7 +169,7 @@
+             let idx_ij = to_1d(i, j, dimen);
+             let idx_ijprev = to_1d(i, j_prev, dimen);
+ 
+-            let t_val = data.cost[solut.s[j_prev as usize] as usize][solut.s[j as usize] as usize]
++            let t_val = data.cost[(solut.s[j_prev as usize] as usize) * data.cost_n + (solut.s[j as usize] as usize)]
+                 + solut.seq[idx_ijprev].t;
+             solut.seq[idx_ij].t = t_val;
+             solut.seq[idx_ij].c = t_val + solut.seq[idx_ijprev].c;
+@@ -192,14 +193,14 @@
+         let i_next = i + 1;
+ 
+         let cost_concat_1 = solut.seq[to_1d(0, i_prev, dimen)].t
+-            + data.cost[solut.s[i_prev as usize] as usize][solut.s[i_next as usize] as usize];
++            + data.cost[(solut.s[i_prev as usize] as usize) * data.cost_n + (solut.s[i_next as usize] as usize)];
+         let cost_concat_2 = cost_concat_1
+             + solut.seq[to_1d(i, i_next, dimen)].t
+-            + data.cost[solut.s[i as usize] as usize][solut.s[(i_next + 1) as usize] as usize];
++            + data.cost[(solut.s[i as usize] as usize) * data.cost_n + (solut.s[(i_next + 1) as usize] as usize)];
+ 
+         let mut cost_new = solut.seq[to_1d(0, i_prev, dimen)].c
+             + solut.seq[to_1d(i, i_next, dimen)].w * cost_concat_1
+-            + data.cost[solut.s[i_next as usize] as usize][solut.s[i as usize] as usize]
++            + data.cost[(solut.s[i_next as usize] as usize) * data.cost_n + (solut.s[i as usize] as usize)]
+             + solut.seq[to_1d(i_next + 1, dimen, dimen)].w * cost_concat_2
+             + solut.seq[to_1d(i_next + 1, dimen, dimen)].c;
+ 
+@@ -214,14 +215,14 @@
+             let j_prev = j - 1;
+ 
+             let cc1 = solut.seq[to_1d(0, i_prev, dimen)].t
+-                + data.cost[solut.s[i_prev as usize] as usize][solut.s[j as usize] as usize];
++                + data.cost[(solut.s[i_prev as usize] as usize) * data.cost_n + (solut.s[j as usize] as usize)];
+             let cc2 =
+-                cc1 + data.cost[solut.s[j as usize] as usize][solut.s[i_next as usize] as usize];
++                cc1 + data.cost[(solut.s[j as usize] as usize) * data.cost_n + (solut.s[i_next as usize] as usize)];
+             let cc3 = cc2
+                 + solut.seq[to_1d(i_next, j_prev, dimen)].t
+-                + data.cost[solut.s[j_prev as usize] as usize][solut.s[i as usize] as usize];
++                + data.cost[(solut.s[j_prev as usize] as usize) * data.cost_n + (solut.s[i as usize] as usize)];
+             let cc4 =
+-                cc3 + data.cost[solut.s[i as usize] as usize][solut.s[j_next as usize] as usize];
++                cc3 + data.cost[(solut.s[i as usize] as usize) * data.cost_n + (solut.s[j_next as usize] as usize)];
+ 
+             cost_new = solut.seq[to_1d(0, i_prev, dimen)].c
+                 + cc1
+@@ -261,15 +262,14 @@
+         for j in (i + 2)..dimen {
+             let j_next = j + 1;
+ 
+-            rev_seq_cost += data.cost[solut.s[(j - 1) as usize] as usize]
+-                [solut.s[j as usize] as usize]
++            rev_seq_cost += data.cost[(solut.s[(j - 1) as usize] as usize) * data.cost_n + (solut.s[j as usize] as usize)]
+                 * (solut.seq[to_1d(i, j, dimen)].w - 1.0);
+ 
+             let cc1 = solut.seq[to_1d(0, i_prev, dimen)].t
+-                + data.cost[solut.s[j as usize] as usize][solut.s[i_prev as usize] as usize];
++                + data.cost[(solut.s[j as usize] as usize) * data.cost_n + (solut.s[i_prev as usize] as usize)];
+             let cc2 = cc1
+                 + solut.seq[to_1d(i, j, dimen)].t
+-                + data.cost[solut.s[j_next as usize] as usize][solut.s[i as usize] as usize];
++                + data.cost[(solut.s[j_next as usize] as usize) * data.cost_n + (solut.s[i as usize] as usize)];
+ 
+             let cost_new = solut.seq[to_1d(0, i_prev, dimen)].c
+                 + solut.seq[to_1d(i, j, dimen)].w * cc1
+@@ -312,13 +312,13 @@
+             let k_next = k + 1;
+ 
+             let cc1 = solut.seq[to_1d(0, k, dimen)].t
+-                + data.cost[solut.s[k as usize] as usize][solut.s[i as usize] as usize];
++                + data.cost[(solut.s[k as usize] as usize) * data.cost_n + (solut.s[i as usize] as usize)];
+             let cc2 = cc1
+                 + solut.seq[to_1d(i, j, dimen)].t
+-                + data.cost[solut.s[j as usize] as usize][solut.s[k_next as usize] as usize];
++                + data.cost[(solut.s[j as usize] as usize) * data.cost_n + (solut.s[k_next as usize] as usize)];
+             let cc3 = cc2
+                 + solut.seq[to_1d(k_next, i_prev, dimen)].t
+-                + data.cost[solut.s[i_prev as usize] as usize][solut.s[j_next as usize] as usize];
++                + data.cost[(solut.s[i_prev as usize] as usize) * data.cost_n + (solut.s[j_next as usize] as usize)];
+ 
+             let cost_new = solut.seq[to_1d(0, k, dimen)].c
+                 + solut.seq[to_1d(i, j, dimen)].w * cc1
+@@ -342,13 +342,13 @@
+             let k_next = k + 1;
+ 
+             let cc1 = solut.seq[to_1d(0, i_prev, dimen)].t
+-                + data.cost[solut.s[i_prev as usize] as usize][solut.s[j_next as usize] as usize];
++                + data.cost[(solut.s[i_prev as usize] as usize) * data.cost_n + (solut.s[j_next as usize] as usize)];
+             let cc2 = cc1
+                 + solut.seq[to_1d(j_next, k, dimen)].t
+-                + data.cost[solut.s[k as usize] as usize][solut.s[i as usize] as usize];
++                + data.cost[(solut.s[k as usize] as usize) * data.cost_n + (solut.s[i as usize] as usize)];
+             let cc3 = cc2
+                 + solut.seq[to_1d(i, j, dimen)].t
+-                + data.cost[solut.s[j as usize] as usize][solut.s[k_next as usize] as usize];
++                + data.cost[(solut.s[j as usize] as usize) * data.cost_n + (solut.s[k_next as usize] as usize)];
+ 
+             let cost_new = solut.seq[to_1d(0, i_prev, dimen)].c
+                 + solut.seq[to_1d(j_next, k, dimen)].w * cc1
+@@ -524,7 +524,8 @@
+     let (cost, dimen) = load_data(&mut rnd);
+ 
+     let mut data = AlgoData {
+-        cost,
++        cost_n: cost.len(),
++        cost: cost.concat(),
+         dimen,
+         rnd: rnd.clone(),
+         rnd_index: 0,

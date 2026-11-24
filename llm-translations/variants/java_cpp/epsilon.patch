@@ -1,0 +1,20 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/tInfo.h b/tInfo.h
+--- a/tInfo.h	2026-11-24 15:44:50.591211345 -0300
++++ b/tInfo.h	2026-11-24 15:44:50.593023882 -0300
+@@ -1,6 +1,7 @@
+ #ifndef TINFO_H
+ #define TINFO_H
+ 
++#include <cfloat>
+ #include <vector>
+ 
+ class tInfo {
+@@ -12,7 +13,7 @@
+     std::vector<std::vector<double>> c;
+ 
+ public:
+-    static constexpr double EPSILON = 1e-16;
++    static constexpr double EPSILON = DBL_EPSILON; // ours
+ 
+     static constexpr int T = 0;
+     static constexpr int C = 1;

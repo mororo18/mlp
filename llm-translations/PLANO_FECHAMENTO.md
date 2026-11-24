@@ -188,8 +188,34 @@ Fases como no `PLANO.md`:
   | JavaScript → C++ | deslocamentos de T, C e W lidos de campos (+25 → +1), matriz aninhada |
   | Julia → C++ | deslocamentos de T, C e W lidos de campos (+27 → +2), matriz plana (coluna) |
 
+  **Leitura do código (2026-11-24), contra as nossas atuais.** Flags de
+  compilação iguais nos dois lados (o harness impõe as do nosso `build.sh`).
+  Gap de base da B1 entre parênteses.
+
+  | Par | Tradução | Nossa | Fatores a medir (B3) |
+  |---|---|---|---|
+  | C++ → C (+0,7) | — | — | nenhum: fechado sem mudança |
+  | C++ → Rust (+69,5) | `seq` plano com índice verificado; matriz `Vec<Vec<f64>>`; índices `i32` convertidos com `as usize` | `get_unchecked` nas duas matrizes, ambas planas (`--features flat`); `usize` | R1 verificação de limites; R2 matriz aninhada; R3 tipo do índice; combinação |
+  | C++ → C# (+8,5; +15,2 sem berlin52) | `seq` plano de `struct` com índice verificado; matriz `double[][]` | `seq` por ponteiro fixado (`GCHandle`), sem verificação; matriz plana | S1 verificação de limites no `seq`; S2 matriz irregular; combinação. Berlin52: a tradução ganha (0,883); o nosso C# tem 1,46 s no berlin52 (aquecimento do JIT em camadas?), olhar à parte |
+  | C++ → LuaJIT (+73,4) | uma tabela `{T, C, W}` por par (i, j); `to_1D` como função; `solut.seq`, `data.cost`, `solut.s` relidos a cada acesso | array `double[]` da FFI, índice em linha, campos em locais | L1 armazenamento das subsequências; L2 chamada do `to_1D`; L3 campos relidos; combinação |
+  | C++ → PyPy (+39,3) | três listas (T, C, W); `seqW[idx] = j + k` inteiro numa lista de floats | uma lista intercalada; `float(j + k)` | P1 tipo dos elementos (`float(j + k)`); P2 layout (as três listas devem ajudar a tradução; com o nosso layout a análise antiga dava +35) |
+  | C → C++ (+0,2; ≈+2,6) | `vector<tSeq>` plano; matriz `vector<vector<double>>`; índice `int` | ponteiro `tSeqInfo*`; `double**`; `to_1D` devolve `unsigned` | depende da repetição do berlin52; se ficar fora de ±2%: tipo do índice e matriz |
+  | Lua → C++ (−0,1; ≈+2,3) | `seq` plano base 1 (`vector<double>`, intercalado); matriz aninhada | idem C → C++ | idem C → C++ |
+  | Python → C++ (+3,8; ≈+6,2) | `vector<vector<array<double,3>>>` (um `vector` por linha); matriz aninhada | `seq` plano | Y1 armazenamento das subsequências; Y2 matriz aninhada |
+  | Java → C++ (+5,1; ≈+7,5) | `seq2d`: um `vector<double>` por linha (`TEST = true`); matriz `vector<vector<double>>`; `tArray` para a solução | `seq` plano | V1 armazenamento das subsequências; V2 matriz aninhada; V3 `tArray` |
+  | JavaScript → C++ (+20,6; ≈+23,4) | `seq` plano com deslocamentos `info.T/C/W` lidos de campos; matriz aninhada | deslocamentos constantes (campos da `struct`) | J1 deslocamentos constantes; J2 matriz aninhada |
+  | Julia → C++ (+29,3; ≈+32,4) | `seq` plano (i, j, t) com deslocamentos `data.T/C/W` lidos de campos; solução base 1 (`S(i)` = `s[i - 1]`); matriz plana com `dimen + 1` por linha via método | deslocamentos constantes; base 0 | U1 deslocamentos constantes; U2 índice base 1; combinação |
+
 - **B3. Variantes:** um patch por fator, a combinação, custo conferido no
   berlin52 antes de subir.
+  Feita (2026-11-24): 29 variantes no manifesto (25 compiladas/LuaJIT/PyPy e
+  4 do Lua interpretado), todas com 143721 no berlin52 pelo harness local.
+  Ficaram de fora, por ora, R3 (índice `i32` no Rust), U2 (base 1 no Julia
+  → C++) e V3 (`tArray` no Java → C++): entram se a combinação deixar
+  resíduo. Na leitura apareceu um fator novo nos pares Java → C++ e Python →
+  C++: o ε (`1e-16` e `1e-13` contra o `DBL_EPSILON` do nosso C++; no Python
+  → C++ o custo da solução também desconta o ε), como no Fortran → C++ e no
+  Go → C++ (V0 e Y0).
 - **B4. Rodadas:**
   - Lote B-comp (4 instâncias): C++ → C, Rust, C#, LuaJIT, PyPy; C, Lua,
     Python, Java, JavaScript, Julia → C++. Uns 11 pares x 4 a 6 programas.

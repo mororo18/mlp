@@ -1,0 +1,153 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.lua b/main.lua
+--- a/main.lua	2026-11-24 15:40:50.439350414 -0300
++++ b/main.lua	2026-11-24 15:40:50.441185173 -0300
+@@ -2,7 +2,7 @@
+ -- Translated from main.cpp
+ --
+ -- The C++ code indexes cities and solution positions from 0, and its
+--- tSeqInfo array is a flat array addressed via to_1D(i,j,size). This
++-- tSeqInfo array is a flat array addressed via ((i) * (size + 1) + (j)). This
+ -- translation keeps that same 0-based indexing scheme in Lua tables
+ -- (rather than shifting everything to 1-based) so the algorithm's logic
+ -- maps back to the original as directly as possible.
+@@ -159,15 +159,15 @@
+         local k = 1 - i - ((i == 0) and 1 or 0)
+         local t = (i == from)
+ 
+-        local ii = to_1D(i, i, dimen)
++        local ii = ((i) * (dimen + 1) + (i))
+         solut.seq[ii].T = 0.0
+         solut.seq[ii].C = 0.0
+         solut.seq[ii].W = (i == 0) and 0.0 or 1.0
+ 
+         for j = i + 1, dimen do
+             local j_prev = j - 1
+-            local idx = to_1D(i, j, dimen)
+-            local idx_prev = to_1D(i, j_prev, dimen)
++            local idx = ((i) * (dimen + 1) + (j))
++            local idx_prev = ((i) * (dimen + 1) + (j_prev))
+             solut.seq[idx].T = data.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[idx_prev].T
+             solut.seq[idx].C = solut.seq[idx].T + solut.seq[idx_prev].C
+             solut.seq[idx].W = j + k
+@@ -176,7 +176,7 @@
+         if t then from = from + 1 end
+     end
+ 
+-    solut.cost = solut.seq[to_1D(0, dimen, dimen)].C
++    solut.cost = solut.seq[((0) * (dimen + 1) + (dimen))].C
+ end
+ 
+ local function search_swap(solut, data)
+@@ -188,12 +188,12 @@
+         local i_prev = i - 1
+         local i_next = i + 1
+ 
+-        local cost_concat_1 = solut.seq[to_1D(0, i_prev, dimen)].T + data.cost[solut.s[i_prev]][solut.s[i_next]]
+-        local cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, i_next, dimen)].T + data.cost[solut.s[i]][solut.s[i_next + 1]]
++        local cost_concat_1 = solut.seq[((0) * (dimen + 1) + (i_prev))].T + data.cost[solut.s[i_prev]][solut.s[i_next]]
++        local cost_concat_2 = cost_concat_1 + solut.seq[((i) * (dimen + 1) + (i_next))].T + data.cost[solut.s[i]][solut.s[i_next + 1]]
+ 
+-        local cost_new = solut.seq[to_1D(0, i_prev, dimen)].C
+-            + solut.seq[to_1D(i, i_next, dimen)].W * cost_concat_1 + data.cost[solut.s[i_next]][solut.s[i]]
+-            + solut.seq[to_1D(i_next + 1, dimen, dimen)].W * cost_concat_2 + solut.seq[to_1D(i_next + 1, dimen, dimen)].C
++        local cost_new = solut.seq[((0) * (dimen + 1) + (i_prev))].C
++            + solut.seq[((i) * (dimen + 1) + (i_next))].W * cost_concat_1 + data.cost[solut.s[i_next]][solut.s[i]]
++            + solut.seq[((i_next + 1) * (dimen + 1) + (dimen))].W * cost_concat_2 + solut.seq[((i_next + 1) * (dimen + 1) + (dimen))].C
+ 
+         if cost_new < cost_best then
+             cost_best = cost_new - EPS
+@@ -205,16 +205,16 @@
+             local j_next = j + 1
+             local j_prev = j - 1
+ 
+-            cost_concat_1 = solut.seq[to_1D(0, i_prev, dimen)].T + data.cost[solut.s[i_prev]][solut.s[j]]
++            cost_concat_1 = solut.seq[((0) * (dimen + 1) + (i_prev))].T + data.cost[solut.s[i_prev]][solut.s[j]]
+             cost_concat_2 = cost_concat_1 + data.cost[solut.s[j]][solut.s[i_next]]
+-            local cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i_next, j_prev, dimen)].T + data.cost[solut.s[j_prev]][solut.s[i]]
++            local cost_concat_3 = cost_concat_2 + solut.seq[((i_next) * (dimen + 1) + (j_prev))].T + data.cost[solut.s[j_prev]][solut.s[i]]
+             local cost_concat_4 = cost_concat_3 + data.cost[solut.s[i]][solut.s[j_next]]
+ 
+-            cost_new = solut.seq[to_1D(0, i_prev, dimen)].C
++            cost_new = solut.seq[((0) * (dimen + 1) + (i_prev))].C
+                 + cost_concat_1
+-                + solut.seq[to_1D(i_next, j_prev, dimen)].W * cost_concat_2 + solut.seq[to_1D(i_next, j_prev, dimen)].C
++                + solut.seq[((i_next) * (dimen + 1) + (j_prev))].W * cost_concat_2 + solut.seq[((i_next) * (dimen + 1) + (j_prev))].C
+                 + cost_concat_3
+-                + solut.seq[to_1D(j_next, dimen, dimen)].W * cost_concat_4 + solut.seq[to_1D(j_next, dimen, dimen)].C
++                + solut.seq[((j_next) * (dimen + 1) + (dimen))].W * cost_concat_4 + solut.seq[((j_next) * (dimen + 1) + (dimen))].C
+ 
+             if cost_new < cost_best then
+                 cost_best = cost_new - EPS
+@@ -240,19 +240,19 @@
+ 
+     for i = 1, dimen - 2 do
+         local i_prev = i - 1
+-        local rev_seq_cost = solut.seq[to_1D(i, i + 1, dimen)].T
++        local rev_seq_cost = solut.seq[((i) * (dimen + 1) + (i + 1))].T
+ 
+         for j = i + 2, dimen - 1 do
+             local j_next = j + 1
+ 
+-            rev_seq_cost = rev_seq_cost + data.cost[solut.s[j - 1]][solut.s[j]] * (solut.seq[to_1D(i, j, dimen)].W - 1.0)
++            rev_seq_cost = rev_seq_cost + data.cost[solut.s[j - 1]][solut.s[j]] * (solut.seq[((i) * (dimen + 1) + (j))].W - 1.0)
+ 
+-            local cost_concat_1 = solut.seq[to_1D(0, i_prev, dimen)].T + data.cost[solut.s[j]][solut.s[i_prev]]
+-            local cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, j, dimen)].T + data.cost[solut.s[j_next]][solut.s[i]]
++            local cost_concat_1 = solut.seq[((0) * (dimen + 1) + (i_prev))].T + data.cost[solut.s[j]][solut.s[i_prev]]
++            local cost_concat_2 = cost_concat_1 + solut.seq[((i) * (dimen + 1) + (j))].T + data.cost[solut.s[j_next]][solut.s[i]]
+ 
+-            local cost_new = solut.seq[to_1D(0, i_prev, dimen)].C
+-                + solut.seq[to_1D(i, j, dimen)].W * cost_concat_1 + rev_seq_cost
+-                + solut.seq[to_1D(j_next, dimen, dimen)].W * cost_concat_2 + solut.seq[to_1D(j_next, dimen, dimen)].C
++            local cost_new = solut.seq[((0) * (dimen + 1) + (i_prev))].C
++                + solut.seq[((i) * (dimen + 1) + (j))].W * cost_concat_1 + rev_seq_cost
++                + solut.seq[((j_next) * (dimen + 1) + (dimen))].W * cost_concat_2 + solut.seq[((j_next) * (dimen + 1) + (dimen))].C
+ 
+             if cost_new < cost_best then
+                 cost_best = cost_new - EPS
+@@ -285,14 +285,14 @@
+         for k = 0, i_prev - 1 do
+             local k_next = k + 1
+ 
+-            local cost_concat_1 = solut.seq[to_1D(0, k, dimen)].T + data.cost[solut.s[k]][solut.s[i]]
+-            local cost_concat_2 = cost_concat_1 + solut.seq[to_1D(i, j, dimen)].T + data.cost[solut.s[j]][solut.s[k_next]]
+-            local cost_concat_3 = cost_concat_2 + solut.seq[to_1D(k_next, i_prev, dimen)].T + data.cost[solut.s[i_prev]][solut.s[j_next]]
+-
+-            local cost_new = solut.seq[to_1D(0, k, dimen)].C
+-                + solut.seq[to_1D(i, j, dimen)].W * cost_concat_1 + solut.seq[to_1D(i, j, dimen)].C
+-                + solut.seq[to_1D(k_next, i_prev, dimen)].W * cost_concat_2 + solut.seq[to_1D(k_next, i_prev, dimen)].C
+-                + solut.seq[to_1D(j_next, dimen, dimen)].W * cost_concat_3 + solut.seq[to_1D(j_next, dimen, dimen)].C
++            local cost_concat_1 = solut.seq[((0) * (dimen + 1) + (k))].T + data.cost[solut.s[k]][solut.s[i]]
++            local cost_concat_2 = cost_concat_1 + solut.seq[((i) * (dimen + 1) + (j))].T + data.cost[solut.s[j]][solut.s[k_next]]
++            local cost_concat_3 = cost_concat_2 + solut.seq[((k_next) * (dimen + 1) + (i_prev))].T + data.cost[solut.s[i_prev]][solut.s[j_next]]
++
++            local cost_new = solut.seq[((0) * (dimen + 1) + (k))].C
++                + solut.seq[((i) * (dimen + 1) + (j))].W * cost_concat_1 + solut.seq[((i) * (dimen + 1) + (j))].C
++                + solut.seq[((k_next) * (dimen + 1) + (i_prev))].W * cost_concat_2 + solut.seq[((k_next) * (dimen + 1) + (i_prev))].C
++                + solut.seq[((j_next) * (dimen + 1) + (dimen))].W * cost_concat_3 + solut.seq[((j_next) * (dimen + 1) + (dimen))].C
+ 
+             if cost_new < cost_best then
+                 cost_best = cost_new - EPS
+@@ -305,14 +305,14 @@
+         for k = i + opt, dimen - 1 do
+             local k_next = k + 1
+ 
+-            local cost_concat_1 = solut.seq[to_1D(0, i_prev, dimen)].T + data.cost[solut.s[i_prev]][solut.s[j_next]]
+-            local cost_concat_2 = cost_concat_1 + solut.seq[to_1D(j_next, k, dimen)].T + data.cost[solut.s[k]][solut.s[i]]
+-            local cost_concat_3 = cost_concat_2 + solut.seq[to_1D(i, j, dimen)].T + data.cost[solut.s[j]][solut.s[k_next]]
+-
+-            local cost_new = solut.seq[to_1D(0, i_prev, dimen)].C
+-                + solut.seq[to_1D(j_next, k, dimen)].W * cost_concat_1 + solut.seq[to_1D(j_next, k, dimen)].C
+-                + solut.seq[to_1D(i, j, dimen)].W * cost_concat_2 + solut.seq[to_1D(i, j, dimen)].C
+-                + solut.seq[to_1D(k_next, dimen, dimen)].W * cost_concat_3 + solut.seq[to_1D(k_next, dimen, dimen)].C
++            local cost_concat_1 = solut.seq[((0) * (dimen + 1) + (i_prev))].T + data.cost[solut.s[i_prev]][solut.s[j_next]]
++            local cost_concat_2 = cost_concat_1 + solut.seq[((j_next) * (dimen + 1) + (k))].T + data.cost[solut.s[k]][solut.s[i]]
++            local cost_concat_3 = cost_concat_2 + solut.seq[((i) * (dimen + 1) + (j))].T + data.cost[solut.s[j]][solut.s[k_next]]
++
++            local cost_new = solut.seq[((0) * (dimen + 1) + (i_prev))].C
++                + solut.seq[((j_next) * (dimen + 1) + (k))].W * cost_concat_1 + solut.seq[((j_next) * (dimen + 1) + (k))].C
++                + solut.seq[((i) * (dimen + 1) + (j))].W * cost_concat_2 + solut.seq[((i) * (dimen + 1) + (j))].C
++                + solut.seq[((k_next) * (dimen + 1) + (dimen))].W * cost_concat_3 + solut.seq[((k_next) * (dimen + 1) + (dimen))].C
+ 
+             if cost_new < cost_best then
+                 cost_best = cost_new - EPS

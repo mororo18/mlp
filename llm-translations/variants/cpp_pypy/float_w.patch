@@ -1,0 +1,12 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/mlp_solver.py b/mlp_solver.py
+--- a/mlp_solver.py	2026-11-24 15:41:29.463042040 -0300
++++ b/mlp_solver.py	2026-11-24 15:41:29.465020339 -0300
+@@ -176,7 +176,7 @@
+ 
+             seqT[idx_ij] = cost[s[j_prev]][s[j]] + seqT[idx_ijprev]
+             seqC[idx_ij] = seqT[idx_ij] + seqC[idx_ijprev]
+-            seqW[idx_ij] = j + k
++            seqW[idx_ij] = float(j + k)
+ 
+         if t:
+             from_ += 1

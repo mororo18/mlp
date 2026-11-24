@@ -1,0 +1,40 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:42:44.685320549 -0300
++++ b/main.cpp	2026-11-24 15:42:44.687302893 -0300
+@@ -12,12 +12,13 @@
+ #include <vector>
+ 
+ struct Info {
+-    std::vector<std::vector<double> > c;
++    double **c; // distance matrix as separately allocated rows (our double**)
+     std::vector<int> rnd;
+     int dimension;
+-    int T;
+-    int C;
+-    int W;
++    // T, C and W offsets as compile-time constants (ours: struct fields)
++    static constexpr int T = 0;
++    static constexpr int C = 1;
++    static constexpr int W = 2;
+     int rnd_index;
+ };
+ 
+@@ -488,12 +489,14 @@
+     const std::vector<double> R(R_values, R_values + sizeof(R_values)/sizeof(R_values[0]));
+ 
+     Info info;
+-    info.c = c;
++    info.c = new double *[c.size()];
++    for (size_t i = 0; i < c.size(); i++) {
++        info.c[i] = new double[c.size()];
++        for (size_t j = 0; j < c.size(); j++)
++            info.c[i][j] = c[i][j];
++    }
+     info.rnd = rnd;
+     info.dimension = dimension;
+-    info.T = 0;
+-    info.C = 1;
+-    info.W = 2;
+     info.rnd_index = 0;
+ 
+     double cpuStart = cpu_usage_seconds();

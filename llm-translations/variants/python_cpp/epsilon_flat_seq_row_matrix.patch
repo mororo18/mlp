@@ -1,0 +1,118 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:45:38.189857108 -0300
++++ b/main.cpp	2026-11-24 15:45:38.191866121 -0300
+@@ -7,13 +7,20 @@
+ #include <cstring>
+ #include <ctime>
+ #include <chrono>
++#include <cfloat>
+ #include <iostream>
+ #include <limits>
+ #include <string>
+ #include <vector>
+ 
+ typedef std::array<double, 3> tSubseq;
+-typedef std::vector<std::vector<tSubseq>> tSeq;
++// all subsequences in one contiguous array (ours); seq[i] points to row i
++struct tSeq {
++    std::vector<tSubseq> d;
++    int n = 0;
++    tSubseq *operator[](int i) { return &d[(size_t)i * n]; }
++    const tSubseq *operator[](int i) const { return &d[(size_t)i * n]; }
++};
+ 
+ // reproduces Python's repr() of a float, so the output is identical
+ static std::string py_float(double v) {
+@@ -39,7 +46,7 @@
+ public:
+     int IT = 0;
+     int dimen;
+-    Matrix cost;
++    double **cost; // separately allocated rows (our double**)
+ 
+     static const int T = 0;
+     static const int C = 1;
+@@ -51,13 +58,20 @@
+     static const int OR_OPT_3 = 3;
+     static const int TWO_OPT = 4;
+ 
+-    static constexpr double EPSILON = 1e-13;
++    static constexpr double EPSILON = DBL_EPSILON; // ours
+ 
+     std::vector<int> rnd;
+     int rnd_index = 0;
+ 
+     tInfo(int dimension, const Matrix &cost, const std::vector<int> &rnd)
+-        : dimen(dimension), cost(cost), rnd(rnd) {}
++        : dimen(dimension), rnd(rnd) {
++        this->cost = new double *[cost.size()];
++        for (size_t i = 0; i < cost.size(); i++) {
++            this->cost[i] = new double[cost[i].size()];
++            for (size_t j = 0; j < cost[i].size(); j++)
++                this->cost[i][j] = cost[i][j];
++        }
++    }
+ };
+ 
+ class tSolution {
+@@ -72,13 +86,8 @@
+ 
+ tSeq subseq_fill(const tInfo &info) {
+     tSeq arr;
+-
+-    for (int i = 0; i < info.dimen + 1; i++) {
+-        arr.push_back(std::vector<tSubseq>());
+-        for (int j = 0; j < info.dimen + 1; j++) {
+-            arr[i].push_back({0.0, 0.0, 0.0});
+-        }
+-    }
++    arr.n = info.dimen + 1;
++    arr.d.assign((size_t)arr.n * arr.n, tSubseq{0.0, 0.0, 0.0});
+ 
+     return arr;
+ }
+@@ -142,7 +151,7 @@
+     const int C = tInfo::C;
+     const int W = tInfo::W;
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+ 
+     for (int i = 0; i < dimen + 1; i++) {
+         int k = 1 - i - (int)(!i);
+@@ -160,7 +169,7 @@
+         }
+     }
+ 
+-    solut.cost = solut.seq[0][dimen][C] - tInfo::EPSILON;
++    solut.cost = solut.seq[0][dimen][C];
+ }
+ 
+ void swap(std::vector<int> &s, int i, int j) {
+@@ -194,7 +203,7 @@
+     int J = -1;
+ 
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+     const std::vector<int> &s = solut.s;
+     const tSeq &seq = solut.seq;
+ 
+@@ -260,7 +269,7 @@
+     int J = -1;
+ 
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+     const std::vector<int> &s = solut.s;
+     const tSeq &seq = solut.seq;
+ 
+@@ -314,7 +323,7 @@
+     const int MAX = info.dimen - opt;
+ 
+     const int dimen = info.dimen;
+-    const Matrix &cost = info.cost;
++    double *const *cost = info.cost;
+     const std::vector<int> &s = solut.s;
+     const int T = tInfo::T;
+     const int C = tInfo::C;

@@ -82,3 +82,32 @@ javascript_cpp.base,javascript_cpp,javascript_cpp/measure.patch,translation as d
 julia_cpp.base,julia_cpp,julia_cpp/measure.patch,translation as delivered + measurement fix
 cpp_lua.luajit,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.patch,translation as delivered + measurement fix; LuaJIT only
 cpp_lua.lua,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch,translation as delivered + measurement fix; plain Lua only
+cpp_rust.unchecked,cpp_rust,cpp_rust/measure.patch cpp_rust/unchecked.patch,R1 (I): seq/route/distance matrix indexed without bounds checks (our get_unchecked)
+cpp_rust.flat_matrix,cpp_rust,cpp_rust/measure.patch cpp_rust/flat_matrix.patch,R2 (I): flat distance matrix (ours) instead of Vec<Vec<f64>>
+cpp_rust.unchecked_flat_matrix,cpp_rust,cpp_rust/measure.patch cpp_rust/unchecked_flat_matrix.patch,R1+R2 (I)
+cpp_csharp.unchecked_seq,cpp_csharp,cpp_csharp/measure.patch cpp_csharp/unchecked_seq.patch,S1 (I): seq pinned once (GCHandle) and read through a pointer without bounds checks (ours)
+cpp_csharp.flat_matrix,cpp_csharp,cpp_csharp/measure.patch cpp_csharp/flat_matrix.patch,S2 (I): flat distance matrix (ours) instead of double[][]
+cpp_csharp.unchecked_seq_flat_matrix,cpp_csharp,cpp_csharp/measure.patch cpp_csharp/unchecked_seq_flat_matrix.patch,S1+S2 (I)
+cpp_lua.luajit_subseq_array,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.patch cpp_lua/subseq_array.patch,L1 (I): subsequences in one numeric array (FFI on LuaJIT) instead of one table per pair; LuaJIT only
+cpp_lua.luajit_inline_to_1d,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.patch cpp_lua/inline_to_1d.patch,L2 (I): to_1D computed inline instead of a function call; LuaJIT only
+cpp_lua.luajit_local_fields,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.patch cpp_lua/local_fields.patch,L3 (I): solut.seq/data.cost/solut.s in locals in the hot functions; LuaJIT only
+cpp_lua.luajit_all,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.patch cpp_lua/subseq_array_inline_local.patch,L1+L2+L3 (I); LuaJIT only
+cpp_lua.lua_subseq_array,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch cpp_lua/subseq_array.patch,L1 (I); plain Lua only
+cpp_lua.lua_inline_to_1d,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch cpp_lua/inline_to_1d.patch,L2 (I); plain Lua only
+cpp_lua.lua_local_fields,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch cpp_lua/local_fields.patch,L3 (I); plain Lua only
+cpp_lua.lua_all,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch cpp_lua/subseq_array_inline_local.patch,L1+L2+L3 (I); plain Lua only
+cpp_pypy.float_w,cpp_pypy,cpp_pypy/measure.patch cpp_pypy/float_w.patch,P1 (I): W stored as float(j + k) (ours) so the list stays a list of floats
+cpp_pypy.interleaved,cpp_pypy,cpp_pypy/measure.patch cpp_pypy/interleaved.patch,P2 (I): T/C/W interleaved in one list (ours) instead of three lists
+cpp_pypy.float_w_interleaved,cpp_pypy,cpp_pypy/measure.patch cpp_pypy/float_w_interleaved.patch,P1+P2 (I)
+julia_cpp.const_offsets,julia_cpp,julia_cpp/measure.patch julia_cpp/const_offsets.patch,U1 (I): T/W/C offsets as compile-time constants instead of tData fields
+javascript_cpp.const_offsets,javascript_cpp,javascript_cpp/measure.patch javascript_cpp/const_offsets.patch,J1 (I): T/C/W offsets as compile-time constants instead of Info fields
+javascript_cpp.row_matrix,javascript_cpp,javascript_cpp/measure.patch javascript_cpp/row_matrix.patch,J2 (I): distance matrix as separately allocated rows (our double**)
+javascript_cpp.const_offsets_row_matrix,javascript_cpp,javascript_cpp/measure.patch javascript_cpp/const_offsets_row_matrix.patch,J1+J2 (I)
+java_cpp.epsilon,java_cpp,java_cpp/measure.patch java_cpp/epsilon.patch,V0 (I): EPSILON = DBL_EPSILON (ours) instead of 1e-16
+java_cpp.flat_seq,java_cpp,java_cpp/measure.patch java_cpp/flat_seq.patch,V1 (I): subsequences in one contiguous vector (ours) instead of one vector per row
+java_cpp.row_matrix,java_cpp,java_cpp/measure.patch java_cpp/row_matrix.patch,V2 (I): distance matrix as separately allocated rows (our double**)
+java_cpp.all,java_cpp,java_cpp/measure.patch java_cpp/epsilon_flat_seq_row_matrix.patch,V0+V1+V2 (I)
+python_cpp.epsilon,python_cpp,python_cpp/measure.patch python_cpp/epsilon.patch,Y0 (I): EPSILON = DBL_EPSILON and the solution cost without epsilon (ours) instead of 1e-13
+python_cpp.flat_seq,python_cpp,python_cpp/measure.patch python_cpp/flat_seq.patch,Y1 (I): subsequences in one contiguous vector (ours) instead of one vector per row
+python_cpp.row_matrix,python_cpp,python_cpp/measure.patch python_cpp/row_matrix.patch,Y2 (I): distance matrix as separately allocated rows (our double**)
+python_cpp.all,python_cpp,python_cpp/measure.patch python_cpp/epsilon_flat_seq_row_matrix.patch,Y0+Y1+Y2 (I)

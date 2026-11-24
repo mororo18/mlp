@@ -1,0 +1,34 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 15:45:38.156566275 -0300
++++ b/main.cpp	2026-11-24 15:45:38.158342132 -0300
+@@ -13,7 +13,13 @@
+ #include <vector>
+ 
+ typedef std::array<double, 3> tSubseq;
+-typedef std::vector<std::vector<tSubseq>> tSeq;
++// all subsequences in one contiguous array (ours); seq[i] points to row i
++struct tSeq {
++    std::vector<tSubseq> d;
++    int n = 0;
++    tSubseq *operator[](int i) { return &d[(size_t)i * n]; }
++    const tSubseq *operator[](int i) const { return &d[(size_t)i * n]; }
++};
+ 
+ // reproduces Python's repr() of a float, so the output is identical
+ static std::string py_float(double v) {
+@@ -72,13 +78,8 @@
+ 
+ tSeq subseq_fill(const tInfo &info) {
+     tSeq arr;
+-
+-    for (int i = 0; i < info.dimen + 1; i++) {
+-        arr.push_back(std::vector<tSubseq>());
+-        for (int j = 0; j < info.dimen + 1; j++) {
+-            arr[i].push_back({0.0, 0.0, 0.0});
+-        }
+-    }
++    arr.n = info.dimen + 1;
++    arr.d.assign((size_t)arr.n * arr.n, tSubseq{0.0, 0.0, 0.0});
+ 
+     return arr;
+ }
