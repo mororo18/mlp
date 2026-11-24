@@ -111,3 +111,8 @@ python_cpp.epsilon,python_cpp,python_cpp/measure.patch python_cpp/epsilon.patch,
 python_cpp.flat_seq,python_cpp,python_cpp/measure.patch python_cpp/flat_seq.patch,Y1 (I): subsequences in one contiguous vector (ours) instead of one vector per row
 python_cpp.row_matrix,python_cpp,python_cpp/measure.patch python_cpp/row_matrix.patch,Y2 (I): distance matrix as separately allocated rows (our double**)
 python_cpp.all,python_cpp,python_cpp/measure.patch python_cpp/epsilon_flat_seq_row_matrix.patch,Y0+Y1+Y2 (I)
+cpp_python.inline_to_1d,cpp_python,cpp_python/measure.patch cpp_python/inline_to_1d.patch,Q1 (I): to_1D computed inline instead of a function call
+cpp_python.local_fields,cpp_python,cpp_python/measure.patch cpp_python/local_fields.patch,Q2 (I): solut.seq/data.cost/solut.s in locals in the hot functions (ours)
+cpp_python.nested_lists,cpp_python,cpp_python/measure.patch cpp_python/nested_lists.patch,Q3 (I): subsequences in nested lists seq[i][j][k] (ours) instead of one SeqInfo object per pair (no to_1D in the hot loops)
+cpp_python.float_w,cpp_python,cpp_python/measure.patch cpp_python/float_w.patch,Q4 (I): W stored as float(j + k) (ours)
+cpp_python.all,cpp_python,cpp_python/measure.patch cpp_python/all.patch,Q1+Q2+Q3+Q4 (I)

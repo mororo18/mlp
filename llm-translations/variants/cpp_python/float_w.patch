@@ -1,0 +1,12 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.py b/main.py
+--- a/main.py	2026-11-24 16:25:45.200780284 -0300
++++ b/main.py	2026-11-24 16:25:45.204506749 -0300
+@@ -143,7 +143,7 @@
+ 
+             solut.seq[idx].T = data.cost[solut.s[j_prev]][solut.s[j]] + solut.seq[idx_prev].T
+             solut.seq[idx].C = solut.seq[idx].T + solut.seq[idx_prev].C
+-            solut.seq[idx].W = j + k
++            solut.seq[idx].W = float(j + k)
+ 
+         from_ += 1 if t else 0
+ 

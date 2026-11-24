@@ -218,6 +218,14 @@ Fases como no `PLANO.md`:
   C++: o ε (`1e-16` e `1e-13` contra o `DBL_EPSILON` do nosso C++; no Python
   → C++ o custo da solução também desconta o ε), como no Fortran → C++ e no
   Go → C++ (V0 e Y0).
+  C++ → Python (interpretado), lido contra o nosso `main.py`: a tradução
+  guarda um objeto `SeqInfo` (`__slots__`) por par numa lista plana, chama
+  `to_1D` em todo acesso, relê `solut.seq`, `data.cost` e `solut.s` e grava
+  `W = j + k` inteiro; o nosso usa listas aninhadas `seq[i][j][k]`, cópias
+  locais e `float(j + k)`. Variantes Q1 (`to_1D` em linha), Q2 (cópias
+  locais), Q3 (listas aninhadas; tira também o `to_1D` dos laços), Q4
+  (`float`) e a combinação. Lote B4-interp: as 4 do Lua e as 5 do Python,
+  com as nossas e as duas bases (13 programas, cerca de 6 h).
 - **B4. Rodadas:**
   - Lote B-comp (4 instâncias): C++ → C, Rust, C#, LuaJIT, PyPy; C, Lua,
     Python, Java, JavaScript, Julia → C++. Uns 11 pares x 4 a 6 programas.
