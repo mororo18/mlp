@@ -74,8 +74,8 @@ com duas mudanças:
 | C++ → C# | +8,5 (+15,2 sem berlin52) | aberto | B |
 | C++ → LuaJIT | +73,4 | aberto | B |
 | C++ → PyPy | +39,3 | aberto | B |
-| C++ → Lua | +75* | a medir (interpretado) | B |
-| C++ → Python | +92* | a medir (interpretado) | B |
+| C++ → Lua | +90,3 | aberto (interpretado) | B |
+| C++ → Python | +102,7 | aberto (interpretado) | B |
 | C → C++ | +0,2 (+2,6†) | a confirmar (berlin52) | B |
 | Lua → C++ | −0,1 (+2,3†) | a confirmar (berlin52) | B |
 | Python → C++ | +3,8 (+6,2†) | aberto | B |
@@ -167,7 +167,9 @@ Fases como no `PLANO.md`:
   O berlin52 dos pares para C++ está puxado para baixo pelas duas execuções
   lentas do nosso C++ (ver Problemas). No C++ → C# o berlin52 é real: o
   nosso C# leva 1,46 s no berlin52 (a tradução, 1,29 s); a diferença do
-  tempo fixo entra na B2. Lote interpretado (`b-interp-20261124`) rodando.
+  tempo fixo entra na B2. Lote interpretado (`b-interp-20261124`, berlin52,
+  kroA100 e lin105, cerca de 1 h 50): C++ → Lua +90,3 (1,886 a 1,920) e
+  C++ → Python +102,7 (2,010 a 2,044), custo ok.
 - **B2. Mapa e lista de fatores**, a partir da Tabela de desvios, da
   análise antiga e da leitura do código. **Revisão do autor antes da B3.**
   Pontos de partida:
