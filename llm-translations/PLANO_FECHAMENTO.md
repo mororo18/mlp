@@ -71,9 +71,9 @@ com duas mudanças:
 | C++ → Java | −10,6 → −3,1 | aberto (diagnóstico do JIT, A2) | A |
 | C++ → C | +0,7 (+1,1 sem berlin52) | fechado (nada) | — |
 | C++ → Rust | +69,5 → +1,1 | fechado (verificação de limites, R1) | B |
-| C++ → C# | +8,5 → 0,0 | fechado (`seq` por ponteiro, S1); berlin52 à parte | B |
+| C++ → C# | +8,4 → −3,5 | fechado (S1+S2; +0,2 sem berlin52, onde a tradução é 14% mais rápida) | B |
 | C++ → LuaJIT | +73,4 → −6,6 | passou do ponto (array das subsequências, L1) | B |
-| C++ → PyPy | +39,3 → +0,5 | fechado (`float`, P1) | B |
+| C++ → PyPy | +39,6 → −4,1 | fechado (P1+P2; −1,7 sem berlin52, onde a tradução é 11% mais rápida) | B |
 | C++ → Lua | +87,8 → +5,7 | aberto (`to_1D` em linha, locais; L4: B6) | B |
 | C++ → Python | +102,7 → −4,7 | passou do ponto (listas aninhadas, `to_1D`, locais) | B |
 | C → C++ | +2,3 → −1,3 | fechado (matriz, K2) | B |
@@ -315,6 +315,21 @@ Fases como no `PLANO.md`:
   deslocamentos constantes e cópias locais na nossa (direção da nossa, que
   com elas fica mais rápida). O resíduo de 4,6% da `p26` era a matriz
   *holey*.
+- **Artigo atualizado (2026-11-25, antes da d66 e da B6).** O `tables.py`
+  passou a gerar as linhas da Frente B e da Tabela 13 (tabelas `pitfalls`,
+  `other` e `closing` do `comparisons.csv`; Lua e Python em
+  `berlin52/kroA100/lin105`, com o custo do lin105 tirado da `b4-interp`).
+  No artigo: Tabelas 8 a 11 sem asteriscos (linhas da análise antiga
+  trocadas pelas da B4/B5; saem C++ → C e C → C++ com o tipo do índice, que
+  não têm mais gap a explicar), Tabela 13 completa, texto da 7.5 e da 7.6
+  com os números novos, parágrafo da matriz *holey* no JavaScript e
+  rascunho do texto da 7.7. Decisão a confirmar com o autor: C++ → C# e
+  C++ → PyPy entram na Tabela 13 com a combinação (S1+S2: −3,5, +0,2 sem
+  berlin52; P1+P2: −4,1, −1,7 sem berlin52) e não com o fator mínimo pela
+  média (S1: 0,0, mas +4,5 sem berlin52; P1: +0,5, mas +3,9 sem berlin52),
+  porque o fator mínimo só fecha na média, compensando o berlin52 (a
+  tradução 11 a 14% mais rápida) com as três instâncias maiores. Falta:
+  linha do C++ → Lua com a B6 e a Figura 7 com a d66.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 
