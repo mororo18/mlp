@@ -125,3 +125,8 @@ lua_cpp.epsilon_row_matrix,lua_cpp,lua_cpp/measure.patch lua_cpp/epsilon_row_mat
 cpp_javascript.packed_matrix,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/packed_matrix.patch,X1 (I): outer array of the distance matrix packed ([] filled in order, ours) instead of new Array(sz) (holey)
 cpp_javascript.interleaved_array_packed,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/interleaved_array.patch cpp_javascript/packed_matrix.patch,P20 on the Array + X1 (I)
 cpp_lua.lua_all_hoist,cpp_lua,cpp_lua/measure.patch cpp_lua/run_lua.patch cpp_lua/subseq_array_inline_local_hoist.patch,L1+L2+L3 + L4 (I): s[i]/s[j]/s[i_prev]/s[j_next] and dimen + 1 hoisted out of the inner loops (as ours); plain Lua only
+ours_lua.luajit,ours/lua,ours_lua/luajit.patch,our Lua on LuaJIT only (reference for the ours_lua variants)
+ours_lua.literal_offsets,ours/lua,ours_lua/literal_offsets.patch,LJ1 (D): T/C/W positions as literals in the seq indices instead of locals copied from info (LuaJIT only)
+ours_lua.literal_offsets_loop_locals,ours/lua,ours_lua/literal_offsets_loop_locals.patch,LJ1+LJ2 (D): plus cost_concat_*/cost_new declared inside the loops (LuaJIT only)
+ours_python.update_locals,ours/python,ours_python/update_locals.patch,PY1 (D): update_subseq_info_matrix uses its local seq and s instead of solut.seq and solut.s in the loops
+ours_python.update_locals_literals,ours/python,ours_python/update_locals_literals.patch,PY1+PY2 (D): plus T/C/W positions as literal indices

@@ -1,0 +1,29 @@
+diff -ruN a/main.py b/main.py
+--- a/main.py	2026-11-25 07:12:31.145839694 -0300
++++ b/main.py	2026-11-25 07:12:31.146965874 -0300
+@@ -109,18 +109,18 @@
+     for i in range(0, dimen+1):
+         k : int = 1 - i - int(not i)
+ 
+-        solut.seq[i][i][T] = 0.0
+-        solut.seq[i][i][C] = 0.0
+-        solut.seq[i][i][W] = float(int(not (i == 0)))
++        seq[i][i][T] = 0.0
++        seq[i][i][C] = 0.0
++        seq[i][i][W] = float(int(not (i == 0)))
+ 
+         for j in range(i+1, dimen+1):
+             j_prev : int = j - 1
+ 
+-            solut.seq[i][j][T] = cost[solut.s[j_prev]][solut.s[j]] + solut.seq[i][j_prev][T]
+-            solut.seq[i][j][C] = solut.seq[i][j][T] + solut.seq[i][j_prev][C]
+-            solut.seq[i][j][W] = float(j + k)
++            seq[i][j][T] = cost[s[j_prev]][s[j]] + seq[i][j_prev][T]
++            seq[i][j][C] = seq[i][j][T] + seq[i][j_prev][C]
++            seq[i][j][W] = float(j + k)
+ 
+-    solut.cost = solut.seq[0][dimen][C] - info.EPSILON
++    solut.cost = seq[0][dimen][C] - info.EPSILON
+ 
+ def swap(s : List[int], i : int, j : int) -> None:
+     s[i], s[j] = s[j], s[i]

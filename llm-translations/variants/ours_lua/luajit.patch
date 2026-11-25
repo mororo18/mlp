@@ -1,0 +1,6 @@
+diff -ruN a/run_luajit_only.sh b/run_luajit_only.sh
+--- a/run_luajit_only.sh	1969-12-31 21:00:00.000000000 -0300
++++ b/run_luajit_only.sh	2026-11-25 07:12:31.165056940 -0300
+@@ -0,0 +1,2 @@
++#!/usr/bin/env bash
++luajit main.lua "$@"
