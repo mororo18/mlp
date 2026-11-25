@@ -67,7 +67,7 @@ com duas mudanças:
 | Rust → C++ | +8,4 → −1,1 | fechado (matriz) | — |
 | Swift → C++ | +12,4 → +1,5 | fechado (matriz); fonte antiga | C |
 | C# → C++ | +12,5 → −0,2 | fechado (matriz) | — |
-| C++ → JavaScript | +18,9 → +4,9 | aberto (matriz holey, X1: B5) | A |
+| C++ → JavaScript | +19,0 → +1,7 | fechado (tipo de array, layout intercalado e matriz *packed* na tradução; posições constantes e cópias locais na nossa) | A |
 | C++ → Java | −10,6 → −3,1 | aberto (diagnóstico do JIT, A2) | A |
 | C++ → C | +0,7 (+1,1 sem berlin52) | fechado (nada) | — |
 | C++ → Rust | +69,5 → +1,1 | fechado (verificação de limites, R1) | B |
@@ -76,12 +76,12 @@ com duas mudanças:
 | C++ → PyPy | +39,3 → +0,5 | fechado (`float`, P1) | B |
 | C++ → Lua | +87,8 → +5,7 | aberto (`to_1D` em linha, locais; L4: B6) | B |
 | C++ → Python | +102,7 → −4,7 | passou do ponto (listas aninhadas, `to_1D`, locais) | B |
-| C → C++ | +2,5 | aberto, na borda (matriz, K2: B5) | B |
-| Lua → C++ | +2,2 | aberto, na borda (ε e matriz, M0/M2: B5) | B |
+| C → C++ | +2,3 → −1,3 | fechado (matriz, K2) | B |
+| Lua → C++ | +1,9 → −0,5 | fechado (matriz, M2; ε não pesa) | B |
 | Python → C++ | +6,0 → +0,7 | fechado (`seq` plano e matriz, Y1+Y2) | B |
-| Java → C++ | +7,2 → +2,0 | na borda (V1+V2; B5 mede de novo); fonte antiga | B, C |
+| Java → C++ | +7,2 → +1,6 | fechado (`seq` plano e matriz, V1+V2); fonte antiga | B, C |
 | JavaScript → C++ | +23,2 → 0,0 | fechado (deslocamentos e matriz, J1+J2); fonte antiga | B, C |
-| Julia → C++ | +32,3 → +14,7 | aberto (U1; GCC 15, U3: B5); fonte antiga | B, C |
+| Julia → C++ | +31,7 → −1,9 | fechado (deslocamentos e matriz, U1+U3); fonte antiga | B, C |
 
 \* Análise antiga (outra máquina, berlin52/bier127/gr202, 1 a 10 execuções,
 versões antigas das nossas): só ponto de partida.
@@ -90,6 +90,9 @@ Frente B depois das rodadas B4 (B4-comp em 4 instâncias, B4-interp em 3):
 16 pares fechados (Java → C++ na borda, +2,0), 2 que passaram do ponto (a
 tradução corrigida fica mais rápida que a nossa, fora de −2%: pela regra de
 direção, falta medir a escolha dela na nossa) e 6 abertos.
+Depois da B5-comp (2026-11-25): 20 fechados, 2 que passaram do ponto
+(C++ → LuaJIT e C++ → Python) e 2 abertos (C++ → Lua, L4 na B6; C++ → Java,
+A2). Os gaps de base dos cinco pares da B5 são os da própria rodada.
 
 Gaps de base da Frente B: rodada `b-comp-20261124` (B1, 4 instâncias, 10
 execuções, custo ok em todas). † Estimativa com a mediana do nosso C++ no
@@ -134,6 +137,9 @@ repetição do berlin52.
   tradução ainda difere em outros pontos do código). Para a Tabela 13:
   mudanças "tipo de array, layout intercalado (na tradução); posições
   constantes e cópias locais (na nossa)", resíduo +4,6%, Aberto.
+  **Fechado na B5-comp (2026-11-25):** com a matriz *packed* (X1) junto do
+  `Array` intercalado, a tradução fica +1,7% contra a nossa com
+  `local_info_consts` (ver B5-comp na Frente B).
 - **A2. C++ → Java.** Resíduo de −3,1% com acessores, cópias locais e
   armazenamento das subsequências na nossa (`ours_java.soa`), −9,3% com
   aquecimento. Hipóteses H-J5 e H-J6 do `PLANO.md`: o caminho quente do
@@ -291,6 +297,24 @@ Fases como no `PLANO.md`:
   locais. Variante L4 (`lua_all_hoist`, custo 143721 no berlin52). O teste
   local não decide (só há Lua 5.3 aqui, e nele a nossa nem fica atrás da
   `lua_all`); precisa do Lua 5.4 do servidor.
+- **B5-comp feita (2026-11-25):** `runs/b5-comp-20261125` (commit
+  `bd12ee0`), 760 execuções, 19 programas, 4 instâncias, custo ok, CV
+  máximo 1,2%. Gaps contra as nossas (média das razões por instância,
+  berlin52/kroA100/gr202/lin318):
+
+  | Par | Base | Variantes | Leitura |
+  |---|---|---|---|
+  | Julia → C++ | +31,7 | U1 deslocamentos +14,3; U3 matriz `double**` +15,3; U1+U3 −1,9 (−3,5 −1,7 −2,8 +0,4) | fechado pela combinação; cada fator sozinho deixa cerca de 15% |
+  | C → C++ | +2,3 | K2 matriz `double**` −1,3 | fechado (K2) |
+  | Lua → C++ | +1,9 | M0 ε +1,9; M2 matriz −0,5; M0+M2 −0,5 | base já dentro de ±2% nesta rodada; a matriz leva a −0,5; ε não pesa |
+  | Java → C++ | +7,2 | V0+V1+V2 +1,6 | fechado (reproduz a base da B4 e confirma a combinação) |
+  | C++ → JavaScript | +19,0 | X1 matriz *packed* +12,9 (−5,1% sobre a base); intercalado −6,7; intercalado + X1 −9,3 | contra a nossa com `local_info_consts` (−10,8% sobre a nossa): intercalado +4,5 (reproduz a `p26`), intercalado + X1 **+1,7** (+3,0 +2,2 +1,0 +0,6): fechado |
+
+  C++ → JavaScript fecha com as cinco escolhas: tipo de array (`Array`),
+  layout intercalado e vetor externo da matriz *packed* na tradução;
+  deslocamentos constantes e cópias locais na nossa (direção da nossa, que
+  com elas fica mais rápida). O resíduo de 4,6% da `p26` era a matriz
+  *holey*.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 

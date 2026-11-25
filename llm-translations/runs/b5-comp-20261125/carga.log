@@ -1,0 +1,1554 @@
+bash: warning: setlocale: LC_ALL: cannot change locale (pt_BR.UTF-8)
+unpacking 'github:numtide/flake-utils/11707dc2f618dd54ca8739b309ec4fc024de578b?narHash=sha256-l0KFg5HjrsfsO/JpG%2Br7fRrqm12kzFHyUHqHCVpMMbI%3D' into the Git cache...
+unpacking 'github:nix-systems/default/da67096a3b9bf56a91d16901293e51ba5b49a27e?narHash=sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768%3D' into the Git cache...
+17 variant(s) in /out/work
+[aviso] /repo/llm-translations/nix-env.sh nao encontrado; usando o PATH atual.
+[setup] building mlp-instances/loader
+g++ main.cpp readData.h -o load -std=c++17
+[build] cplusplus
+\033[31mcleaning obj directory \033[0m
+\033[31m \nCompiling main.cpp: \033[0m
+g++  -m64 -Ofast -fPIC -fexceptions -DNDEBUG -DIL_STD -std=c++0x -Winline -c main.cpp -o obj/main.o -g
+\033[32m \ncreating main.cpp dependency file: \033[0m
+g++ -std=c++0x  -MM main.cpp > obj/main.d
+\033[31m \nCompiling readData.cpp: \033[0m
+g++  -m64 -Ofast -fPIC -fexceptions -DNDEBUG -DIL_STD -std=c++0x -Winline -c readData.cpp -o obj/readData.o -g
+\033[32m \ncreating readData.cpp dependency file: \033[0m
+g++ -std=c++0x  -MM readData.cpp > obj/readData.d
+\033[31m \nLinking all objects files: \033[0m
+g++ -m64  obj/main.o  obj/readData.o -o solve  -m64 -Ofast -fPIC -fexceptions -DNDEBUG -DIL_STD -std=c++0x -Winline -g 
+[build] julia_cpp.base
+[build] julia_cpp.const_offsets
+[build] julia_cpp.row_matrix
+[build] julia_cpp.const_offsets_row_matrix
+[build] c_cpp.base
+[build] c_cpp.row_matrix
+[build] lua_cpp.base
+[build] lua_cpp.epsilon
+[build] lua_cpp.row_matrix
+[build] lua_cpp.epsilon_row_matrix
+[build] java_cpp.base
+[build] java_cpp.all
+760 run(s) queued across 19 target(s), 4 instance(s), 4 parallel job(s)
+[slot1] start cplusplus berlin52.tsp     rep=1 core=9
+[slot0] start cplusplus berlin52.tsp     rep=0 core=8
+[slot2] start cplusplus berlin52.tsp     rep=2 core=10
+[slot3] start cplusplus berlin52.tsp     rep=3 core=11
+[slot0] done  cplusplus berlin52.tsp     rep=0 COST=143721.0 TIME=0.096 (0.1s wall)
+[slot1] done  cplusplus berlin52.tsp     rep=1 COST=143721.0 TIME=0.093 (0.1s wall)
+[slot0] start cplusplus berlin52.tsp     rep=4 core=8
+[slot1] start cplusplus berlin52.tsp     rep=5 core=9
+[slot3] done  cplusplus berlin52.tsp     rep=3 COST=143721.0 TIME=0.094 (0.1s wall)
+[slot3] start cplusplus berlin52.tsp     rep=6 core=11
+[slot2] done  cplusplus berlin52.tsp     rep=2 COST=143721.0 TIME=0.107 (0.2s wall)
+[slot2] start cplusplus berlin52.tsp     rep=7 core=10
+[slot0] done  cplusplus berlin52.tsp     rep=4 COST=143721.0 TIME=0.093 (0.1s wall)
+[slot0] start cplusplus berlin52.tsp     rep=8 core=8
+[slot1] done  cplusplus berlin52.tsp     rep=5 COST=143721.0 TIME=0.094 (0.1s wall)
+[slot1] start cplusplus berlin52.tsp     rep=9 core=9
+[slot3] done  cplusplus berlin52.tsp     rep=6 COST=143721.0 TIME=0.093 (0.1s wall)
+[slot3] start javascript berlin52.tsp     rep=0 core=11
+[slot2] done  cplusplus berlin52.tsp     rep=7 COST=143721.0 TIME=0.093 (0.1s wall)
+[slot2] start javascript berlin52.tsp     rep=1 core=10
+[slot0] done  cplusplus berlin52.tsp     rep=8 COST=143721.0 TIME=0.093 (0.1s wall)
+[slot0] start javascript berlin52.tsp     rep=2 core=8
+[slot1] done  cplusplus berlin52.tsp     rep=9 COST=143721.0 TIME=0.093 (0.1s wall)
+[slot1] start javascript berlin52.tsp     rep=3 core=9
+[slot3] done  javascript berlin52.tsp     rep=0 COST=143721.0 TIME=0.409 (0.5s wall)
+[slot3] start javascript berlin52.tsp     rep=4 core=11
+[slot2] done  javascript berlin52.tsp     rep=1 COST=143721.0 TIME=0.403 (0.5s wall)
+[slot2] start javascript berlin52.tsp     rep=5 core=10
+[slot0] done  javascript berlin52.tsp     rep=2 COST=143721.0 TIME=0.404 (0.5s wall)
+[slot1] done  javascript berlin52.tsp     rep=3 COST=143721.0 TIME=0.405 (0.5s wall)
+[slot1] start javascript berlin52.tsp     rep=7 core=9
+[slot0] start javascript berlin52.tsp     rep=6 core=8
+[slot3] done  javascript berlin52.tsp     rep=4 COST=143721.0 TIME=0.407 (0.5s wall)
+[slot3] start javascript berlin52.tsp     rep=8 core=11
+[slot2] done  javascript berlin52.tsp     rep=5 COST=143721.0 TIME=0.405 (0.5s wall)
+[slot2] start javascript berlin52.tsp     rep=9 core=10
+[slot0] done  javascript berlin52.tsp     rep=6 COST=143721.0 TIME=0.412 (0.5s wall)
+[slot0] start julia_cpp.base berlin52.tsp     rep=0 core=8
+[slot1] done  javascript berlin52.tsp     rep=7 COST=143721.0 TIME=0.404 (0.5s wall)
+[slot1] start julia_cpp.base berlin52.tsp     rep=1 core=9
+[slot0] done  julia_cpp.base berlin52.tsp     rep=0 COST=143721.0 TIME=0.123333921 (0.2s wall)
+[slot0] start julia_cpp.base berlin52.tsp     rep=2 core=8
+[slot1] done  julia_cpp.base berlin52.tsp     rep=1 COST=143721.0 TIME=0.123318324 (0.2s wall)
+[slot1] start julia_cpp.base berlin52.tsp     rep=3 core=9
+[slot0] done  julia_cpp.base berlin52.tsp     rep=2 COST=143721.0 TIME=0.122994485 (0.2s wall)
+[slot0] start julia_cpp.base berlin52.tsp     rep=4 core=8
+[slot1] done  julia_cpp.base berlin52.tsp     rep=3 COST=143721.0 TIME=0.123246759 (0.2s wall)
+[slot1] start julia_cpp.base berlin52.tsp     rep=5 core=9
+[slot3] done  javascript berlin52.tsp     rep=8 COST=143721.0 TIME=0.406 (0.5s wall)
+[slot3] start julia_cpp.base berlin52.tsp     rep=6 core=11
+[slot2] done  javascript berlin52.tsp     rep=9 COST=143721.0 TIME=0.411 (0.5s wall)
+[slot2] start julia_cpp.base berlin52.tsp     rep=7 core=10
+[slot0] done  julia_cpp.base berlin52.tsp     rep=4 COST=143721.0 TIME=0.123015456 (0.2s wall)
+[slot0] start julia_cpp.base berlin52.tsp     rep=8 core=8
+[slot1] done  julia_cpp.base berlin52.tsp     rep=5 COST=143721.0 TIME=0.122962559 (0.2s wall)
+[slot1] start julia_cpp.base berlin52.tsp     rep=9 core=9
+[slot3] done  julia_cpp.base berlin52.tsp     rep=6 COST=143721.0 TIME=0.122737422 (0.2s wall)
+[slot3] start julia_cpp.const_offsets berlin52.tsp     rep=0 core=11
+[slot2] done  julia_cpp.base berlin52.tsp     rep=7 COST=143721.0 TIME=0.122868823 (0.2s wall)
+[slot2] start julia_cpp.const_offsets berlin52.tsp     rep=1 core=10
+[slot1] done  julia_cpp.base berlin52.tsp     rep=9 COST=143721.0 TIME=0.122743724 (0.2s wall)
+[slot1] start julia_cpp.const_offsets berlin52.tsp     rep=2 core=9
+[slot0] done  julia_cpp.base berlin52.tsp     rep=8 COST=143721.0 TIME=0.122782108 (0.2s wall)
+[slot0] start julia_cpp.const_offsets berlin52.tsp     rep=3 core=8
+[slot3] done  julia_cpp.const_offsets berlin52.tsp     rep=0 COST=143721.0 TIME=0.107511011 (0.2s wall)
+[slot3] start julia_cpp.const_offsets berlin52.tsp     rep=4 core=11
+[slot2] done  julia_cpp.const_offsets berlin52.tsp     rep=1 COST=143721.0 TIME=0.10742691 (0.2s wall)
+[slot2] start julia_cpp.const_offsets berlin52.tsp     rep=5 core=10
+[slot1] done  julia_cpp.const_offsets berlin52.tsp     rep=2 COST=143721.0 TIME=0.107070363 (0.2s wall)
+[slot1] start julia_cpp.const_offsets berlin52.tsp     rep=6 core=9
+[slot0] done  julia_cpp.const_offsets berlin52.tsp     rep=3 COST=143721.0 TIME=0.107164968 (0.2s wall)
+[slot0] start julia_cpp.const_offsets berlin52.tsp     rep=7 core=8
+[slot3] done  julia_cpp.const_offsets berlin52.tsp     rep=4 COST=143721.0 TIME=0.107402925 (0.2s wall)
+[slot3] start julia_cpp.const_offsets berlin52.tsp     rep=8 core=11
+[slot2] done  julia_cpp.const_offsets berlin52.tsp     rep=5 COST=143721.0 TIME=0.107343927 (0.2s wall)
+[slot2] start julia_cpp.const_offsets berlin52.tsp     rep=9 core=10
+[slot1] done  julia_cpp.const_offsets berlin52.tsp     rep=6 COST=143721.0 TIME=0.107054369 (0.2s wall)
+[slot1] start julia_cpp.row_matrix berlin52.tsp     rep=0 core=9
+[slot0] done  julia_cpp.const_offsets berlin52.tsp     rep=7 COST=143721.0 TIME=0.107752149 (0.2s wall)
+[slot0] start julia_cpp.row_matrix berlin52.tsp     rep=1 core=8
+[slot3] done  julia_cpp.const_offsets berlin52.tsp     rep=8 COST=143721.0 TIME=0.107873106 (0.2s wall)
+[slot3] start julia_cpp.row_matrix berlin52.tsp     rep=2 core=11
+[slot2] done  julia_cpp.const_offsets berlin52.tsp     rep=9 COST=143721.0 TIME=0.108489027 (0.2s wall)
+[slot2] start julia_cpp.row_matrix berlin52.tsp     rep=3 core=10
+[slot1] done  julia_cpp.row_matrix berlin52.tsp     rep=0 COST=143721.0 TIME=0.106082836 (0.2s wall)
+[slot1] start julia_cpp.row_matrix berlin52.tsp     rep=4 core=9
+[slot0] done  julia_cpp.row_matrix berlin52.tsp     rep=1 COST=143721.0 TIME=0.106096322 (0.2s wall)
+[slot0] start julia_cpp.row_matrix berlin52.tsp     rep=5 core=8
+[slot3] done  julia_cpp.row_matrix berlin52.tsp     rep=2 COST=143721.0 TIME=0.106312225 (0.2s wall)
+[slot3] start julia_cpp.row_matrix berlin52.tsp     rep=6 core=11
+[slot2] done  julia_cpp.row_matrix berlin52.tsp     rep=3 COST=143721.0 TIME=0.106102992 (0.2s wall)
+[slot2] start julia_cpp.row_matrix berlin52.tsp     rep=7 core=10
+[slot1] done  julia_cpp.row_matrix berlin52.tsp     rep=4 COST=143721.0 TIME=0.106110531 (0.2s wall)
+[slot1] start julia_cpp.row_matrix berlin52.tsp     rep=8 core=9
+[slot0] done  julia_cpp.row_matrix berlin52.tsp     rep=5 COST=143721.0 TIME=0.106280859 (0.2s wall)
+[slot0] start julia_cpp.row_matrix berlin52.tsp     rep=9 core=8
+[slot3] done  julia_cpp.row_matrix berlin52.tsp     rep=6 COST=143721.0 TIME=0.106151979 (0.2s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=0 core=11
+[slot2] done  julia_cpp.row_matrix berlin52.tsp     rep=7 COST=143721.0 TIME=0.106519945 (0.2s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=1 core=10
+[slot3] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=0 COST=143721.0 TIME=0.091189838 (0.1s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=2 core=11
+[slot1] done  julia_cpp.row_matrix berlin52.tsp     rep=8 COST=143721.0 TIME=0.106453681 (0.2s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=3 core=9
+[slot0] done  julia_cpp.row_matrix berlin52.tsp     rep=9 COST=143721.0 TIME=0.106143706 (0.2s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=4 core=8
+[slot2] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=1 COST=143721.0 TIME=0.091618105 (0.1s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=5 core=10
+[slot3] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=2 COST=143721.0 TIME=0.09167848 (0.1s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=6 core=11
+[slot1] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=3 COST=143721.0 TIME=0.091535814 (0.1s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=7 core=9
+[slot0] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=4 COST=143721.0 TIME=0.092304687 (0.1s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=8 core=8
+[slot2] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=5 COST=143721.0 TIME=0.091356498 (0.1s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=9 core=10
+[slot3] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=6 COST=143721.0 TIME=0.091393781 (0.1s wall)
+[slot3] start c_cpp.base berlin52.tsp     rep=0 core=11
+[slot1] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=7 COST=143721.0 TIME=0.091423078 (0.1s wall)
+[slot1] start c_cpp.base berlin52.tsp     rep=1 core=9
+[slot0] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=8 COST=143721.0 TIME=0.091697578 (0.1s wall)
+[slot0] start c_cpp.base berlin52.tsp     rep=2 core=8
+[slot2] done  julia_cpp.const_offsets_row_matrix berlin52.tsp     rep=9 COST=143721.0 TIME=0.091866743 (0.1s wall)
+[slot2] start c_cpp.base berlin52.tsp     rep=3 core=10
+[slot3] done  c_cpp.base berlin52.tsp     rep=0 COST=143721.0 TIME=0.096289721 (0.1s wall)
+[slot3] start c_cpp.base berlin52.tsp     rep=4 core=11
+[slot1] done  c_cpp.base berlin52.tsp     rep=1 COST=143721.0 TIME=0.096370586 (0.1s wall)
+[slot1] start c_cpp.base berlin52.tsp     rep=5 core=9
+[slot0] done  c_cpp.base berlin52.tsp     rep=2 COST=143721.0 TIME=0.096761487 (0.1s wall)
+[slot0] start c_cpp.base berlin52.tsp     rep=6 core=8
+[slot2] done  c_cpp.base berlin52.tsp     rep=3 COST=143721.0 TIME=0.096379667 (0.1s wall)
+[slot2] start c_cpp.base berlin52.tsp     rep=7 core=10
+[slot3] done  c_cpp.base berlin52.tsp     rep=4 COST=143721.0 TIME=0.09634993 (0.1s wall)
+[slot3] start c_cpp.base berlin52.tsp     rep=8 core=11
+[slot1] done  c_cpp.base berlin52.tsp     rep=5 COST=143721.0 TIME=0.096410938 (0.1s wall)
+[slot1] start c_cpp.base berlin52.tsp     rep=9 core=9
+[slot0] done  c_cpp.base berlin52.tsp     rep=6 COST=143721.0 TIME=0.096645318 (0.1s wall)
+[slot0] start c_cpp.row_matrix berlin52.tsp     rep=0 core=8
+[slot2] done  c_cpp.base berlin52.tsp     rep=7 COST=143721.0 TIME=0.096293137 (0.1s wall)
+[slot2] start c_cpp.row_matrix berlin52.tsp     rep=1 core=10
+[slot3] done  c_cpp.base berlin52.tsp     rep=8 COST=143721.0 TIME=0.096234697 (0.1s wall)
+[slot3] start c_cpp.row_matrix berlin52.tsp     rep=2 core=11
+[slot1] done  c_cpp.base berlin52.tsp     rep=9 COST=143721.0 TIME=0.096508473 (0.1s wall)
+[slot1] start c_cpp.row_matrix berlin52.tsp     rep=3 core=9
+[slot0] done  c_cpp.row_matrix berlin52.tsp     rep=0 COST=143721.0 TIME=0.093585522 (0.1s wall)
+[slot0] start c_cpp.row_matrix berlin52.tsp     rep=4 core=8
+[slot2] done  c_cpp.row_matrix berlin52.tsp     rep=1 COST=143721.0 TIME=0.092826604 (0.1s wall)
+[slot2] start c_cpp.row_matrix berlin52.tsp     rep=5 core=10
+[slot3] done  c_cpp.row_matrix berlin52.tsp     rep=2 COST=143721.0 TIME=0.092882482 (0.1s wall)
+[slot3] start c_cpp.row_matrix berlin52.tsp     rep=6 core=11
+[slot1] done  c_cpp.row_matrix berlin52.tsp     rep=3 COST=143721.0 TIME=0.09331989 (0.1s wall)
+[slot1] start c_cpp.row_matrix berlin52.tsp     rep=7 core=9
+[slot0] done  c_cpp.row_matrix berlin52.tsp     rep=4 COST=143721.0 TIME=0.092960112 (0.1s wall)
+[slot0] start c_cpp.row_matrix berlin52.tsp     rep=8 core=8
+[slot2] done  c_cpp.row_matrix berlin52.tsp     rep=5 COST=143721.0 TIME=0.092781382 (0.1s wall)
+[slot2] start c_cpp.row_matrix berlin52.tsp     rep=9 core=10
+[slot3] done  c_cpp.row_matrix berlin52.tsp     rep=6 COST=143721.0 TIME=0.092696828 (0.1s wall)
+[slot3] start lua_cpp.base berlin52.tsp     rep=0 core=11
+[slot1] done  c_cpp.row_matrix berlin52.tsp     rep=7 COST=143721.0 TIME=0.093425322 (0.1s wall)
+[slot1] start lua_cpp.base berlin52.tsp     rep=1 core=9
+[slot0] done  c_cpp.row_matrix berlin52.tsp     rep=8 COST=143721.0 TIME=0.092974825 (0.1s wall)
+[slot0] start lua_cpp.base berlin52.tsp     rep=2 core=8
+[slot2] done  c_cpp.row_matrix berlin52.tsp     rep=9 COST=143721.0 TIME=0.092899808 (0.1s wall)
+[slot2] start lua_cpp.base berlin52.tsp     rep=3 core=10
+[slot3] done  lua_cpp.base berlin52.tsp     rep=0 COST=143721.0 TIME=0.094092058 (0.1s wall)
+[slot3] start lua_cpp.base berlin52.tsp     rep=4 core=11
+[slot1] done  lua_cpp.base berlin52.tsp     rep=1 COST=143721.0 TIME=0.094508074 (0.1s wall)
+[slot1] start lua_cpp.base berlin52.tsp     rep=5 core=9
+[slot0] done  lua_cpp.base berlin52.tsp     rep=2 COST=143721.0 TIME=0.094148205 (0.1s wall)
+[slot0] start lua_cpp.base berlin52.tsp     rep=6 core=8
+[slot2] done  lua_cpp.base berlin52.tsp     rep=3 COST=143721.0 TIME=0.09457882 (0.1s wall)
+[slot2] start lua_cpp.base berlin52.tsp     rep=7 core=10
+[slot3] done  lua_cpp.base berlin52.tsp     rep=4 COST=143721.0 TIME=0.094168943 (0.1s wall)
+[slot3] start lua_cpp.base berlin52.tsp     rep=8 core=11
+[slot1] done  lua_cpp.base berlin52.tsp     rep=5 COST=143721.0 TIME=0.094400329 (0.1s wall)
+[slot1] start lua_cpp.base berlin52.tsp     rep=9 core=9
+[slot0] done  lua_cpp.base berlin52.tsp     rep=6 COST=143721.0 TIME=0.094471853 (0.1s wall)
+[slot0] start lua_cpp.epsilon berlin52.tsp     rep=0 core=8
+[slot2] done  lua_cpp.base berlin52.tsp     rep=7 COST=143721.0 TIME=0.094182784 (0.1s wall)
+[slot2] start lua_cpp.epsilon berlin52.tsp     rep=1 core=10
+[slot3] done  lua_cpp.base berlin52.tsp     rep=8 COST=143721.0 TIME=0.094265512 (0.1s wall)
+[slot3] start lua_cpp.epsilon berlin52.tsp     rep=2 core=11
+[slot1] done  lua_cpp.base berlin52.tsp     rep=9 COST=143721.0 TIME=0.09499215 (0.1s wall)
+[slot1] start lua_cpp.epsilon berlin52.tsp     rep=3 core=9
+[slot0] done  lua_cpp.epsilon berlin52.tsp     rep=0 COST=143721.0 TIME=0.094218877 (0.1s wall)
+[slot0] start lua_cpp.epsilon berlin52.tsp     rep=4 core=8
+[slot2] done  lua_cpp.epsilon berlin52.tsp     rep=1 COST=143721.0 TIME=0.094175965 (0.1s wall)
+[slot2] start lua_cpp.epsilon berlin52.tsp     rep=5 core=10
+[slot3] done  lua_cpp.epsilon berlin52.tsp     rep=2 COST=143721.0 TIME=0.094044468 (0.1s wall)
+[slot3] start lua_cpp.epsilon berlin52.tsp     rep=6 core=11
+[slot1] done  lua_cpp.epsilon berlin52.tsp     rep=3 COST=143721.0 TIME=0.094498621 (0.1s wall)
+[slot1] start lua_cpp.epsilon berlin52.tsp     rep=7 core=9
+[slot0] done  lua_cpp.epsilon berlin52.tsp     rep=4 COST=143721.0 TIME=0.094345939 (0.1s wall)
+[slot0] start lua_cpp.epsilon berlin52.tsp     rep=8 core=8
+[slot2] done  lua_cpp.epsilon berlin52.tsp     rep=5 COST=143721.0 TIME=0.094127345 (0.1s wall)
+[slot2] start lua_cpp.epsilon berlin52.tsp     rep=9 core=10
+[slot3] done  lua_cpp.epsilon berlin52.tsp     rep=6 COST=143721.0 TIME=0.094058009 (0.1s wall)
+[slot3] start lua_cpp.row_matrix berlin52.tsp     rep=0 core=11
+[slot1] done  lua_cpp.epsilon berlin52.tsp     rep=7 COST=143721.0 TIME=0.094415887 (0.1s wall)
+[slot1] start lua_cpp.row_matrix berlin52.tsp     rep=1 core=9
+[slot0] done  lua_cpp.epsilon berlin52.tsp     rep=8 COST=143721.0 TIME=0.094923683 (0.1s wall)
+[slot0] start lua_cpp.row_matrix berlin52.tsp     rep=2 core=8
+[slot2] done  lua_cpp.epsilon berlin52.tsp     rep=9 COST=143721.0 TIME=0.094357982 (0.1s wall)
+[slot2] start lua_cpp.row_matrix berlin52.tsp     rep=3 core=10
+[slot3] done  lua_cpp.row_matrix berlin52.tsp     rep=0 COST=143721.0 TIME=0.092715058 (0.1s wall)
+[slot3] start lua_cpp.row_matrix berlin52.tsp     rep=4 core=11
+[slot1] done  lua_cpp.row_matrix berlin52.tsp     rep=1 COST=143721.0 TIME=0.093024871 (0.1s wall)
+[slot1] start lua_cpp.row_matrix berlin52.tsp     rep=5 core=9
+[slot0] done  lua_cpp.row_matrix berlin52.tsp     rep=2 COST=143721.0 TIME=0.092733083 (0.1s wall)
+[slot0] start lua_cpp.row_matrix berlin52.tsp     rep=6 core=8
+[slot2] done  lua_cpp.row_matrix berlin52.tsp     rep=3 COST=143721.0 TIME=0.092649775 (0.1s wall)
+[slot2] start lua_cpp.row_matrix berlin52.tsp     rep=7 core=10
+[slot3] done  lua_cpp.row_matrix berlin52.tsp     rep=4 COST=143721.0 TIME=0.092637857 (0.1s wall)
+[slot3] start lua_cpp.row_matrix berlin52.tsp     rep=8 core=11
+[slot1] done  lua_cpp.row_matrix berlin52.tsp     rep=5 COST=143721.0 TIME=0.092792316 (0.1s wall)
+[slot1] start lua_cpp.row_matrix berlin52.tsp     rep=9 core=9
+[slot0] done  lua_cpp.row_matrix berlin52.tsp     rep=6 COST=143721.0 TIME=0.092929247 (0.1s wall)
+[slot0] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=0 core=8
+[slot2] done  lua_cpp.row_matrix berlin52.tsp     rep=7 COST=143721.0 TIME=0.092769151 (0.1s wall)
+[slot2] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=1 core=10
+[slot3] done  lua_cpp.row_matrix berlin52.tsp     rep=8 COST=143721.0 TIME=0.093074611 (0.1s wall)
+[slot3] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=2 core=11
+[slot1] done  lua_cpp.row_matrix berlin52.tsp     rep=9 COST=143721.0 TIME=0.092871266 (0.1s wall)
+[slot1] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=3 core=9
+[slot0] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=0 COST=143721.0 TIME=0.092869634 (0.1s wall)
+[slot0] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=4 core=8
+[slot2] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=1 COST=143721.0 TIME=0.09283118 (0.1s wall)
+[slot2] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=5 core=10
+[slot3] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=2 COST=143721.0 TIME=0.092758205 (0.1s wall)
+[slot3] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=6 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=3 COST=143721.0 TIME=0.092871582 (0.1s wall)
+[slot1] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=7 core=9
+[slot0] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=4 COST=143721.0 TIME=0.093099299 (0.1s wall)
+[slot0] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=8 core=8
+[slot2] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=5 COST=143721.0 TIME=0.092600531 (0.1s wall)
+[slot2] start lua_cpp.epsilon_row_matrix berlin52.tsp     rep=9 core=10
+[slot3] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=6 COST=143721.0 TIME=0.092576914 (0.1s wall)
+[slot3] start java_cpp.base berlin52.tsp     rep=0 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=7 COST=143721.0 TIME=0.092636559 (0.1s wall)
+[slot1] start java_cpp.base berlin52.tsp     rep=1 core=9
+[slot0] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=8 COST=143721.0 TIME=0.094227648 (0.1s wall)
+[slot0] start java_cpp.base berlin52.tsp     rep=2 core=8
+[slot2] done  lua_cpp.epsilon_row_matrix berlin52.tsp     rep=9 COST=143721.0 TIME=0.09237353 (0.1s wall)
+[slot2] start java_cpp.base berlin52.tsp     rep=3 core=10
+[slot3] done  java_cpp.base berlin52.tsp     rep=0 COST=143721.0 TIME=0.096388264 (0.1s wall)
+[slot3] start java_cpp.base berlin52.tsp     rep=4 core=11
+[slot1] done  java_cpp.base berlin52.tsp     rep=1 COST=143721.0 TIME=0.096784805 (0.1s wall)
+[slot1] start java_cpp.base berlin52.tsp     rep=5 core=9
+[slot0] done  java_cpp.base berlin52.tsp     rep=2 COST=143721.0 TIME=0.097305183 (0.1s wall)
+[slot0] start java_cpp.base berlin52.tsp     rep=6 core=8
+[slot2] done  java_cpp.base berlin52.tsp     rep=3 COST=143721.0 TIME=0.096991503 (0.1s wall)
+[slot2] start java_cpp.base berlin52.tsp     rep=7 core=10
+[slot3] done  java_cpp.base berlin52.tsp     rep=4 COST=143721.0 TIME=0.096340477 (0.1s wall)
+[slot3] start java_cpp.base berlin52.tsp     rep=8 core=11
+[slot1] done  java_cpp.base berlin52.tsp     rep=5 COST=143721.0 TIME=0.096512175 (0.1s wall)
+[slot1] start java_cpp.base berlin52.tsp     rep=9 core=9
+[slot0] done  java_cpp.base berlin52.tsp     rep=6 COST=143721.0 TIME=0.096940692 (0.1s wall)
+[slot0] start java_cpp.all berlin52.tsp     rep=0 core=8
+[slot2] done  java_cpp.base berlin52.tsp     rep=7 COST=143721.0 TIME=0.09675008 (0.1s wall)
+[slot2] start java_cpp.all berlin52.tsp     rep=1 core=10
+[slot3] done  java_cpp.base berlin52.tsp     rep=8 COST=143721.0 TIME=0.096692564 (0.1s wall)
+[slot3] start java_cpp.all berlin52.tsp     rep=2 core=11
+[slot1] done  java_cpp.base berlin52.tsp     rep=9 COST=143721.0 TIME=0.096731763 (0.1s wall)
+[slot1] start java_cpp.all berlin52.tsp     rep=3 core=9
+[slot0] done  java_cpp.all berlin52.tsp     rep=0 COST=143721.0 TIME=0.095172167 (0.1s wall)
+[slot0] start java_cpp.all berlin52.tsp     rep=4 core=8
+[slot2] done  java_cpp.all berlin52.tsp     rep=1 COST=143721.0 TIME=0.095013008 (0.1s wall)
+[slot2] start java_cpp.all berlin52.tsp     rep=5 core=10
+[slot3] done  java_cpp.all berlin52.tsp     rep=2 COST=143721.0 TIME=0.095335826 (0.1s wall)
+[slot3] start java_cpp.all berlin52.tsp     rep=6 core=11
+[slot1] done  java_cpp.all berlin52.tsp     rep=3 COST=143721.0 TIME=0.095153656 (0.1s wall)
+[slot1] start java_cpp.all berlin52.tsp     rep=7 core=9
+[slot0] done  java_cpp.all berlin52.tsp     rep=4 COST=143721.0 TIME=0.094896801 (0.1s wall)
+[slot0] start java_cpp.all berlin52.tsp     rep=8 core=8
+[slot2] done  java_cpp.all berlin52.tsp     rep=5 COST=143721.0 TIME=0.095300377 (0.1s wall)
+[slot2] start java_cpp.all berlin52.tsp     rep=9 core=10
+[slot3] done  java_cpp.all berlin52.tsp     rep=6 COST=143721.0 TIME=0.094642932 (0.1s wall)
+[slot3] start cpp_javascript.base berlin52.tsp     rep=0 core=11
+[slot1] done  java_cpp.all berlin52.tsp     rep=7 COST=143721.0 TIME=0.095015777 (0.1s wall)
+[slot1] start cpp_javascript.base berlin52.tsp     rep=1 core=9
+[slot0] done  java_cpp.all berlin52.tsp     rep=8 COST=143721.0 TIME=0.094717333 (0.1s wall)
+[slot0] start cpp_javascript.base berlin52.tsp     rep=2 core=8
+[slot2] done  java_cpp.all berlin52.tsp     rep=9 COST=143721.0 TIME=0.094795918 (0.1s wall)
+[slot2] start cpp_javascript.base berlin52.tsp     rep=3 core=10
+[slot3] done  cpp_javascript.base berlin52.tsp     rep=0 COST=143721.0 TIME=0.471491 (0.6s wall)
+[slot3] start cpp_javascript.base berlin52.tsp     rep=4 core=11
+[slot1] done  cpp_javascript.base berlin52.tsp     rep=1 COST=143721.0 TIME=0.47305 (0.6s wall)
+[slot1] start cpp_javascript.base berlin52.tsp     rep=5 core=9
+[slot0] done  cpp_javascript.base berlin52.tsp     rep=2 COST=143721.0 TIME=0.474279 (0.6s wall)
+[slot0] start cpp_javascript.base berlin52.tsp     rep=6 core=8
+[slot2] done  cpp_javascript.base berlin52.tsp     rep=3 COST=143721.0 TIME=0.476124 (0.6s wall)
+[slot2] start cpp_javascript.base berlin52.tsp     rep=7 core=10
+[slot3] done  cpp_javascript.base berlin52.tsp     rep=4 COST=143721.0 TIME=0.471404 (0.6s wall)
+[slot3] start cpp_javascript.base berlin52.tsp     rep=8 core=11
+[slot1] done  cpp_javascript.base berlin52.tsp     rep=5 COST=143721.0 TIME=0.469997 (0.6s wall)
+[slot1] start cpp_javascript.base berlin52.tsp     rep=9 core=9
+[slot0] done  cpp_javascript.base berlin52.tsp     rep=6 COST=143721.0 TIME=0.467923 (0.6s wall)
+[slot0] start cpp_javascript.packed_matrix berlin52.tsp     rep=0 core=8
+[slot2] done  cpp_javascript.base berlin52.tsp     rep=7 COST=143721.0 TIME=0.474214 (0.6s wall)
+[slot2] start cpp_javascript.packed_matrix berlin52.tsp     rep=1 core=10
+[slot0] done  cpp_javascript.packed_matrix berlin52.tsp     rep=0 COST=143721.0 TIME=0.445386 (0.5s wall)
+[slot0] start cpp_javascript.packed_matrix berlin52.tsp     rep=2 core=8
+[slot2] done  cpp_javascript.packed_matrix berlin52.tsp     rep=1 COST=143721.0 TIME=0.447209 (0.5s wall)
+[slot2] start cpp_javascript.packed_matrix berlin52.tsp     rep=3 core=10
+[slot3] done  cpp_javascript.base berlin52.tsp     rep=8 COST=143721.0 TIME=0.470146 (0.6s wall)
+[slot3] start cpp_javascript.packed_matrix berlin52.tsp     rep=4 core=11
+[slot1] done  cpp_javascript.base berlin52.tsp     rep=9 COST=143721.0 TIME=0.469392 (0.6s wall)
+[slot1] start cpp_javascript.packed_matrix berlin52.tsp     rep=5 core=9
+[slot0] done  cpp_javascript.packed_matrix berlin52.tsp     rep=2 COST=143721.0 TIME=0.449567 (0.5s wall)
+[slot0] start cpp_javascript.packed_matrix berlin52.tsp     rep=6 core=8
+[slot2] done  cpp_javascript.packed_matrix berlin52.tsp     rep=3 COST=143721.0 TIME=0.449888 (0.5s wall)
+[slot2] start cpp_javascript.packed_matrix berlin52.tsp     rep=7 core=10
+[slot3] done  cpp_javascript.packed_matrix berlin52.tsp     rep=4 COST=143721.0 TIME=0.449079 (0.5s wall)
+[slot3] start cpp_javascript.packed_matrix berlin52.tsp     rep=8 core=11
+[slot1] done  cpp_javascript.packed_matrix berlin52.tsp     rep=5 COST=143721.0 TIME=0.447088 (0.5s wall)
+[slot1] start cpp_javascript.packed_matrix berlin52.tsp     rep=9 core=9
+[slot0] done  cpp_javascript.packed_matrix berlin52.tsp     rep=6 COST=143721.0 TIME=0.444012 (0.5s wall)
+[slot0] start cpp_javascript.interleaved_array berlin52.tsp     rep=0 core=8
+[slot2] done  cpp_javascript.packed_matrix berlin52.tsp     rep=7 COST=143721.0 TIME=0.451718 (0.5s wall)
+[slot2] start cpp_javascript.interleaved_array berlin52.tsp     rep=1 core=10
+[slot3] done  cpp_javascript.packed_matrix berlin52.tsp     rep=8 COST=143721.0 TIME=0.447702 (0.5s wall)
+[slot3] start cpp_javascript.interleaved_array berlin52.tsp     rep=2 core=11
+[slot1] done  cpp_javascript.packed_matrix berlin52.tsp     rep=9 COST=143721.0 TIME=0.444239 (0.5s wall)
+[slot1] start cpp_javascript.interleaved_array berlin52.tsp     rep=3 core=9
+[slot0] done  cpp_javascript.interleaved_array berlin52.tsp     rep=0 COST=143721.0 TIME=0.389705 (0.5s wall)
+[slot0] start cpp_javascript.interleaved_array berlin52.tsp     rep=4 core=8
+[slot2] done  cpp_javascript.interleaved_array berlin52.tsp     rep=1 COST=143721.0 TIME=0.391626 (0.5s wall)
+[slot2] start cpp_javascript.interleaved_array berlin52.tsp     rep=5 core=10
+[slot3] done  cpp_javascript.interleaved_array berlin52.tsp     rep=2 COST=143721.0 TIME=0.388711 (0.5s wall)
+[slot3] start cpp_javascript.interleaved_array berlin52.tsp     rep=6 core=11
+[slot1] done  cpp_javascript.interleaved_array berlin52.tsp     rep=3 COST=143721.0 TIME=0.394375 (0.5s wall)
+[slot1] start cpp_javascript.interleaved_array berlin52.tsp     rep=7 core=9
+[slot0] done  cpp_javascript.interleaved_array berlin52.tsp     rep=4 COST=143721.0 TIME=0.387972 (0.5s wall)
+[slot0] start cpp_javascript.interleaved_array berlin52.tsp     rep=8 core=8
+[slot2] done  cpp_javascript.interleaved_array berlin52.tsp     rep=5 COST=143721.0 TIME=0.389932 (0.5s wall)
+[slot2] start cpp_javascript.interleaved_array berlin52.tsp     rep=9 core=10
+[slot3] done  cpp_javascript.interleaved_array berlin52.tsp     rep=6 COST=143721.0 TIME=0.388941 (0.5s wall)
+[slot3] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=0 core=11
+[slot1] done  cpp_javascript.interleaved_array berlin52.tsp     rep=7 COST=143721.0 TIME=0.388817 (0.5s wall)
+[slot1] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=1 core=9
+[slot0] done  cpp_javascript.interleaved_array berlin52.tsp     rep=8 COST=143721.0 TIME=0.386931 (0.5s wall)
+[slot0] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=2 core=8
+[slot2] done  cpp_javascript.interleaved_array berlin52.tsp     rep=9 COST=143721.0 TIME=0.389263 (0.5s wall)
+[slot2] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=3 core=10
+[slot3] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=0 COST=143721.0 TIME=0.372472 (0.5s wall)
+[slot3] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=4 core=11
+[slot1] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=1 COST=143721.0 TIME=0.372256 (0.5s wall)
+[slot1] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=5 core=9
+[slot0] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=2 COST=143721.0 TIME=0.372265 (0.5s wall)
+[slot0] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=6 core=8
+[slot2] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=3 COST=143721.0 TIME=0.372594 (0.5s wall)
+[slot2] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=7 core=10
+[slot3] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=4 COST=143721.0 TIME=0.377247 (0.5s wall)
+[slot3] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=8 core=11
+[slot1] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=5 COST=143721.0 TIME=0.37368 (0.5s wall)
+[slot1] start cpp_javascript.interleaved_array_packed berlin52.tsp     rep=9 core=9
+[slot0] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=6 COST=143721.0 TIME=0.370374 (0.5s wall)
+[slot0] start ours_javascript.local_info_consts berlin52.tsp     rep=0 core=8
+[slot2] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=7 COST=143721.0 TIME=0.372095 (0.5s wall)
+[slot2] start ours_javascript.local_info_consts berlin52.tsp     rep=1 core=10
+[slot3] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=8 COST=143721.0 TIME=0.371288 (0.5s wall)
+[slot3] start ours_javascript.local_info_consts berlin52.tsp     rep=2 core=11
+[slot1] done  cpp_javascript.interleaved_array_packed berlin52.tsp     rep=9 COST=143721.0 TIME=0.37225 (0.5s wall)
+[slot1] start ours_javascript.local_info_consts berlin52.tsp     rep=3 core=9
+[slot0] done  ours_javascript.local_info_consts berlin52.tsp     rep=0 COST=143721.0 TIME=0.359 (0.4s wall)
+[slot0] start ours_javascript.local_info_consts berlin52.tsp     rep=4 core=8
+[slot2] done  ours_javascript.local_info_consts berlin52.tsp     rep=1 COST=143721.0 TIME=0.362 (0.4s wall)
+[slot2] start ours_javascript.local_info_consts berlin52.tsp     rep=5 core=10
+[slot1] done  ours_javascript.local_info_consts berlin52.tsp     rep=3 COST=143721.0 TIME=0.362 (0.4s wall)
+[slot1] start ours_javascript.local_info_consts berlin52.tsp     rep=6 core=9
+[slot3] done  ours_javascript.local_info_consts berlin52.tsp     rep=2 COST=143721.0 TIME=0.366 (0.5s wall)
+[slot3] start ours_javascript.local_info_consts berlin52.tsp     rep=7 core=11
+[slot0] done  ours_javascript.local_info_consts berlin52.tsp     rep=4 COST=143721.0 TIME=0.362 (0.4s wall)
+[slot0] start ours_javascript.local_info_consts berlin52.tsp     rep=8 core=8
+[slot2] done  ours_javascript.local_info_consts berlin52.tsp     rep=5 COST=143721.0 TIME=0.361 (0.4s wall)
+[slot2] start ours_javascript.local_info_consts berlin52.tsp     rep=9 core=10
+[slot1] done  ours_javascript.local_info_consts berlin52.tsp     rep=6 COST=143721.0 TIME=0.363 (0.4s wall)
+[slot1] start cplusplus kroA100.tsp      rep=0 core=9
+[slot3] done  ours_javascript.local_info_consts berlin52.tsp     rep=7 COST=143721.0 TIME=0.362 (0.4s wall)
+[slot3] start cplusplus kroA100.tsp      rep=1 core=11
+[slot0] done  ours_javascript.local_info_consts berlin52.tsp     rep=8 COST=143721.0 TIME=0.36 (0.4s wall)
+[slot0] start cplusplus kroA100.tsp      rep=2 core=8
+[slot2] done  ours_javascript.local_info_consts berlin52.tsp     rep=9 COST=143721.0 TIME=0.36 (0.4s wall)
+[slot2] start cplusplus kroA100.tsp      rep=3 core=10
+[slot3] done  cplusplus kroA100.tsp      rep=1 COST=983128.0 TIME=1.197 (1.2s wall)
+[slot3] start cplusplus kroA100.tsp      rep=4 core=11
+[slot1] done  cplusplus kroA100.tsp      rep=0 COST=983128.0 TIME=1.205 (1.3s wall)
+[slot1] start cplusplus kroA100.tsp      rep=5 core=9
+[slot0] done  cplusplus kroA100.tsp      rep=2 COST=983128.0 TIME=1.198 (1.2s wall)
+[slot0] start cplusplus kroA100.tsp      rep=6 core=8
+[slot2] done  cplusplus kroA100.tsp      rep=3 COST=983128.0 TIME=1.2 (1.3s wall)
+[slot2] start cplusplus kroA100.tsp      rep=7 core=10
+[slot3] done  cplusplus kroA100.tsp      rep=4 COST=983128.0 TIME=1.199 (1.3s wall)
+[slot3] start cplusplus kroA100.tsp      rep=8 core=11
+[slot1] done  cplusplus kroA100.tsp      rep=5 COST=983128.0 TIME=1.202 (1.3s wall)
+[slot1] start cplusplus kroA100.tsp      rep=9 core=9
+[slot0] done  cplusplus kroA100.tsp      rep=6 COST=983128.0 TIME=1.208 (1.3s wall)
+[slot0] start javascript kroA100.tsp      rep=0 core=8
+[slot2] done  cplusplus kroA100.tsp      rep=7 COST=983128.0 TIME=1.203 (1.2s wall)
+[slot2] start javascript kroA100.tsp      rep=1 core=10
+[slot3] done  cplusplus kroA100.tsp      rep=8 COST=983128.0 TIME=1.198 (1.2s wall)
+[slot3] start javascript kroA100.tsp      rep=2 core=11
+[slot1] done  cplusplus kroA100.tsp      rep=9 COST=983128.0 TIME=1.199 (1.2s wall)
+[slot1] start javascript kroA100.tsp      rep=3 core=9
+[slot0] done  javascript kroA100.tsp      rep=0 COST=983128.0 TIME=4.408 (4.5s wall)
+[slot0] start javascript kroA100.tsp      rep=4 core=8
+[slot2] done  javascript kroA100.tsp      rep=1 COST=983128.0 TIME=4.453 (4.5s wall)
+[slot2] start javascript kroA100.tsp      rep=5 core=10
+[slot1] done  javascript kroA100.tsp      rep=3 COST=983128.0 TIME=4.408 (4.5s wall)
+[slot1] start javascript kroA100.tsp      rep=6 core=9
+[slot3] done  javascript kroA100.tsp      rep=2 COST=983128.0 TIME=4.456 (4.5s wall)
+[slot3] start javascript kroA100.tsp      rep=7 core=11
+[slot0] done  javascript kroA100.tsp      rep=4 COST=983128.0 TIME=4.406 (4.5s wall)
+[slot0] start javascript kroA100.tsp      rep=8 core=8
+[slot2] done  javascript kroA100.tsp      rep=5 COST=983128.0 TIME=4.462 (4.5s wall)
+[slot2] start javascript kroA100.tsp      rep=9 core=10
+[slot1] done  javascript kroA100.tsp      rep=6 COST=983128.0 TIME=4.414 (4.5s wall)
+[slot1] start julia_cpp.base kroA100.tsp      rep=0 core=9
+[slot3] done  javascript kroA100.tsp      rep=7 COST=983128.0 TIME=4.412 (4.5s wall)
+[slot3] start julia_cpp.base kroA100.tsp      rep=1 core=11
+[slot1] done  julia_cpp.base kroA100.tsp      rep=0 COST=983128.0 TIME=1.612635263 (1.7s wall)
+[slot1] start julia_cpp.base kroA100.tsp      rep=2 core=9
+[slot3] done  julia_cpp.base kroA100.tsp      rep=1 COST=983128.0 TIME=1.613926162 (1.7s wall)
+[slot3] start julia_cpp.base kroA100.tsp      rep=3 core=11
+[slot1] done  julia_cpp.base kroA100.tsp      rep=2 COST=983128.0 TIME=1.618981436 (1.7s wall)
+[slot1] start julia_cpp.base kroA100.tsp      rep=4 core=9
+[slot3] done  julia_cpp.base kroA100.tsp      rep=3 COST=983128.0 TIME=1.617385122 (1.7s wall)
+[slot3] start julia_cpp.base kroA100.tsp      rep=5 core=11
+[slot0] done  javascript kroA100.tsp      rep=8 COST=983128.0 TIME=4.414 (4.5s wall)
+[slot0] start julia_cpp.base kroA100.tsp      rep=6 core=8
+[slot2] done  javascript kroA100.tsp      rep=9 COST=983128.0 TIME=4.422 (4.5s wall)
+[slot2] start julia_cpp.base kroA100.tsp      rep=7 core=10
+[slot1] done  julia_cpp.base kroA100.tsp      rep=4 COST=983128.0 TIME=1.611757874 (1.7s wall)
+[slot1] start julia_cpp.base kroA100.tsp      rep=8 core=9
+[slot3] done  julia_cpp.base kroA100.tsp      rep=5 COST=983128.0 TIME=1.625433318 (1.7s wall)
+[slot3] start julia_cpp.base kroA100.tsp      rep=9 core=11
+[slot0] done  julia_cpp.base kroA100.tsp      rep=6 COST=983128.0 TIME=1.617127423 (1.7s wall)
+[slot0] start julia_cpp.const_offsets kroA100.tsp      rep=0 core=8
+[slot2] done  julia_cpp.base kroA100.tsp      rep=7 COST=983128.0 TIME=1.625699308 (1.7s wall)
+[slot2] start julia_cpp.const_offsets kroA100.tsp      rep=1 core=10
+[slot1] done  julia_cpp.base kroA100.tsp      rep=8 COST=983128.0 TIME=1.610726285 (1.7s wall)
+[slot1] start julia_cpp.const_offsets kroA100.tsp      rep=2 core=9
+[slot3] done  julia_cpp.base kroA100.tsp      rep=9 COST=983128.0 TIME=1.616172322 (1.7s wall)
+[slot3] start julia_cpp.const_offsets kroA100.tsp      rep=3 core=11
+[slot0] done  julia_cpp.const_offsets kroA100.tsp      rep=0 COST=983128.0 TIME=1.403613627 (1.5s wall)
+[slot0] start julia_cpp.const_offsets kroA100.tsp      rep=4 core=8
+[slot2] done  julia_cpp.const_offsets kroA100.tsp      rep=1 COST=983128.0 TIME=1.402073231 (1.5s wall)
+[slot2] start julia_cpp.const_offsets kroA100.tsp      rep=5 core=10
+[slot1] done  julia_cpp.const_offsets kroA100.tsp      rep=2 COST=983128.0 TIME=1.395444646 (1.4s wall)
+[slot1] start julia_cpp.const_offsets kroA100.tsp      rep=6 core=9
+[slot0] done  julia_cpp.const_offsets kroA100.tsp      rep=4 COST=983128.0 TIME=1.392881976 (1.4s wall)
+[slot0] start julia_cpp.const_offsets kroA100.tsp      rep=7 core=8
+[slot3] done  julia_cpp.const_offsets kroA100.tsp      rep=3 COST=983128.0 TIME=1.402001177 (1.5s wall)
+[slot3] start julia_cpp.const_offsets kroA100.tsp      rep=8 core=11
+[slot2] done  julia_cpp.const_offsets kroA100.tsp      rep=5 COST=983128.0 TIME=1.400513591 (1.5s wall)
+[slot2] start julia_cpp.const_offsets kroA100.tsp      rep=9 core=10
+[slot1] done  julia_cpp.const_offsets kroA100.tsp      rep=6 COST=983128.0 TIME=1.397660409 (1.4s wall)
+[slot1] start julia_cpp.row_matrix kroA100.tsp      rep=0 core=9
+[slot0] done  julia_cpp.const_offsets kroA100.tsp      rep=7 COST=983128.0 TIME=1.39405477 (1.4s wall)
+[slot0] start julia_cpp.row_matrix kroA100.tsp      rep=1 core=8
+[slot3] done  julia_cpp.const_offsets kroA100.tsp      rep=8 COST=983128.0 TIME=1.398444078 (1.4s wall)
+[slot3] start julia_cpp.row_matrix kroA100.tsp      rep=2 core=11
+[slot2] done  julia_cpp.const_offsets kroA100.tsp      rep=9 COST=983128.0 TIME=1.398369222 (1.4s wall)
+[slot2] start julia_cpp.row_matrix kroA100.tsp      rep=3 core=10
+[slot1] done  julia_cpp.row_matrix kroA100.tsp      rep=0 COST=983128.0 TIME=1.389279293 (1.4s wall)
+[slot1] start julia_cpp.row_matrix kroA100.tsp      rep=4 core=9
+[slot0] done  julia_cpp.row_matrix kroA100.tsp      rep=1 COST=983128.0 TIME=1.384951207 (1.4s wall)
+[slot0] start julia_cpp.row_matrix kroA100.tsp      rep=5 core=8
+[slot3] done  julia_cpp.row_matrix kroA100.tsp      rep=2 COST=983128.0 TIME=1.39316884 (1.4s wall)
+[slot3] start julia_cpp.row_matrix kroA100.tsp      rep=6 core=11
+[slot2] done  julia_cpp.row_matrix kroA100.tsp      rep=3 COST=983128.0 TIME=1.39191965 (1.4s wall)
+[slot2] start julia_cpp.row_matrix kroA100.tsp      rep=7 core=10
+[slot1] done  julia_cpp.row_matrix kroA100.tsp      rep=4 COST=983128.0 TIME=1.390924291 (1.4s wall)
+[slot1] start julia_cpp.row_matrix kroA100.tsp      rep=8 core=9
+[slot0] done  julia_cpp.row_matrix kroA100.tsp      rep=5 COST=983128.0 TIME=1.394757305 (1.4s wall)
+[slot0] start julia_cpp.row_matrix kroA100.tsp      rep=9 core=8
+[slot3] done  julia_cpp.row_matrix kroA100.tsp      rep=6 COST=983128.0 TIME=1.395060632 (1.4s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=0 core=11
+[slot2] done  julia_cpp.row_matrix kroA100.tsp      rep=7 COST=983128.0 TIME=1.390222368 (1.4s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=1 core=10
+[slot3] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=0 COST=983128.0 TIME=1.181235303 (1.2s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=2 core=11
+[slot1] done  julia_cpp.row_matrix kroA100.tsp      rep=8 COST=983128.0 TIME=1.387953179 (1.4s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=3 core=9
+[slot2] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=1 COST=983128.0 TIME=1.180832472 (1.2s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=4 core=10
+[slot0] done  julia_cpp.row_matrix kroA100.tsp      rep=9 COST=983128.0 TIME=1.388786871 (1.4s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=5 core=8
+[slot3] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=2 COST=983128.0 TIME=1.1751396 (1.2s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=6 core=11
+[slot1] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=3 COST=983128.0 TIME=1.183276805 (1.2s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=7 core=9
+[slot2] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=4 COST=983128.0 TIME=1.1799815 (1.2s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=8 core=10
+[slot0] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=5 COST=983128.0 TIME=1.180559782 (1.2s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=9 core=8
+[slot3] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=6 COST=983128.0 TIME=1.180531836 (1.2s wall)
+[slot3] start c_cpp.base kroA100.tsp      rep=0 core=11
+[slot1] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=7 COST=983128.0 TIME=1.182303238 (1.2s wall)
+[slot1] start c_cpp.base kroA100.tsp      rep=1 core=9
+[slot2] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=8 COST=983128.0 TIME=1.178792292 (1.2s wall)
+[slot2] start c_cpp.base kroA100.tsp      rep=2 core=10
+[slot0] done  julia_cpp.const_offsets_row_matrix kroA100.tsp      rep=9 COST=983128.0 TIME=1.181024293 (1.2s wall)
+[slot0] start c_cpp.base kroA100.tsp      rep=3 core=8
+[slot3] done  c_cpp.base kroA100.tsp      rep=0 COST=983128.0 TIME=1.229630588 (1.3s wall)
+[slot3] start c_cpp.base kroA100.tsp      rep=4 core=11
+[slot1] done  c_cpp.base kroA100.tsp      rep=1 COST=983128.0 TIME=1.223476864 (1.3s wall)
+[slot1] start c_cpp.base kroA100.tsp      rep=5 core=9
+[slot2] done  c_cpp.base kroA100.tsp      rep=2 COST=983128.0 TIME=1.236171637 (1.3s wall)
+[slot2] start c_cpp.base kroA100.tsp      rep=6 core=10
+[slot0] done  c_cpp.base kroA100.tsp      rep=3 COST=983128.0 TIME=1.226641907 (1.3s wall)
+[slot0] start c_cpp.base kroA100.tsp      rep=7 core=8
+[slot3] done  c_cpp.base kroA100.tsp      rep=4 COST=983128.0 TIME=1.221194271 (1.3s wall)
+[slot3] start c_cpp.base kroA100.tsp      rep=8 core=11
+[slot1] done  c_cpp.base kroA100.tsp      rep=5 COST=983128.0 TIME=1.221976463 (1.3s wall)
+[slot1] start c_cpp.base kroA100.tsp      rep=9 core=9
+[slot2] done  c_cpp.base kroA100.tsp      rep=6 COST=983128.0 TIME=1.224275992 (1.3s wall)
+[slot2] start c_cpp.row_matrix kroA100.tsp      rep=0 core=10
+[slot0] done  c_cpp.base kroA100.tsp      rep=7 COST=983128.0 TIME=1.238358766 (1.3s wall)
+[slot0] start c_cpp.row_matrix kroA100.tsp      rep=1 core=8
+[slot3] done  c_cpp.base kroA100.tsp      rep=8 COST=983128.0 TIME=1.223460804 (1.3s wall)
+[slot3] start c_cpp.row_matrix kroA100.tsp      rep=2 core=11
+[slot2] done  c_cpp.row_matrix kroA100.tsp      rep=0 COST=983128.0 TIME=1.191365215 (1.2s wall)
+[slot2] start c_cpp.row_matrix kroA100.tsp      rep=3 core=10
+[slot0] done  c_cpp.row_matrix kroA100.tsp      rep=1 COST=983128.0 TIME=1.186281189 (1.2s wall)
+[slot0] start c_cpp.row_matrix kroA100.tsp      rep=4 core=8
+[slot1] done  c_cpp.base kroA100.tsp      rep=9 COST=983128.0 TIME=1.224699426 (1.3s wall)
+[slot1] start c_cpp.row_matrix kroA100.tsp      rep=5 core=9
+[slot3] done  c_cpp.row_matrix kroA100.tsp      rep=2 COST=983128.0 TIME=1.183405176 (1.2s wall)
+[slot3] start c_cpp.row_matrix kroA100.tsp      rep=6 core=11
+[slot1] done  c_cpp.row_matrix kroA100.tsp      rep=5 COST=983128.0 TIME=1.194220684 (1.2s wall)
+[slot1] start c_cpp.row_matrix kroA100.tsp      rep=7 core=9
+[slot2] done  c_cpp.row_matrix kroA100.tsp      rep=3 COST=983128.0 TIME=1.199920442 (1.3s wall)
+[slot2] start c_cpp.row_matrix kroA100.tsp      rep=8 core=10
+[slot0] done  c_cpp.row_matrix kroA100.tsp      rep=4 COST=983128.0 TIME=1.200783668 (1.3s wall)
+[slot0] start c_cpp.row_matrix kroA100.tsp      rep=9 core=8
+[slot3] done  c_cpp.row_matrix kroA100.tsp      rep=6 COST=983128.0 TIME=1.188611409 (1.2s wall)
+[slot3] start lua_cpp.base kroA100.tsp      rep=0 core=11
+[slot1] done  c_cpp.row_matrix kroA100.tsp      rep=7 COST=983128.0 TIME=1.194826929 (1.2s wall)
+[slot1] start lua_cpp.base kroA100.tsp      rep=1 core=9
+[slot2] done  c_cpp.row_matrix kroA100.tsp      rep=8 COST=983128.0 TIME=1.18837268 (1.2s wall)
+[slot2] start lua_cpp.base kroA100.tsp      rep=2 core=10
+[slot0] done  c_cpp.row_matrix kroA100.tsp      rep=9 COST=983128.0 TIME=1.194218872 (1.2s wall)
+[slot0] start lua_cpp.base kroA100.tsp      rep=3 core=8
+[slot3] done  lua_cpp.base kroA100.tsp      rep=0 COST=983128.0 TIME=1.217454343 (1.3s wall)
+[slot3] start lua_cpp.base kroA100.tsp      rep=4 core=11
+[slot1] done  lua_cpp.base kroA100.tsp      rep=1 COST=983128.0 TIME=1.218248017 (1.3s wall)
+[slot1] start lua_cpp.base kroA100.tsp      rep=5 core=9
+[slot2] done  lua_cpp.base kroA100.tsp      rep=2 COST=983128.0 TIME=1.222696266 (1.3s wall)
+[slot2] start lua_cpp.base kroA100.tsp      rep=6 core=10
+[slot0] done  lua_cpp.base kroA100.tsp      rep=3 COST=983128.0 TIME=1.220971528 (1.3s wall)
+[slot0] start lua_cpp.base kroA100.tsp      rep=7 core=8
+[slot3] done  lua_cpp.base kroA100.tsp      rep=4 COST=983128.0 TIME=1.218659936 (1.3s wall)
+[slot3] start lua_cpp.base kroA100.tsp      rep=8 core=11
+[slot1] done  lua_cpp.base kroA100.tsp      rep=5 COST=983128.0 TIME=1.228319739 (1.3s wall)
+[slot1] start lua_cpp.base kroA100.tsp      rep=9 core=9
+[slot2] done  lua_cpp.base kroA100.tsp      rep=6 COST=983128.0 TIME=1.216162282 (1.3s wall)
+[slot2] start lua_cpp.epsilon kroA100.tsp      rep=0 core=10
+[slot0] done  lua_cpp.base kroA100.tsp      rep=7 COST=983128.0 TIME=1.222061667 (1.3s wall)
+[slot0] start lua_cpp.epsilon kroA100.tsp      rep=1 core=8
+[slot3] done  lua_cpp.base kroA100.tsp      rep=8 COST=983128.0 TIME=1.227265303 (1.3s wall)
+[slot3] start lua_cpp.epsilon kroA100.tsp      rep=2 core=11
+[slot1] done  lua_cpp.base kroA100.tsp      rep=9 COST=983128.0 TIME=1.217291607 (1.3s wall)
+[slot1] start lua_cpp.epsilon kroA100.tsp      rep=3 core=9
+[slot2] done  lua_cpp.epsilon kroA100.tsp      rep=0 COST=983128.0 TIME=1.219436138 (1.3s wall)
+[slot2] start lua_cpp.epsilon kroA100.tsp      rep=4 core=10
+[slot0] done  lua_cpp.epsilon kroA100.tsp      rep=1 COST=983128.0 TIME=1.219374371 (1.3s wall)
+[slot0] start lua_cpp.epsilon kroA100.tsp      rep=5 core=8
+[slot3] done  lua_cpp.epsilon kroA100.tsp      rep=2 COST=983128.0 TIME=1.216625545 (1.3s wall)
+[slot3] start lua_cpp.epsilon kroA100.tsp      rep=6 core=11
+[slot1] done  lua_cpp.epsilon kroA100.tsp      rep=3 COST=983128.0 TIME=1.220830578 (1.3s wall)
+[slot1] start lua_cpp.epsilon kroA100.tsp      rep=7 core=9
+[slot2] done  lua_cpp.epsilon kroA100.tsp      rep=4 COST=983128.0 TIME=1.213562181 (1.3s wall)
+[slot2] start lua_cpp.epsilon kroA100.tsp      rep=8 core=10
+[slot0] done  lua_cpp.epsilon kroA100.tsp      rep=5 COST=983128.0 TIME=1.225061285 (1.3s wall)
+[slot0] start lua_cpp.epsilon kroA100.tsp      rep=9 core=8
+[slot3] done  lua_cpp.epsilon kroA100.tsp      rep=6 COST=983128.0 TIME=1.215711837 (1.3s wall)
+[slot3] start lua_cpp.row_matrix kroA100.tsp      rep=0 core=11
+[slot1] done  lua_cpp.epsilon kroA100.tsp      rep=7 COST=983128.0 TIME=1.219818725 (1.3s wall)
+[slot1] start lua_cpp.row_matrix kroA100.tsp      rep=1 core=9
+[slot2] done  lua_cpp.epsilon kroA100.tsp      rep=8 COST=983128.0 TIME=1.221990245 (1.3s wall)
+[slot2] start lua_cpp.row_matrix kroA100.tsp      rep=2 core=10
+[slot0] done  lua_cpp.epsilon kroA100.tsp      rep=9 COST=983128.0 TIME=1.225246056 (1.3s wall)
+[slot0] start lua_cpp.row_matrix kroA100.tsp      rep=3 core=8
+[slot3] done  lua_cpp.row_matrix kroA100.tsp      rep=0 COST=983128.0 TIME=1.195975991 (1.2s wall)
+[slot3] start lua_cpp.row_matrix kroA100.tsp      rep=4 core=11
+[slot1] done  lua_cpp.row_matrix kroA100.tsp      rep=1 COST=983128.0 TIME=1.198973485 (1.2s wall)
+[slot1] start lua_cpp.row_matrix kroA100.tsp      rep=5 core=9
+[slot2] done  lua_cpp.row_matrix kroA100.tsp      rep=2 COST=983128.0 TIME=1.203004954 (1.3s wall)
+[slot2] start lua_cpp.row_matrix kroA100.tsp      rep=6 core=10
+[slot0] done  lua_cpp.row_matrix kroA100.tsp      rep=3 COST=983128.0 TIME=1.209476779 (1.3s wall)
+[slot0] start lua_cpp.row_matrix kroA100.tsp      rep=7 core=8
+[slot3] done  lua_cpp.row_matrix kroA100.tsp      rep=4 COST=983128.0 TIME=1.196988789 (1.2s wall)
+[slot3] start lua_cpp.row_matrix kroA100.tsp      rep=8 core=11
+[slot1] done  lua_cpp.row_matrix kroA100.tsp      rep=5 COST=983128.0 TIME=1.211814252 (1.3s wall)
+[slot1] start lua_cpp.row_matrix kroA100.tsp      rep=9 core=9
+[slot2] done  lua_cpp.row_matrix kroA100.tsp      rep=6 COST=983128.0 TIME=1.200531475 (1.3s wall)
+[slot2] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=0 core=10
+[slot0] done  lua_cpp.row_matrix kroA100.tsp      rep=7 COST=983128.0 TIME=1.212953378 (1.3s wall)
+[slot0] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=1 core=8
+[slot3] done  lua_cpp.row_matrix kroA100.tsp      rep=8 COST=983128.0 TIME=1.193540728 (1.2s wall)
+[slot3] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=2 core=11
+[slot1] done  lua_cpp.row_matrix kroA100.tsp      rep=9 COST=983128.0 TIME=1.20848083 (1.3s wall)
+[slot1] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=3 core=9
+[slot2] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=0 COST=983128.0 TIME=1.200089617 (1.3s wall)
+[slot2] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=4 core=10
+[slot0] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=1 COST=983128.0 TIME=1.201858031 (1.3s wall)
+[slot0] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=5 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=2 COST=983128.0 TIME=1.198746438 (1.2s wall)
+[slot3] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=6 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=3 COST=983128.0 TIME=1.20324487 (1.3s wall)
+[slot1] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=7 core=9
+[slot2] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=4 COST=983128.0 TIME=1.208609817 (1.3s wall)
+[slot2] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=8 core=10
+[slot0] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=5 COST=983128.0 TIME=1.203522716 (1.3s wall)
+[slot0] start lua_cpp.epsilon_row_matrix kroA100.tsp      rep=9 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=6 COST=983128.0 TIME=1.199070526 (1.2s wall)
+[slot3] start java_cpp.base kroA100.tsp      rep=0 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=7 COST=983128.0 TIME=1.212828422 (1.3s wall)
+[slot1] start java_cpp.base kroA100.tsp      rep=1 core=9
+[slot0] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=9 COST=983128.0 TIME=1.196612646 (1.2s wall)
+[slot0] start java_cpp.base kroA100.tsp      rep=2 core=8
+[slot2] done  lua_cpp.epsilon_row_matrix kroA100.tsp      rep=8 COST=983128.0 TIME=1.199107675 (1.3s wall)
+[slot2] start java_cpp.base kroA100.tsp      rep=3 core=10
+[slot3] done  java_cpp.base kroA100.tsp      rep=0 COST=983128.0 TIME=1.27532917 (1.3s wall)
+[slot3] start java_cpp.base kroA100.tsp      rep=4 core=11
+[slot1] done  java_cpp.base kroA100.tsp      rep=1 COST=983128.0 TIME=1.283418765 (1.3s wall)
+[slot1] start java_cpp.base kroA100.tsp      rep=5 core=9
+[slot0] done  java_cpp.base kroA100.tsp      rep=2 COST=983128.0 TIME=1.276020575 (1.3s wall)
+[slot0] start java_cpp.base kroA100.tsp      rep=6 core=8
+[slot2] done  java_cpp.base kroA100.tsp      rep=3 COST=983128.0 TIME=1.277832859 (1.3s wall)
+[slot2] start java_cpp.base kroA100.tsp      rep=7 core=10
+[slot3] done  java_cpp.base kroA100.tsp      rep=4 COST=983128.0 TIME=1.274286148 (1.3s wall)
+[slot3] start java_cpp.base kroA100.tsp      rep=8 core=11
+[slot1] done  java_cpp.base kroA100.tsp      rep=5 COST=983128.0 TIME=1.277412379 (1.3s wall)
+[slot1] start java_cpp.base kroA100.tsp      rep=9 core=9
+[slot0] done  java_cpp.base kroA100.tsp      rep=6 COST=983128.0 TIME=1.287286806 (1.3s wall)
+[slot0] start java_cpp.all kroA100.tsp      rep=0 core=8
+[slot2] done  java_cpp.base kroA100.tsp      rep=7 COST=983128.0 TIME=1.282308942 (1.3s wall)
+[slot2] start java_cpp.all kroA100.tsp      rep=1 core=10
+[slot3] done  java_cpp.base kroA100.tsp      rep=8 COST=983128.0 TIME=1.288790693 (1.3s wall)
+[slot3] start java_cpp.all kroA100.tsp      rep=2 core=11
+[slot0] done  java_cpp.all kroA100.tsp      rep=0 COST=983128.0 TIME=1.240983633 (1.3s wall)
+[slot0] start java_cpp.all kroA100.tsp      rep=3 core=8
+[slot1] done  java_cpp.base kroA100.tsp      rep=9 COST=983128.0 TIME=1.278922326 (1.3s wall)
+[slot1] start java_cpp.all kroA100.tsp      rep=4 core=9
+[slot2] done  java_cpp.all kroA100.tsp      rep=1 COST=983128.0 TIME=1.235740673 (1.3s wall)
+[slot2] start java_cpp.all kroA100.tsp      rep=5 core=10
+[slot3] done  java_cpp.all kroA100.tsp      rep=2 COST=983128.0 TIME=1.228168962 (1.3s wall)
+[slot3] start java_cpp.all kroA100.tsp      rep=6 core=11
+[slot0] done  java_cpp.all kroA100.tsp      rep=3 COST=983128.0 TIME=1.236567923 (1.3s wall)
+[slot0] start java_cpp.all kroA100.tsp      rep=7 core=8
+[slot1] done  java_cpp.all kroA100.tsp      rep=4 COST=983128.0 TIME=1.238927359 (1.3s wall)
+[slot1] start java_cpp.all kroA100.tsp      rep=8 core=9
+[slot2] done  java_cpp.all kroA100.tsp      rep=5 COST=983128.0 TIME=1.229541573 (1.3s wall)
+[slot2] start java_cpp.all kroA100.tsp      rep=9 core=10
+[slot3] done  java_cpp.all kroA100.tsp      rep=6 COST=983128.0 TIME=1.23368195 (1.3s wall)
+[slot3] start cpp_javascript.base kroA100.tsp      rep=0 core=11
+[slot0] done  java_cpp.all kroA100.tsp      rep=7 COST=983128.0 TIME=1.233811181 (1.3s wall)
+[slot0] start cpp_javascript.base kroA100.tsp      rep=1 core=8
+[slot1] done  java_cpp.all kroA100.tsp      rep=8 COST=983128.0 TIME=1.236943756 (1.3s wall)
+[slot1] start cpp_javascript.base kroA100.tsp      rep=2 core=9
+[slot2] done  java_cpp.all kroA100.tsp      rep=9 COST=983128.0 TIME=1.242315778 (1.3s wall)
+[slot2] start cpp_javascript.base kroA100.tsp      rep=3 core=10
+[slot3] done  cpp_javascript.base kroA100.tsp      rep=0 COST=983128.0 TIME=5.19689 (5.3s wall)
+[slot3] start cpp_javascript.base kroA100.tsp      rep=4 core=11
+[slot0] done  cpp_javascript.base kroA100.tsp      rep=1 COST=983128.0 TIME=5.20596 (5.3s wall)
+[slot0] start cpp_javascript.base kroA100.tsp      rep=5 core=8
+[slot2] done  cpp_javascript.base kroA100.tsp      rep=3 COST=983128.0 TIME=5.19676 (5.3s wall)
+[slot2] start cpp_javascript.base kroA100.tsp      rep=6 core=10
+[slot1] done  cpp_javascript.base kroA100.tsp      rep=2 COST=983128.0 TIME=5.24695 (5.3s wall)
+[slot1] start cpp_javascript.base kroA100.tsp      rep=7 core=9
+[slot3] done  cpp_javascript.base kroA100.tsp      rep=4 COST=983128.0 TIME=5.19423 (5.3s wall)
+[slot3] start cpp_javascript.base kroA100.tsp      rep=8 core=11
+[slot0] done  cpp_javascript.base kroA100.tsp      rep=5 COST=983128.0 TIME=5.18359 (5.3s wall)
+[slot0] start cpp_javascript.base kroA100.tsp      rep=9 core=8
+[slot1] done  cpp_javascript.base kroA100.tsp      rep=7 COST=983128.0 TIME=5.18879 (5.3s wall)
+[slot1] start cpp_javascript.packed_matrix kroA100.tsp      rep=0 core=9
+[slot2] done  cpp_javascript.base kroA100.tsp      rep=6 COST=983128.0 TIME=5.22349 (5.3s wall)
+[slot2] start cpp_javascript.packed_matrix kroA100.tsp      rep=1 core=10
+[slot3] done  cpp_javascript.base kroA100.tsp      rep=8 COST=983128.0 TIME=5.2149 (5.3s wall)
+[slot3] start cpp_javascript.packed_matrix kroA100.tsp      rep=2 core=11
+[slot2] done  cpp_javascript.packed_matrix kroA100.tsp      rep=1 COST=983128.0 TIME=4.92023 (5.0s wall)
+[slot2] start cpp_javascript.packed_matrix kroA100.tsp      rep=3 core=10
+[slot1] done  cpp_javascript.packed_matrix kroA100.tsp      rep=0 COST=983128.0 TIME=4.94483 (5.0s wall)
+[slot1] start cpp_javascript.packed_matrix kroA100.tsp      rep=4 core=9
+[slot0] done  cpp_javascript.base kroA100.tsp      rep=9 COST=983128.0 TIME=5.17524 (5.3s wall)
+[slot0] start cpp_javascript.packed_matrix kroA100.tsp      rep=5 core=8
+[slot3] done  cpp_javascript.packed_matrix kroA100.tsp      rep=2 COST=983128.0 TIME=4.92107 (5.0s wall)
+[slot3] start cpp_javascript.packed_matrix kroA100.tsp      rep=6 core=11
+[slot2] done  cpp_javascript.packed_matrix kroA100.tsp      rep=3 COST=983128.0 TIME=4.93418 (5.0s wall)
+[slot2] start cpp_javascript.packed_matrix kroA100.tsp      rep=7 core=10
+[slot1] done  cpp_javascript.packed_matrix kroA100.tsp      rep=4 COST=983128.0 TIME=4.93177 (5.0s wall)
+[slot1] start cpp_javascript.packed_matrix kroA100.tsp      rep=8 core=9
+[slot0] done  cpp_javascript.packed_matrix kroA100.tsp      rep=5 COST=983128.0 TIME=4.98477 (5.1s wall)
+[slot0] start cpp_javascript.packed_matrix kroA100.tsp      rep=9 core=8
+[slot3] done  cpp_javascript.packed_matrix kroA100.tsp      rep=6 COST=983128.0 TIME=4.93326 (5.0s wall)
+[slot3] start cpp_javascript.interleaved_array kroA100.tsp      rep=0 core=11
+[slot2] done  cpp_javascript.packed_matrix kroA100.tsp      rep=7 COST=983128.0 TIME=4.9302 (5.0s wall)
+[slot2] start cpp_javascript.interleaved_array kroA100.tsp      rep=1 core=10
+[slot1] done  cpp_javascript.packed_matrix kroA100.tsp      rep=8 COST=983128.0 TIME=4.96503 (5.0s wall)
+[slot1] start cpp_javascript.interleaved_array kroA100.tsp      rep=2 core=9
+[slot0] done  cpp_javascript.packed_matrix kroA100.tsp      rep=9 COST=983128.0 TIME=4.97749 (5.1s wall)
+[slot0] start cpp_javascript.interleaved_array kroA100.tsp      rep=3 core=8
+[slot3] done  cpp_javascript.interleaved_array kroA100.tsp      rep=0 COST=983128.0 TIME=4.12395 (4.2s wall)
+[slot3] start cpp_javascript.interleaved_array kroA100.tsp      rep=4 core=11
+[slot1] done  cpp_javascript.interleaved_array kroA100.tsp      rep=2 COST=983128.0 TIME=4.05963 (4.1s wall)
+[slot1] start cpp_javascript.interleaved_array kroA100.tsp      rep=5 core=9
+[slot2] done  cpp_javascript.interleaved_array kroA100.tsp      rep=1 COST=983128.0 TIME=4.07474 (4.2s wall)
+[slot2] start cpp_javascript.interleaved_array kroA100.tsp      rep=6 core=10
+[slot0] done  cpp_javascript.interleaved_array kroA100.tsp      rep=3 COST=983128.0 TIME=4.07286 (4.2s wall)
+[slot0] start cpp_javascript.interleaved_array kroA100.tsp      rep=7 core=8
+[slot3] done  cpp_javascript.interleaved_array kroA100.tsp      rep=4 COST=983128.0 TIME=4.06605 (4.1s wall)
+[slot3] start cpp_javascript.interleaved_array kroA100.tsp      rep=8 core=11
+[slot1] done  cpp_javascript.interleaved_array kroA100.tsp      rep=5 COST=983128.0 TIME=4.07276 (4.2s wall)
+[slot1] start cpp_javascript.interleaved_array kroA100.tsp      rep=9 core=9
+[slot2] done  cpp_javascript.interleaved_array kroA100.tsp      rep=6 COST=983128.0 TIME=4.12108 (4.2s wall)
+[slot2] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=0 core=10
+[slot0] done  cpp_javascript.interleaved_array kroA100.tsp      rep=7 COST=983128.0 TIME=4.13623 (4.2s wall)
+[slot0] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=1 core=8
+[slot3] done  cpp_javascript.interleaved_array kroA100.tsp      rep=8 COST=983128.0 TIME=4.0885 (4.2s wall)
+[slot3] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=2 core=11
+[slot1] done  cpp_javascript.interleaved_array kroA100.tsp      rep=9 COST=983128.0 TIME=4.08202 (4.2s wall)
+[slot1] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=3 core=9
+[slot2] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=0 COST=983128.0 TIME=4.02809 (4.1s wall)
+[slot2] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=4 core=10
+[slot0] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=1 COST=983128.0 TIME=4.01067 (4.1s wall)
+[slot0] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=5 core=8
+[slot3] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=2 COST=983128.0 TIME=3.99919 (4.1s wall)
+[slot3] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=6 core=11
+[slot2] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=4 COST=983128.0 TIME=4.01775 (4.1s wall)
+[slot2] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=7 core=10
+[slot1] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=3 COST=983128.0 TIME=4.05384 (4.1s wall)
+[slot1] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=8 core=9
+[slot0] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=5 COST=983128.0 TIME=4.00976 (4.1s wall)
+[slot0] start cpp_javascript.interleaved_array_packed kroA100.tsp      rep=9 core=8
+[slot3] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=6 COST=983128.0 TIME=4.00911 (4.1s wall)
+[slot3] start ours_javascript.local_info_consts kroA100.tsp      rep=0 core=11
+[slot2] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=7 COST=983128.0 TIME=4.00907 (4.1s wall)
+[slot2] start ours_javascript.local_info_consts kroA100.tsp      rep=1 core=10
+[slot1] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=8 COST=983128.0 TIME=4.00361 (4.1s wall)
+[slot1] start ours_javascript.local_info_consts kroA100.tsp      rep=2 core=9
+[slot0] done  cpp_javascript.interleaved_array_packed kroA100.tsp      rep=9 COST=983128.0 TIME=4.01952 (4.1s wall)
+[slot0] start ours_javascript.local_info_consts kroA100.tsp      rep=3 core=8
+[slot3] done  ours_javascript.local_info_consts kroA100.tsp      rep=0 COST=983128.0 TIME=3.91 (4.0s wall)
+[slot3] start ours_javascript.local_info_consts kroA100.tsp      rep=4 core=11
+[slot1] done  ours_javascript.local_info_consts kroA100.tsp      rep=2 COST=983128.0 TIME=3.918 (4.0s wall)
+[slot1] start ours_javascript.local_info_consts kroA100.tsp      rep=5 core=9
+[slot2] done  ours_javascript.local_info_consts kroA100.tsp      rep=1 COST=983128.0 TIME=3.941 (4.0s wall)
+[slot2] start ours_javascript.local_info_consts kroA100.tsp      rep=6 core=10
+[slot0] done  ours_javascript.local_info_consts kroA100.tsp      rep=3 COST=983128.0 TIME=3.934 (4.0s wall)
+[slot0] start ours_javascript.local_info_consts kroA100.tsp      rep=7 core=8
+[slot3] done  ours_javascript.local_info_consts kroA100.tsp      rep=4 COST=983128.0 TIME=3.927 (4.0s wall)
+[slot3] start ours_javascript.local_info_consts kroA100.tsp      rep=8 core=11
+[slot2] done  ours_javascript.local_info_consts kroA100.tsp      rep=6 COST=983128.0 TIME=3.913 (4.0s wall)
+[slot2] start ours_javascript.local_info_consts kroA100.tsp      rep=9 core=10
+[slot1] done  ours_javascript.local_info_consts kroA100.tsp      rep=5 COST=983128.0 TIME=3.969 (4.0s wall)
+[slot1] start cplusplus gr202.tsp        rep=0 core=9
+[slot0] done  ours_javascript.local_info_consts kroA100.tsp      rep=7 COST=983128.0 TIME=3.928 (4.0s wall)
+[slot0] start cplusplus gr202.tsp        rep=1 core=8
+[slot3] done  ours_javascript.local_info_consts kroA100.tsp      rep=8 COST=983128.0 TIME=3.966 (4.0s wall)
+[slot3] start cplusplus gr202.tsp        rep=2 core=11
+[slot2] done  ours_javascript.local_info_consts kroA100.tsp      rep=9 COST=983128.0 TIME=3.907 (4.0s wall)
+[slot2] start cplusplus gr202.tsp        rep=3 core=10
+[slot1] done  cplusplus gr202.tsp        rep=0 COST=2909247.0 TIME=11.547 (11.6s wall)
+[slot1] start cplusplus gr202.tsp        rep=4 core=9
+[slot0] done  cplusplus gr202.tsp        rep=1 COST=2909247.0 TIME=11.604 (11.6s wall)
+[slot0] start cplusplus gr202.tsp        rep=5 core=8
+[slot2] done  cplusplus gr202.tsp        rep=3 COST=2909247.0 TIME=11.493 (11.5s wall)
+[slot2] start cplusplus gr202.tsp        rep=6 core=10
+[slot3] done  cplusplus gr202.tsp        rep=2 COST=2909247.0 TIME=11.59 (11.6s wall)
+[slot3] start cplusplus gr202.tsp        rep=7 core=11
+[slot1] done  cplusplus gr202.tsp        rep=4 COST=2909247.0 TIME=11.592 (11.6s wall)
+[slot1] start cplusplus gr202.tsp        rep=8 core=9
+[slot0] done  cplusplus gr202.tsp        rep=5 COST=2909247.0 TIME=11.482 (11.5s wall)
+[slot0] start cplusplus gr202.tsp        rep=9 core=8
+[slot2] done  cplusplus gr202.tsp        rep=6 COST=2909247.0 TIME=11.512 (11.5s wall)
+[slot2] start javascript gr202.tsp        rep=0 core=10
+[slot3] done  cplusplus gr202.tsp        rep=7 COST=2909247.0 TIME=11.76 (11.8s wall)
+[slot3] start javascript gr202.tsp        rep=1 core=11
+[slot1] done  cplusplus gr202.tsp        rep=8 COST=2909247.0 TIME=11.516 (11.5s wall)
+[slot1] start javascript gr202.tsp        rep=2 core=9
+[slot0] done  cplusplus gr202.tsp        rep=9 COST=2909247.0 TIME=11.515 (11.5s wall)
+[slot0] start javascript gr202.tsp        rep=3 core=8
+[slot2] done  javascript gr202.tsp        rep=0 COST=2909247.0 TIME=43.056 (43.1s wall)
+[slot2] start javascript gr202.tsp        rep=4 core=10
+[slot3] done  javascript gr202.tsp        rep=1 COST=2909247.0 TIME=42.933 (43.0s wall)
+[slot3] start javascript gr202.tsp        rep=5 core=11
+[slot1] done  javascript gr202.tsp        rep=2 COST=2909247.0 TIME=42.739 (42.8s wall)
+[slot1] start javascript gr202.tsp        rep=6 core=9
+[slot0] done  javascript gr202.tsp        rep=3 COST=2909247.0 TIME=42.892 (43.0s wall)
+[slot0] start javascript gr202.tsp        rep=7 core=8
+[slot2] done  javascript gr202.tsp        rep=4 COST=2909247.0 TIME=42.962 (43.0s wall)
+[slot2] start javascript gr202.tsp        rep=8 core=10
+[slot3] done  javascript gr202.tsp        rep=5 COST=2909247.0 TIME=43.153 (43.2s wall)
+[slot3] start javascript gr202.tsp        rep=9 core=11
+[slot1] done  javascript gr202.tsp        rep=6 COST=2909247.0 TIME=43.214 (43.3s wall)
+[slot1] start julia_cpp.base gr202.tsp        rep=0 core=9
+[slot0] done  javascript gr202.tsp        rep=7 COST=2909247.0 TIME=43.031 (43.1s wall)
+[slot0] start julia_cpp.base gr202.tsp        rep=1 core=8
+[slot1] done  julia_cpp.base gr202.tsp        rep=0 COST=2909247.0 TIME=15.477888649 (15.5s wall)
+[slot1] start julia_cpp.base gr202.tsp        rep=2 core=9
+[slot0] done  julia_cpp.base gr202.tsp        rep=1 COST=2909247.0 TIME=15.526846953 (15.5s wall)
+[slot0] start julia_cpp.base gr202.tsp        rep=3 core=8
+[slot1] done  julia_cpp.base gr202.tsp        rep=2 COST=2909247.0 TIME=15.553847721 (15.6s wall)
+[slot1] start julia_cpp.base gr202.tsp        rep=4 core=9
+[slot0] done  julia_cpp.base gr202.tsp        rep=3 COST=2909247.0 TIME=15.486712965 (15.5s wall)
+[slot0] start julia_cpp.base gr202.tsp        rep=5 core=8
+[slot2] done  javascript gr202.tsp        rep=8 COST=2909247.0 TIME=42.874 (43.0s wall)
+[slot2] start julia_cpp.base gr202.tsp        rep=6 core=10
+[slot3] done  javascript gr202.tsp        rep=9 COST=2909247.0 TIME=42.855 (42.9s wall)
+[slot3] start julia_cpp.base gr202.tsp        rep=7 core=11
+[slot1] done  julia_cpp.base gr202.tsp        rep=4 COST=2909247.0 TIME=15.485217445 (15.5s wall)
+[slot1] start julia_cpp.base gr202.tsp        rep=8 core=9
+[slot0] done  julia_cpp.base gr202.tsp        rep=5 COST=2909247.0 TIME=15.441214892 (15.5s wall)
+[slot0] start julia_cpp.base gr202.tsp        rep=9 core=8
+[slot2] done  julia_cpp.base gr202.tsp        rep=6 COST=2909247.0 TIME=15.541651142 (15.6s wall)
+[slot2] start julia_cpp.const_offsets gr202.tsp        rep=0 core=10
+[slot3] done  julia_cpp.base gr202.tsp        rep=7 COST=2909247.0 TIME=15.473372116 (15.5s wall)
+[slot3] start julia_cpp.const_offsets gr202.tsp        rep=1 core=11
+[slot1] done  julia_cpp.base gr202.tsp        rep=8 COST=2909247.0 TIME=15.467078054 (15.5s wall)
+[slot1] start julia_cpp.const_offsets gr202.tsp        rep=2 core=9
+[slot0] done  julia_cpp.base gr202.tsp        rep=9 COST=2909247.0 TIME=15.465614623 (15.5s wall)
+[slot0] start julia_cpp.const_offsets gr202.tsp        rep=3 core=8
+[slot2] done  julia_cpp.const_offsets gr202.tsp        rep=0 COST=2909247.0 TIME=13.360083243 (13.4s wall)
+[slot2] start julia_cpp.const_offsets gr202.tsp        rep=4 core=10
+[slot3] done  julia_cpp.const_offsets gr202.tsp        rep=1 COST=2909247.0 TIME=13.360460052 (13.4s wall)
+[slot3] start julia_cpp.const_offsets gr202.tsp        rep=5 core=11
+[slot1] done  julia_cpp.const_offsets gr202.tsp        rep=2 COST=2909247.0 TIME=13.332117209 (13.4s wall)
+[slot1] start julia_cpp.const_offsets gr202.tsp        rep=6 core=9
+[slot0] done  julia_cpp.const_offsets gr202.tsp        rep=3 COST=2909247.0 TIME=13.330423066 (13.4s wall)
+[slot0] start julia_cpp.const_offsets gr202.tsp        rep=7 core=8
+[slot2] done  julia_cpp.const_offsets gr202.tsp        rep=4 COST=2909247.0 TIME=13.51153164 (13.5s wall)
+[slot2] start julia_cpp.const_offsets gr202.tsp        rep=8 core=10
+[slot3] done  julia_cpp.const_offsets gr202.tsp        rep=5 COST=2909247.0 TIME=13.329671988 (13.3s wall)
+[slot3] start julia_cpp.const_offsets gr202.tsp        rep=9 core=11
+[slot1] done  julia_cpp.const_offsets gr202.tsp        rep=6 COST=2909247.0 TIME=13.329429882 (13.3s wall)
+[slot1] start julia_cpp.row_matrix gr202.tsp        rep=0 core=9
+[slot0] done  julia_cpp.const_offsets gr202.tsp        rep=7 COST=2909247.0 TIME=13.343082616 (13.4s wall)
+[slot0] start julia_cpp.row_matrix gr202.tsp        rep=1 core=8
+[slot3] done  julia_cpp.const_offsets gr202.tsp        rep=9 COST=2909247.0 TIME=13.331249208 (13.4s wall)
+[slot3] start julia_cpp.row_matrix gr202.tsp        rep=2 core=11
+[slot2] done  julia_cpp.const_offsets gr202.tsp        rep=8 COST=2909247.0 TIME=13.576288698 (13.6s wall)
+[slot2] start julia_cpp.row_matrix gr202.tsp        rep=3 core=10
+[slot1] done  julia_cpp.row_matrix gr202.tsp        rep=0 COST=2909247.0 TIME=13.365026452 (13.4s wall)
+[slot1] start julia_cpp.row_matrix gr202.tsp        rep=4 core=9
+[slot0] done  julia_cpp.row_matrix gr202.tsp        rep=1 COST=2909247.0 TIME=13.520365836 (13.5s wall)
+[slot0] start julia_cpp.row_matrix gr202.tsp        rep=5 core=8
+[slot3] done  julia_cpp.row_matrix gr202.tsp        rep=2 COST=2909247.0 TIME=13.377974066 (13.4s wall)
+[slot3] start julia_cpp.row_matrix gr202.tsp        rep=6 core=11
+[slot2] done  julia_cpp.row_matrix gr202.tsp        rep=3 COST=2909247.0 TIME=13.369661527 (13.4s wall)
+[slot2] start julia_cpp.row_matrix gr202.tsp        rep=7 core=10
+[slot1] done  julia_cpp.row_matrix gr202.tsp        rep=4 COST=2909247.0 TIME=13.340062418 (13.4s wall)
+[slot1] start julia_cpp.row_matrix gr202.tsp        rep=8 core=9
+[slot0] done  julia_cpp.row_matrix gr202.tsp        rep=5 COST=2909247.0 TIME=13.42385119 (13.4s wall)
+[slot0] start julia_cpp.row_matrix gr202.tsp        rep=9 core=8
+[slot3] done  julia_cpp.row_matrix gr202.tsp        rep=6 COST=2909247.0 TIME=13.375231266 (13.4s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=0 core=11
+[slot2] done  julia_cpp.row_matrix gr202.tsp        rep=7 COST=2909247.0 TIME=13.495100602 (13.5s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=1 core=10
+[slot1] done  julia_cpp.row_matrix gr202.tsp        rep=8 COST=2909247.0 TIME=13.338976231 (13.4s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=2 core=9
+[slot3] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=0 COST=2909247.0 TIME=11.240665401 (11.3s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=3 core=11
+[slot2] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=1 COST=2909247.0 TIME=11.224766363 (11.3s wall)
+[slot0] done  julia_cpp.row_matrix gr202.tsp        rep=9 COST=2909247.0 TIME=13.4932627 (13.5s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=5 core=8
+[slot2] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=4 core=10
+[slot1] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=2 COST=2909247.0 TIME=11.295749244 (11.3s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=6 core=9
+[slot3] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=3 COST=2909247.0 TIME=11.234541497 (11.3s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=7 core=11
+[slot0] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=5 COST=2909247.0 TIME=11.168359677 (11.2s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=8 core=8
+[slot2] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=4 COST=2909247.0 TIME=11.352335726 (11.4s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix gr202.tsp        rep=9 core=10
+[slot1] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=6 COST=2909247.0 TIME=11.200402023 (11.2s wall)
+[slot1] start c_cpp.base gr202.tsp        rep=0 core=9
+[slot3] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=7 COST=2909247.0 TIME=11.256541034 (11.3s wall)
+[slot3] start c_cpp.base gr202.tsp        rep=1 core=11
+[slot0] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=8 COST=2909247.0 TIME=11.172613011 (11.2s wall)
+[slot0] start c_cpp.base gr202.tsp        rep=2 core=8
+[slot2] done  julia_cpp.const_offsets_row_matrix gr202.tsp        rep=9 COST=2909247.0 TIME=11.244690567 (11.3s wall)
+[slot2] start c_cpp.base gr202.tsp        rep=3 core=10
+[slot1] done  c_cpp.base gr202.tsp        rep=0 COST=2909247.0 TIME=12.016188768 (12.0s wall)
+[slot1] start c_cpp.base gr202.tsp        rep=4 core=9
+[slot3] done  c_cpp.base gr202.tsp        rep=1 COST=2909247.0 TIME=11.959017768 (12.0s wall)
+[slot3] start c_cpp.base gr202.tsp        rep=5 core=11
+[slot0] done  c_cpp.base gr202.tsp        rep=2 COST=2909247.0 TIME=11.911938763 (11.9s wall)
+[slot0] start c_cpp.base gr202.tsp        rep=6 core=8
+[slot2] done  c_cpp.base gr202.tsp        rep=3 COST=2909247.0 TIME=11.974989947 (12.0s wall)
+[slot2] start c_cpp.base gr202.tsp        rep=7 core=10
+[slot1] done  c_cpp.base gr202.tsp        rep=4 COST=2909247.0 TIME=12.008824198 (12.0s wall)
+[slot1] start c_cpp.base gr202.tsp        rep=8 core=9
+[slot0] done  c_cpp.base gr202.tsp        rep=6 COST=2909247.0 TIME=11.782624256 (11.8s wall)
+[slot0] start c_cpp.base gr202.tsp        rep=9 core=8
+[slot3] done  c_cpp.base gr202.tsp        rep=5 COST=2909247.0 TIME=12.065257779 (12.1s wall)
+[slot3] start c_cpp.row_matrix gr202.tsp        rep=0 core=11
+[slot2] done  c_cpp.base gr202.tsp        rep=7 COST=2909247.0 TIME=11.959648877 (12.0s wall)
+[slot2] start c_cpp.row_matrix gr202.tsp        rep=1 core=10
+[slot3] done  c_cpp.row_matrix gr202.tsp        rep=0 COST=2909247.0 TIME=11.40189621 (11.4s wall)
+[slot3] start c_cpp.row_matrix gr202.tsp        rep=2 core=11
+[slot2] done  c_cpp.row_matrix gr202.tsp        rep=1 COST=2909247.0 TIME=11.373648548 (11.4s wall)
+[slot0] done  c_cpp.base gr202.tsp        rep=9 COST=2909247.0 TIME=11.903151187 (11.9s wall)
+[slot2] start c_cpp.row_matrix gr202.tsp        rep=3 core=10
+[slot0] start c_cpp.row_matrix gr202.tsp        rep=4 core=8
+[slot1] done  c_cpp.base gr202.tsp        rep=8 COST=2909247.0 TIME=12.014834475 (12.0s wall)
+[slot1] start c_cpp.row_matrix gr202.tsp        rep=5 core=9
+[slot3] done  c_cpp.row_matrix gr202.tsp        rep=2 COST=2909247.0 TIME=11.419951167 (11.5s wall)
+[slot3] start c_cpp.row_matrix gr202.tsp        rep=6 core=11
+[slot2] done  c_cpp.row_matrix gr202.tsp        rep=3 COST=2909247.0 TIME=11.353604654 (11.4s wall)
+[slot2] start c_cpp.row_matrix gr202.tsp        rep=7 core=10
+[slot0] done  c_cpp.row_matrix gr202.tsp        rep=4 COST=2909247.0 TIME=11.398592361 (11.4s wall)
+[slot0] start c_cpp.row_matrix gr202.tsp        rep=8 core=8
+[slot1] done  c_cpp.row_matrix gr202.tsp        rep=5 COST=2909247.0 TIME=11.371272269 (11.4s wall)
+[slot1] start c_cpp.row_matrix gr202.tsp        rep=9 core=9
+[slot1] done  c_cpp.row_matrix gr202.tsp        rep=9 COST=2909247.0 TIME=11.409344688 (11.4s wall)
+[slot3] done  c_cpp.row_matrix gr202.tsp        rep=6 COST=2909247.0 TIME=11.68953427 (11.7s wall)
+[slot1] start lua_cpp.base gr202.tsp        rep=0 core=9
+[slot3] start lua_cpp.base gr202.tsp        rep=1 core=11
+[slot0] done  c_cpp.row_matrix gr202.tsp        rep=8 COST=2909247.0 TIME=11.439989103 (11.5s wall)
+[slot2] done  c_cpp.row_matrix gr202.tsp        rep=7 COST=2909247.0 TIME=11.500732297 (11.5s wall)
+[slot0] start lua_cpp.base gr202.tsp        rep=2 core=8
+[slot2] start lua_cpp.base gr202.tsp        rep=3 core=10
+[slot3] done  lua_cpp.base gr202.tsp        rep=1 COST=2909247.0 TIME=11.848226468 (11.9s wall)
+[slot3] start lua_cpp.base gr202.tsp        rep=4 core=11
+[slot0] done  lua_cpp.base gr202.tsp        rep=2 COST=2909247.0 TIME=11.913738592 (11.9s wall)
+[slot2] done  lua_cpp.base gr202.tsp        rep=3 COST=2909247.0 TIME=11.88866158 (11.9s wall)
+[slot2] start lua_cpp.base gr202.tsp        rep=6 core=10
+[slot0] start lua_cpp.base gr202.tsp        rep=5 core=8
+[slot1] done  lua_cpp.base gr202.tsp        rep=0 COST=2909247.0 TIME=11.961256947 (12.0s wall)
+[slot1] start lua_cpp.base gr202.tsp        rep=7 core=9
+[slot2] done  lua_cpp.base gr202.tsp        rep=6 COST=2909247.0 TIME=11.960271894 (12.0s wall)
+[slot2] start lua_cpp.base gr202.tsp        rep=8 core=10
+[slot3] done  lua_cpp.base gr202.tsp        rep=4 COST=2909247.0 TIME=12.023422099 (12.1s wall)
+[slot3] start lua_cpp.base gr202.tsp        rep=9 core=11
+[slot1] done  lua_cpp.base gr202.tsp        rep=7 COST=2909247.0 TIME=11.991696727 (12.0s wall)
+[slot1] start lua_cpp.epsilon gr202.tsp        rep=0 core=9
+[slot0] done  lua_cpp.base gr202.tsp        rep=5 COST=2909247.0 TIME=12.036454743 (12.1s wall)
+[slot0] start lua_cpp.epsilon gr202.tsp        rep=1 core=8
+[slot2] done  lua_cpp.base gr202.tsp        rep=8 COST=2909247.0 TIME=11.819025656 (11.8s wall)
+[slot2] start lua_cpp.epsilon gr202.tsp        rep=2 core=10
+[slot3] done  lua_cpp.base gr202.tsp        rep=9 COST=2909247.0 TIME=11.971189228 (12.0s wall)
+[slot3] start lua_cpp.epsilon gr202.tsp        rep=3 core=11
+[slot0] done  lua_cpp.epsilon gr202.tsp        rep=1 COST=2909247.0 TIME=12.010635672 (12.0s wall)
+[slot0] start lua_cpp.epsilon gr202.tsp        rep=4 core=8
+[slot1] done  lua_cpp.epsilon gr202.tsp        rep=0 COST=2909247.0 TIME=12.114653509 (12.1s wall)
+[slot1] start lua_cpp.epsilon gr202.tsp        rep=5 core=9
+[slot2] done  lua_cpp.epsilon gr202.tsp        rep=2 COST=2909247.0 TIME=11.908131653 (11.9s wall)
+[slot2] start lua_cpp.epsilon gr202.tsp        rep=6 core=10
+[slot3] done  lua_cpp.epsilon gr202.tsp        rep=3 COST=2909247.0 TIME=11.937370345 (12.0s wall)
+[slot3] start lua_cpp.epsilon gr202.tsp        rep=7 core=11
+[slot0] done  lua_cpp.epsilon gr202.tsp        rep=4 COST=2909247.0 TIME=11.970112387 (12.0s wall)
+[slot0] start lua_cpp.epsilon gr202.tsp        rep=8 core=8
+[slot1] done  lua_cpp.epsilon gr202.tsp        rep=5 COST=2909247.0 TIME=11.877024032 (11.9s wall)
+[slot1] start lua_cpp.epsilon gr202.tsp        rep=9 core=9
+[slot2] done  lua_cpp.epsilon gr202.tsp        rep=6 COST=2909247.0 TIME=12.040108603 (12.1s wall)
+[slot2] start lua_cpp.row_matrix gr202.tsp        rep=0 core=10
+[slot0] done  lua_cpp.epsilon gr202.tsp        rep=8 COST=2909247.0 TIME=11.86867844 (11.9s wall)
+[slot0] start lua_cpp.row_matrix gr202.tsp        rep=1 core=8
+[slot3] done  lua_cpp.epsilon gr202.tsp        rep=7 COST=2909247.0 TIME=12.076438904 (12.1s wall)
+[slot3] start lua_cpp.row_matrix gr202.tsp        rep=2 core=11
+[slot1] done  lua_cpp.epsilon gr202.tsp        rep=9 COST=2909247.0 TIME=12.110237496 (12.1s wall)
+[slot1] start lua_cpp.row_matrix gr202.tsp        rep=3 core=9
+[slot2] done  lua_cpp.row_matrix gr202.tsp        rep=0 COST=2909247.0 TIME=11.480568593 (11.5s wall)
+[slot2] start lua_cpp.row_matrix gr202.tsp        rep=4 core=10
+[slot0] done  lua_cpp.row_matrix gr202.tsp        rep=1 COST=2909247.0 TIME=11.596570228 (11.6s wall)
+[slot0] start lua_cpp.row_matrix gr202.tsp        rep=5 core=8
+[slot3] done  lua_cpp.row_matrix gr202.tsp        rep=2 COST=2909247.0 TIME=11.571896766 (11.6s wall)
+[slot3] start lua_cpp.row_matrix gr202.tsp        rep=6 core=11
+[slot1] done  lua_cpp.row_matrix gr202.tsp        rep=3 COST=2909247.0 TIME=11.591507297 (11.6s wall)
+[slot1] start lua_cpp.row_matrix gr202.tsp        rep=7 core=9
+[slot2] done  lua_cpp.row_matrix gr202.tsp        rep=4 COST=2909247.0 TIME=11.492562562 (11.5s wall)
+[slot2] start lua_cpp.row_matrix gr202.tsp        rep=8 core=10
+[slot0] done  lua_cpp.row_matrix gr202.tsp        rep=5 COST=2909247.0 TIME=11.525311995 (11.6s wall)
+[slot0] start lua_cpp.row_matrix gr202.tsp        rep=9 core=8
+[slot3] done  lua_cpp.row_matrix gr202.tsp        rep=6 COST=2909247.0 TIME=11.466258754 (11.5s wall)
+[slot3] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=0 core=11
+[slot1] done  lua_cpp.row_matrix gr202.tsp        rep=7 COST=2909247.0 TIME=11.654921962 (11.7s wall)
+[slot1] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=1 core=9
+[slot2] done  lua_cpp.row_matrix gr202.tsp        rep=8 COST=2909247.0 TIME=11.431739741 (11.5s wall)
+[slot2] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=2 core=10
+[slot0] done  lua_cpp.row_matrix gr202.tsp        rep=9 COST=2909247.0 TIME=11.560547022 (11.6s wall)
+[slot0] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=3 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=0 COST=2909247.0 TIME=11.512473976 (11.5s wall)
+[slot3] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=4 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=1 COST=2909247.0 TIME=11.710768328 (11.7s wall)
+[slot1] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=5 core=9
+[slot2] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=2 COST=2909247.0 TIME=11.489061284 (11.5s wall)
+[slot2] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=6 core=10
+[slot0] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=3 COST=2909247.0 TIME=11.465066784 (11.5s wall)
+[slot0] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=7 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=4 COST=2909247.0 TIME=11.609952137 (11.6s wall)
+[slot3] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=8 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=5 COST=2909247.0 TIME=11.544305903 (11.6s wall)
+[slot1] start lua_cpp.epsilon_row_matrix gr202.tsp        rep=9 core=9
+[slot2] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=6 COST=2909247.0 TIME=11.651499903 (11.7s wall)
+[slot2] start java_cpp.base gr202.tsp        rep=0 core=10
+[slot0] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=7 COST=2909247.0 TIME=11.605772238 (11.6s wall)
+[slot0] start java_cpp.base gr202.tsp        rep=1 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=8 COST=2909247.0 TIME=11.516654078 (11.5s wall)
+[slot3] start java_cpp.base gr202.tsp        rep=2 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix gr202.tsp        rep=9 COST=2909247.0 TIME=11.819908151 (11.8s wall)
+[slot1] start java_cpp.base gr202.tsp        rep=3 core=9
+[slot2] done  java_cpp.base gr202.tsp        rep=0 COST=2909247.0 TIME=13.117049325 (13.2s wall)
+[slot2] start java_cpp.base gr202.tsp        rep=4 core=10
+[slot0] done  java_cpp.base gr202.tsp        rep=1 COST=2909247.0 TIME=12.986848037 (13.0s wall)
+[slot0] start java_cpp.base gr202.tsp        rep=5 core=8
+[slot3] done  java_cpp.base gr202.tsp        rep=2 COST=2909247.0 TIME=12.963653417 (13.0s wall)
+[slot3] start java_cpp.base gr202.tsp        rep=6 core=11
+[slot1] done  java_cpp.base gr202.tsp        rep=3 COST=2909247.0 TIME=13.072384972 (13.1s wall)
+[slot1] start java_cpp.base gr202.tsp        rep=7 core=9
+[slot2] done  java_cpp.base gr202.tsp        rep=4 COST=2909247.0 TIME=12.719022478 (12.7s wall)
+[slot2] start java_cpp.base gr202.tsp        rep=8 core=10
+[slot3] done  java_cpp.base gr202.tsp        rep=6 COST=2909247.0 TIME=12.716050995 (12.7s wall)
+[slot3] start java_cpp.base gr202.tsp        rep=9 core=11
+[slot0] done  java_cpp.base gr202.tsp        rep=5 COST=2909247.0 TIME=12.820808436 (12.8s wall)
+[slot0] start java_cpp.all gr202.tsp        rep=0 core=8
+[slot1] done  java_cpp.base gr202.tsp        rep=7 COST=2909247.0 TIME=12.718282837 (12.7s wall)
+[slot1] start java_cpp.all gr202.tsp        rep=1 core=9
+[slot0] done  java_cpp.all gr202.tsp        rep=0 COST=2909247.0 TIME=11.807174241 (11.8s wall)
+[slot0] start java_cpp.all gr202.tsp        rep=2 core=8
+[slot2] done  java_cpp.base gr202.tsp        rep=8 COST=2909247.0 TIME=12.754798897 (12.8s wall)
+[slot2] start java_cpp.all gr202.tsp        rep=3 core=10
+[slot3] done  java_cpp.base gr202.tsp        rep=9 COST=2909247.0 TIME=12.722783079 (12.8s wall)
+[slot3] start java_cpp.all gr202.tsp        rep=4 core=11
+[slot1] done  java_cpp.all gr202.tsp        rep=1 COST=2909247.0 TIME=11.936799109 (12.0s wall)
+[slot1] start java_cpp.all gr202.tsp        rep=5 core=9
+[slot0] done  java_cpp.all gr202.tsp        rep=2 COST=2909247.0 TIME=11.785258074 (11.8s wall)
+[slot0] start java_cpp.all gr202.tsp        rep=6 core=8
+[slot2] done  java_cpp.all gr202.tsp        rep=3 COST=2909247.0 TIME=11.968593663 (12.0s wall)
+[slot2] start java_cpp.all gr202.tsp        rep=7 core=10
+[slot3] done  java_cpp.all gr202.tsp        rep=4 COST=2909247.0 TIME=11.805925546 (11.8s wall)
+[slot3] start java_cpp.all gr202.tsp        rep=8 core=11
+[slot1] done  java_cpp.all gr202.tsp        rep=5 COST=2909247.0 TIME=11.853979525 (11.9s wall)
+[slot1] start java_cpp.all gr202.tsp        rep=9 core=9
+[slot0] done  java_cpp.all gr202.tsp        rep=6 COST=2909247.0 TIME=11.818191122 (11.8s wall)
+[slot0] start cpp_javascript.base gr202.tsp        rep=0 core=8
+[slot3] done  java_cpp.all gr202.tsp        rep=8 COST=2909247.0 TIME=11.804763618 (11.8s wall)
+[slot3] start cpp_javascript.base gr202.tsp        rep=1 core=11
+[slot2] done  java_cpp.all gr202.tsp        rep=7 COST=2909247.0 TIME=11.878897383 (11.9s wall)
+[slot2] start cpp_javascript.base gr202.tsp        rep=2 core=10
+[slot1] done  java_cpp.all gr202.tsp        rep=9 COST=2909247.0 TIME=12.006576152 (12.0s wall)
+[slot1] start cpp_javascript.base gr202.tsp        rep=3 core=9
+[slot0] done  cpp_javascript.base gr202.tsp        rep=0 COST=2909247.0 TIME=51.2041 (51.3s wall)
+[slot0] start cpp_javascript.base gr202.tsp        rep=4 core=8
+[slot3] done  cpp_javascript.base gr202.tsp        rep=1 COST=2909247.0 TIME=51.4086 (51.5s wall)
+[slot3] start cpp_javascript.base gr202.tsp        rep=5 core=11
+[slot2] done  cpp_javascript.base gr202.tsp        rep=2 COST=2909247.0 TIME=51.5308 (51.6s wall)
+[slot2] start cpp_javascript.base gr202.tsp        rep=6 core=10
+[slot1] done  cpp_javascript.base gr202.tsp        rep=3 COST=2909247.0 TIME=51.5722 (51.7s wall)
+[slot1] start cpp_javascript.base gr202.tsp        rep=7 core=9
+[slot0] done  cpp_javascript.base gr202.tsp        rep=4 COST=2909247.0 TIME=51.5198 (51.6s wall)
+[slot0] start cpp_javascript.base gr202.tsp        rep=8 core=8
+[slot2] done  cpp_javascript.base gr202.tsp        rep=6 COST=2909247.0 TIME=51.2913 (51.3s wall)
+[slot2] start cpp_javascript.base gr202.tsp        rep=9 core=10
+[slot1] done  cpp_javascript.base gr202.tsp        rep=7 COST=2909247.0 TIME=51.1779 (51.2s wall)
+[slot1] start cpp_javascript.packed_matrix gr202.tsp        rep=0 core=9
+[slot3] done  cpp_javascript.base gr202.tsp        rep=5 COST=2909247.0 TIME=51.7711 (51.8s wall)
+[slot3] start cpp_javascript.packed_matrix gr202.tsp        rep=1 core=11
+[slot3] done  cpp_javascript.packed_matrix gr202.tsp        rep=1 COST=2909247.0 TIME=48.8129 (48.9s wall)
+[slot3] start cpp_javascript.packed_matrix gr202.tsp        rep=2 core=11
+[slot1] done  cpp_javascript.packed_matrix gr202.tsp        rep=0 COST=2909247.0 TIME=49.0984 (49.2s wall)
+[slot1] start cpp_javascript.packed_matrix gr202.tsp        rep=3 core=9
+[slot0] done  cpp_javascript.base gr202.tsp        rep=8 COST=2909247.0 TIME=51.1333 (51.2s wall)
+[slot0] start cpp_javascript.packed_matrix gr202.tsp        rep=4 core=8
+[slot2] done  cpp_javascript.base gr202.tsp        rep=9 COST=2909247.0 TIME=51.5596 (51.6s wall)
+[slot2] start cpp_javascript.packed_matrix gr202.tsp        rep=5 core=10
+[slot3] done  cpp_javascript.packed_matrix gr202.tsp        rep=2 COST=2909247.0 TIME=48.8402 (48.9s wall)
+[slot3] start cpp_javascript.packed_matrix gr202.tsp        rep=6 core=11
+[slot1] done  cpp_javascript.packed_matrix gr202.tsp        rep=3 COST=2909247.0 TIME=49.0558 (49.1s wall)
+[slot1] start cpp_javascript.packed_matrix gr202.tsp        rep=7 core=9
+[slot0] done  cpp_javascript.packed_matrix gr202.tsp        rep=4 COST=2909247.0 TIME=49.2122 (49.3s wall)
+[slot0] start cpp_javascript.packed_matrix gr202.tsp        rep=8 core=8
+[slot2] done  cpp_javascript.packed_matrix gr202.tsp        rep=5 COST=2909247.0 TIME=49.4578 (49.6s wall)
+[slot2] start cpp_javascript.packed_matrix gr202.tsp        rep=9 core=10
+[slot3] done  cpp_javascript.packed_matrix gr202.tsp        rep=6 COST=2909247.0 TIME=48.7995 (48.9s wall)
+[slot3] start cpp_javascript.interleaved_array gr202.tsp        rep=0 core=11
+[slot1] done  cpp_javascript.packed_matrix gr202.tsp        rep=7 COST=2909247.0 TIME=48.9826 (49.0s wall)
+[slot1] start cpp_javascript.interleaved_array gr202.tsp        rep=1 core=9
+[slot0] done  cpp_javascript.packed_matrix gr202.tsp        rep=8 COST=2909247.0 TIME=49.1312 (49.2s wall)
+[slot0] start cpp_javascript.interleaved_array gr202.tsp        rep=2 core=8
+[slot2] done  cpp_javascript.packed_matrix gr202.tsp        rep=9 COST=2909247.0 TIME=49.0755 (49.1s wall)
+[slot2] start cpp_javascript.interleaved_array gr202.tsp        rep=3 core=10
+[slot3] done  cpp_javascript.interleaved_array gr202.tsp        rep=0 COST=2909247.0 TIME=39.3193 (39.4s wall)
+[slot3] start cpp_javascript.interleaved_array gr202.tsp        rep=4 core=11
+[slot1] done  cpp_javascript.interleaved_array gr202.tsp        rep=1 COST=2909247.0 TIME=39.1166 (39.2s wall)
+[slot1] start cpp_javascript.interleaved_array gr202.tsp        rep=5 core=9
+[slot0] done  cpp_javascript.interleaved_array gr202.tsp        rep=2 COST=2909247.0 TIME=39.5098 (39.6s wall)
+[slot0] start cpp_javascript.interleaved_array gr202.tsp        rep=6 core=8
+[slot2] done  cpp_javascript.interleaved_array gr202.tsp        rep=3 COST=2909247.0 TIME=39.2979 (39.4s wall)
+[slot2] start cpp_javascript.interleaved_array gr202.tsp        rep=7 core=10
+[slot1] done  cpp_javascript.interleaved_array gr202.tsp        rep=5 COST=2909247.0 TIME=39.354 (39.5s wall)
+[slot1] start cpp_javascript.interleaved_array gr202.tsp        rep=8 core=9
+[slot3] done  cpp_javascript.interleaved_array gr202.tsp        rep=4 COST=2909247.0 TIME=39.7938 (39.9s wall)
+[slot3] start cpp_javascript.interleaved_array gr202.tsp        rep=9 core=11
+[slot0] done  cpp_javascript.interleaved_array gr202.tsp        rep=6 COST=2909247.0 TIME=39.6142 (39.7s wall)
+[slot0] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=0 core=8
+[slot2] done  cpp_javascript.interleaved_array gr202.tsp        rep=7 COST=2909247.0 TIME=39.6337 (39.7s wall)
+[slot2] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=1 core=10
+[slot1] done  cpp_javascript.interleaved_array gr202.tsp        rep=8 COST=2909247.0 TIME=39.2278 (39.3s wall)
+[slot1] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=2 core=9
+[slot3] done  cpp_javascript.interleaved_array gr202.tsp        rep=9 COST=2909247.0 TIME=39.2491 (39.3s wall)
+[slot3] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=3 core=11
+[slot0] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=0 COST=2909247.0 TIME=38.3981 (38.5s wall)
+[slot0] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=4 core=8
+[slot2] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=1 COST=2909247.0 TIME=38.3693 (38.5s wall)
+[slot2] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=5 core=10
+[slot1] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=2 COST=2909247.0 TIME=38.897 (39.0s wall)
+[slot1] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=6 core=9
+[slot3] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=3 COST=2909247.0 TIME=38.9075 (39.0s wall)
+[slot3] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=7 core=11
+[slot0] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=4 COST=2909247.0 TIME=38.7754 (38.9s wall)
+[slot0] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=8 core=8
+[slot2] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=5 COST=2909247.0 TIME=39.5992 (39.7s wall)
+[slot2] start cpp_javascript.interleaved_array_packed gr202.tsp        rep=9 core=10
+[slot1] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=6 COST=2909247.0 TIME=38.7629 (38.9s wall)
+[slot1] start ours_javascript.local_info_consts gr202.tsp        rep=0 core=9
+[slot3] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=7 COST=2909247.0 TIME=38.7883 (38.9s wall)
+[slot3] start ours_javascript.local_info_consts gr202.tsp        rep=1 core=11
+[slot0] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=8 COST=2909247.0 TIME=38.8061 (38.9s wall)
+[slot0] start ours_javascript.local_info_consts gr202.tsp        rep=2 core=8
+[slot2] done  cpp_javascript.interleaved_array_packed gr202.tsp        rep=9 COST=2909247.0 TIME=38.4838 (38.6s wall)
+[slot2] start ours_javascript.local_info_consts gr202.tsp        rep=3 core=10
+[slot1] done  ours_javascript.local_info_consts gr202.tsp        rep=0 COST=2909247.0 TIME=38.358 (38.4s wall)
+[slot1] start ours_javascript.local_info_consts gr202.tsp        rep=4 core=9
+[slot3] done  ours_javascript.local_info_consts gr202.tsp        rep=1 COST=2909247.0 TIME=38.404 (38.5s wall)
+[slot3] start ours_javascript.local_info_consts gr202.tsp        rep=5 core=11
+[slot0] done  ours_javascript.local_info_consts gr202.tsp        rep=2 COST=2909247.0 TIME=38.629 (38.7s wall)
+[slot0] start ours_javascript.local_info_consts gr202.tsp        rep=6 core=8
+[slot2] done  ours_javascript.local_info_consts gr202.tsp        rep=3 COST=2909247.0 TIME=37.836 (37.9s wall)
+[slot2] start ours_javascript.local_info_consts gr202.tsp        rep=7 core=10
+[slot1] done  ours_javascript.local_info_consts gr202.tsp        rep=4 COST=2909247.0 TIME=38.374 (38.5s wall)
+[slot1] start ours_javascript.local_info_consts gr202.tsp        rep=8 core=9
+[slot3] done  ours_javascript.local_info_consts gr202.tsp        rep=5 COST=2909247.0 TIME=38.527 (38.6s wall)
+[slot3] start ours_javascript.local_info_consts gr202.tsp        rep=9 core=11
+[slot0] done  ours_javascript.local_info_consts gr202.tsp        rep=6 COST=2909247.0 TIME=38.244 (38.3s wall)
+[slot0] start cplusplus lin318.tsp       rep=0 core=8
+[slot2] done  ours_javascript.local_info_consts gr202.tsp        rep=7 COST=2909247.0 TIME=38.284 (38.4s wall)
+[slot2] start cplusplus lin318.tsp       rep=1 core=10
+[slot0] done  cplusplus lin318.tsp       rep=0 COST=5620197.0 TIME=35.952 (36.0s wall)
+[slot0] start cplusplus lin318.tsp       rep=2 core=8
+[slot1] done  ours_javascript.local_info_consts gr202.tsp        rep=8 COST=2909247.0 TIME=38.642 (38.7s wall)
+[slot1] start cplusplus lin318.tsp       rep=3 core=9
+[slot2] done  cplusplus lin318.tsp       rep=1 COST=5620197.0 TIME=36.574 (36.6s wall)
+[slot2] start cplusplus lin318.tsp       rep=4 core=10
+[slot3] done  ours_javascript.local_info_consts gr202.tsp        rep=9 COST=2909247.0 TIME=38.739 (38.8s wall)
+[slot3] start cplusplus lin318.tsp       rep=5 core=11
+[slot0] done  cplusplus lin318.tsp       rep=2 COST=5620197.0 TIME=35.657 (35.7s wall)
+[slot0] start cplusplus lin318.tsp       rep=6 core=8
+[slot1] done  cplusplus lin318.tsp       rep=3 COST=5620197.0 TIME=35.582 (35.6s wall)
+[slot1] start cplusplus lin318.tsp       rep=7 core=9
+[slot2] done  cplusplus lin318.tsp       rep=4 COST=5620197.0 TIME=36.253 (36.3s wall)
+[slot2] start cplusplus lin318.tsp       rep=8 core=10
+[slot3] done  cplusplus lin318.tsp       rep=5 COST=5620197.0 TIME=36.493 (36.6s wall)
+[slot3] start cplusplus lin318.tsp       rep=9 core=11
+[slot0] done  cplusplus lin318.tsp       rep=6 COST=5620197.0 TIME=35.687 (35.8s wall)
+[slot0] start javascript lin318.tsp       rep=0 core=8
+[slot1] done  cplusplus lin318.tsp       rep=7 COST=5620197.0 TIME=35.703 (35.7s wall)
+[slot1] start javascript lin318.tsp       rep=1 core=9
+[slot2] done  cplusplus lin318.tsp       rep=8 COST=5620197.0 TIME=36.26 (36.3s wall)
+[slot2] start javascript lin318.tsp       rep=2 core=10
+[slot3] done  cplusplus lin318.tsp       rep=9 COST=5620197.0 TIME=36.45 (36.5s wall)
+[slot3] start javascript lin318.tsp       rep=3 core=11
+[slot0] done  javascript lin318.tsp       rep=0 COST=5620197.0 TIME=122.267 (122.3s wall)
+[slot0] start javascript lin318.tsp       rep=4 core=8
+[slot1] done  javascript lin318.tsp       rep=1 COST=5620197.0 TIME=122.539 (122.6s wall)
+[slot1] start javascript lin318.tsp       rep=5 core=9
+[slot2] done  javascript lin318.tsp       rep=2 COST=5620197.0 TIME=123.608 (123.7s wall)
+[slot2] start javascript lin318.tsp       rep=6 core=10
+[slot3] done  javascript lin318.tsp       rep=3 COST=5620197.0 TIME=124.154 (124.2s wall)
+[slot3] start javascript lin318.tsp       rep=7 core=11
+[slot0] done  javascript lin318.tsp       rep=4 COST=5620197.0 TIME=123.155 (123.2s wall)
+[slot0] start javascript lin318.tsp       rep=8 core=8
+[slot1] done  javascript lin318.tsp       rep=5 COST=5620197.0 TIME=122.742 (122.8s wall)
+[slot1] start javascript lin318.tsp       rep=9 core=9
+[slot2] done  javascript lin318.tsp       rep=6 COST=5620197.0 TIME=123.773 (123.8s wall)
+[slot2] start julia_cpp.base lin318.tsp       rep=0 core=10
+[slot3] done  javascript lin318.tsp       rep=7 COST=5620197.0 TIME=123.505 (123.6s wall)
+[slot3] start julia_cpp.base lin318.tsp       rep=1 core=11
+[slot2] done  julia_cpp.base lin318.tsp       rep=0 COST=5620197.0 TIME=46.169345461 (46.2s wall)
+[slot2] start julia_cpp.base lin318.tsp       rep=2 core=10
+[slot3] done  julia_cpp.base lin318.tsp       rep=1 COST=5620197.0 TIME=46.410092594 (46.4s wall)
+[slot3] start julia_cpp.base lin318.tsp       rep=3 core=11
+[slot2] done  julia_cpp.base lin318.tsp       rep=2 COST=5620197.0 TIME=46.417598806 (46.5s wall)
+[slot2] start julia_cpp.base lin318.tsp       rep=4 core=10
+[slot3] done  julia_cpp.base lin318.tsp       rep=3 COST=5620197.0 TIME=46.454221139 (46.5s wall)
+[slot3] start julia_cpp.base lin318.tsp       rep=5 core=11
+[slot0] done  javascript lin318.tsp       rep=8 COST=5620197.0 TIME=122.399 (122.5s wall)
+[slot0] start julia_cpp.base lin318.tsp       rep=6 core=8
+[slot1] done  javascript lin318.tsp       rep=9 COST=5620197.0 TIME=122.974 (123.1s wall)
+[slot1] start julia_cpp.base lin318.tsp       rep=7 core=9
+[slot2] done  julia_cpp.base lin318.tsp       rep=4 COST=5620197.0 TIME=46.293497278 (46.3s wall)
+[slot2] start julia_cpp.base lin318.tsp       rep=8 core=10
+[slot3] done  julia_cpp.base lin318.tsp       rep=5 COST=5620197.0 TIME=46.547282157 (46.6s wall)
+[slot3] start julia_cpp.base lin318.tsp       rep=9 core=11
+[slot0] done  julia_cpp.base lin318.tsp       rep=6 COST=5620197.0 TIME=45.800834923 (45.8s wall)
+[slot0] start julia_cpp.const_offsets lin318.tsp       rep=0 core=8
+[slot1] done  julia_cpp.base lin318.tsp       rep=7 COST=5620197.0 TIME=45.994657893 (46.0s wall)
+[slot1] start julia_cpp.const_offsets lin318.tsp       rep=1 core=9
+[slot2] done  julia_cpp.base lin318.tsp       rep=8 COST=5620197.0 TIME=46.405542668 (46.4s wall)
+[slot2] start julia_cpp.const_offsets lin318.tsp       rep=2 core=10
+[slot3] done  julia_cpp.base lin318.tsp       rep=9 COST=5620197.0 TIME=46.467958663 (46.5s wall)
+[slot3] start julia_cpp.const_offsets lin318.tsp       rep=3 core=11
+[slot0] done  julia_cpp.const_offsets lin318.tsp       rep=0 COST=5620197.0 TIME=40.083555109 (40.1s wall)
+[slot0] start julia_cpp.const_offsets lin318.tsp       rep=4 core=8
+[slot1] done  julia_cpp.const_offsets lin318.tsp       rep=1 COST=5620197.0 TIME=39.933643231 (40.0s wall)
+[slot1] start julia_cpp.const_offsets lin318.tsp       rep=5 core=9
+[slot2] done  julia_cpp.const_offsets lin318.tsp       rep=2 COST=5620197.0 TIME=40.372963033 (40.4s wall)
+[slot2] start julia_cpp.const_offsets lin318.tsp       rep=6 core=10
+[slot3] done  julia_cpp.const_offsets lin318.tsp       rep=3 COST=5620197.0 TIME=40.515012579 (40.6s wall)
+[slot3] start julia_cpp.const_offsets lin318.tsp       rep=7 core=11
+[slot0] done  julia_cpp.const_offsets lin318.tsp       rep=4 COST=5620197.0 TIME=40.17794655 (40.2s wall)
+[slot0] start julia_cpp.const_offsets lin318.tsp       rep=8 core=8
+[slot1] done  julia_cpp.const_offsets lin318.tsp       rep=5 COST=5620197.0 TIME=40.118486281 (40.2s wall)
+[slot1] start julia_cpp.const_offsets lin318.tsp       rep=9 core=9
+[slot2] done  julia_cpp.const_offsets lin318.tsp       rep=6 COST=5620197.0 TIME=40.537474922 (40.6s wall)
+[slot2] start julia_cpp.row_matrix lin318.tsp       rep=0 core=10
+[slot3] done  julia_cpp.const_offsets lin318.tsp       rep=7 COST=5620197.0 TIME=40.337924334 (40.4s wall)
+[slot3] start julia_cpp.row_matrix lin318.tsp       rep=1 core=11
+[slot0] done  julia_cpp.const_offsets lin318.tsp       rep=8 COST=5620197.0 TIME=39.967951087 (40.0s wall)
+[slot0] start julia_cpp.row_matrix lin318.tsp       rep=2 core=8
+[slot1] done  julia_cpp.const_offsets lin318.tsp       rep=9 COST=5620197.0 TIME=40.239918057 (40.3s wall)
+[slot1] start julia_cpp.row_matrix lin318.tsp       rep=3 core=9
+[slot2] done  julia_cpp.row_matrix lin318.tsp       rep=0 COST=5620197.0 TIME=42.59351967 (42.6s wall)
+[slot2] start julia_cpp.row_matrix lin318.tsp       rep=4 core=10
+[slot3] done  julia_cpp.row_matrix lin318.tsp       rep=1 COST=5620197.0 TIME=42.890135123 (42.9s wall)
+[slot3] start julia_cpp.row_matrix lin318.tsp       rep=5 core=11
+[slot0] done  julia_cpp.row_matrix lin318.tsp       rep=2 COST=5620197.0 TIME=42.172954395 (42.2s wall)
+[slot0] start julia_cpp.row_matrix lin318.tsp       rep=6 core=8
+[slot1] done  julia_cpp.row_matrix lin318.tsp       rep=3 COST=5620197.0 TIME=42.153316184 (42.2s wall)
+[slot1] start julia_cpp.row_matrix lin318.tsp       rep=7 core=9
+[slot2] done  julia_cpp.row_matrix lin318.tsp       rep=4 COST=5620197.0 TIME=42.386654813 (42.4s wall)
+[slot2] start julia_cpp.row_matrix lin318.tsp       rep=8 core=10
+[slot3] done  julia_cpp.row_matrix lin318.tsp       rep=5 COST=5620197.0 TIME=42.578354488 (42.6s wall)
+[slot3] start julia_cpp.row_matrix lin318.tsp       rep=9 core=11
+[slot0] done  julia_cpp.row_matrix lin318.tsp       rep=6 COST=5620197.0 TIME=41.931615121 (42.0s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=0 core=8
+[slot1] done  julia_cpp.row_matrix lin318.tsp       rep=7 COST=5620197.0 TIME=42.067817071 (42.1s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=1 core=9
+[slot2] done  julia_cpp.row_matrix lin318.tsp       rep=8 COST=5620197.0 TIME=42.405685708 (42.5s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=2 core=10
+[slot3] done  julia_cpp.row_matrix lin318.tsp       rep=9 COST=5620197.0 TIME=42.527952612 (42.6s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=3 core=11
+[slot0] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=0 COST=5620197.0 TIME=35.908161796 (35.9s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=4 core=8
+[slot1] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=1 COST=5620197.0 TIME=36.136344583 (36.2s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=5 core=9
+[slot2] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=2 COST=5620197.0 TIME=36.51403986 (36.6s wall)
+[slot2] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=6 core=10
+[slot3] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=3 COST=5620197.0 TIME=36.629495061 (36.7s wall)
+[slot3] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=7 core=11
+[slot0] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=4 COST=5620197.0 TIME=35.862898196 (35.9s wall)
+[slot0] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=8 core=8
+[slot1] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=5 COST=5620197.0 TIME=36.088183722 (36.1s wall)
+[slot1] start julia_cpp.const_offsets_row_matrix lin318.tsp       rep=9 core=9
+[slot2] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=6 COST=5620197.0 TIME=36.29318927 (36.4s wall)
+[slot2] start c_cpp.base lin318.tsp       rep=0 core=10
+[slot3] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=7 COST=5620197.0 TIME=36.691927255 (36.7s wall)
+[slot3] start c_cpp.base lin318.tsp       rep=1 core=11
+[slot0] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=8 COST=5620197.0 TIME=35.831807235 (35.9s wall)
+[slot0] start c_cpp.base lin318.tsp       rep=2 core=8
+[slot1] done  julia_cpp.const_offsets_row_matrix lin318.tsp       rep=9 COST=5620197.0 TIME=36.01917246 (36.1s wall)
+[slot1] start c_cpp.base lin318.tsp       rep=3 core=9
+[slot2] done  c_cpp.base lin318.tsp       rep=0 COST=5620197.0 TIME=37.115695162 (37.2s wall)
+[slot2] start c_cpp.base lin318.tsp       rep=4 core=10
+[slot3] done  c_cpp.base lin318.tsp       rep=1 COST=5620197.0 TIME=37.193375698 (37.2s wall)
+[slot3] start c_cpp.base lin318.tsp       rep=5 core=11
+[slot0] done  c_cpp.base lin318.tsp       rep=2 COST=5620197.0 TIME=36.412080325 (36.5s wall)
+[slot0] start c_cpp.base lin318.tsp       rep=6 core=8
+[slot1] done  c_cpp.base lin318.tsp       rep=3 COST=5620197.0 TIME=36.757323943 (36.8s wall)
+[slot1] start c_cpp.base lin318.tsp       rep=7 core=9
+[slot2] done  c_cpp.base lin318.tsp       rep=4 COST=5620197.0 TIME=36.775115579 (36.8s wall)
+[slot2] start c_cpp.base lin318.tsp       rep=8 core=10
+[slot3] done  c_cpp.base lin318.tsp       rep=5 COST=5620197.0 TIME=37.060626361 (37.1s wall)
+[slot3] start c_cpp.base lin318.tsp       rep=9 core=11
+[slot0] done  c_cpp.base lin318.tsp       rep=6 COST=5620197.0 TIME=36.379445022 (36.4s wall)
+[slot0] start c_cpp.row_matrix lin318.tsp       rep=0 core=8
+[slot1] done  c_cpp.base lin318.tsp       rep=7 COST=5620197.0 TIME=36.600893762 (36.7s wall)
+[slot1] start c_cpp.row_matrix lin318.tsp       rep=1 core=9
+[slot2] done  c_cpp.base lin318.tsp       rep=8 COST=5620197.0 TIME=36.658088551 (36.7s wall)
+[slot2] start c_cpp.row_matrix lin318.tsp       rep=2 core=10
+[slot3] done  c_cpp.base lin318.tsp       rep=9 COST=5620197.0 TIME=37.24227153 (37.3s wall)
+[slot3] start c_cpp.row_matrix lin318.tsp       rep=3 core=11
+[slot0] done  c_cpp.row_matrix lin318.tsp       rep=0 COST=5620197.0 TIME=35.199843763 (35.3s wall)
+[slot0] start c_cpp.row_matrix lin318.tsp       rep=4 core=8
+[slot1] done  c_cpp.row_matrix lin318.tsp       rep=1 COST=5620197.0 TIME=35.472639143 (35.5s wall)
+[slot1] start c_cpp.row_matrix lin318.tsp       rep=5 core=9
+[slot2] done  c_cpp.row_matrix lin318.tsp       rep=2 COST=5620197.0 TIME=35.481191575 (35.5s wall)
+[slot2] start c_cpp.row_matrix lin318.tsp       rep=6 core=10
+[slot3] done  c_cpp.row_matrix lin318.tsp       rep=3 COST=5620197.0 TIME=36.043101798 (36.1s wall)
+[slot3] start c_cpp.row_matrix lin318.tsp       rep=7 core=11
+[slot0] done  c_cpp.row_matrix lin318.tsp       rep=4 COST=5620197.0 TIME=35.278203207 (35.3s wall)
+[slot0] start c_cpp.row_matrix lin318.tsp       rep=8 core=8
+[slot1] done  c_cpp.row_matrix lin318.tsp       rep=5 COST=5620197.0 TIME=35.228943128 (35.2s wall)
+[slot1] start c_cpp.row_matrix lin318.tsp       rep=9 core=9
+[slot2] done  c_cpp.row_matrix lin318.tsp       rep=6 COST=5620197.0 TIME=35.774787886 (35.8s wall)
+[slot2] start lua_cpp.base lin318.tsp       rep=0 core=10
+[slot3] done  c_cpp.row_matrix lin318.tsp       rep=7 COST=5620197.0 TIME=36.071692039 (36.1s wall)
+[slot3] start lua_cpp.base lin318.tsp       rep=1 core=11
+[slot0] done  c_cpp.row_matrix lin318.tsp       rep=8 COST=5620197.0 TIME=35.101244844 (35.1s wall)
+[slot0] start lua_cpp.base lin318.tsp       rep=2 core=8
+[slot1] done  c_cpp.row_matrix lin318.tsp       rep=9 COST=5620197.0 TIME=35.282067692 (35.3s wall)
+[slot1] start lua_cpp.base lin318.tsp       rep=3 core=9
+[slot2] done  lua_cpp.base lin318.tsp       rep=0 COST=5620197.0 TIME=37.291431835 (37.3s wall)
+[slot2] start lua_cpp.base lin318.tsp       rep=4 core=10
+[slot0] done  lua_cpp.base lin318.tsp       rep=2 COST=5620197.0 TIME=36.729050777 (36.8s wall)
+[slot0] start lua_cpp.base lin318.tsp       rep=5 core=8
+[slot3] done  lua_cpp.base lin318.tsp       rep=1 COST=5620197.0 TIME=37.717818659 (37.8s wall)
+[slot3] start lua_cpp.base lin318.tsp       rep=6 core=11
+[slot1] done  lua_cpp.base lin318.tsp       rep=3 COST=5620197.0 TIME=37.009343563 (37.1s wall)
+[slot1] start lua_cpp.base lin318.tsp       rep=7 core=9
+[slot2] done  lua_cpp.base lin318.tsp       rep=4 COST=5620197.0 TIME=37.314357823 (37.4s wall)
+[slot2] start lua_cpp.base lin318.tsp       rep=8 core=10
+[slot0] done  lua_cpp.base lin318.tsp       rep=5 COST=5620197.0 TIME=36.864620067 (36.9s wall)
+[slot0] start lua_cpp.base lin318.tsp       rep=9 core=8
+[slot3] done  lua_cpp.base lin318.tsp       rep=6 COST=5620197.0 TIME=37.809968972 (37.9s wall)
+[slot3] start lua_cpp.epsilon lin318.tsp       rep=0 core=11
+[slot1] done  lua_cpp.base lin318.tsp       rep=7 COST=5620197.0 TIME=36.946997716 (37.0s wall)
+[slot1] start lua_cpp.epsilon lin318.tsp       rep=1 core=9
+[slot2] done  lua_cpp.base lin318.tsp       rep=8 COST=5620197.0 TIME=37.113773536 (37.2s wall)
+[slot2] start lua_cpp.epsilon lin318.tsp       rep=2 core=10
+[slot0] done  lua_cpp.base lin318.tsp       rep=9 COST=5620197.0 TIME=36.636740448 (36.7s wall)
+[slot0] start lua_cpp.epsilon lin318.tsp       rep=3 core=8
+[slot3] done  lua_cpp.epsilon lin318.tsp       rep=0 COST=5620197.0 TIME=37.293135069 (37.4s wall)
+[slot3] start lua_cpp.epsilon lin318.tsp       rep=4 core=11
+[slot1] done  lua_cpp.epsilon lin318.tsp       rep=1 COST=5620197.0 TIME=37.040031315 (37.1s wall)
+[slot1] start lua_cpp.epsilon lin318.tsp       rep=5 core=9
+[slot2] done  lua_cpp.epsilon lin318.tsp       rep=2 COST=5620197.0 TIME=37.113677363 (37.2s wall)
+[slot2] start lua_cpp.epsilon lin318.tsp       rep=6 core=10
+[slot0] done  lua_cpp.epsilon lin318.tsp       rep=3 COST=5620197.0 TIME=36.820753115 (36.9s wall)
+[slot0] start lua_cpp.epsilon lin318.tsp       rep=7 core=8
+[slot3] done  lua_cpp.epsilon lin318.tsp       rep=4 COST=5620197.0 TIME=37.646155486 (37.7s wall)
+[slot3] start lua_cpp.epsilon lin318.tsp       rep=8 core=11
+[slot1] done  lua_cpp.epsilon lin318.tsp       rep=5 COST=5620197.0 TIME=37.220332198 (37.3s wall)
+[slot1] start lua_cpp.epsilon lin318.tsp       rep=9 core=9
+[slot2] done  lua_cpp.epsilon lin318.tsp       rep=6 COST=5620197.0 TIME=37.204552287 (37.3s wall)
+[slot2] start lua_cpp.row_matrix lin318.tsp       rep=0 core=10
+[slot0] done  lua_cpp.epsilon lin318.tsp       rep=7 COST=5620197.0 TIME=36.777426978 (36.8s wall)
+[slot0] start lua_cpp.row_matrix lin318.tsp       rep=1 core=8
+[slot3] done  lua_cpp.epsilon lin318.tsp       rep=8 COST=5620197.0 TIME=37.485089029 (37.5s wall)
+[slot3] start lua_cpp.row_matrix lin318.tsp       rep=2 core=11
+[slot1] done  lua_cpp.epsilon lin318.tsp       rep=9 COST=5620197.0 TIME=37.183188252 (37.2s wall)
+[slot1] start lua_cpp.row_matrix lin318.tsp       rep=3 core=9
+[slot2] done  lua_cpp.row_matrix lin318.tsp       rep=0 COST=5620197.0 TIME=36.068022794 (36.1s wall)
+[slot2] start lua_cpp.row_matrix lin318.tsp       rep=4 core=10
+[slot0] done  lua_cpp.row_matrix lin318.tsp       rep=1 COST=5620197.0 TIME=35.773551417 (35.8s wall)
+[slot0] start lua_cpp.row_matrix lin318.tsp       rep=5 core=8
+[slot3] done  lua_cpp.row_matrix lin318.tsp       rep=2 COST=5620197.0 TIME=36.242643701 (36.3s wall)
+[slot3] start lua_cpp.row_matrix lin318.tsp       rep=6 core=11
+[slot1] done  lua_cpp.row_matrix lin318.tsp       rep=3 COST=5620197.0 TIME=36.197790346 (36.3s wall)
+[slot1] start lua_cpp.row_matrix lin318.tsp       rep=7 core=9
+[slot2] done  lua_cpp.row_matrix lin318.tsp       rep=4 COST=5620197.0 TIME=36.319613976 (36.4s wall)
+[slot2] start lua_cpp.row_matrix lin318.tsp       rep=8 core=10
+[slot0] done  lua_cpp.row_matrix lin318.tsp       rep=5 COST=5620197.0 TIME=36.164772489 (36.2s wall)
+[slot0] start lua_cpp.row_matrix lin318.tsp       rep=9 core=8
+[slot3] done  lua_cpp.row_matrix lin318.tsp       rep=6 COST=5620197.0 TIME=36.593476667 (36.6s wall)
+[slot3] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=0 core=11
+[slot1] done  lua_cpp.row_matrix lin318.tsp       rep=7 COST=5620197.0 TIME=36.36507695 (36.4s wall)
+[slot1] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=1 core=9
+[slot2] done  lua_cpp.row_matrix lin318.tsp       rep=8 COST=5620197.0 TIME=36.192707665 (36.3s wall)
+[slot2] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=2 core=10
+[slot0] done  lua_cpp.row_matrix lin318.tsp       rep=9 COST=5620197.0 TIME=35.731779288 (35.8s wall)
+[slot0] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=3 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=0 COST=5620197.0 TIME=36.032697012 (36.0s wall)
+[slot3] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=4 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=1 COST=5620197.0 TIME=35.802774282 (35.8s wall)
+[slot1] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=5 core=9
+[slot2] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=2 COST=5620197.0 TIME=35.899397141 (36.0s wall)
+[slot2] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=6 core=10
+[slot0] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=3 COST=5620197.0 TIME=35.756978565 (35.8s wall)
+[slot0] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=7 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=4 COST=5620197.0 TIME=36.162680464 (36.2s wall)
+[slot3] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=8 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=5 COST=5620197.0 TIME=35.889066201 (36.0s wall)
+[slot1] start lua_cpp.epsilon_row_matrix lin318.tsp       rep=9 core=9
+[slot2] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=6 COST=5620197.0 TIME=36.176746615 (36.2s wall)
+[slot2] start java_cpp.base lin318.tsp       rep=0 core=10
+[slot0] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=7 COST=5620197.0 TIME=35.665180265 (35.7s wall)
+[slot0] start java_cpp.base lin318.tsp       rep=1 core=8
+[slot3] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=8 COST=5620197.0 TIME=36.408866337 (36.5s wall)
+[slot3] start java_cpp.base lin318.tsp       rep=2 core=11
+[slot1] done  lua_cpp.epsilon_row_matrix lin318.tsp       rep=9 COST=5620197.0 TIME=36.183276704 (36.2s wall)
+[slot1] start java_cpp.base lin318.tsp       rep=3 core=9
+[slot2] done  java_cpp.base lin318.tsp       rep=0 COST=5620197.0 TIME=39.298374372 (39.4s wall)
+[slot2] start java_cpp.base lin318.tsp       rep=4 core=10
+[slot0] done  java_cpp.base lin318.tsp       rep=1 COST=5620197.0 TIME=38.885972992 (38.9s wall)
+[slot0] start java_cpp.base lin318.tsp       rep=5 core=8
+[slot3] done  java_cpp.base lin318.tsp       rep=2 COST=5620197.0 TIME=39.537803447 (39.6s wall)
+[slot3] start java_cpp.base lin318.tsp       rep=6 core=11
+[slot1] done  java_cpp.base lin318.tsp       rep=3 COST=5620197.0 TIME=39.344470792 (39.4s wall)
+[slot1] start java_cpp.base lin318.tsp       rep=7 core=9
+[slot2] done  java_cpp.base lin318.tsp       rep=4 COST=5620197.0 TIME=39.347270178 (39.4s wall)
+[slot2] start java_cpp.base lin318.tsp       rep=8 core=10
+[slot0] done  java_cpp.base lin318.tsp       rep=5 COST=5620197.0 TIME=39.040640746 (39.1s wall)
+[slot0] start java_cpp.base lin318.tsp       rep=9 core=8
+[slot3] done  java_cpp.base lin318.tsp       rep=6 COST=5620197.0 TIME=39.48589808 (39.5s wall)
+[slot3] start java_cpp.all lin318.tsp       rep=0 core=11
+[slot1] done  java_cpp.base lin318.tsp       rep=7 COST=5620197.0 TIME=39.38609023 (39.4s wall)
+[slot1] start java_cpp.all lin318.tsp       rep=1 core=9
+[slot2] done  java_cpp.base lin318.tsp       rep=8 COST=5620197.0 TIME=39.322185833 (39.4s wall)
+[slot2] start java_cpp.all lin318.tsp       rep=2 core=10
+[slot0] done  java_cpp.base lin318.tsp       rep=9 COST=5620197.0 TIME=38.986225672 (39.0s wall)
+[slot0] start java_cpp.all lin318.tsp       rep=3 core=8
+[slot3] done  java_cpp.all lin318.tsp       rep=0 COST=5620197.0 TIME=36.987406755 (37.0s wall)
+[slot3] start java_cpp.all lin318.tsp       rep=4 core=11
+[slot1] done  java_cpp.all lin318.tsp       rep=1 COST=5620197.0 TIME=36.064874712 (36.1s wall)
+[slot1] start java_cpp.all lin318.tsp       rep=5 core=9
+[slot2] done  java_cpp.all lin318.tsp       rep=2 COST=5620197.0 TIME=36.429530457 (36.4s wall)
+[slot2] start java_cpp.all lin318.tsp       rep=6 core=10
+[slot0] done  java_cpp.all lin318.tsp       rep=3 COST=5620197.0 TIME=36.071590479 (36.1s wall)
+[slot0] start java_cpp.all lin318.tsp       rep=7 core=8
+[slot1] done  java_cpp.all lin318.tsp       rep=5 COST=5620197.0 TIME=36.103290161 (36.1s wall)
+[slot1] start java_cpp.all lin318.tsp       rep=8 core=9
+[slot3] done  java_cpp.all lin318.tsp       rep=4 COST=5620197.0 TIME=36.925674486 (36.9s wall)
+[slot3] start java_cpp.all lin318.tsp       rep=9 core=11
+[slot0] done  java_cpp.all lin318.tsp       rep=7 COST=5620197.0 TIME=35.918773618 (35.9s wall)
+[slot0] start cpp_javascript.base lin318.tsp       rep=0 core=8
+[slot2] done  java_cpp.all lin318.tsp       rep=6 COST=5620197.0 TIME=36.574595961 (36.6s wall)
+[slot2] start cpp_javascript.base lin318.tsp       rep=1 core=10
+[slot1] done  java_cpp.all lin318.tsp       rep=8 COST=5620197.0 TIME=35.980706931 (36.0s wall)
+[slot1] start cpp_javascript.base lin318.tsp       rep=2 core=9
+[slot3] done  java_cpp.all lin318.tsp       rep=9 COST=5620197.0 TIME=36.931095113 (37.0s wall)
+[slot3] start cpp_javascript.base lin318.tsp       rep=3 core=11
+[slot0] done  cpp_javascript.base lin318.tsp       rep=0 COST=5620197.0 TIME=150.042 (150.2s wall)
+[slot0] start cpp_javascript.base lin318.tsp       rep=4 core=8
+[slot2] done  cpp_javascript.base lin318.tsp       rep=1 COST=5620197.0 TIME=150.882 (151.0s wall)
+[slot2] start cpp_javascript.base lin318.tsp       rep=5 core=10
+[slot1] done  cpp_javascript.base lin318.tsp       rep=2 COST=5620197.0 TIME=150.415 (150.5s wall)
+[slot1] start cpp_javascript.base lin318.tsp       rep=6 core=9
+[slot3] done  cpp_javascript.base lin318.tsp       rep=3 COST=5620197.0 TIME=151.347 (151.4s wall)
+[slot3] start cpp_javascript.base lin318.tsp       rep=7 core=11
+[slot0] done  cpp_javascript.base lin318.tsp       rep=4 COST=5620197.0 TIME=149.618 (149.7s wall)
+[slot0] start cpp_javascript.base lin318.tsp       rep=8 core=8
+[slot2] done  cpp_javascript.base lin318.tsp       rep=5 COST=5620197.0 TIME=151.782 (151.9s wall)
+[slot2] start cpp_javascript.base lin318.tsp       rep=9 core=10
+[slot1] done  cpp_javascript.base lin318.tsp       rep=6 COST=5620197.0 TIME=151.268 (151.4s wall)
+[slot1] start cpp_javascript.packed_matrix lin318.tsp       rep=0 core=9
+[slot3] done  cpp_javascript.base lin318.tsp       rep=7 COST=5620197.0 TIME=151.635 (151.7s wall)
+[slot3] start cpp_javascript.packed_matrix lin318.tsp       rep=1 core=11
+[slot1] done  cpp_javascript.packed_matrix lin318.tsp       rep=0 COST=5620197.0 TIME=141.993 (142.1s wall)
+[slot1] start cpp_javascript.packed_matrix lin318.tsp       rep=2 core=9
+[slot0] done  cpp_javascript.base lin318.tsp       rep=8 COST=5620197.0 TIME=150.409 (150.5s wall)
+[slot0] start cpp_javascript.packed_matrix lin318.tsp       rep=3 core=8
+[slot3] done  cpp_javascript.packed_matrix lin318.tsp       rep=1 COST=5620197.0 TIME=143.558 (143.7s wall)
+[slot3] start cpp_javascript.packed_matrix lin318.tsp       rep=4 core=11
+[slot2] done  cpp_javascript.base lin318.tsp       rep=9 COST=5620197.0 TIME=151.741 (151.8s wall)
+[slot2] start cpp_javascript.packed_matrix lin318.tsp       rep=5 core=10
+[slot1] done  cpp_javascript.packed_matrix lin318.tsp       rep=2 COST=5620197.0 TIME=141.724 (141.8s wall)
+[slot1] start cpp_javascript.packed_matrix lin318.tsp       rep=6 core=9
+[slot0] done  cpp_javascript.packed_matrix lin318.tsp       rep=3 COST=5620197.0 TIME=141.737 (141.8s wall)
+[slot0] start cpp_javascript.packed_matrix lin318.tsp       rep=7 core=8
+[slot3] done  cpp_javascript.packed_matrix lin318.tsp       rep=4 COST=5620197.0 TIME=143.565 (143.6s wall)
+[slot3] start cpp_javascript.packed_matrix lin318.tsp       rep=8 core=11
+[slot2] done  cpp_javascript.packed_matrix lin318.tsp       rep=5 COST=5620197.0 TIME=142.121 (142.2s wall)
+[slot2] start cpp_javascript.packed_matrix lin318.tsp       rep=9 core=10
+[slot1] done  cpp_javascript.packed_matrix lin318.tsp       rep=6 COST=5620197.0 TIME=142.024 (142.1s wall)
+[slot1] start cpp_javascript.interleaved_array lin318.tsp       rep=0 core=9
+[slot0] done  cpp_javascript.packed_matrix lin318.tsp       rep=7 COST=5620197.0 TIME=141.158 (141.2s wall)
+[slot0] start cpp_javascript.interleaved_array lin318.tsp       rep=1 core=8
+[slot3] done  cpp_javascript.packed_matrix lin318.tsp       rep=8 COST=5620197.0 TIME=142.968 (143.1s wall)
+[slot3] start cpp_javascript.interleaved_array lin318.tsp       rep=2 core=11
+[slot2] done  cpp_javascript.packed_matrix lin318.tsp       rep=9 COST=5620197.0 TIME=142.841 (143.0s wall)
+[slot2] start cpp_javascript.interleaved_array lin318.tsp       rep=3 core=10
+[slot0] done  cpp_javascript.interleaved_array lin318.tsp       rep=1 COST=5620197.0 TIME=113.601 (113.7s wall)
+[slot0] start cpp_javascript.interleaved_array lin318.tsp       rep=4 core=8
+[slot1] done  cpp_javascript.interleaved_array lin318.tsp       rep=0 COST=5620197.0 TIME=114.445 (114.5s wall)
+[slot1] start cpp_javascript.interleaved_array lin318.tsp       rep=5 core=9
+[slot3] done  cpp_javascript.interleaved_array lin318.tsp       rep=2 COST=5620197.0 TIME=115.498 (115.6s wall)
+[slot3] start cpp_javascript.interleaved_array lin318.tsp       rep=6 core=11
+[slot2] done  cpp_javascript.interleaved_array lin318.tsp       rep=3 COST=5620197.0 TIME=115.462 (115.5s wall)
+[slot2] start cpp_javascript.interleaved_array lin318.tsp       rep=7 core=10
+[slot0] done  cpp_javascript.interleaved_array lin318.tsp       rep=4 COST=5620197.0 TIME=114.154 (114.2s wall)
+[slot0] start cpp_javascript.interleaved_array lin318.tsp       rep=8 core=8
+[slot1] done  cpp_javascript.interleaved_array lin318.tsp       rep=5 COST=5620197.0 TIME=114.253 (114.3s wall)
+[slot1] start cpp_javascript.interleaved_array lin318.tsp       rep=9 core=9
+[slot2] done  cpp_javascript.interleaved_array lin318.tsp       rep=7 COST=5620197.0 TIME=115.418 (115.5s wall)
+[slot2] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=0 core=10
+[slot3] done  cpp_javascript.interleaved_array lin318.tsp       rep=6 COST=5620197.0 TIME=115.647 (115.7s wall)
+[slot3] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=1 core=11
+[slot0] done  cpp_javascript.interleaved_array lin318.tsp       rep=8 COST=5620197.0 TIME=113.936 (114.0s wall)
+[slot0] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=2 core=8
+[slot1] done  cpp_javascript.interleaved_array lin318.tsp       rep=9 COST=5620197.0 TIME=114.542 (114.6s wall)
+[slot1] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=3 core=9
+[slot2] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=0 COST=5620197.0 TIME=111.479 (111.6s wall)
+[slot2] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=4 core=10
+[slot3] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=1 COST=5620197.0 TIME=111.583 (111.7s wall)
+[slot3] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=5 core=11
+[slot0] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=2 COST=5620197.0 TIME=110.086 (110.2s wall)
+[slot0] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=6 core=8
+[slot1] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=3 COST=5620197.0 TIME=110.629 (110.7s wall)
+[slot1] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=7 core=9
+[slot2] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=4 COST=5620197.0 TIME=111.816 (111.9s wall)
+[slot2] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=8 core=10
+[slot3] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=5 COST=5620197.0 TIME=111.804 (111.9s wall)
+[slot3] start cpp_javascript.interleaved_array_packed lin318.tsp       rep=9 core=11
+[slot0] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=6 COST=5620197.0 TIME=110.183 (110.3s wall)
+[slot0] start ours_javascript.local_info_consts lin318.tsp       rep=0 core=8
+[slot1] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=7 COST=5620197.0 TIME=111.087 (111.2s wall)
+[slot1] start ours_javascript.local_info_consts lin318.tsp       rep=1 core=9
+[slot2] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=8 COST=5620197.0 TIME=111.31 (111.4s wall)
+[slot2] start ours_javascript.local_info_consts lin318.tsp       rep=2 core=10
+[slot3] done  cpp_javascript.interleaved_array_packed lin318.tsp       rep=9 COST=5620197.0 TIME=111.59 (111.7s wall)
+[slot3] start ours_javascript.local_info_consts lin318.tsp       rep=3 core=11
+[slot0] done  ours_javascript.local_info_consts lin318.tsp       rep=0 COST=5620197.0 TIME=109.773 (109.9s wall)
+[slot0] start ours_javascript.local_info_consts lin318.tsp       rep=4 core=8
+[slot1] done  ours_javascript.local_info_consts lin318.tsp       rep=1 COST=5620197.0 TIME=110.088 (110.2s wall)
+[slot1] start ours_javascript.local_info_consts lin318.tsp       rep=5 core=9
+[slot2] done  ours_javascript.local_info_consts lin318.tsp       rep=2 COST=5620197.0 TIME=111.148 (111.2s wall)
+[slot2] start ours_javascript.local_info_consts lin318.tsp       rep=6 core=10
+[slot3] done  ours_javascript.local_info_consts lin318.tsp       rep=3 COST=5620197.0 TIME=111.105 (111.2s wall)
+[slot3] start ours_javascript.local_info_consts lin318.tsp       rep=7 core=11
+[slot0] done  ours_javascript.local_info_consts lin318.tsp       rep=4 COST=5620197.0 TIME=109.921 (110.0s wall)
+[slot0] start ours_javascript.local_info_consts lin318.tsp       rep=8 core=8
+[slot1] done  ours_javascript.local_info_consts lin318.tsp       rep=5 COST=5620197.0 TIME=110.049 (110.1s wall)
+[slot1] start ours_javascript.local_info_consts lin318.tsp       rep=9 core=9
+[slot3] done  ours_javascript.local_info_consts lin318.tsp       rep=7 COST=5620197.0 TIME=110.989 (111.1s wall)
+[slot2] done  ours_javascript.local_info_consts lin318.tsp       rep=6 COST=5620197.0 TIME=111.384 (111.5s wall)
+[slot0] done  ours_javascript.local_info_consts lin318.tsp       rep=8 COST=5620197.0 TIME=110.086 (110.1s wall)
+[slot1] done  ours_javascript.local_info_consts lin318.tsp       rep=9 COST=5620197.0 TIME=110.515 (110.6s wall)
+Benchmark run complete.
+FIM
