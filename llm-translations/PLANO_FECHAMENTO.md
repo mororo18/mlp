@@ -500,6 +500,24 @@ as nossas 5 nas 66 instâncias levariam cerca de 18 h. **Decidido (autor,
 2026-11-24): 3 execuções**, traduções e nossas na mesma rodada
 (`d66-20261125`, cerca de 5,5 h), disparada depois da B5-comp.
 
+**Feita (2026-11-25, 09h44 a 15h10 no relógio do servidor).** As 10 séries
+(5 traduções e as 5 nossas) com 3 execuções nas 66 instâncias, custos iguais
+em todas, cv acima de 5% só nas instâncias de milissegundos (Fortran) e nas
+pequenas do Java (JIT). Razão = média, nas 66 instâncias, de média da
+tradução / média da nossa (tempo de parede da busca):
+
+| C++ → | Antes (julho) | d66 | mín. a máx. por instância |
+|---|---|---|---|
+| Java | 0,928 | 0,889 | 0,64 a 1,18 |
+| Go | 0,955 | 0,968 | 0,95 a 0,98 |
+| Fortran | 0,986 | 0,992 | 0,67 a 1,16 |
+| Swift | 0,950 | 0,995 | 0,95 a 1,04 |
+| JavaScript | 1,147 | 1,162 | 0,97 a 1,25 |
+
+Artigo: Figura 7 com esses valores (nova ordem: Java, Julia, Go, Fortran,
+Swift), nota d da Tabela 13 aponta o aquecimento do JIT, e a 7.6 diz que
+Fortran e Swift são mais rápidas por menos de 1%.
+
 ## Ordem proposta
 
 1. A1 (dados da `p26`, já rodando).
