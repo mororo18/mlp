@@ -227,6 +227,23 @@ Fases como no `PLANO.md`:
   (`float`) e a combinação. Lote B4-interp: as 4 do Lua e as 5 do Python,
   com as nossas e as duas bases (13 programas, cerca de 6 h).
 - **B4. Rodadas:**
+  B4-comp feita (`runs/b4-comp-20261124`, 1640 execuções, 41 programas,
+  custo ok; o nosso C++ no berlin52 voltou a 0,092 a 0,094 s). Gaps (4
+  instâncias):
+
+  | Par | Base | Variantes | Leitura |
+  |---|---|---|---|
+  | C++ → Rust | +69,1 | R1 sem verificação +1,1; R2 matriz plana +46,0; R1+R2 +5,6 | fechado pela verificação de limites (R1); com a matriz plana junto fica pior |
+  | C++ → C# | +8,4 | S1 `seq` por ponteiro 0,0; S2 matriz plana +5,6; S1+S2 −3,5 | fechado (S1); berlin52 ainda 0,86 a 0,89 em todas (tempo fixo do nosso C#) |
+  | C++ → LuaJIT | +73,7 | L1 array −6,6; L2 `to_1D` +73,5; L3 locais +75,2; todos −11,2 | L1 explica tudo; com ele a tradução fica mais rápida que a nossa |
+  | C++ → PyPy | +39,6 | P1 `float` +0,5; P2 intercalada +41,1; P1+P2 −4,1 | fechado (P1) |
+  | C → C++ | +2,5 | — | berlin52 normal (1,020 a 1,037): um pouco fora de ±2% |
+  | Lua → C++ | +2,2 | — | idem |
+  | Python → C++ | +6,0 | Y0 ε +5,8; Y1 `seq` plano +2,4; Y2 matriz +3,7; todos +0,7 | fechado pela combinação (Y1 + Y2); ε não pesa |
+  | Java → C++ | +7,2 | V0 ε +7,4; V1 `seq` plano +4,4; V2 matriz +4,2; todos +2,0 | na borda de ±2% (V1 + V2); ε não pesa |
+  | JavaScript → C++ | +23,2 | J1 deslocamentos +5,5; J2 matriz +17,9; J1+J2 0,0 | fechado pela combinação |
+  | Julia → C++ | +32,3 | U1 deslocamentos +14,7 | aberto: falta U2 (base 1) e o resto |
+
   - Lote B-comp (4 instâncias): C++ → C, Rust, C#, LuaJIT, PyPy; C, Lua,
     Python, Java, JavaScript, Julia → C++. Uns 11 pares x 4 a 6 programas.
     Estimativa: 3 a 4 h (o PyPy pesa: 153 s no lin318, cerca de 1 h

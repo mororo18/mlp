@@ -27,7 +27,7 @@ def our_lang(variant):
     if pair.startswith("ours_"):
         return pair[len("ours_"):]
     if pair == "cpp_lua":
-        return variant.split(".")[1]  # cpp_lua.luajit ou cpp_lua.lua
+        return variant.split(".")[1].split("_")[0]  # cpp_lua.luajit[_x] ou cpp_lua.lua[_x]
     return OURS.get(pair, "cplusplus")
 
 
