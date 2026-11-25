@@ -518,6 +518,18 @@ Fases como no `PLANO.md`:
   - Artigo: Tabela 13 (Java, LuaJIT, PyPy, Python, Lua com a B6; nota d
     só para o C#), Tabela 12 (linhas do `BufferedReader`), 7.6 e 7.7
     reescritas, contagem 22 de 24.
+- **B9-comp feita (2026-11-25, 17h50 a 18h15; commit `1724ac4`).**
+  `runs/b9-comp-20261125`, 4 instâncias, 10 execuções, custo ok, carga
+  máxima 18,8 (CV de 20% só no C# padrão da berlin52, bimodal como na
+  B7-short). C#: S1+S2 / nossa −3,5 (+1,0 sem berlin52; berlin52 0,832);
+  com `QuickJitForLoops=false` nos dois **+2,5** (1,018 a 1,029 em todas;
+  a berlin52 fica 4,9x mais rápida na nossa e 4,0x na tradução). LuaJIT:
+  L1 / nossa LJ1 +10,7 (gr202 1,294); **L1-L5 / nossa LJ1 +0,3** (+1,3 sem
+  berlin52; 0,973, 1,125 no gr202, 0,977 e 0,938): fecha pela média, com
+  a nota de rodapé sobre o gr202 (decisão do autor).
+  Artigo (`paper: C# tiered compilation...`): LuaJIT fechado com nota e,
+  C# com a causa (camadas do JIT) na nota d e na 7.7, linha do Lua com a
+  B8 (−2,2, aberto até a B9-interp), contagem 23 de 24.
 - **B8 feita (2026-11-25, 16h23 a 17h50; commit `228e4bd`).**
   `runs/b8-lua-20261125`, Lua 5.2, 3 instâncias, 10 execuções, custo ok,
   CV máximo 1,2%, carga máxima 21. Contra a nossa: `lua_all_hoist` −13,6,
@@ -551,6 +563,9 @@ Fases como no `PLANO.md`:
   tradução tem a diagonal nunca escrita (buraco em cada linha), mas isso
   pesa só 1 a 3%. Variante `cpp_lua.luajit_all_hoist_carry` (L1-L5 no
   LuaJIT) para a B9.
+  **Decidido (autor, 2026-11-25):** ficam os números do LuaJIT do
+  servidor (o do ambiente nix de todas as rodadas), com uma nota de rodapé
+  no artigo sobre a anomalia do gr202 e a outra versão do LuaJIT.
 - **C# na berlin52: causa achada (2026-11-25, `diag/csharp-20261125/`).**
   Ambiente nix das rodadas (.NET SDK 8.0.423), núcleo 14, binários da
   `b7-short`, execuções alternadas (mediana; berlin52 4 a 5, kroA100 2).

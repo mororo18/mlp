@@ -26,13 +26,14 @@ INTERP = ["berlin52", "kroA100", "lin105"]
 ALL = INSTANCES + ["lin105"]
 B4C, B4I, B5C = "b4-comp-20261124", "b4-interp-20261124", "b5-comp-20261125"
 B7C, B7S, B7I = "b7-comp-20261125", "b7-short-20261125", "b7-interp-20261125"
+B8I, B9C, B9I = "b8-lua-20261125", "b9-comp-20261125", "b9-interp-20261125"
 SHORT = ["berlin52", "kroA100"]
 
 
 def instances(round_):
     if "short" in round_:
         return SHORT
-    return INTERP if "interp" in round_ else INSTANCES
+    return INTERP if "interp" in round_ or "-lua-" in round_ else INSTANCES
 
 C = [
     ("pitfalls", "to", "Rust -> C++", "", "gap", "factors-20261121", "rust_cpp.base", "cplusplus"),
@@ -166,6 +167,19 @@ C = [
     ("closing", "from", "C++ -> PyPy", "Element types + subsequence storage, short round", "ours_in_translation", B7S, "cpp_pypy.float_w_interleaved", "python"),
     ("closing", "from", "C++ -> PyPy", "Element types + subsequence storage, JIT warm-up in both", "both", B7S, "cpp_pypy.float_w_interleaved_warm", "ours_python.pypy_warm"),
     ("closing", "from", "PyPy", "JIT warm-up", "control", B7S, "ours_python.pypy_warm", "python"),
+    # B8 e B9: Lua (LZ1, LZ2, L5), LuaJIT (L1-L5) e C# com os laços otimizados desde o início.
+    ("closing", "from", "C++ -> Lua", "L1-L4", "ours_in_translation", B8I, "cpp_lua.lua_all_hoist", "lua"),
+    ("closing", "from", "C++ -> Lua", "L1-L5", "ours_in_translation", B8I, "cpp_lua.lua_all_hoist_carry", "lua"),
+    ("closing", "from", "C++ -> Lua", "L1-L4 (translation); index without -1 (ours)", "both", B8I, "cpp_lua.lua_all_hoist", "ours_lua.zero_based_index"),
+    ("closing", "from", "C++ -> Lua", "L1-L5 (translation); index without -1 (ours)", "both", B8I, "cpp_lua.lua_all_hoist_carry", "ours_lua.zero_based_index"),
+    ("closing", "from", "Lua", "Index without -1", "control", B8I, "ours_lua.zero_based_index", "lua"),
+    ("closing", "from", "C++ -> LuaJIT", "Subsequence storage, B9", "ours_in_translation", B9C, "cpp_lua.luajit_subseq_array", "lua"),
+    ("closing", "from", "C++ -> LuaJIT", "L1-L5", "ours_in_translation", B9C, "cpp_lua.luajit_all_hoist_carry", "lua"),
+    ("closing", "from", "C++ -> LuaJIT", "Subsequence storage (translation); literal positions (ours), B9", "both", B9C, "cpp_lua.luajit_subseq_array", "ours_lua.literal_offsets"),
+    ("closing", "from", "C++ -> LuaJIT", "L1-L5 (translation); literal positions (ours)", "both", B9C, "cpp_lua.luajit_all_hoist_carry", "ours_lua.literal_offsets"),
+    ("closing", "from", "C++ -> C#", "Bounds checks + distance matrix, B9", "ours_in_translation", B9C, "cpp_csharp.unchecked_seq_flat_matrix", "csharp"),
+    ("closing", "from", "C++ -> C#", "Bounds checks + distance matrix, loops optimized from the start in both", "both", B9C, "cpp_csharp.unchecked_seq_flat_matrix_quickjit_loops_off", "ours_csharp.quickjit_loops_off"),
+    ("closing", "from", "C#", "Loops optimized from the start", "control", B9C, "ours_csharp.quickjit_loops_off", "csharp"),
 
     ("controls", "from", "JavaScript", "Float64Array instead of Array", "control", "jsf64-20261122", "ours_javascript.float64array", "javascript"),
     ("controls", "from", "C++ -> JavaScript", "Array instead of Float64Array, against the translation", "control", "jsf64-20261122", "cpp_javascript.array", "cpp_javascript.base"),
