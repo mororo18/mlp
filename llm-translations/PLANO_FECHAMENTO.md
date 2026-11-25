@@ -220,6 +220,35 @@ repetição do berlin52.
     `ours_python.pypy_warm`, `cpp_pypy.float_w_interleaved_warm`) na
     `b7-short-20261125` (berlin52 e kroA100, `instances_short.txt`), entre
     a `b7-comp` e a `b7-interp`.
+  - **PyPy no servidor (2026-11-25, a pedido do autor).** Diagnóstico
+    fora do harness, no ambiente nix das rodadas (PyPy 7.3.20), container
+    preso ao núcleo 14 (livre; a d66 ocupava 8 a 11), 5 a 6 execuções
+    alternadas, CV abaixo de 2%, custos ok. Scripts, saídas e
+    `PYPYLOG=jit-summary` em `diag/pypy-20261125/`. Programas: nossa
+    (`main_pypy.py`), tradução P1+P2 (`float_w_interleaved`), as duas com
+    uma busca não medida antes (aquecimento) e a nossa com o índice
+    calculado em linha (PP1: `3*(i*(dimen+1)+j)+K` com K literal no lugar
+    de `to_1D(i, j, info.X, info.dimen+1)`). Razões tradução/nossa
+    (medianas):
+
+    | | berlin52 | kroA100 |
+    |---|---|---|
+    | sem aquecimento | 0,886 / 0,893 | 0,969 / 0,968 |
+    | com aquecimento nos dois | 0,973 / 0,972 | 0,983 / 0,980 |
+    | nossa com PP1 | 0,946 | 0,987 |
+    | nossa com PP1, com aquecimento nos dois | 0,973 | 0,989 |
+
+    O aquecimento explica a maior parte da berlin52 (0,713 → 0,507 s na
+    nossa, 0,631 → 0,493 s na tradução). O `jit-summary` mostra traços
+    quase duas vezes maiores na nossa (operações gravadas na berlin52:
+    64 mil contra 35 mil; tempo de tracing 0,097 contra 0,066 s): as
+    chamadas a `to_1D` e as leituras de `info.T/C/W` e `info.dimen` entram
+    nos traços. Com PP1, 46 mil operações e 0,079 s; sem aquecimento, PP1
+    leva a berlin52 de 0,893 para 0,946 e o kroA100 de 0,968 para 0,987.
+    Com aquecimento, PP1 só muda o kroA100; sobra cerca de 2,7% na
+    berlin52 (cópias locais e outras leituras de campo ainda nos traços).
+    Variante `ours_python.pypy_inline` na `b7-comp` (4 instâncias, contra
+    `cpp_pypy.float_w_interleaved` e a nossa no PyPy), para a Tabela 13.
 
 ## Frente B. Pares só com a análise antiga (13)
 
