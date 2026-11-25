@@ -249,6 +249,28 @@ repetição do berlin52.
     berlin52 (cópias locais e outras leituras de campo ainda nos traços).
     Variante `ours_python.pypy_inline` na `b7-comp` (4 instâncias, contra
     `cpp_pypy.float_w_interleaved` e a nossa no PyPy), para a Tabela 13.
+  - **Parâmetros do JIT do PyPy (2026-11-25, pedido do autor: induzir o
+    aquecimento como no C#).** Grade no servidor (`diag3.sh`, `out3.txt`;
+    núcleo 14, 3 execuções, custos ok), medianas em s, berlin52:
+
+    | `--jit` | nossa | nossa PP1 | tradução | trad./nossa | trad./PP1 |
+    |---|---|---|---|---|---|
+    | padrão | 0,712 | 0,662 | 0,630 | 0,884 | 0,952 |
+    | `threshold=200,function_threshold=300` | 0,830 | 0,690 | 0,655 | 0,790 | 0,950 |
+    | `threshold=50,function_threshold=80` | 0,707 | 0,677 | 0,651 | 0,920 | 0,960 |
+    | `trace_eagerness=50` | 0,692 | 0,646 | 0,615 | 0,888 | 0,951 |
+    | `threshold=200,...,trace_eagerness=50` | 0,792 | 0,677 | 0,647 | 0,817 | 0,956 |
+    | `trace_limit=20000` | 0,720 | 0,669 | 0,637 | 0,885 | 0,952 |
+
+    No kroA100 todas as configurações ficam entre 0,966 e 0,991. Leitura:
+    não há no PyPy um equivalente ao `DOTNET_TieredCompilation=0`; o JIT
+    de traços só compila o que já executou, e baixar os limiares não
+    antecipa o aquecimento (o melhor caso, `trace_eagerness=50`, tira 3%
+    da nossa e 2% da tradução; `threshold=200` piora a nossa em 17%, com
+    traços de caminhos ainda atípicos). Nenhuma configuração chega perto da
+    busca não medida antes (nossa 0,507 s, tradução 0,493 s). A razão
+    tradução/nossa com PP1 fica em 0,95 a 0,96 em todas: o resíduo sem
+    aquecimento é do código (índice por função), não dos limiares.
 
 ## Frente B. Pares só com a análise antiga (13)
 
