@@ -68,14 +68,14 @@ com duas mudanças:
 | Swift → C++ | +12,4 → +1,5 | fechado (matriz); fonte antiga | C |
 | C# → C++ | +12,5 → −0,2 | fechado (matriz) | — |
 | C++ → JavaScript | +19,0 → +1,7 | fechado (tipo de array, layout intercalado e matriz *packed* na tradução; posições constantes e cópias locais na nossa) | A |
-| C++ → Java | −10,6 → −3,1 | aberto (diagnóstico do JIT, A2) | A |
+| C++ → Java | −10,6 → −1,8 | fechado (acessores, cópias locais, SoA e `BufferedReader` na nossa; B7) | A |
 | C++ → C | +0,7 (+1,1 sem berlin52) | fechado (nada) | — |
 | C++ → Rust | +69,5 → +1,1 | fechado (verificação de limites, R1) | B |
-| C++ → C# | +8,4 → −3,5 | fechado (S1+S2; +0,2 sem berlin52, onde a tradução é 14% mais rápida) | B |
-| C++ → LuaJIT | +73,4 → −6,6 | passou do ponto (array das subsequências, L1) | B |
-| C++ → PyPy | +39,6 → −4,1 | fechado (P1+P2; −1,7 sem berlin52, onde a tradução é 11% mais rápida) | B |
+| C++ → C# | +8,4 → −3,5 | fechado (S1+S2; +0,2 sem berlin52, onde a tradução é 14% mais rápida também com aquecimento nos dois; causa não achada) | B |
+| C++ → LuaJIT | +73,4 → −6,6 → +11,1 | aberto (L1 na tradução; LJ1 na nossa passa do ponto ao contrário, 1,315 no gr202) | B |
+| C++ → PyPy | +39,6 → −4,1 → −1,4 | fechado (P1+P2 na tradução, PP1 na nossa; B7) | B |
 | C++ → Lua | +89,2 → −14,0 | passou do ponto com L4 (B6); LZ1 na nossa: B8 | B |
-| C++ → Python | +102,7 → −4,7 | passou do ponto (listas aninhadas, `to_1D`, locais) | B |
+| C++ → Python | +102,7 → −4,7 → −0,4 | fechado (tudo na tradução, PY1 na nossa; B7) | B |
 | C → C++ | +2,3 → −1,3 | fechado (matriz, K2) | B |
 | Lua → C++ | +1,9 → −0,5 | fechado (matriz, M2; ε não pesa) | B |
 | Python → C++ | +6,0 → +0,7 | fechado (`seq` plano e matriz, Y1+Y2) | B |
@@ -93,6 +93,9 @@ direção, falta medir a escolha dela na nossa) e 6 abertos.
 Depois da B5-comp (2026-11-25): 20 fechados, 2 que passaram do ponto
 (C++ → LuaJIT e C++ → Python) e 2 abertos (C++ → Lua, L4 na B6; C++ → Java,
 A2). Os gaps de base dos cinco pares da B5 são os da própria rodada.
+Depois da B6 e da B7 (2026-11-25): **22 fechados** (entram Java, Python e
+PyPy, agora com a berlin52) e 2 abertos (C++ → LuaJIT, +11,1 com LJ1 na
+nossa; C++ → Lua, B8). Artigo atualizado (`459010c` no artigo).
 
 Gaps de base da Frente B: rodada `b-comp-20261124` (B1, 4 instâncias, 10
 execuções, custo ok em todas). † Estimativa com a mediana do nosso C++ no
@@ -491,6 +494,30 @@ Fases como no `PLANO.md`:
     `b8-lua-20261125`, 3 instâncias interpretadas, nossa Lua,
     `cpp_lua.lua_all_hoist`, `cpp_lua.lua_all_hoist_carry` e
     `ours_lua.zero_based_index`.
+- **B7 feita (2026-11-25, 13h50 a 16h20; commit `441dcd0`).** Três lotes,
+  custo ok em todos. Gaps (média das razões por instância; entre
+  parênteses, sem berlin52), em `tables.py`/`comparisons.csv`:
+  - `b7-comp-20261125` (4 instâncias, carga máxima 18,6): Java base −9,8
+    (−10,6); tradução / nossa com SoA −3,8 (−2,5), com `BufferedReader`
+    −7,4 (−7,6), com os dois **−1,8 (+0,8): fecha**. LuaJIT: L1 −6,6
+    (o mesmo da B5); LJ1 deixa a nossa 15,9% mais rápida e a tradução
+    fica **+11,1** (+12,9) contra ela (1,058, 1,073, 1,315 no gr202 e
+    0,998); LJ1+LJ2 +8,2. PyPy: P1+P2 −3,9 (−1,9); PP1 na nossa: **−1,4
+    (−0,8): fecha**, com berlin52 0,971.
+  - `b7-short-20261125` (berlin52 e kroA100, carga máxima 8): células
+    bimodais no berlin52 da nossa PyPy (0,71 a 1,18 s) e dos dois C#
+    sem aquecimento (1,46 a 2,21 s e 1,24 a 2,03 s); as com aquecimento
+    não. C# com aquecimento nos dois: −6,6 (berlin52 0,857, kroA100
+    1,011): o aquecimento deixa os dois 20% mais rápidos no kroA100, mas
+    **não tira a diferença da berlin52** (o diagnóstico no notebook dizia
+    que tirava; no servidor, não). PyPy com aquecimento nos dois: −2,4
+    (0,972 e 0,979).
+  - `b7-interp-20261125` (3 instâncias, carga máxima 20): Python
+    `cpp_python.all` −4,8; com PY1 na nossa **−0,4: fecha**; PY1+PY2
+    −0,4 (as posições literais não mudam nada no CPython).
+  - Artigo: Tabela 13 (Java, LuaJIT, PyPy, Python, Lua com a B6; nota d
+    só para o C#), Tabela 12 (linhas do `BufferedReader`), 7.6 e 7.7
+    reescritas, contagem 22 de 24.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 

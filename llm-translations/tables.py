@@ -21,13 +21,17 @@ from statistics import mean, stdev
 HERE = Path(__file__).resolve().parent
 RUNS = HERE / "runs"
 INSTANCES = ["berlin52", "kroA100", "gr202", "lin318"]
-# C++ -> Lua e C++ -> Python no Lua 5.4 e no CPython (rodadas *-interp-*).
+# C++ -> Lua e C++ -> Python no Lua 5.2 e no CPython (rodadas *-interp-*).
 INTERP = ["berlin52", "kroA100", "lin105"]
 ALL = INSTANCES + ["lin105"]
 B4C, B4I, B5C = "b4-comp-20261124", "b4-interp-20261124", "b5-comp-20261125"
+B7C, B7S, B7I = "b7-comp-20261125", "b7-short-20261125", "b7-interp-20261125"
+SHORT = ["berlin52", "kroA100"]
 
 
 def instances(round_):
+    if "short" in round_:
+        return SHORT
     return INTERP if "interp" in round_ else INSTANCES
 
 C = [
@@ -141,6 +145,27 @@ C = [
     ("closing", "from", "C++ -> JavaScript", "Array, interleaved", "ours_in_translation", B5C, "cpp_javascript.interleaved_array", "javascript"),
     ("closing", "from", "C++ -> JavaScript", "Array, interleaved, packed matrix", "ours_in_translation", B5C, "cpp_javascript.interleaved_array_packed", "javascript"),
     ("closing", "from", "JavaScript", "Constant positions, local copies", "control", B5C, "ours_javascript.local_info_consts", "javascript"),
+    # B7: escolhas das traduções nas nossas (Java, LuaJIT, Python, PyPy) e aquecimento (C#, PyPy).
+    ("closing", "from", "C++ -> Java", "", "gap", B7C, "cpp_java.base", "java"),
+    ("closing", "from", "C++ -> Java", "Accessors + local copies + subsequence storage", "translation_in_ours", B7C, "cpp_java.base", "ours_java.soa"),
+    ("closing", "from", "C++ -> Java", "Reading of the instance", "translation_in_ours", B7C, "cpp_java.base", "ours_java.bufread"),
+    ("closing", "from", "C++ -> Java", "Accessors + local copies + subsequence storage + reading of the instance", "translation_in_ours", B7C, "cpp_java.base", "ours_java.soa_bufread"),
+    ("closing", "from", "C++ -> LuaJIT", "Subsequence storage", "ours_in_translation", B7C, "cpp_lua.luajit_subseq_array", "lua"),
+    ("closing", "from", "C++ -> LuaJIT", "Subsequence storage (translation); literal positions (ours)", "both", B7C, "cpp_lua.luajit_subseq_array", "ours_lua.literal_offsets"),
+    ("closing", "from", "C++ -> LuaJIT", "Subsequence storage (translation); literal positions, loop locals (ours)", "both", B7C, "cpp_lua.luajit_subseq_array", "ours_lua.literal_offsets_loop_locals"),
+    ("closing", "from", "LuaJIT", "Literal positions", "control", B7C, "ours_lua.literal_offsets", "lua"),
+    ("closing", "from", "C++ -> PyPy", "Element types + subsequence storage", "ours_in_translation", B7C, "cpp_pypy.float_w_interleaved", "python"),
+    ("closing", "from", "C++ -> PyPy", "Element types + subsequence storage (translation); inline index (ours)", "both", B7C, "cpp_pypy.float_w_interleaved", "ours_python.pypy_inline"),
+    ("closing", "from", "PyPy", "Inline index", "control", B7C, "ours_python.pypy_inline", "python"),
+    ("closing", "from", "C++ -> Python", "All (translation)", "ours_in_translation", B7I, "cpp_python.all", "python"),
+    ("closing", "from", "C++ -> Python", "All (translation); local copies in the update (ours)", "both", B7I, "cpp_python.all", "ours_python.update_locals"),
+    ("closing", "from", "C++ -> Python", "All (translation); local copies in the update, literal positions (ours)", "both", B7I, "cpp_python.all", "ours_python.update_locals_literals"),
+    ("closing", "from", "C++ -> C#", "Bounds checks + distance matrix", "ours_in_translation", B7S, "cpp_csharp.unchecked_seq_flat_matrix", "csharp"),
+    ("closing", "from", "C++ -> C#", "Bounds checks + distance matrix, JIT warm-up in both", "both", B7S, "cpp_csharp.unchecked_seq_flat_matrix_warm", "ours_csharp.warm"),
+    ("closing", "from", "C#", "JIT warm-up", "control", B7S, "ours_csharp.warm", "csharp"),
+    ("closing", "from", "C++ -> PyPy", "Element types + subsequence storage, short round", "ours_in_translation", B7S, "cpp_pypy.float_w_interleaved", "python"),
+    ("closing", "from", "C++ -> PyPy", "Element types + subsequence storage, JIT warm-up in both", "both", B7S, "cpp_pypy.float_w_interleaved_warm", "ours_python.pypy_warm"),
+    ("closing", "from", "PyPy", "JIT warm-up", "control", B7S, "ours_python.pypy_warm", "python"),
 
     ("controls", "from", "JavaScript", "Float64Array instead of Array", "control", "jsf64-20261122", "ours_javascript.float64array", "javascript"),
     ("controls", "from", "C++ -> JavaScript", "Array instead of Float64Array, against the translation", "control", "jsf64-20261122", "cpp_javascript.array", "cpp_javascript.base"),
