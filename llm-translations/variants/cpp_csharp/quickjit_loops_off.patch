@@ -1,0 +1,10 @@
+--- a/mlp.csproj	2026-11-25 16:55:27.982995843 -0300
++++ b/mlp.csproj	2026-11-25 16:55:27.983804385 -0300
+@@ -10,6 +10,7 @@
+     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+     <ServerGarbageCollection>true</ServerGarbageCollection>
+     <InvariantGlobalization>true</InvariantGlobalization>
++    <TieredCompilationQuickJitForLoops>false</TieredCompilationQuickJitForLoops>
+     <NoWarn>0168;0219</NoWarn>
+   </PropertyGroup>
+ 

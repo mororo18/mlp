@@ -518,6 +518,36 @@ Fases como no `PLANO.md`:
   - Artigo: Tabela 13 (Java, LuaJIT, PyPy, Python, Lua com a B6; nota d
     só para o C#), Tabela 12 (linhas do `BufferedReader`), 7.6 e 7.7
     reescritas, contagem 22 de 24.
+- **C# na berlin52: causa achada (2026-11-25, `diag/csharp-20261125/`).**
+  Ambiente nix das rodadas (.NET SDK 8.0.423), núcleo 14, binários da
+  `b7-short`, execuções alternadas (mediana; berlin52 4 a 5, kroA100 2).
+  O GC não pesa (`gcServer` 0/1, `gcConcurrent=0`: igual ao padrão). O JIT
+  em camadas pesa tudo:
+
+  | berlin52 | nossa | tradução | tr./nossa |
+  |---|---|---|---|
+  | padrão | 1,459 | 1,243 | 0,852 |
+  | padrão, aquecimento nos dois | 1,446 | 1,235 | 0,854 |
+  | `TC_QuickJitForLoops=0` | 0,332 | 0,340 | 1,024 |
+  | `TieredCompilation=0` | 0,332 | 0,347 | 1,045 |
+  | `TC_QuickJit=0` | 0,331 | 0,340 | 1,027 |
+  | `TC_CallCountingDelayMs=0` | 0,430 | 0,456 | 1,060 |
+  | `TC_OnStackReplacement=0` | 2,081 | 1,955 | 0,939 |
+  | `TC_BackgroundWorkerTimeoutMs=0` | 1,459 | 1,245 | 0,853 |
+  | `TieredPGO=0` | 1,398 | 1,195 | 0,855 |
+
+  kroA100: padrão 5,00 e 4,93 s; `QuickJitForLoops=0` 3,99 e 4,07 (1,019).
+  Leitura: os métodos quentes (com laços) rodam a execução inteira no
+  código de tier 0 com OSR, por isso a busca de aquecimento não muda nada
+  (o diagnóstico do notebook, outro .NET, dizia o contrário). A vantagem
+  da tradução na berlin52 é a qualidade desse código não otimizado; com os
+  laços compilados otimizados desde o início, a tradução fica cerca de 2%
+  mais lenta, como nas instâncias maiores. Isso também vale para a Seção 6:
+  o C# nas instâncias pequenas mede em boa parte o tier 0 (nossa berlin52
+  1,46 s contra 0,33 s). Variantes CS1 (`TieredCompilationQuickJitForLoops`
+  `false` no `.csproj`): `ours_csharp.quickjit_loops_off` e
+  `cpp_csharp.unchecked_seq_flat_matrix_quickjit_loops_off`, para a rodada
+  B9 (4 instâncias) depois da B8.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 

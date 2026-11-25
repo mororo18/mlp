@@ -1,0 +1,10 @@
+--- a/csharp.csproj	2026-11-25 16:55:49.928131714 -0300
++++ b/csharp.csproj	2026-11-25 16:55:49.929084890 -0300
+@@ -11,6 +11,7 @@
+     <TargetFramework>net8.0</TargetFramework>
+     <StartupObject>MLP.main</StartupObject>
+     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
++    <TieredCompilationQuickJitForLoops>false</TieredCompilationQuickJitForLoops>
+   </PropertyGroup>
+ 
+ </Project>
