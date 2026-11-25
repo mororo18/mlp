@@ -1,0 +1,26 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 23:48:03.523973043 -0300
++++ b/main.cpp	2026-11-24 23:48:03.525535797 -0300
+@@ -42,7 +42,8 @@
+     std::vector<int> rnd;
+     int rnd_index;
+ 
+-    inline double c(int i, int j) const { return cost[i * (dimen + 1) + j]; }
++    double **rows; // distance matrix as separately allocated rows (our double**)
++    inline double c(int i, int j) const { return rows[i][j]; }
+ };
+ 
+ struct tSolution {
+@@ -470,6 +471,12 @@
+ 
+     tData data;
+     data.cost = cost;
++    data.rows = new double *[dimension + 1];
++    for (int i = 0; i <= dimension; i++) {
++        data.rows[i] = new double[dimension + 1];
++        for (int j = 0; j <= dimension; j++)
++            data.rows[i][j] = cost[i * (dimension + 1) + j];
++    }
+     data.dimen = dimension;
+     data.T = 0;
+     data.W = 1;

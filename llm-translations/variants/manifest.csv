@@ -116,3 +116,11 @@ cpp_python.local_fields,cpp_python,cpp_python/measure.patch cpp_python/local_fie
 cpp_python.nested_lists,cpp_python,cpp_python/measure.patch cpp_python/nested_lists.patch,Q3 (I): subsequences in nested lists seq[i][j][k] (ours) instead of one SeqInfo object per pair (no to_1D in the hot loops)
 cpp_python.float_w,cpp_python,cpp_python/measure.patch cpp_python/float_w.patch,Q4 (I): W stored as float(j + k) (ours)
 cpp_python.all,cpp_python,cpp_python/measure.patch cpp_python/all.patch,Q1+Q2+Q3+Q4 (I)
+julia_cpp.row_matrix,julia_cpp,julia_cpp/measure.patch julia_cpp/row_matrix.patch,U3 (I): distance matrix as separately allocated rows (our double**) instead of one flat vector indexed with i * (dimen + 1)
+julia_cpp.const_offsets_row_matrix,julia_cpp,julia_cpp/measure.patch julia_cpp/const_offsets_row_matrix.patch,U1+U3 (I)
+c_cpp.row_matrix,c_cpp,c_cpp/measure.patch c_cpp/row_matrix.patch,K2 (I): distance matrix as separately allocated rows (our double**) instead of vector<vector<double>>
+lua_cpp.epsilon,lua_cpp,lua_cpp/measure.patch lua_cpp/epsilon.patch,M0 (I): EPSILON = DBL_EPSILON (ours) instead of 1e-15
+lua_cpp.row_matrix,lua_cpp,lua_cpp/measure.patch lua_cpp/row_matrix.patch,M2 (I): distance matrix as separately allocated rows (our double**) instead of vector<vector<double>>
+lua_cpp.epsilon_row_matrix,lua_cpp,lua_cpp/measure.patch lua_cpp/epsilon_row_matrix.patch,M0+M2 (I)
+cpp_javascript.packed_matrix,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/packed_matrix.patch,X1 (I): outer array of the distance matrix packed ([] filled in order, ours) instead of new Array(sz) (holey)
+cpp_javascript.interleaved_array_packed,cpp_javascript,cpp_javascript/measure.patch cpp_javascript/interleaved_array.patch cpp_javascript/packed_matrix.patch,P20 on the Array + X1 (I)

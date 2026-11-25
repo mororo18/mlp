@@ -1,0 +1,69 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 23:49:20.913655692 -0300
++++ b/main.cpp	2026-11-24 23:49:20.914941830 -0300
+@@ -19,6 +19,7 @@
+ 
+ struct tInfo {
+     std::vector<std::vector<double>> c;
++    double **cr; // separately allocated rows (our double**)
+     int dimension;
+     std::vector<int> rnd;
+     int rnd_index;
+@@ -114,7 +115,7 @@
+     const int dimen = info.dimension;
+     std::vector<double> &seq = solut.seq;
+ 
+-    const std::vector<std::vector<double>> &c = info.c;
++    double *const *c = info.cr;
+     const std::vector<int> &s = solut.s;
+     const int s_size = dimen + 1;
+ 
+@@ -158,7 +159,7 @@
+     int i = left - 1;
+ 
+     for (int j = left; j <= right - 1; j++) {
+-        if (info.c[r][arr[j]] < info.c[r][pivotValue]) {
++        if (info.cr[r][arr[j]] < info.cr[r][pivotValue]) {
+             i = i + 1;
+             std::swap(arr[i], arr[j]);
+         }
+@@ -261,7 +262,7 @@
+ 
+     const std::vector<int> &s = solut.s;
+     const std::vector<double> &seq = solut.seq;
+-    const std::vector<std::vector<double>> &c = info.c;
++    double *const *c = info.cr;
+ 
+     const int s_size = dimen + 1;
+ 
+@@ -332,7 +333,7 @@
+ 
+     const std::vector<int> &s = solut.s;
+     const std::vector<double> &seq = solut.seq;
+-    const std::vector<std::vector<double>> &c = info.c;
++    double *const *c = info.cr;
+ 
+     const double EP = EPSILON;
+ 
+@@ -390,7 +391,7 @@
+ 
+     const std::vector<int> &s = solut.s;
+     const std::vector<double> &seq = solut.seq;
+-    const std::vector<std::vector<double>> &c = info.c;
++    double *const *c = info.cr;
+     const int s_size = dimen + 1;
+ 
+     const double EP = EPSILON;
+@@ -626,6 +627,12 @@
+ 
+     int a = 0;
+     info.dimension = readData(info.c, info.rnd, a);
++    info.cr = new double *[info.c.size()];
++    for (size_t i = 0; i < info.c.size(); i++) {
++        info.cr[i] = new double[info.c[i].size()];
++        for (size_t j = 0; j < info.c[i].size(); j++)
++            info.cr[i][j] = info.c[i][j];
++    }
+     printf("%d\n", info.rnd[a]);
+     srand((unsigned)time(NULL));
+ 

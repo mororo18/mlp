@@ -1,0 +1,12 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/data.js b/data.js
+--- a/data.js	2026-11-24 23:51:46.734140480 -0300
++++ b/data.js	2026-11-24 23:51:46.736448390 -0300
+@@ -3,7 +3,7 @@
+ const fs = require('fs');
+ 
+ function matrix_allocate(sz) {
+-    const ptr = new Array(sz);
++    const ptr = []; // packed array of rows (ours: [] filled in order), not new Array(sz)
+ 
+     for (let i = 0; i < sz; i++) {
+         ptr[i] = new Float64Array(sz);

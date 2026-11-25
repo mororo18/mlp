@@ -116,7 +116,15 @@ repetição do berlin52.
     programas (tradução `interleaved_array` × nossa `local_info_consts`): a
     tradução fica **+4,6%** mais lenta (+7,9, +4,5, +2,5, +3,7% por
     instância). Mesmo quadro do P21 com `Float64Array` (5 a 8%).
-  Conclusão: o par **não fecha**. Igualando as três escolhas, sobra uma
+  **Nova hipótese (2026-11-24): matriz de distâncias "holey".** A tradução
+  cria o vetor externo da matriz com `new Array(sz)` (elementos *holey* no
+  V8: toda leitura `cost[s[k]]` confere buraco); o nosso usa `[]`
+  preenchido em ordem (*packed*). No Node 20 local (kroA100, 2 execuções),
+  só essa troca (X1, `packed_matrix.patch`) leva a tradução igualada de
+  11,8/11,6 s para 11,1/10,7 s, empatando com a nossa igualada (11,1/10,8 s).
+  Variantes `cpp_javascript.packed_matrix` e
+  `cpp_javascript.interleaved_array_packed` na próxima rodada.
+  Conclusão (p26): o par **não fecha**. Igualando as três escolhas, sobra uma
   diferença de 4,6% a favor da nossa, de causa não identificada (a
   tradução ainda difere em outros pontos do código). Para a Tabela 13:
   mudanças "tipo de array, layout intercalado (na tradução); posições
@@ -251,6 +259,17 @@ Fases como no `PLANO.md`:
   - Lote B-interp (`instances_interp.txt`): C++ → Lua e C++ → Python. Uns 7
     programas por par a cerca de 1,4 vez o tempo da nossa: cerca de 3 h por
     par, 6 h os dois (uma noite).
+- **Resíduos depois da B4 (2026-11-24).** Julia → C++ (+14,7% com U1): a
+  diferença não aparece com o GCC 14 local (nossa 2,41 s, tradução 2,31 s
+  na kroA100) e aparece com os binários do GCC 15.3 do servidor rodados aqui
+  (nossa 2,10 s, U1 2,52 s): o GCC 15 acelera o nosso C++ e não a tradução.
+  No laço quente da reinserção, a tradução calcula `S(k) * (dimen + 1)`
+  (`imul` + `cltq`) para a matriz plana; o nosso lê o ponteiro da linha
+  (`double**`). Variantes U3 (`row_matrix`) e U1+U3. C → C++ (+2,5%) e
+  Lua → C++ (+2,2%): matriz `double**` (K2, M2; a análise antiga já dava −4%
+  com a matriz no C → C++) e, no Lua, o ε `1e-15` (M0). Java → C++ (+2,0%):
+  o `tArray::get` é expandido no lugar (sem V3); a rodada mede de novo a base
+  e a combinação.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 

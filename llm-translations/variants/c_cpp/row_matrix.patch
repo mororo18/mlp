@@ -1,0 +1,115 @@
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/main.cpp b/main.cpp
+--- a/main.cpp	2026-11-24 23:49:20.887207748 -0300
++++ b/main.cpp	2026-11-24 23:49:20.889322557 -0300
+@@ -32,7 +32,7 @@
+     int pivot = arr[right];
+     int i = left - 1;
+     for (int j = left; j < right; j++) {
+-        if (data.cost[r][arr[j]] < data.cost[r][pivot]) {
++        if (data.rows[r][arr[j]] < data.rows[r][pivot]) {
+             i++;
+             int temp = arr[i];
+             arr[i] = arr[j];
+@@ -146,7 +146,7 @@
+         for (j = i+1; j < data.dimen+1; j++) {
+             j_prev = j-1;
+ 
+-            Real T = data.cost[solut.s[j_prev]][solut.s[j]] + solut.seq_get_T(i, j_prev);
++            Real T = data.rows[solut.s[j_prev]][solut.s[j]] + solut.seq_get_T(i, j_prev);
+             solut.seq_set_T(i, j, T);
+ 
+             Real C = solut.seq_get_T(i, j) + solut.seq_get_C(i, j_prev);
+@@ -175,11 +175,11 @@
+         i_next = i + 1;
+ 
+         //consecutive nodes
+-        cost_concat_1 =                 solut.seq_get_T(0, i_prev) + data.cost[solut.s[i_prev]][solut.s[i_next]];
+-        cost_concat_2 = cost_concat_1 + solut.seq_get_T(i, i_next)  + data.cost[solut.s[i]][solut.s[i_next+1]];
++        cost_concat_1 =                 solut.seq_get_T(0, i_prev) + data.rows[solut.s[i_prev]][solut.s[i_next]];
++        cost_concat_2 = cost_concat_1 + solut.seq_get_T(i, i_next)  + data.rows[solut.s[i]][solut.s[i_next+1]];
+ 
+         cost_new = solut.seq_get_C(0, i_prev)                                                    +           //       1st subseq
+-        solut.seq_get_W(i, i_next)               * (cost_concat_1) + data.cost[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
++        solut.seq_get_W(i, i_next)               * (cost_concat_1) + data.rows[solut.s[i_next]][solut.s[i]]  +           // concat 2nd subseq
+         solut.seq_get_W(i_next+1, data.dimen)    * (cost_concat_2) + solut.seq_get_C(i_next+1, data.dimen);   // concat 3rd subseq
+ 
+         if (cost_new < cost_best) {
+@@ -192,10 +192,10 @@
+             j_next = j + 1;
+             j_prev = j - 1;
+ 
+-            cost_concat_1 =                 solut.seq_get_T(0, i_prev)       + data.cost[solut.s[i_prev]][solut.s[j]];
+-            cost_concat_2 = cost_concat_1                           + data.cost[solut.s[j]][solut.s[i_next]];
+-            cost_concat_3 = cost_concat_2 + solut.seq_get_T(i_next, j_prev)  + data.cost[solut.s[j_prev]][solut.s[i]];
+-            cost_concat_4 = cost_concat_3                           + data.cost[solut.s[i]][solut.s[j_next]];
++            cost_concat_1 =                 solut.seq_get_T(0, i_prev)       + data.rows[solut.s[i_prev]][solut.s[j]];
++            cost_concat_2 = cost_concat_1                           + data.rows[solut.s[j]][solut.s[i_next]];
++            cost_concat_3 = cost_concat_2 + solut.seq_get_T(i_next, j_prev)  + data.rows[solut.s[j_prev]][solut.s[i]];
++            cost_concat_4 = cost_concat_3                           + data.rows[solut.s[i]][solut.s[j_next]];
+ 
+             cost_new = solut.seq_get_C(0, i_prev)                                                 +      // 1st subseq
+             cost_concat_1 +                                                             // concat 2nd subseq (single node)
+@@ -240,10 +240,10 @@
+             j_next = j + 1;
+ 
+ 
+-          rev_seq_cost += data.cost[solut.s[j-1]][solut.s[j]] * (solut.seq_get_W(i, j)-1.0);
++          rev_seq_cost += data.rows[solut.s[j-1]][solut.s[j]] * (solut.seq_get_W(i, j)-1.0);
+ 
+-          cost_concat_1 =                 solut.seq_get_T(0, i_prev)   + data.cost[solut.s[j]][solut.s[i_prev]];
+-          cost_concat_2 = cost_concat_1 + solut.seq_get_T(i, j)        + data.cost[solut.s[j_next]][solut.s[i]];
++          cost_concat_1 =                 solut.seq_get_T(0, i_prev)   + data.rows[solut.s[j]][solut.s[i_prev]];
++          cost_concat_2 = cost_concat_1 + solut.seq_get_T(i, j)        + data.rows[solut.s[j_next]][solut.s[i]];
+ 
+           cost_new = solut.seq_get_C(0, i_prev)                                                        +   //  1st subseq
+               solut.seq_get_W(i, j)                * cost_concat_1 + rev_seq_cost                  +   // concat 2nd subseq (reversed seq)
+@@ -285,9 +285,9 @@
+         for(k = 0; k < i_prev; ++k){
+             k_next = k+1;
+ 
+-          cost_concat_1 =                 solut.seq_get_T(0, k)            + data.cost[solut.s[k]][solut.s[i]];
+-          cost_concat_2 = cost_concat_1 + solut.seq_get_T(i, j)            + data.cost[solut.s[j]][solut.s[k_next]];
+-          cost_concat_3 = cost_concat_2 + solut.seq_get_T(k_next, i_prev)  + data.cost[solut.s[i_prev]][solut.s[j_next]];
++          cost_concat_1 =                 solut.seq_get_T(0, k)            + data.rows[solut.s[k]][solut.s[i]];
++          cost_concat_2 = cost_concat_1 + solut.seq_get_T(i, j)            + data.rows[solut.s[j]][solut.s[k_next]];
++          cost_concat_3 = cost_concat_2 + solut.seq_get_T(k_next, i_prev)  + data.rows[solut.s[i_prev]][solut.s[j_next]];
+ 
+           cost_new = solut.seq_get_C(0, k)                                                                   +   //       1st subseq
+               solut.seq_get_W(i, j)               * cost_concat_1 + solut.seq_get_C(i, j)                  +   //  concat 2nd subseq (reinserted seq)
+@@ -305,9 +305,9 @@
+         for (k = i + opt; k < data.dimen; ++k) {
+             k_next = k + 1;
+ 
+-          cost_concat_1 =                 solut.seq_get_T(0, i_prev)  + data.cost[solut.s[i_prev]][solut.s[j_next]];
+-          cost_concat_2 = cost_concat_1 + solut.seq_get_T(j_next, k)  + data.cost[solut.s[k]][solut.s[i]];
+-          cost_concat_3 = cost_concat_2 + solut.seq_get_T(i, j)       + data.cost[solut.s[j]][solut.s[k_next]];
++          cost_concat_1 =                 solut.seq_get_T(0, i_prev)  + data.rows[solut.s[i_prev]][solut.s[j_next]];
++          cost_concat_2 = cost_concat_1 + solut.seq_get_T(j_next, k)  + data.rows[solut.s[k]][solut.s[i]];
++          cost_concat_3 = cost_concat_2 + solut.seq_get_T(i, j)       + data.rows[solut.s[j]][solut.s[k_next]];
+ 
+           cost_new = solut.seq_get_C(0, i_prev)                                                                  +   //       1st subseq
+                   solut.seq_get_W(j_next, k)          * cost_concat_1 + solut.seq_get_C(j_next, k)             +   // concat 2nd subseq
+@@ -511,6 +511,12 @@
+     std::vector<int> rnd;
+ 
+     data.dimen = loadData(data.cost, rnd);
++    data.rows = new double *[data.cost.size()];
++    for (size_t i = 0; i < data.cost.size(); i++) {
++        data.rows[i] = new double[data.cost[i].size()];
++        for (size_t j = 0; j < data.cost[i].size(); j++)
++            data.rows[i][j] = data.cost[i][j];
++    }
+     data.rnd = rnd;
+     data.rnd_index = 0;
+ 
+diff -ruN -x target -x obj -x bin -x '*.o' -x solve -x __pycache__ a/types.hpp b/types.hpp
+--- a/types.hpp	2026-11-24 23:49:20.887323487 -0300
++++ b/types.hpp	2026-11-24 23:49:20.889480292 -0300
+@@ -10,6 +10,7 @@
+ 
+ struct tData {
+     std::vector<std::vector<Real>> cost;
++    Real **rows = nullptr; // separately allocated rows (our double**)
+     int dimen = 0;
+     std::vector<int> rnd;
+     int rnd_index = 0;
