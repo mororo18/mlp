@@ -338,6 +338,13 @@ as nossas 5 nas 66 instâncias levariam cerca de 18 h. **Decidido (autor,
 6. Tabela 13 completa, saída dos asteriscos, texto da 7.7 e o parágrafo de
    fechamento da Seção 7.
 
+Pedido do autor (2026-11-25): quando B5-comp, d66 e B6-lua terminarem,
+atualizar as tabelas e o texto do artigo com as novas descobertas (Tabela 13,
+asteriscos das Tabelas 8 a 12, 7.7, Figura 7 com a d66) e registrar tudo
+aqui. Fila no q-dual: B5-comp (até cerca de 08h), d66 (até cerca de 13h30),
+B6-lua (até cerca de 14h30), cada uma disparada pela anterior a partir da
+sessão local.
+
 Servidor no total: cerca de 9 a 10 h para as variantes (B) e até 4 h para a
 Figura 7 (D). O servidor está mais carregado desde 2026-11-23 (outros
 dois usuários nos CPUs 0 a 6, 12 a 39 e 40 a 46, e um `podman` sem pinning que
