@@ -1,0 +1,57 @@
+108601	0
+6
+6
+COST: 	2909247
+TIME: 	45.547297
+wall clock (s): 	45.556428567972
+52%  main.lua:search_reinsertion < main.lua:RVND
+  -- 20%  main.lua:486
+  -- 12%  main.lua:465
+  --  9%  main.lua:480
+  --  9%  main.lua:464
+  --  8%  main.lua:460
+  --  7%  main.lua:458
+  --  6%  main.lua:481
+  --  6%  main.lua:459
+  --  5%  main.lua:476
+  --  5%  main.lua:455
+  --  3%  main.lua:456
+  --  3%  main.lua:485
+22%  main.lua:search_swap < main.lua:RVND
+  -- 26%  main.lua:338
+  -- 17%  main.lua:329
+  -- 15%  main.lua:330
+  -- 14%  main.lua:328
+  --  8%  main.lua:331
+  --  7%  main.lua:323
+  --  4%  main.lua:322
+  --  3%  main.lua:325
+10%  main.lua:subseq_load < main.lua:search_reinsertion
+  -- 44%  main.lua:167
+  -- 24%  main.lua:171
+  -- 17%  main.lua:162
+  --  4%  main.lua:164
+  --  4%  main.lua:178
+  --  3%  main.lua:175
+ 9%  main.lua:search_two_opt < main.lua:RVND
+  -- 36%  main.lua:400
+  -- 27%  main.lua:396
+  -- 10%  main.lua:390
+  --  9%  main.lua:408
+  --  8%  main.lua:393
+  --  6%  main.lua:395
+  --  3%  main.lua:399
+ 3%  main.lua:subseq_load < main.lua:search_swap
+  -- 44%  main.lua:167
+  -- 20%  main.lua:171
+  -- 18%  main.lua:162
+  --  5%  main.lua:164
+  --  4%  main.lua:175
+  --  3%  main.lua:178
+ 3%  main.lua:subseq_load < main.lua:search_two_opt
+  -- 41%  main.lua:167
+  -- 24%  main.lua:171
+  -- 18%  main.lua:162
+  --  6%  main.lua:164
+  --  4%  main.lua:178
+  --  3%  main.lua:175

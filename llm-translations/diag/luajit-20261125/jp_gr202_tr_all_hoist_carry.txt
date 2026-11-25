@@ -1,0 +1,52 @@
+COST: 2909247.00
+TIME: 42.279651
+wall clock (s): 42.294987877831
+Tamanho RND 108601
+53%  main.lua:search_reinsertion < main.lua:RVND
+  -- 19%  main.lua:345
+  -- 13%  main.lua:325
+  --  9%  main.lua:324
+  --  8%  main.lua:339
+  --  8%  main.lua:318
+  --  7%  main.lua:320
+  --  7%  main.lua:319
+  --  6%  main.lua:340
+  --  5%  main.lua:315
+  --  5%  main.lua:335
+  --  4%  main.lua:344
+22%  main.lua:search_swap < main.lua:RVND
+  -- 25%  main.lua:238
+  -- 20%  main.lua:230
+  -- 13%  main.lua:231
+  -- 12%  main.lua:229
+  --  8%  main.lua:225
+  --  6%  main.lua:232
+  --  5%  main.lua:224
+  --  3%  main.lua:227
+  --  3%  main.lua:237
+ 9%  main.lua:update_subseq_info_matrix < main.lua:search_reinsertion
+  -- 46%  main.lua:185
+  -- 21%  main.lua:187
+  -- 14%  main.lua:183
+  --  7%  main.lua:184
+  --  5%  main.lua:189
+  --  3%  main.lua:190
+ 9%  main.lua:search_two_opt < main.lua:RVND
+  -- 33%  main.lua:281
+  -- 31%  main.lua:277
+  -- 10%  main.lua:288
+  --  9%  main.lua:274
+  --  7%  main.lua:276
+  --  7%  main.lua:271
+ 3%  main.lua:update_subseq_info_matrix < main.lua:search_two_opt
+  -- 48%  main.lua:185
+  -- 23%  main.lua:187
+  -- 13%  main.lua:183
+  --  6%  main.lua:184
+  --  5%  main.lua:189
+ 3%  main.lua:update_subseq_info_matrix < main.lua:search_swap
+  -- 45%  main.lua:185
+  -- 23%  main.lua:187
+  -- 11%  main.lua:183
+  -- 10%  main.lua:184
+  --  4%  main.lua:189

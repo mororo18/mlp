@@ -1,0 +1,21 @@
+T gr202 ours_lua.literal_offsets 1 31.966866179137 2909247
+T gr202 cpp_lua.luajit_subseq_array 1 41.256891526049 2909247.00
+T gr202 cpp_lua.luajit_subseq_array_for 1 40.722581228008 2909247.00
+T gr202 tr_all_hoist_carry 1 36.081746971002 2909247.00
+T gr202 tr_all_hoist_carry_for 1 35.95185540989 2909247.00
+T gr202 ours_lua.literal_offsets 2 31.869913547067 2909247
+T gr202 cpp_lua.luajit_subseq_array 2 41.958560816944 2909247.00
+T gr202 cpp_lua.luajit_subseq_array_for 2 40.594971003011 2909247.00
+T gr202 tr_all_hoist_carry 2 35.925786050037 2909247.00
+T gr202 tr_all_hoist_carry_for 2 35.988684976008 2909247.00
+T kroA100 ours_lua.literal_offsets 1 3.2944777319208 983128
+T kroA100 cpp_lua.luajit_subseq_array 1 3.5060996629763 983128.00
+T kroA100 cpp_lua.luajit_subseq_array_for 1 3.4577911328524 983128.00
+T kroA100 tr_all_hoist_carry 1 3.2151681741234 983128.00
+T kroA100 tr_all_hoist_carry_for 1 3.2210038369521 983128.00
+T kroA100 ours_lua.literal_offsets 2 3.3100985090714 983128
+T kroA100 cpp_lua.luajit_subseq_array 2 3.5284516490065 983128.00
+T kroA100 cpp_lua.luajit_subseq_array_for 2 3.4608899389859 983128.00
+T kroA100 tr_all_hoist_carry 2 3.2166962961201 983128.00
+T kroA100 tr_all_hoist_carry_for 2 3.2132156500593 983128.00
+FIM

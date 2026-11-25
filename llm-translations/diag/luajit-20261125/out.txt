@@ -1,0 +1,19 @@
+LuaJIT 2.1.1774638290 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/
+/nix/store/kbdhjfcrq0qahfv9h65gabn0aslj3q7n-luajit-2.1.1774638290/bin/luajit
+T gr202 ours_lua.literal_offsets 1 31.828690982191 2909247
+T gr202 cpp_lua.luajit_subseq_array 1 41.100672255037 2909247.00
+T gr202 tr_all_hoist 1 37.317000865005 2909247.00
+T gr202 tr_all_hoist_carry 1 35.862284488976 2909247.00
+T gr202 ours_lua.literal_offsets 2 31.989520258969 2909247
+T gr202 cpp_lua.luajit_subseq_array 2 41.399479235988 2909247.00
+T gr202 tr_all_hoist 2 37.296121817082 2909247.00
+T gr202 tr_all_hoist_carry 2 35.743800890166 2909247.00
+T kroA100 ours_lua.literal_offsets 1 3.2908238200471 983128
+T kroA100 cpp_lua.luajit_subseq_array 1 3.5079670769628 983128.00
+T kroA100 tr_all_hoist 1 3.3459122839849 983128.00
+T kroA100 tr_all_hoist_carry 1 3.2111691108439 983128.00
+T kroA100 ours_lua.literal_offsets 2 3.268444564892 983128
+T kroA100 cpp_lua.luajit_subseq_array 2 3.5375987661537 983128.00
+T kroA100 tr_all_hoist 2 3.3402809710242 983128.00
+T kroA100 tr_all_hoist_carry 2 3.2196187751833 983128.00
+FIM

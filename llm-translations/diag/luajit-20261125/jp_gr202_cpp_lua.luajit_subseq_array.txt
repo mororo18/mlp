@@ -1,0 +1,36 @@
+COST: 2909247.00
+TIME: 51.528829
+wall clock (s): 51.538635689998
+Tamanho RND 108601
+49%  main.lua:search_reinsertion < main.lua:RVND
+  -- 18%  main.lua:327
+  -- 12%  main.lua:307
+  --  9%  main.lua:300
+  --  9%  main.lua:302
+  --  8%  main.lua:321
+  --  7%  main.lua:301
+  --  7%  main.lua:306
+  --  7%  main.lua:322
+  --  5%  main.lua:317
+  --  4%  main.lua:297
+  --  4%  main.lua:326
+26%  main.lua:search_swap < main.lua:RVND
+  -- 32%  main.lua:220
+  -- 21%  main.lua:229
+  -- 16%  main.lua:221
+  -- 11%  main.lua:222
+  --  6%  main.lua:217
+  --  6%  main.lua:223
+  --  3%  main.lua:216
+ 8%  main.lua:search_two_opt < main.lua:RVND
+  -- 35%  main.lua:267
+  -- 32%  main.lua:263
+  -- 13%  main.lua:260
+  --  9%  main.lua:257
+  --  7%  main.lua:258
+  --  3%  main.lua:262
+ 7%  main.lua:update_subseq_info_matrix < main.lua:search_reinsertion
+  -- 58%  main.lua:184
+  -- 27%  main.lua:185
+  --  9%  main.lua:180
+  --  3%  main.lua:181

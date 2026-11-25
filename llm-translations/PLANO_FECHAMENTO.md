@@ -527,6 +527,30 @@ Fases como no `PLANO.md`:
   internos `s[i_prev]` (swap) e `s[i_prev]` e `s[i]` (2-opt), que a nossa
   relê a cada iteração. Variante LZ2 (`ours_lua.zero_based_index_hoist`,
   `ours_lua/hoist_reads.patch`, sobre a LZ1), para a B9.
+- **LuaJIT no gr202 (2026-11-25, `diag/luajit-20261125/`).** O LuaJIT
+  do ambiente nix é o 2.1.1774638290 (o do notebook, 2.1.1703358377, não
+  mostra a anomalia: tradução L1 / nossa LJ1 = 1,004 em ciclos). No
+  servidor (núcleo 14, médias de 2), tempo / nossa com LJ1:
+
+  | Tradução | gr202 | kroA100 |
+  |---|---|---|
+  | L1 | 1,30 a 1,31 | 1,07 |
+  | L1 + matriz sem buracos | 1,27 | 1,07 |
+  | L1 + reinserção com `for` | 1,27 | 1,05 |
+  | L1-L4 | 1,17 | 1,02 |
+  | L1-L5 | 1,13 | 0,97 a 0,98 |
+  | L1-L5 + matriz sem buracos | 1,11 | 0,97 |
+  | L1-L5 + reinserção com `for` | 1,13 | 0,97 |
+
+  Perfil (`-jp`): mesma distribuição por função nos dois programas (busca
+  de reinserção 52%, swap 22%, recálculo das subsequências 15%, 2-opt 9%),
+  100% em código compilado, sem GC. A tradução é cerca de 13% mais lenta
+  por igual no gr202. O `-jv` mostra 505 traços na tradução contra 219 na
+  nossa, com muitas saídas laterais no traço da reinserção e 179 traços
+  no quicksort recursivo da construção. Causa não achada. A matriz da
+  tradução tem a diagonal nunca escrita (buraco em cada linha), mas isso
+  pesa só 1 a 3%. Variante `cpp_lua.luajit_all_hoist_carry` (L1-L5 no
+  LuaJIT) para a B9.
 - **C# na berlin52: causa achada (2026-11-25, `diag/csharp-20261125/`).**
   Ambiente nix das rodadas (.NET SDK 8.0.423), núcleo 14, binários da
   `b7-short`, execuções alternadas (mediana; berlin52 4 a 5, kroA100 2).
