@@ -137,3 +137,4 @@ cpp_csharp.unchecked_seq_flat_matrix_warm,cpp_csharp,cpp_csharp/measure.patch cp
 ours_python.pypy_warm,ours/python,ours_python/pypy_warm.patch,JIT warm-up diagnostic on PyPy: one untimed search before the timed one (PyPy only)
 cpp_pypy.float_w_interleaved_warm,cpp_pypy,cpp_pypy/measure.patch cpp_pypy/float_w_interleaved.patch cpp_pypy/warm.patch,P1+P2 (I) with one untimed search before the timed one (JIT warm-up diagnostic)
 ours_python.pypy_inline,ours/python,ours_python/pypy_inline.patch,PP1 (D): index computed inline with literal T/C/W positions instead of to_1D(i j info.X info.dimen+1) (PyPy only)
+ours_lua.zero_based_index,ours/lua,cpp_lua/run_lua.patch ours_lua/zero_based_index.patch,LZ1 (D): seq indices without the -1 of the 1-based positions (offset folded into T0/C0/W0 = T/C/W - 3*(dimen+1) - 3) as the 0-based translation; plain Lua only

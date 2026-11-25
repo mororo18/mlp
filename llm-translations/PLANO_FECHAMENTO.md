@@ -74,7 +74,7 @@ com duas mudanças:
 | C++ → C# | +8,4 → −3,5 | fechado (S1+S2; +0,2 sem berlin52, onde a tradução é 14% mais rápida) | B |
 | C++ → LuaJIT | +73,4 → −6,6 | passou do ponto (array das subsequências, L1) | B |
 | C++ → PyPy | +39,6 → −4,1 | fechado (P1+P2; −1,7 sem berlin52, onde a tradução é 11% mais rápida) | B |
-| C++ → Lua | +87,8 → +5,7 | aberto (`to_1D` em linha, locais; L4: B6) | B |
+| C++ → Lua | +89,2 → −14,0 | passou do ponto com L4 (B6); LZ1 na nossa: B8 | B |
 | C++ → Python | +102,7 → −4,7 | passou do ponto (listas aninhadas, `to_1D`, locais) | B |
 | C → C++ | +2,3 → −1,3 | fechado (matriz, K2) | B |
 | Lua → C++ | +1,9 → −0,5 | fechado (matriz, M2; ε não pesa) | B |
@@ -458,6 +458,23 @@ Fases como no `PLANO.md`:
   aquecimento na berlin52 do C# e do PyPy e o índice por função no PyPy.
   Números só das rodadas do protocolo: cada ponto que depende da B7 está
   com `\todo{B7: ...}`; a Tabela 13 não muda até a B7 (e a B6).
+- **B6-lua feita (2026-11-25, 12h20 a 13h50):** `runs/b6-lua-20261125`
+  (commit `6aad636`), 4 programas, 3 instâncias interpretadas, 10
+  execuções, custo ok, CV máximo 2,8% (`cpp_lua.lua`). Gaps contra a nossa
+  Lua 5.4: base +89,2; `lua_all` (L1+L2+L3) +5,6 (o mesmo da B4-interp);
+  `lua_all_hoist` (+L4) **−14,0** (0,858 a 0,861 por instância). Com L4 a
+  tradução passa do ponto, como no LuaJIT e no Python. Causa achada no
+  código: a tradução usa posições a partir de 0 e calcula o índice da
+  subsequência como `3*(i*n1+j)+K` (4 operações da VM); a nossa usa
+  posições a partir de 1 e escreve `3*((s_size)*(i - 1) + (j - 1)) + T`
+  (6 operações; o `luac` dá 99 a 263 instruções nas funções quentes da
+  nossa contra 91 a 222 da tradução). Variante LZ1
+  (`ours_lua.zero_based_index`): os índices sem os `- 1`, com o
+  deslocamento somado nas posições (`T0 = T - 3*(dimen+1) - 3`, idem
+  `C0`, `W0`). Local (Lua 5.3, berlin52, núcleo 2): nossa 33,4 s, LZ1
+  28,2 s, `lua_all_hoist` 28,4 s, custos ok. Diagnóstico no servidor
+  (Lua 5.4, núcleo 14, `diag/lua-20261125/`) e rodada B8 do protocolo
+  (nossa, `lua_all_hoist` e LZ1, 3 instâncias) depois da B7.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 
