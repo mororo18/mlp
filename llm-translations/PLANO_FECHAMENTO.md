@@ -72,9 +72,9 @@ com duas mudanças:
 | C++ → C | +0,7 (+1,1 sem berlin52) | fechado (nada) | — |
 | C++ → Rust | +69,5 → +1,1 | fechado (verificação de limites, R1) | B |
 | C++ → C# | +8,4 → −3,5 | fechado (S1+S2; +0,2 sem berlin52, onde a tradução é 14% mais rápida também com aquecimento nos dois; causa não achada) | B |
-| C++ → LuaJIT | +73,4 → −6,6 → +11,1 | aberto (L1 na tradução; LJ1 na nossa passa do ponto ao contrário, 1,315 no gr202) | B |
+| C++ → LuaJIT | +73,4 → −6,6 → +11,1 → +0,3 | fechado (L1-L5 na tradução, LJ1 na nossa; B9; gr202 1,125 em nota de rodapé) | B |
 | C++ → PyPy | +39,6 → −4,1 → −1,4 | fechado (P1+P2 na tradução, PP1 na nossa; B7) | B |
-| C++ → Lua | +89,2 → −14,0 | passou do ponto com L4 (B6); LZ1 na nossa: B8 | B |
+| C++ → Lua | +89,2 → −14,0 → −1,4 | fechado (L1-L5 na tradução, LZ1+LZ2 na nossa; B9) | B |
 | C++ → Python | +102,7 → −4,7 → −0,4 | fechado (tudo na tradução, PY1 na nossa; B7) | B |
 | C → C++ | +2,3 → −1,3 | fechado (matriz, K2) | B |
 | Lua → C++ | +1,9 → −0,5 | fechado (matriz, M2; ε não pesa) | B |
@@ -518,6 +518,13 @@ Fases como no `PLANO.md`:
   - Artigo: Tabela 13 (Java, LuaJIT, PyPy, Python, Lua com a B6; nota d
     só para o C#), Tabela 12 (linhas do `BufferedReader`), 7.6 e 7.7
     reescritas, contagem 22 de 24.
+- **B9-interp feita (2026-11-25, 18h15 a 19h20; commit `1724ac4`).**
+  `runs/b9-interp-20261125`, Lua 5.2, 3 instâncias, 10 execuções, custo
+  ok, carga máxima 17. Contra a nossa: L1-L5 −21,2; LZ1 −19,5; LZ1+LZ2
+  −20,1. Tradução L1-L5 / nossa com LZ1 −2,1; **com LZ1+LZ2 −1,4** (0,986,
+  0,976 e 0,996): **fecha**. Com isso, os 24 pares fecham. Artigo
+  (`67b1469`): linha do Lua fechada, texto da 7.7 com a LZ2, contagem
+  "all 24 pairs close", pendência da seção removida.
 - **B9-comp feita (2026-11-25, 17h50 a 18h15; commit `1724ac4`).**
   `runs/b9-comp-20261125`, 4 instâncias, 10 execuções, custo ok, carga
   máxima 18,8 (CV de 20% só no C# padrão da berlin52, bimodal como na

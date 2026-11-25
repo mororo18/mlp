@@ -134,6 +134,9 @@ closing,from,C++ -> LuaJIT,L1-L5 (translation); literal positions (ours),both,b9
 closing,from,C++ -> C#,"Bounds checks + distance matrix, B9",ours_in_translation,b9-comp-20261125,cpp_csharp.unchecked_seq_flat_matrix,csharp,0.8321,0.9927,1.0252,1.0119,,-3.5,1.0,21.3
 closing,from,C++ -> C#,"Bounds checks + distance matrix, loops optimized from the start in both",both,b9-comp-20261125,cpp_csharp.unchecked_seq_flat_matrix_quickjit_loops_off,ours_csharp.quickjit_loops_off,1.0275,1.0175,1.0288,1.0277,,2.5,2.5,1.3
 closing,from,C#,Loops optimized from the start,control,b9-comp-20261125,ours_csharp.quickjit_loops_off,csharp,0.2017,0.7970,0.9870,0.9929,,-25.5,-7.4,15.1
+closing,from,C++ -> Lua,"L1-L5 (translation); index without -1 (ours), B9",both,b9-interp-20261125,cpp_lua.lua_all_hoist_carry,ours_lua.zero_based_index,0.9789,0.9672,,,0.9911,-2.1,-2.1,3.8
+closing,from,C++ -> Lua,"L1-L5 (translation); index without -1, reads out of the inner loops (ours)",both,b9-interp-20261125,cpp_lua.lua_all_hoist_carry,ours_lua.zero_based_index_hoist,0.9859,0.9762,,,0.9964,-1.4,-1.4,3.8
+closing,from,Lua,"Index without -1, reads out of the inner loops",control,b9-interp-20261125,ours_lua.zero_based_index_hoist,lua,0.7992,0.8014,,,0.7964,-20.1,-20.1,0.8
 controls,from,JavaScript,Float64Array instead of Array,control,jsf64-20261122,ours_javascript.float64array,javascript,1.1629,1.1725,1.1625,1.1562,,16.4,16.4,0.8
 controls,from,C++ -> JavaScript,"Array instead of Float64Array, against the translation",control,jsf64-20261122,cpp_javascript.array,cpp_javascript.base,0.8880,0.8697,0.8948,0.8769,,-11.8,-12.0,0.7
 controls,from,C++ -> JavaScript,Both Float64Array: translation / ours,control,p20-20261123,cpp_javascript.base,javascript,0.9986,1.0088,1.0336,1.0615,,2.6,3.5,0.5

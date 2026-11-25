@@ -180,6 +180,9 @@ C = [
     ("closing", "from", "C++ -> C#", "Bounds checks + distance matrix, B9", "ours_in_translation", B9C, "cpp_csharp.unchecked_seq_flat_matrix", "csharp"),
     ("closing", "from", "C++ -> C#", "Bounds checks + distance matrix, loops optimized from the start in both", "both", B9C, "cpp_csharp.unchecked_seq_flat_matrix_quickjit_loops_off", "ours_csharp.quickjit_loops_off"),
     ("closing", "from", "C#", "Loops optimized from the start", "control", B9C, "ours_csharp.quickjit_loops_off", "csharp"),
+    ("closing", "from", "C++ -> Lua", "L1-L5 (translation); index without -1 (ours), B9", "both", B9I, "cpp_lua.lua_all_hoist_carry", "ours_lua.zero_based_index"),
+    ("closing", "from", "C++ -> Lua", "L1-L5 (translation); index without -1, reads out of the inner loops (ours)", "both", B9I, "cpp_lua.lua_all_hoist_carry", "ours_lua.zero_based_index_hoist"),
+    ("closing", "from", "Lua", "Index without -1, reads out of the inner loops", "control", B9I, "ours_lua.zero_based_index_hoist", "lua"),
 
     ("controls", "from", "JavaScript", "Float64Array instead of Array", "control", "jsf64-20261122", "ours_javascript.float64array", "javascript"),
     ("controls", "from", "C++ -> JavaScript", "Array instead of Float64Array, against the translation", "control", "jsf64-20261122", "cpp_javascript.array", "cpp_javascript.base"),
