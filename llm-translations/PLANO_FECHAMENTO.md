@@ -303,6 +303,15 @@ instâncias são do mesmo servidor e do mesmo método das nossas atuais
 (`results/main/cleaned_data_2026-11-23.csv`); se forem, só recalcular a
 razão; se não, medir as 5 traduções nas 66 instâncias (cerca de 4 h).
 
+**Conferido (2026-11-24):** a `results/translations/mlp_result/` (16 a 18/11)
+tem as traduções e as nossas, mas com mais de 4 execuções por socket e antes
+das mudanças do nosso JavaScript (flag, volta ao `Array`) e da repetição do
+Java; a `main/cleaned_data` (17/11) também não segue o protocolo atual (só o
+JavaScript e 4 instâncias foram refeitos). Com 10 execuções, as 5 traduções e
+as nossas 5 nas 66 instâncias levariam cerca de 18 h. **Decidido (autor,
+2026-11-24): 3 execuções**, traduções e nossas na mesma rodada
+(`d66-20261125`, cerca de 5,5 h), disparada depois da B5-comp.
+
 ## Ordem proposta
 
 1. A1 (dados da `p26`, já rodando).
