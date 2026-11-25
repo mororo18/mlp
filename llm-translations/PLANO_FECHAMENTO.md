@@ -451,6 +451,13 @@ Fases como no `PLANO.md`:
   porque o fator mínimo só fecha na média, compensando o berlin52 (a
   tradução 11 a 14% mais rápida) com as três instâncias maiores. Falta:
   linha do C++ → Lua com a B6 e a Figura 7 com a d66.
+- **Artigo, texto das causas (2026-11-25, `b6aeb6a` no artigo).** Na 7.6,
+  o resíduo do C++ → Java vai para o JIT (leitura com `Scanner`, um núcleo
+  por execução); na 7.7, as causas do LuaJIT (posições literais) e do
+  Python (cópias locais não usadas na atualização das subsequências), o
+  aquecimento na berlin52 do C# e do PyPy e o índice por função no PyPy.
+  Números só das rodadas do protocolo: cada ponto que depende da B7 está
+  com `\todo{B7: ...}`; a Tabela 13 não muda até a B7 (e a B6).
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 
