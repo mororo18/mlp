@@ -737,3 +737,14 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   acrescentar ao `run.sh` depois da B8 (não mudar o harness com rodadas na
   fila). Decisão do autor: manter o 5.2 (o que todas as rodadas usaram) ou
   trocar para `lua5_4` e refazer as rodadas interpretadas do Lua.
+
+- **Versões do ambiente nix (2026-11-25).** Consultadas no servidor, dentro
+  do container das rodadas (uma sessão SSH): GCC 15.3.0, Go 1.26.5, rustc e
+  cargo 1.97.0, Swift 5.10.1, .NET SDK 8.0.423 (runtime 8.0.29), OpenJDK
+  21.0.12, Node.js 24.18.0, Julia 1.12.6, CPython 3.14.6, PyPy 7.3.20
+  (Python 3.11.13), Lua 5.2.4, LuaJIT 2.1.1774638290; Nixpkgs `e2587ca`
+  (2026-07-23) e, para Swift, `597283a` (2026-07-24). Artigo: Apêndice C
+  (`tab:versions`) e frase na seção do ambiente, com `\todo` sobre as Figs.
+  4 e 6 e os mapas de calor (rodada de 17/11, sem registro de versões).
+  Monografia: Tabela 2 na Seção 3.2. O `run.sh` ainda não grava lua,
+  luajit, pypy3 nem dotnet no `versions.txt`.
