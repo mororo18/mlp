@@ -130,3 +130,5 @@ ours_lua.literal_offsets,ours/lua,ours_lua/literal_offsets.patch,LJ1 (D): T/C/W 
 ours_lua.literal_offsets_loop_locals,ours/lua,ours_lua/literal_offsets_loop_locals.patch,LJ1+LJ2 (D): plus cost_concat_*/cost_new declared inside the loops (LuaJIT only)
 ours_python.update_locals,ours/python,ours_python/update_locals.patch,PY1 (D): update_subseq_info_matrix uses its local seq and s instead of solut.seq and solut.s in the loops
 ours_python.update_locals_literals,ours/python,ours_python/update_locals_literals.patch,PY1+PY2 (D): plus T/C/W positions as literal indices
+ours_java.bufread,ours/java,ours_java/bufread.patch,JV1 (D): instance read with BufferedReader as in the translation instead of Scanner (fewer JDK methods left for C2 inside the timed search on one core)
+ours_java.soa_bufread,ours/java,ours_java/soa.patch ours_java/bufread.patch,P11 + JV1 (D)

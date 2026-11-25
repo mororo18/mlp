@@ -1,0 +1,61 @@
+diff -ruN a/Data.java b/Data.java
+--- a/Data.java	2026-11-25 07:24:06.340055358 -0300
++++ b/Data.java	2026-11-25 07:24:06.341911833 -0300
+@@ -1,6 +1,7 @@
+ import java.io.File;  
+-import java.io.FileNotFoundException; 
+-import java.util.Scanner; 
++import java.io.BufferedReader;
++import java.io.FileReader;
++import java.io.IOException;
+ 
+ class Data{
+     private int dimension;
+@@ -21,16 +22,16 @@
+         String file_name = "../distance_matrix";
+         try{
+             File file = new File(file_name);
+-            Scanner f_reader = new Scanner(file);
++            BufferedReader f_reader = new BufferedReader(new FileReader(file));
+ 
+-            String line = f_reader.nextLine();
++            String line = f_reader.readLine();
+ 
+             dimension = Integer.parseInt(line);
+             matrix = new double [dimension][dimension];
+             for(int k = 0; k < dimension; k++) matrix[k][k] = 0.0;
+ 
+             for (int i = 0; i < dimension; i++) {
+-                line = f_reader.nextLine();
++                line = f_reader.readLine();
+ 
+                 int j = i + 1;
+                 while(line.indexOf(' ') != -1){
+@@ -45,22 +46,22 @@
+             }
+ 
+ 
+-            line = f_reader.nextLine();
+-            line = f_reader.nextLine();
+-            line = f_reader.nextLine();
++            line = f_reader.readLine();
++            line = f_reader.readLine();
++            line = f_reader.readLine();
+ 
+             rnd_size = Integer.parseInt(line);
+             rnd = new int[rnd_size];
+ 
+             for (int i = 0; i < rnd_size; i++) {
+-                line = f_reader.nextLine();
++                line = f_reader.readLine();
+                 rnd[i] = Integer.parseInt(line);
+             }
+ 
+ 
+             f_reader.close();
+ 
+-        }catch (FileNotFoundException e){
++        }catch (IOException e){
+             System.out.println("Error while reading " + file_name + " file");
+             e.printStackTrace();
+         }
