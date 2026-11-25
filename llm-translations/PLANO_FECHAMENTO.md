@@ -74,8 +74,8 @@ com duas mudanças:
 | C++ → C# | +8,5 (+15,2 sem berlin52) | aberto | B |
 | C++ → LuaJIT | +73,4 | aberto | B |
 | C++ → PyPy | +39,3 | aberto | B |
-| C++ → Lua | +90,3 | aberto (interpretado) | B |
-| C++ → Python | +102,7 | aberto (interpretado) | B |
+| C++ → Lua | +90,3 → +5,7 | aberto (`to_1D` em linha, locais; resíduo) | B |
+| C++ → Python | +102,7 → −4,7 | fechado (listas aninhadas, `to_1D`, locais) | B |
 | C → C++ | +0,2 (+2,6†) | a confirmar (berlin52) | B |
 | Lua → C++ | −0,1 (+2,3†) | a confirmar (berlin52) | B |
 | Python → C++ | +3,8 (+6,2†) | aberto | B |
@@ -270,6 +270,18 @@ Fases como no `PLANO.md`:
   com a matriz no C → C++) e, no Lua, o ε `1e-15` (M0). Java → C++ (+2,0%):
   o `tArray::get` é expandido no lugar (sem V3); a rodada mede de novo a base
   e a combinação.
+- **B4-interp feita (2026-11-25):** `runs/b4-interp-20261124`, 390
+  execuções, 13 programas, 3 instâncias (`instances_interp.txt`), custo ok.
+  Gaps contra as nossas (Lua 5.4 e CPython):
+
+  | Par | Base | Variantes | Leitura |
+  |---|---|---|---|
+  | C++ → Lua | +87,8 | L1 array +98,1; L2 `to_1D` em linha +43,0; L3 locais +50,3; todos +5,7 | L2 e L3 pesam e se somam (juntos rendem mais que a soma); L1 sozinho piora; sobra +5,7, fora de ±2% |
+  | C++ → Python | +102,3 | Q1 `to_1D` em linha +55,7; Q2 locais +86,4; Q3 listas aninhadas +17,8; Q4 `float` +105,8; todos −4,7 | fechado pela combinação (Q3 explica a maior parte); `float` não pesa no CPython |
+
+  Q1 no lin105 com CV de 11,4% (uma execução fora da curva); não muda a
+  leitura. O resíduo do Lua fica em aberto: comparar `lua_all` com a nossa
+  linha a linha antes de propor outra variante.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 
