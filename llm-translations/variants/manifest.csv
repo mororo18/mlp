@@ -136,3 +136,4 @@ ours_csharp.warm,ours/csharp,ours_csharp/warm.patch,JIT warm-up diagnostic: one 
 cpp_csharp.unchecked_seq_flat_matrix_warm,cpp_csharp,cpp_csharp/measure.patch cpp_csharp/unchecked_seq_flat_matrix.patch cpp_csharp/warm.patch,S1+S2 (I) with one untimed search before the timed one (JIT warm-up diagnostic)
 ours_python.pypy_warm,ours/python,ours_python/pypy_warm.patch,JIT warm-up diagnostic on PyPy: one untimed search before the timed one (PyPy only)
 cpp_pypy.float_w_interleaved_warm,cpp_pypy,cpp_pypy/measure.patch cpp_pypy/float_w_interleaved.patch cpp_pypy/warm.patch,P1+P2 (I) with one untimed search before the timed one (JIT warm-up diagnostic)
+ours_python.pypy_inline,ours/python,ours_python/pypy_inline.patch,PP1 (D): index computed inline with literal T/C/W positions instead of to_1D(i j info.X info.dimen+1) (PyPy only)
