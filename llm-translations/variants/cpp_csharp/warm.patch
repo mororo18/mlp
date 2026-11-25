@@ -1,0 +1,12 @@
+diff -ruN a/Program.cs b/Program.cs
+--- a/Program.cs	2026-11-25 09:18:47.516699312 -0300
++++ b/Program.cs	2026-11-25 09:18:47.517694038 -0300
+@@ -798,6 +798,8 @@
+             TSolution solut = Solution_init(data);
+ 
+             Iils = data.dimen < 100 ? data.dimen : 100;
++            GILS_RVND(Imax, Iils, data, verbose);
++            data.rnd_index = 0;
+             Stopwatch t1 = Stopwatch.StartNew();
+             TimeSpan start = Process.GetCurrentProcess().TotalProcessorTime;
+             double best_cost = GILS_RVND(Imax, Iils, data, verbose);

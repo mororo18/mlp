@@ -1,0 +1,17 @@
+diff -ruN a/main_pypy.py b/main_pypy.py
+--- a/main_pypy.py	2026-11-25 09:18:47.525388216 -0300
++++ b/main_pypy.py	2026-11-25 09:18:47.526382369 -0300
+@@ -538,6 +538,7 @@
+ 
+ """
+ 
++    GILS_RVND(Imax, Iils, R, tInfo(dimension, cost, rnd), False)
+     start = time.time()
+     cost = GILS_RVND(Imax, Iils, R, info, verbose)
+     elapsed = time.time() - start
+diff -ruN a/run_pypy_only.sh b/run_pypy_only.sh
+--- a/run_pypy_only.sh	1969-12-31 21:00:00.000000000 -0300
++++ b/run_pypy_only.sh	2026-11-25 09:18:47.526382369 -0300
+@@ -0,0 +1,2 @@
++#!/usr/bin/env bash
++pypy3 main_pypy.py "$@"

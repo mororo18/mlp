@@ -1,0 +1,2 @@
+berlin52.tsp
+kroA100.tsp

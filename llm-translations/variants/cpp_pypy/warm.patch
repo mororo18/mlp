@@ -1,0 +1,13 @@
+diff -ruN a/mlp_solver.py b/mlp_solver.py
+--- a/mlp_solver.py	2026-11-25 09:18:47.534657361 -0300
++++ b/mlp_solver.py	2026-11-25 09:18:47.535641221 -0300
+@@ -483,6 +483,9 @@
+ 
+     Iils = data.dimen if data.dimen < 100 else 100
+ 
++    GILS_RVND(Imax, Iils, data, verbose)
++    data.rnd_index = 0
++    Solution_init(data)
+     t1 = time.perf_counter()
+     start = time.process_time()
+     best_cost = GILS_RVND(Imax, Iils, data, verbose)

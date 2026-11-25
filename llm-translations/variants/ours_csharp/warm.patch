@@ -1,0 +1,67 @@
+diff -ruN a/main.cs b/main.cs
+--- a/main.cs	2026-11-25 09:18:47.506836562 -0300
++++ b/main.cs	2026-11-25 09:18:47.508153370 -0300
+@@ -1,31 +1,32 @@
+-using System;
+-using System.Diagnostics;
+-
+-namespace MLP {
+-    class main {
+-        static void Main(string[] args){
+-            bool verbose = Array.Exists(args, a => a == "-v" || a == "--verbose");
+-
+-            if (verbose) {
+-                Console.WriteLine("Hello World!");
+-            }
+-            GILS_RVND tsp = new GILS_RVND();
+-
+-            Process proc = Process.GetCurrentProcess();
+-            TimeSpan cpuStart = proc.TotalProcessorTime;
+-
+-            DateTime start = DateTime.Now;
+-            double cost = tsp.solve(verbose);
+-            DateTime end = DateTime.Now;
+-
+-            proc.Refresh();
+-            TimeSpan cpuTime = proc.TotalProcessorTime - cpuStart;
+-
+-            TimeSpan ts = (end - start);
+-            Console.WriteLine("COST: " + cost);
+-            Console.WriteLine("TIME: "+ cpuTime.TotalSeconds);
+-
+-            Console.WriteLine("wall clock (s): "+ ts.TotalSeconds);
+-        }
+-    }
+-}
++using System;
++using System.Diagnostics;
++
++namespace MLP {
++    class main {
++        static void Main(string[] args){
++            bool verbose = Array.Exists(args, a => a == "-v" || a == "--verbose");
++
++            if (verbose) {
++                Console.WriteLine("Hello World!");
++            }
++            new GILS_RVND().solve(false);
++            GILS_RVND tsp = new GILS_RVND();
++
++            Process proc = Process.GetCurrentProcess();
++            TimeSpan cpuStart = proc.TotalProcessorTime;
++
++            DateTime start = DateTime.Now;
++            double cost = tsp.solve(verbose);
++            DateTime end = DateTime.Now;
++
++            proc.Refresh();
++            TimeSpan cpuTime = proc.TotalProcessorTime - cpuStart;
++
++            TimeSpan ts = (end - start);
++            Console.WriteLine("COST: " + cost);
++            Console.WriteLine("TIME: "+ cpuTime.TotalSeconds);
++
++            Console.WriteLine("wall clock (s): "+ ts.TotalSeconds);
++        }
++    }
++}

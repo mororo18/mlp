@@ -132,3 +132,7 @@ ours_python.update_locals,ours/python,ours_python/update_locals.patch,PY1 (D): u
 ours_python.update_locals_literals,ours/python,ours_python/update_locals_literals.patch,PY1+PY2 (D): plus T/C/W positions as literal indices
 ours_java.bufread,ours/java,ours_java/bufread.patch,JV1 (D): instance read with BufferedReader as in the translation instead of Scanner (fewer JDK methods left for C2 inside the timed search on one core)
 ours_java.soa_bufread,ours/java,ours_java/soa.patch ours_java/bufread.patch,P11 + JV1 (D)
+ours_csharp.warm,ours/csharp,ours_csharp/warm.patch,JIT warm-up diagnostic: one untimed search before the timed one
+cpp_csharp.unchecked_seq_flat_matrix_warm,cpp_csharp,cpp_csharp/measure.patch cpp_csharp/unchecked_seq_flat_matrix.patch cpp_csharp/warm.patch,S1+S2 (I) with one untimed search before the timed one (JIT warm-up diagnostic)
+ours_python.pypy_warm,ours/python,ours_python/pypy_warm.patch,JIT warm-up diagnostic on PyPy: one untimed search before the timed one (PyPy only)
+cpp_pypy.float_w_interleaved_warm,cpp_pypy,cpp_pypy/measure.patch cpp_pypy/float_w_interleaved.patch cpp_pypy/warm.patch,P1+P2 (I) with one untimed search before the timed one (JIT warm-up diagnostic)
