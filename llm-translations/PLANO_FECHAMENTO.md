@@ -151,6 +151,56 @@ repetição do berlin52.
   variante da nossa sem as classes intermediárias, se (1) e (2) apontarem
   para elas. Sem rodada grande até ter a hipótese.
 
+- **A3. Traduções que ficam mais rápidas que a nossa (2026-11-25, local).**
+  Pedido do autor: investigar C++ → LuaJIT (−6,6 com L1), C++ → Python
+  (−4,7 com Q1 a Q4) e o JIT do C++ → Java (A2). Medições locais (notebook
+  i5-8265U, um núcleo, ciclos de usuário com `perf stat`, porque o relógio
+  oscila 10 a 15% aqui; Lua 5.1/LuaJIT 2.1, CPython 3.12, OpenJDK 21).
+  - **LuaJIT.** Reproduz: kroA100, nossa 15,9 G ciclos (37,9 G instruções),
+    tradução com L1 13,8 (30,8). Causa no código de máquina (`-jdump`): o
+    traço do laço interno começa no meio da função, então `T`, `C` e `W`
+    (locais copiadas de `info`) entram como valores de pilha (`SLOAD`), e
+    cada acesso faz soma, conversão e deslocamento próprios; na tradução,
+    as posições são literais (`+1`, `+2`, `+3`) e viram deslocamento fixo do
+    endereço, com um só cálculo de base para T, C e W. Variantes da nossa:
+    LJ1 posições literais nos índices: 13,9 (−12%); LJ1 + LJ2
+    (`cost_concat_*` e `cost_new` declaradas dentro do laço, como na
+    tradução, em vez de fora): 13,3 (−16%), abaixo da tradução. Só
+    `local T = 1` (sem literal) não muda nada (16,1). Custo 143721/983128.
+  - **Python.** Reproduz: berlin52, nossa 48,5 G ciclos, tradução
+    corrigida 46,2. A nossa `update_subseq_info_matrix` cria `seq` e `s`
+    locais, mas os laços continuam lendo `solut.seq[...]` e `solut.s[...]`:
+    usar as locais (PY1) dá 46,7 (−3,7%); índices literais `[0] [1] [2]`
+    sozinhos não mudam nada (48,3); os dois juntos (PY1 + PY2) dão 46,0,
+    empate com a tradução.
+  - **Java.** Com a `ours_java.soa` (acessores, cópias locais e
+    armazenamento da tradução na nossa), o gr202 e o lin318 já empatavam
+    (0,998 e 1,000 na `p11p12`); o resíduo é do berlin52 e do kroA100,
+    execuções curtas. O `bench.py` fixa cada execução num núcleo, então as
+    threads do C1/C2 dividem a CPU com a busca medida. Contagem com
+    `-XX:+PrintCompilation` e o horário do início do relógio (kroA100): depois
+    do início, o C2 da nossa ainda compila 31 métodos do JDK (`Scanner`,
+    `java.util.regex`, `CharBuffer`, `String`), todos da leitura da
+    instância, e 23 do programa; a tradução, 6 e 15 (lê com
+    `BufferedReader` e `parseInt`). Tempo de compilação dentro do trecho
+    medido (`CompilationMXBean`): nossa 1,1 s (berlin52) e 1,5 a 1,8 s
+    (kroA100); tradução 0,6 a 0,7 s. Com `BufferedReader` na nossa (JV1),
+    as compilações do JDK depois do início caem para 2; tempos locais
+    (mínimo/mediana de 6): kroA100 `soa` 3,84/4,01, `soa` + JV1 3,50/3,67,
+    tradução 3,81/4,08; berlin52 0,87/1,11, 0,82/1,17 e 0,75/0,97 (ainda
+    sobra um pouco no berlin52). O `TIME` impresso pelo nosso Java é o
+    tempo de CPU do processo (com as threads do JIT) e o da tradução, o da
+    thread; o harness usa o `wall clock` dos dois, então a tabela não é
+    afetada.
+  - **Rodada B7** (disparada pela sessão local depois da B6, commits até
+    `e004b08` pelo `b7.bundle`): `b7-comp-20261125` (4 instâncias: nossa
+    LuaJIT, `cpp_lua.luajit_subseq_array`, `ours_lua.literal_offsets`,
+    `ours_lua.literal_offsets_loop_locals`; nosso Java, `cpp_java.base`,
+    `ours_java.soa`, `ours_java.bufread`, `ours_java.soa_bufread`) e
+    `b7-interp-20261125` (3 instâncias: nosso Python, `cpp_python.all`,
+    `ours_python.update_locals`, `ours_python.update_locals_literals`).
+    Cerca de 2 h.
+
 ## Frente B. Pares só com a análise antiga (13)
 
 Fases como no `PLANO.md`:
