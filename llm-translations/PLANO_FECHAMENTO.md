@@ -54,7 +54,7 @@ com duas mudanças:
    por `git bundle` para o clone do servidor (`~/mlp-test/fa/mlp`), como na
    `p26`. O `commit.txt` da rodada continua citando o hash local.
 
-## Situação dos 24 pares (2026-11-23)
+## Situação dos 24 pares (2026-11-25)
 
 | Par | Gap | Situação | Frente |
 |---|---|---|---|
@@ -67,24 +67,29 @@ com duas mudanças:
 | Rust → C++ | +8,4 → −1,1 | fechado (matriz) | — |
 | Swift → C++ | +12,4 → +1,5 | fechado (matriz); fonte antiga | C |
 | C# → C++ | +12,5 → −0,2 | fechado (matriz) | — |
-| C++ → JavaScript | +18,9 → +4,9 | aberto | A |
-| C++ → Java | −10,6 → −3,1 | aberto | A |
+| C++ → JavaScript | +18,9 → +4,9 | aberto (matriz holey, X1: B5) | A |
+| C++ → Java | −10,6 → −3,1 | aberto (diagnóstico do JIT, A2) | A |
 | C++ → C | +0,7 (+1,1 sem berlin52) | fechado (nada) | — |
-| C++ → Rust | +69,5 | aberto | B |
-| C++ → C# | +8,5 (+15,2 sem berlin52) | aberto | B |
-| C++ → LuaJIT | +73,4 | aberto | B |
-| C++ → PyPy | +39,3 | aberto | B |
-| C++ → Lua | +90,3 → +5,7 | aberto (`to_1D` em linha, locais; resíduo) | B |
-| C++ → Python | +102,7 → −4,7 | fechado (listas aninhadas, `to_1D`, locais) | B |
-| C → C++ | +0,2 (+2,6†) | a confirmar (berlin52) | B |
-| Lua → C++ | −0,1 (+2,3†) | a confirmar (berlin52) | B |
-| Python → C++ | +3,8 (+6,2†) | aberto | B |
-| Java → C++ | +5,1 (+7,5†) | aberto; fonte antiga | B, C |
-| JavaScript → C++ | +20,6 (+23,4†) | aberto; fonte antiga | B, C |
-| Julia → C++ | +29,3 (+32,4†) | aberto; fonte antiga | B, C |
+| C++ → Rust | +69,5 → +1,1 | fechado (verificação de limites, R1) | B |
+| C++ → C# | +8,5 → 0,0 | fechado (`seq` por ponteiro, S1); berlin52 à parte | B |
+| C++ → LuaJIT | +73,4 → −6,6 | passou do ponto (array das subsequências, L1) | B |
+| C++ → PyPy | +39,3 → +0,5 | fechado (`float`, P1) | B |
+| C++ → Lua | +87,8 → +5,7 | aberto (`to_1D` em linha, locais; L4: B6) | B |
+| C++ → Python | +102,7 → −4,7 | passou do ponto (listas aninhadas, `to_1D`, locais) | B |
+| C → C++ | +2,5 | aberto, na borda (matriz, K2: B5) | B |
+| Lua → C++ | +2,2 | aberto, na borda (ε e matriz, M0/M2: B5) | B |
+| Python → C++ | +6,0 → +0,7 | fechado (`seq` plano e matriz, Y1+Y2) | B |
+| Java → C++ | +7,2 → +2,0 | na borda (V1+V2; B5 mede de novo); fonte antiga | B, C |
+| JavaScript → C++ | +23,2 → 0,0 | fechado (deslocamentos e matriz, J1+J2); fonte antiga | B, C |
+| Julia → C++ | +32,3 → +14,7 | aberto (U1; GCC 15, U3: B5); fonte antiga | B, C |
 
 \* Análise antiga (outra máquina, berlin52/bier127/gr202, 1 a 10 execuções,
 versões antigas das nossas): só ponto de partida.
+
+Frente B depois das rodadas B4 (B4-comp em 4 instâncias, B4-interp em 3):
+16 pares fechados (Java → C++ na borda, +2,0), 2 que passaram do ponto (a
+tradução corrigida fica mais rápida que a nossa, fora de −2%: pela regra de
+direção, falta medir a escolha dela na nossa) e 6 abertos.
 
 Gaps de base da Frente B: rodada `b-comp-20261124` (B1, 4 instâncias, 10
 execuções, custo ok em todas). † Estimativa com a mediana do nosso C++ no
