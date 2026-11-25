@@ -280,8 +280,12 @@ Fases como no `PLANO.md`:
   | C++ → Python | +102,3 | Q1 `to_1D` em linha +55,7; Q2 locais +86,4; Q3 listas aninhadas +17,8; Q4 `float` +105,8; todos −4,7 | fechado pela combinação (Q3 explica a maior parte); `float` não pesa no CPython |
 
   Q1 no lin105 com CV de 11,4% (uma execução fora da curva); não muda a
-  leitura. O resíduo do Lua fica em aberto: comparar `lua_all` com a nossa
-  linha a linha antes de propor outra variante.
+  leitura. Resíduo do Lua (+5,7): comparando `lua_all` com a nossa, a
+  tradução relê `s[i]`, `s[j]`, `s[i_prev]` e `s[j_next]` dentro dos laços
+  internos e recalcula `dimen + 1` em cada índice; a nossa guarda tudo em
+  locais. Variante L4 (`lua_all_hoist`, custo 143721 no berlin52). O teste
+  local não decide (só há Lua 5.3 aqui, e nele a nossa nem fica atrás da
+  `lua_all`); precisa do Lua 5.4 do servidor.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 
