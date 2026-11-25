@@ -518,6 +518,15 @@ Fases como no `PLANO.md`:
   - Artigo: Tabela 13 (Java, LuaJIT, PyPy, Python, Lua com a B6; nota d
     só para o C#), Tabela 12 (linhas do `BufferedReader`), 7.6 e 7.7
     reescritas, contagem 22 de 24.
+- **B8 feita (2026-11-25, 16h23 a 17h50; commit `228e4bd`).**
+  `runs/b8-lua-20261125`, Lua 5.2, 3 instâncias, 10 execuções, custo ok,
+  CV máximo 1,2%, carga máxima 21. Contra a nossa: `lua_all_hoist` −13,6,
+  L1-L5 (`lua_all_hoist_carry`) −21,5, LZ1 −19,7. Tradução / nossa com LZ1:
+  L1-L4 +7,6; **L1-L5 −2,2** (−2,4 sem berlin52; 0,982, 0,980 e 0,972), na
+  borda. Diferença que sobra, no código: a tradução com L4 tira dos laços
+  internos `s[i_prev]` (swap) e `s[i_prev]` e `s[i]` (2-opt), que a nossa
+  relê a cada iteração. Variante LZ2 (`ours_lua.zero_based_index_hoist`,
+  `ours_lua/hoist_reads.patch`, sobre a LZ1), para a B9.
 - **C# na berlin52: causa achada (2026-11-25, `diag/csharp-20261125/`).**
   Ambiente nix das rodadas (.NET SDK 8.0.423), núcleo 14, binários da
   `b7-short`, execuções alternadas (mediana; berlin52 4 a 5, kroA100 2).

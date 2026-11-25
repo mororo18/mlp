@@ -1,0 +1,42 @@
+--- a/main.lua	2026-11-25 17:28:37.890056589 -0300
++++ b/main.lua	2026-11-25 17:28:37.891084587 -0300
+@@ -308,8 +308,9 @@
+ 
+         local s_i = s[i]
+         local s_i_next = s[i_next]
++        local s_i_prev = s[i_prev]
+ 
+-        cost_concat_1 =                 seq[(3 * ((s_size) * (1) + (i_prev)) + T0)] + c[s[i_prev]][s_i_next]
++        cost_concat_1 =                 seq[(3 * ((s_size) * (1) + (i_prev)) + T0)] + c[s_i_prev][s_i_next]
+         cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (i) + (i_next)) + T0)] + c[s_i][     s[i_next+1]]
+ 
+         cost_new = seq[(3 * ((s_size) * (1) + (i_prev)) + C0)]                                                    +           --       1st subseq
+@@ -328,7 +329,7 @@
+             local s_j = s[j]
+ 
+ 
+-            cost_concat_1 =                 seq[(3 * ((s_size) * (1) + (i_prev)) + T0)]       + c[s[i_prev]][s_j]
++            cost_concat_1 =                 seq[(3 * ((s_size) * (1) + (i_prev)) + T0)]       + c[s_i_prev][s_j]
+             cost_concat_2 = cost_concat_1                     + c[s_j][s_i_next]
+             cost_concat_3 = cost_concat_2 + seq[(3 * ((s_size) * (i_next) + (j_prev)) + T0)]  + c[s[j_prev]][s_i]
+             cost_concat_4 = cost_concat_3                           + c[s_i][s[j_next]]
+@@ -387,6 +388,8 @@
+ 
+     for i = 2,dimen-1 do
+         local i_prev = i - 1
++        local s_i_prev = s[i_prev]
++        local s_i = s[i]
+         local rev_seq_cost = seq[(3 * ((s_size) * (i) + (i+1)) + T0)]
+ 
+         local s_j_prev = s[i+1]
+@@ -397,8 +400,8 @@
+ 
+             rev_seq_cost = rev_seq_cost + c[s_j_prev][s_j] * (seq[(3 * ((s_size) * (i) + (j)) + W0)]-1.0)
+ 
+-            cost_concat_1 =                 seq[(3 * ((s_size) * (1) + (i_prev)) + T0)]   + c[s_j][     s[i_prev]]
+-            cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (i) + (j)) + T0)]        + c[s[j_next]][s[i]]
++            cost_concat_1 =                 seq[(3 * ((s_size) * (1) + (i_prev)) + T0)]   + c[s_j][     s_i_prev]
++            cost_concat_2 = cost_concat_1 + seq[(3 * ((s_size) * (i) + (j)) + T0)]        + c[s[j_next]][s_i]
+ 
+             cost_new = seq[(3 * ((s_size) * (1) + (i_prev)) + C0)]                                                        +   --   1st subseq
+                     seq[(3 * ((s_size) * (i) + (j)) + W0)]                * cost_concat_1 + rev_seq_cost                  +   -- concat 2nd subseq (reversed seq)
