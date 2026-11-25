@@ -200,6 +200,26 @@ repetição do berlin52.
     `b7-interp-20261125` (3 instâncias: nosso Python, `cpp_python.all`,
     `ours_python.update_locals`, `ours_python.update_locals_literals`).
     Cerca de 2 h.
+  - **Berlin52 do C# e do PyPy (2026-11-25, local).** No servidor, a
+    diferença do C# é fixa (berlin52: nossa 1,46 s, tradução S1+S2 1,25 s;
+    kroA100 5,00 e 4,97 s). Sem efeito na nossa (berlin52, local, 5
+    execuções): `Stopwatch` no lugar do `DateTime.Now`, `InvariantGlobalization`
+    e `ServerGarbageCollection` (os dois estão no `.csproj` da tradução e
+    não no nosso). A compilação em camadas domina a berlin52 nos dois
+    programas: com `DOTNET_TieredCompilation=0` (ou
+    `DOTNET_TC_QuickJitForLoops=0`), nossa 1,8 → 0,5 s e tradução 1,45 →
+    0,45 s; em ciclos do processo, a diferença cai de ~1,0 G para ~0,2 G.
+    Com uma busca não medida antes da medida nos dois (aquecimento), a
+    berlin52 empata: nossa 1,41 s, tradução 1,42 s (custos ok); a tradução
+    quase não muda com o aquecimento e a nossa perde 0,4 s. Leitura
+    provável: no tier 0 os acessores da nossa (`GetSeq`, `GetCost`, o
+    indexador da `List<int>`) são chamadas de verdade até a recompilação.
+    No PyPy, o tempo local oscila demais (kroA100 de 11,4 a 17,7 s na
+    mesma variante) para decidir. Variantes com aquecimento nos dois
+    programas (`ours_csharp.warm`, `cpp_csharp.unchecked_seq_flat_matrix_warm`,
+    `ours_python.pypy_warm`, `cpp_pypy.float_w_interleaved_warm`) na
+    `b7-short-20261125` (berlin52 e kroA100, `instances_short.txt`), entre
+    a `b7-comp` e a `b7-interp`.
 
 ## Frente B. Pares só com a análise antiga (13)
 
