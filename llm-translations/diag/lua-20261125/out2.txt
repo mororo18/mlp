@@ -1,0 +1,21 @@
+Lua 5.2.4  Copyright (C) 1994-2015 Lua.org, PUC-Rio
+/nix/store/dmzf6bg1rspz8prlhqsiig9bq2fk94vb-lua-5.2.4/bin/lua
+T berlin52 lua_z 1 13.916839 143721
+T berlin52 lua_tr 1 15.186586 143721.00
+T berlin52 lua_tr5 1 13.610746 143721.00
+T berlin52 lua_z 2 13.890133 143721
+T berlin52 lua_tr 2 14.903283 143721.00
+T berlin52 lua_tr5 2 13.688823 143721.00
+T berlin52 lua_z 3 13.904458 143721
+T berlin52 lua_tr 3 14.897057 143721.00
+T berlin52 lua_tr5 3 13.65184 143721.00
+T berlin52 lua_z 4 13.903823 143721
+T berlin52 lua_tr 4 14.955265 143721.00
+T berlin52 lua_tr5 4 13.829765 143721.00
+T berlin52 lua_z 5 13.930327 143721
+T berlin52 lua_tr 5 14.937007 143721.00
+T berlin52 lua_tr5 5 13.606181 143721.00
+T kroA100 lua_z 1 173.030911 983128
+T kroA100 lua_tr 1 182.946335 983128.00
+T kroA100 lua_tr5 1 167.416891 983128.00
+FIM

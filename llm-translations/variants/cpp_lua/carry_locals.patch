@@ -1,0 +1,63 @@
+--- a/main.lua	2026-11-25 14:42:42.552012175 -0300
++++ b/main.lua	2026-11-25 14:42:42.553296658 -0300
+@@ -177,13 +177,17 @@
+         seq[3 * (ii) + 2] = 0.0
+         seq[3 * (ii) + 3] = (i == 0) and 0.0 or 1.0
+ 
++        local acc_t, acc_c = 0.0, 0.0
++        local s_prev = s[i]
+         for j = i + 1, dimen do
+-            local j_prev = j - 1
++            local s_j = s[j]
+             local idx = ((i) * (dimen + 1) + (j))
+-            local idx_prev = ((i) * (dimen + 1) + (j_prev))
+-            seq[3 * (idx) + 1] = cost[s[j_prev]][s[j]] + seq[3 * (idx_prev) + 1]
+-            seq[3 * (idx) + 2] = seq[3 * (idx) + 1] + seq[3 * (idx_prev) + 2]
++            acc_t = cost[s_prev][s_j] + acc_t
++            seq[3 * (idx) + 1] = acc_t
++            acc_c = acc_t + acc_c
++            seq[3 * (idx) + 2] = acc_c
+             seq[3 * (idx) + 3] = j + k
++            s_prev = s_j
+         end
+ 
+         if t then from = from + 1 end
+@@ -220,9 +224,10 @@
+         for j = i_next + 1, dimen - 1 do
+             local j_next = j + 1
+             local j_prev = j - 1
++            local s_j = s[j]
+ 
+-            cost_concat_1 = seq[3 * (((0) * n1 + (i_prev))) + 1] + cost[s_ip][s[j]]
+-            cost_concat_2 = cost_concat_1 + cost[s[j]][s_in]
++            cost_concat_1 = seq[3 * (((0) * n1 + (i_prev))) + 1] + cost[s_ip][s_j]
++            cost_concat_2 = cost_concat_1 + cost[s_j][s_in]
+             local cost_concat_3 = cost_concat_2 + seq[3 * (((i_next) * n1 + (j_prev))) + 1] + cost[s[j_prev]][s_i]
+             local cost_concat_4 = cost_concat_3 + cost[s_i][s[j_next]]
+ 
+@@ -260,13 +265,15 @@
+         local i_prev = i - 1
+         local s_i, s_ip = s[i], s[i_prev]
+         local rev_seq_cost = seq[3 * (((i) * n1 + (i + 1))) + 1]
++        local s_j_prev = s[i + 1]
+ 
+         for j = i + 2, dimen - 1 do
+             local j_next = j + 1
++            local s_j = s[j]
+ 
+-            rev_seq_cost = rev_seq_cost + cost[s[j - 1]][s[j]] * (seq[3 * (((i) * n1 + (j))) + 3] - 1.0)
++            rev_seq_cost = rev_seq_cost + cost[s_j_prev][s_j] * (seq[3 * (((i) * n1 + (j))) + 3] - 1.0)
+ 
+-            local cost_concat_1 = seq[3 * (((0) * n1 + (i_prev))) + 1] + cost[s[j]][s_ip]
++            local cost_concat_1 = seq[3 * (((0) * n1 + (i_prev))) + 1] + cost[s_j][s_ip]
+             local cost_concat_2 = cost_concat_1 + seq[3 * (((i) * n1 + (j))) + 1] + cost[s[j_next]][s_i]
+ 
+             local cost_new = seq[3 * (((0) * n1 + (i_prev))) + 2]
+@@ -278,6 +285,7 @@
+                 I = i
+                 J = j
+             end
++            s_j_prev = s_j
+         end
+     end
+ 

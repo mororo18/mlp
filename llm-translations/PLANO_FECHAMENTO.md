@@ -472,9 +472,25 @@ Fases como no `PLANO.md`:
   (`ours_lua.zero_based_index`): os índices sem os `- 1`, com o
   deslocamento somado nas posições (`T0 = T - 3*(dimen+1) - 3`, idem
   `C0`, `W0`). Local (Lua 5.3, berlin52, núcleo 2): nossa 33,4 s, LZ1
-  28,2 s, `lua_all_hoist` 28,4 s, custos ok. Diagnóstico no servidor
-  (Lua 5.4, núcleo 14, `diag/lua-20261125/`) e rodada B8 do protocolo
-  (nossa, `lua_all_hoist` e LZ1, 3 instâncias) depois da B7.
+  28,2 s, `lua_all_hoist` 28,4 s, custos ok.
+  - **Diagnóstico no servidor (2026-11-25, `diag/lua-20261125/`).**
+    Ambiente nix das rodadas, container no núcleo 14 (a B7 ocupava 8 a
+    11), execuções alternadas, custos ok. O `lua` do ambiente é o
+    **5.2.4** (ver Problemas). Medianas, berlin52 (5 execuções) e kroA100
+    (1 a 2): nossa 17,36 e 214,2 s; LZ1 13,91 e 172,6 s;
+    `lua_all_hoist` 14,94 e 183,5 s. Razões `lua_all_hoist`/nossa 0,861
+    e 0,857 (a B6 deu 0,858 a 0,861); LZ1/nossa 0,801 e 0,806;
+    `lua_all_hoist`/LZ1 1,074 e 1,063: com LZ1 a nossa passa a ser mais
+    rápida. Diferenças que sobram, no código: a tradução lê `s[j]` duas
+    vezes no swap e no 2-opt, relê `s[j - 1]` no 2-opt e, na atualização
+    das subsequências, relê do `seq` os valores da posição anterior; a
+    nossa leva tudo em locais. Variante L5 (`cpp_lua.lua_all_hoist_carry`,
+    `cpp_lua/carry_locals.patch`, sobre a L4): L5/LZ1 0,982 (berlin52) e
+    0,968 (kroA100), cerca de −2,5%, na borda.
+  - **Rodada B8** (disparada pela sessão local depois da B7, `b8.bundle`):
+    `b8-lua-20261125`, 3 instâncias interpretadas, nossa Lua,
+    `cpp_lua.lua_all_hoist`, `cpp_lua.lua_all_hoist_carry` e
+    `ours_lua.zero_based_index`.
 - **B5. Tabela:** linhas da Tabela 13 (`tables.py` passa a gerar também a
   tabela de fechamento) e saída dos asteriscos das Tabelas 8 a 12.
 
@@ -600,3 +616,12 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   o acompanhamento das rodadas usa o master aberto. Antes de toda rodada,
   `git checkout -- c/solve` (o lote compilado recompila o binário
   versionado e o `run.sh` recusa a rodada seguinte).
+
+- **Versão do Lua (2026-11-25).** O `lua` do `flake.nix` é o Lua **5.2.4**
+  (`lua -v` dentro do ambiente nix das rodadas, diagnóstico de
+  `diag/lua-20261125/`), não o 5.4 que as notas c, d e f das Tabelas 8, 10
+  e 13 do artigo diziam. Corrigido no artigo para "Lua 5.2". O
+  `versions.txt` das rodadas não registra `lua`, `luajit` nem `pypy3`;
+  acrescentar ao `run.sh` depois da B8 (não mudar o harness com rodadas na
+  fila). Decisão do autor: manter o 5.2 (o que todas as rodadas usaram) ou
+  trocar para `lua5_4` e refazer as rodadas interpretadas do Lua.
