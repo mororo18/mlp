@@ -146,3 +146,4 @@ cpp_lua.luajit_all_hoist_carry,cpp_lua,cpp_lua/measure.patch cpp_lua/run_luajit.
 ours_javascript.concurrent_recompilation,ours/javascript,ours_javascript/concurrent_recompilation.patch,JIT1 (D): node default (concurrent recompilation on) instead of --no-concurrent-recompilation
 ours_java.xbatch,ours/java,ours_java/xbatch.patch,JIT2 (D): java -Xbatch (background compilation off)
 ours_csharp.tiered_off,ours/csharp,ours_csharp/tiered_off.patch,JIT3 (D): TieredCompilation=false in the csproj (every method compiled optimized from the start)
+ours_cplusplus.index_int,ours/cplusplus,ours_cplusplus/index_int.patch,F2C1 (D): to_1D returns int instead of unsigned (signed 32-bit index, as the Fortran->C++ translation uses signed arithmetic)

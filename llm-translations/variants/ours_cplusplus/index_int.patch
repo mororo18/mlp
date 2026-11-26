@@ -1,0 +1,11 @@
+--- a/main.cpp	2026-11-25 22:57:35.059637939 -0300
++++ b/main.cpp	2026-11-25 22:57:35.061637763 -0300
+@@ -58,7 +58,7 @@
+     double cost;
+ } tSolution;
+ 
+-inline unsigned to_1D(int x, int y, int size) {
++inline int to_1D(int x, int y, int size) {
+     int a = x*(size+1) + y;
+ 
+     return a;
