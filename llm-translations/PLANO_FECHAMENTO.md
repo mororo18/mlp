@@ -814,3 +814,15 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   Nenhuma diferença sozinha explica os ~2,6%. Contribuem D8 (~1,2%), o swap
   transplantado (0,5 a 1,5%) e o índice `int` (até 0,9%). Falta medir a
   combinação D8 + swap transplantado + `int`.
+
+- **Fortran → C++, combinações (2026-11-26, `diag/f2c-20261126/static_st4_combinations.txt`).**
+  Mesmo método (binários estáticos do GCC 14, host, núcleo 16, 3 execuções
+  alternadas). Razão ao nosso C++, gr202 / lin318: tradução 0,972 / 0,971;
+  `int` 0,996 / 0,998; D8 0,991 / 0,984; swap transplantado 0,983 / 0,989;
+  D8 + `int` 0,984 / 0,985; D8 + swap 0,979 / 0,974; **D8 + swap + `int`
+  0,974 / 0,974**. Tradução / nosso com as três: **0,998 / 0,996**, dentro de
+  ±2%. D8 (matriz em `struct` com acessor `cost(i, j)`) e a forma do laço do
+  swap da tradução explicam quase toda a diferença; o índice `int` acrescenta
+  pouco. Falta confirmar com uma rodada do protocolo (Nix, GCC 15, 4
+  instâncias, 10 execuções) antes de mudar a Tabela 13 (o par passaria a
+  "Both programs", sem a exceção da nota g).
