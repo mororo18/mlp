@@ -748,3 +748,15 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   4 e 6 e os mapas de calor (rodada de 17/11, sem registro de versões).
   Monografia: Tabela 2 na Seção 3.2. O `run.sh` ainda não grava lua,
   luajit, pypy3 nem dotnet no `versions.txt`.
+
+- **Rodada B10, opções de JIT (2026-11-25, pedido do autor).** Para a
+  subseção nova da compilação JIT (monografia 2.4.2, artigo 4.2): só as
+  nossas implementações, padrão × opção, em instâncias pequenas, médias e
+  grandes (`instances_jit.txt`: berlin52, kroA100, gr202, pr299, lin318 e
+  pr439), 3 execuções (`REPS=3`). JavaScript: nossa (com
+  `--no-concurrent-recompilation`) × `ours_javascript.concurrent_recompilation`
+  (padrão do Node). Java: nossa × `ours_java.xbatch` (`-Xbatch`, nunca testado
+  antes). C#: nossa × `ours_csharp.tiered_off` (`TieredCompilation=false`) ×
+  `ours_csharp.quickjit_loops_off`. PyPy, LuaJIT e Julia ficam de fora: não
+  têm compilação em segundo plano nem camadas para desligar. Commit `f9f002b`,
+  `runs/b10-jit-20261125`, disparada às 21h50.
