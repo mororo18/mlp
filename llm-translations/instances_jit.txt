@@ -1,0 +1,6 @@
+berlin52.tsp
+kroA100.tsp
+gr202.tsp
+pr299.tsp
+lin318.tsp
+pr439.tsp

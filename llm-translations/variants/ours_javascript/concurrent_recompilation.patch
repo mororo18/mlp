@@ -1,0 +1,6 @@
+--- a/run_node.sh	2026-11-25 21:35:44.404535264 -0300
++++ b/run_node.sh	2026-11-25 21:35:44.405095013 -0300
+@@ -1,2 +1,2 @@
+ #! /usr/bin/bash
+-node --no-concurrent-recompilation main.js "$@"
++node main.js "$@"
