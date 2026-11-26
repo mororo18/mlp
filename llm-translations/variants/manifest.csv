@@ -147,3 +147,5 @@ ours_javascript.concurrent_recompilation,ours/javascript,ours_javascript/concurr
 ours_java.xbatch,ours/java,ours_java/xbatch.patch,JIT2 (D): java -Xbatch (background compilation off)
 ours_csharp.tiered_off,ours/csharp,ours_csharp/tiered_off.patch,JIT3 (D): TieredCompilation=false in the csproj (every method compiled optimized from the start)
 ours_cplusplus.index_int,ours/cplusplus,ours_cplusplus/index_int.patch,F2C1 (D): to_1D returns int instead of unsigned (signed 32-bit index, as the Fortran->C++ translation uses signed arithmetic)
+ours_cplusplus.d8_swap,ours/cplusplus,ours_cplusplus/d8_swap.patch,F2C2 (D): distance matrix in a struct with an accessor cost(i j) and the swap search of the Fortran->C++ translation (1-based loops and size_t indices)
+ours_cplusplus.d8_swap_int,ours/cplusplus,ours_cplusplus/d8_swap_int.patch,F2C3 (D): F2C2 plus to_1D returning int
