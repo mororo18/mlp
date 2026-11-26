@@ -826,3 +826,14 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   pouco. Falta confirmar com uma rodada do protocolo (Nix, GCC 15, 4
   instâncias, 10 execuções) antes de mudar a Tabela 13 (o par passaria a
   "Both programs", sem a exceção da nota g).
+
+- **B12, protocolo (2026-11-26, `runs/b12-f2c-20261126`, commit `11df9e2`).**
+  Nix, GCC 15, 4 instâncias, 10 execuções, custo ok, CV máximo 1,0%, carga
+  máxima 4,4. Razão ao nosso C++ (berlin52, kroA100, gr202, lin318): tradução
+  −2,4% (0,981, 0,978, 0,971, 0,974); `ours_cplusplus.d8_swap` −1,6%;
+  `ours_cplusplus.d8_swap_int` −2,3%. Tradução / nosso com D8 + swap **−0,8%**
+  (−1,0 sem berlin52); / nosso com D8 + swap + `int` **−0,1%** (−0,5 sem
+  berlin52). **O Fortran → C++ fecha pela regra**, com as escolhas da tradução
+  no nosso C++: matriz de distâncias numa `struct` com acessor, a forma do
+  laço do swap da tradução e o índice `int`. Para o artigo (só com o pedido
+  do autor): o par passa ao grupo "Both programs" e a nota g sai.
