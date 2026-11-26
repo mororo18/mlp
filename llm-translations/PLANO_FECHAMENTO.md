@@ -778,3 +778,39 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   4 instâncias, 10 execuções): nosso C++, as duas variantes e a tradução.
   Atenção: o controle antigo (factors-20261121) dizia que o índice de 64 bits
   não muda o nosso C++; a B11 decide.
+
+- **Fortran → C++, diferenças testadas (2026-11-25/26, `diag/f2c-20261126/`).**
+  B11 (protocolo, GCC 15, 4 instâncias, 10 execuções): tradução / nosso C++
+  −3,2%; nosso com índice `int` −1,6% (quase tudo na berlin52), com índice de
+  64 bits −0,9%; tradução / nosso com `int` −1,7%, / nosso com 64 bits −2,3%.
+  Caminho de busca: os dois programas aceitam os mesmos movimentos em todas as
+  buscas (contagem por busca idêntica no kroA100 e no gr202). Sem `perf` no
+  servidor (`perf_event_paranoid=4`); `valgrind` 3.27 pelo Nix do contêiner.
+  `cachegrind` (GCC 15, kroA100): instruções 12,41 bilhões (nosso), 11,23
+  (`int`), 11,02 (tradução), falhas de cache iguais. Ciclos por busca (rdtsc,
+  lin318): a diferença que sobra com o índice `int` fica no swap (5 a 6%) e no
+  2-opt (3 a 4%). Compilador × processador: binários estáticos do GCC 14 rodando
+  no host do servidor dão a mesma vantagem (tradução 0,971), e no notebook os
+  ciclos empatam: a diferença depende do processador (Xeon Ice Lake), não do
+  compilador. Cada diferença sozinha no nosso C++ (binários estáticos do GCC 14,
+  host, núcleo 16, 3 execuções, razão ao nosso C++ em gr202 / lin318):
+
+  | Diferença | gr202 | lin318 |
+  |---|---|---|
+  | tradução (referência) | 0,974 a 0,978 | 0,972 a 0,974 |
+  | D1 índice `int` | 0,991 | 1,002 |
+  | D1 índice de 64 bits | 0,993 | 1,002 |
+  | D2 subsequências em `std::vector` | 0,999 | 1,000 |
+  | D3 um arquivo de compilação | 0,998 | 1,000 |
+  | D4 sem `alignas` | 0,999 | 1,001 |
+  | D5 laços alinhados (nosso / tradução) | 1,002 / 0,973 | 0,998 / 0,975 |
+  | D6 tolerância `float` no swap | mesmo caminho de busca | |
+  | D7 resultado por referência | 1,003 | 1,002 |
+  | D8 matriz em `struct` com acessor | **0,989** | **0,988** |
+  | D9 swap da tradução transplantado | **0,985** | **0,995** |
+  | D9 2-opt da tradução transplantado | 1,000 | 1,001 |
+  | D9 os dois transplantes | 0,993 | 0,992 |
+
+  Nenhuma diferença sozinha explica os ~2,6%. Contribuem D8 (~1,2%), o swap
+  transplantado (0,5 a 1,5%) e o índice `int` (até 0,9%). Falta medir a
+  combinação D8 + swap transplantado + `int`.
