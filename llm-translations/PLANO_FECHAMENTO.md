@@ -760,3 +760,21 @@ rodada e refazer as células com tempo bimodal por núcleo, como no P21.
   `ours_csharp.quickjit_loops_off`. PyPy, LuaJIT e Julia ficam de fora: não
   têm compilação em segundo plano nem camadas para desligar. Commit `f9f002b`,
   `runs/b10-jit-20261125`, disparada às 21h50.
+
+- **Fortran → C++, investigação do resíduo de −2,6% (2026-11-25).** A
+  tradução com ε e a nossa matriz (`fortran_cpp.epsilon_row_matrix`) fica
+  2,6% mais rápida que o nosso C++ (−3,3 a −1,8 por instância), fora de ±2%;
+  no artigo, fechado como exceção com nota (nota g). Local (GCC 14, gr202,
+  `perf`): mesmos ciclos, mas a tradução executa 9% menos instruções (100,7
+  contra 110,2 bilhões), quase todas na busca de reinserção (58,1 contra
+  66,4). No laço interno, o nosso C++ recalcula dois índices das
+  subsequências a cada iteração (`lea` em 32 bits); a tradução usa ponteiros
+  que só avançam um passo (`add $0x18`). Causa provável: o `to_1D` do nosso
+  C++ devolve `unsigned` de 32 bits, o que impede o compilador de trocar o
+  índice por incremento de ponteiro (a tradução indexa com `size_t`). Com
+  índice de 64 bits (`ours_cplusplus.index64`) ou `int`
+  (`ours_cplusplus.index_int`, novo), o nosso C++ cai para 101,6 e 101,4
+  bilhões de instruções. Rodada B11 no servidor (`b11-f2c-20261125`, GCC 15,
+  4 instâncias, 10 execuções): nosso C++, as duas variantes e a tradução.
+  Atenção: o controle antigo (factors-20261121) dizia que o índice de 64 bits
+  não muda o nosso C++; a B11 decide.
